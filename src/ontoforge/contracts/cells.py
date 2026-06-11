@@ -12,7 +12,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from .temporal import FOREVER, Instant, Interval, Stance
+from .temporal import Interval, Stance
 
 
 @dataclass(frozen=True, slots=True)

@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Optional, Protocol, Sequence
+from typing import Any, Protocol, Sequence
 
 
 class DecisionKind(str, Enum):

@@ -1,0 +1,667 @@
+{
+  "estate": "aviation",
+  "version": 1,
+  "namespace": "onto://gold/aviation",
+  "provenance": "gold://aviation/mini_ontology.json",
+  "generator": {
+    "script": "scripts/build_aviation_fixtures.py",
+    "seed": 42
+  },
+  "classes": [
+    {
+      "name": "Agent",
+      "parents": [],
+      "is_event": false,
+      "definition": "Any legal person able to own or operate aircraft.",
+      "properties": [
+        {
+          "name": "name",
+          "datatype": "string",
+          "synonyms": [
+            "full name",
+            "legal name"
+          ]
+        }
+      ],
+      "shapes": [
+        {
+          "prop": "name",
+          "min_count": 1
+        }
+      ]
+    },
+    {
+      "name": "Organization",
+      "parents": [
+        "Agent"
+      ],
+      "is_event": false,
+      "definition": "A company, school, bank, or government body.",
+      "properties": [
+        {
+          "name": "org_kind",
+          "datatype": "string",
+          "definition": "airline|cargo|regional|charter|school|corporate|trustee|government|heli"
+        }
+      ],
+      "shapes": [
+        {
+          "prop": "org_kind",
+          "in_values": [
+            "airline",
+            "cargo",
+            "regional",
+            "charter",
+            "school",
+            "corporate",
+            "trustee",
+            "government",
+            "heli"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Person",
+      "parents": [
+        "Agent"
+      ],
+      "is_event": false,
+      "definition": "A natural person (individual registrant, crew, mechanic).",
+      "properties": [],
+      "shapes": []
+    },
+    {
+      "name": "Manufacturer",
+      "parents": [
+        "Organization"
+      ],
+      "is_event": false,
+      "definition": "An airframe or engine maker. The FAA registry spells the same maker multiple ways (e.g. ROCKWELL INTERNATIONAL CORP vs ROCKWELL INTL).",
+      "properties": [
+        {
+          "name": "name_variants",
+          "datatype": "string",
+          "cardinality": "many",
+          "definition": "observed registry spellings"
+        }
+      ],
+      "shapes": []
+    },
+    {
+      "name": "Operator",
+      "parents": [
+        "Organization"
+      ],
+      "is_event": false,
+      "definition": "An organization that operates or holds the registration of aircraft.",
+      "properties": [],
+      "shapes": []
+    },
+    {
+      "name": "Mechanic",
+      "parents": [
+        "Person"
+      ],
+      "is_event": false,
+      "definition": "A certificated maintenance technician identified by ERP id.",
+      "properties": [
+        {
+          "name": "mechanic_id",
+          "datatype": "string",
+          "functional": true
+        }
+      ],
+      "shapes": [
+        {
+          "prop": "mechanic_id",
+          "min_count": 1,
+          "max_count": 1,
+          "pattern": "^M-[0-9]{3}$"
+        }
+      ]
+    },
+    {
+      "name": "Aircraft",
+      "parents": [],
+      "is_event": false,
+      "definition": "A physical airframe. Identity anchors on serial number + model; tail numbers are reused over time and are NOT identity.",
+      "properties": [
+        {
+          "name": "serial_number",
+          "datatype": "string",
+          "functional": true
+        },
+        {
+          "name": "tail_number",
+          "datatype": "string",
+          "synonyms": [
+            "n-number",
+            "registration number"
+          ]
+        },
+        {
+          "name": "year_mfr",
+          "datatype": "integer"
+        },
+        {
+          "name": "mode_s_code",
+          "datatype": "string"
+        },
+        {
+          "name": "model",
+          "is_link": true,
+          "range": "AircraftModel",
+          "cardinality": "one"
+        },
+        {
+          "name": "engine",
+          "is_link": true,
+          "range": "Engine"
+        },
+        {
+          "name": "registrant",
+          "is_link": true,
+          "range": "Agent"
+        }
+      ],
+      "shapes": [
+        {
+          "prop": "serial_number",
+          "min_count": 1,
+          "max_count": 1
+        },
+        {
+          "prop": "tail_number",
+          "pattern": "^N[1-9][0-9A-Z]*$"
+        },
+        {
+          "prop": "year_mfr",
+          "min_value": 1903,
+          "max_value": 2026
+        }
+      ]
+    },
+    {
+      "name": "AircraftModel",
+      "parents": [],
+      "is_event": false,
+      "definition": "A type design (manufacturer + model designation), per FAA ACFTREF.",
+      "properties": [
+        {
+          "name": "model_name",
+          "datatype": "string",
+          "synonyms": [
+            "model",
+            "type designation"
+          ]
+        },
+        {
+          "name": "mfr_mdl_code",
+          "datatype": "string",
+          "functional": true
+        },
+        {
+          "name": "manufacturer",
+          "is_link": true,
+          "range": "Manufacturer"
+        },
+        {
+          "name": "seats",
+          "datatype": "integer",
+          "dimension": {
+            "count": 1
+          }
+        },
+        {
+          "name": "engine_count",
+          "datatype": "integer",
+          "dimension": {
+            "count": 1
+          }
+        },
+        {
+          "name": "weight_class",
+          "datatype": "string"
+        },
+        {
+          "name": "cruise_speed",
+          "datatype": "float",
+          "dimension": {
+            "m": 1,
+            "s": -1
+          },
+          "unit": "mph",
+          "definition": "ACFTREF average cruising speed; 0 when not published"
+        },
+        {
+          "name": "type_aircraft",
+          "datatype": "string"
+        }
+      ],
+      "shapes": [
+        {
+          "prop": "mfr_mdl_code",
+          "min_count": 1,
+          "max_count": 1,
+          "pattern": "^[0-9]{7}$"
+        },
+        {
+          "prop": "engine_count",
+          "min_value": 0,
+          "max_value": 8
+        },
+        {
+          "prop": "type_aircraft",
+          "in_values": [
+            "4",
+            "5",
+            "6"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Engine",
+      "parents": [],
+      "is_event": false,
+      "definition": "An engine type (ENG MFR MDL code in the registry).",
+      "properties": [
+        {
+          "name": "eng_mfr_mdl",
+          "datatype": "string",
+          "functional": true
+        },
+        {
+          "name": "engine_model",
+          "datatype": "string"
+        },
+        {
+          "name": "manufacturer",
+          "is_link": true,
+          "range": "Manufacturer"
+        },
+        {
+          "name": "engine_type",
+          "datatype": "string",
+          "definition": "FAA TYPE ENGINE code: 1 recip, 2 turboprop, 3 turboshaft, 5 turbofan"
+        }
+      ],
+      "shapes": [
+        {
+          "prop": "engine_type",
+          "in_values": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Component",
+      "parents": [],
+      "is_event": false,
+      "definition": "A maintainable aircraft component, addressed by ATA chapter.",
+      "properties": [
+        {
+          "name": "component_name",
+          "datatype": "string"
+        },
+        {
+          "name": "ata_chapter",
+          "datatype": "string"
+        }
+      ],
+      "shapes": [
+        {
+          "prop": "ata_chapter",
+          "pattern": "^[0-9]{2}$"
+        }
+      ]
+    },
+    {
+      "name": "Place",
+      "parents": [],
+      "is_event": false,
+      "definition": "A named location in the US.",
+      "properties": [
+        {
+          "name": "place_name",
+          "datatype": "string"
+        },
+        {
+          "name": "city",
+          "datatype": "string"
+        },
+        {
+          "name": "state",
+          "datatype": "string"
+        }
+      ],
+      "shapes": [
+        {
+          "prop": "state",
+          "pattern": "^[A-Z]{2}$"
+        }
+      ]
+    },
+    {
+      "name": "Airport",
+      "parents": [
+        "Place"
+      ],
+      "is_event": false,
+      "definition": "An airport with an IATA code (OpenFlights-seeded).",
+      "properties": [
+        {
+          "name": "iata",
+          "datatype": "string",
+          "functional": true
+        }
+      ],
+      "shapes": [
+        {
+          "prop": "iata",
+          "min_count": 1,
+          "max_count": 1,
+          "pattern": "^[A-Z]{3}$"
+        }
+      ]
+    },
+    {
+      "name": "Registration",
+      "parents": [],
+      "is_event": true,
+      "definition": "The bi-temporal binding of a tail number to an airframe and a registrant. Carries the validity window that resolves N-number reuse.",
+      "properties": [
+        {
+          "name": "aircraft",
+          "is_link": true,
+          "range": "Aircraft"
+        },
+        {
+          "name": "registrant_party",
+          "is_link": true,
+          "range": "Agent"
+        },
+        {
+          "name": "cert_issue_date",
+          "datatype": "date"
+        },
+        {
+          "name": "expiration_date",
+          "datatype": "date"
+        },
+        {
+          "name": "last_action_date",
+          "datatype": "date"
+        },
+        {
+          "name": "status_code",
+          "datatype": "string"
+        }
+      ],
+      "shapes": [
+        {
+          "prop": "status_code",
+          "in_values": [
+            "V",
+            "D"
+          ]
+        },
+        {
+          "prop": "cert_issue_date",
+          "min_count": 1
+        }
+      ]
+    },
+    {
+      "name": "SafetyEvent",
+      "parents": [],
+      "is_event": true,
+      "definition": "Any reported aviation safety occurrence.",
+      "properties": [
+        {
+          "name": "event_date",
+          "datatype": "date"
+        },
+        {
+          "name": "aircraft",
+          "is_link": true,
+          "range": "Aircraft"
+        },
+        {
+          "name": "operator",
+          "is_link": true,
+          "range": "Operator"
+        },
+        {
+          "name": "place",
+          "is_link": true,
+          "range": "Place"
+        }
+      ],
+      "shapes": [
+        {
+          "prop": "event_date",
+          "min_count": 1
+        }
+      ]
+    },
+    {
+      "name": "IncidentReport",
+      "parents": [
+        "SafetyEvent"
+      ],
+      "is_event": true,
+      "definition": "A voluntary ASRS incident report (de-identified, self-reported).",
+      "properties": [
+        {
+          "name": "acn",
+          "datatype": "string",
+          "functional": true
+        },
+        {
+          "name": "altitude_agl",
+          "datatype": "float",
+          "dimension": {
+            "m": 1
+          },
+          "unit": "ft",
+          "definition": "altitude above ground; a wart slice is recorded in meters with an 'm' suffix and must be converted"
+        },
+        {
+          "name": "flight_phase",
+          "datatype": "string"
+        },
+        {
+          "name": "narrative",
+          "datatype": "text"
+        },
+        {
+          "name": "synopsis",
+          "datatype": "text"
+        }
+      ],
+      "shapes": [
+        {
+          "prop": "acn",
+          "min_count": 1,
+          "max_count": 1
+        },
+        {
+          "prop": "altitude_agl",
+          "min_value": 0,
+          "max_value": 60000,
+          "unit": "ft"
+        },
+        {
+          "prop": "flight_phase",
+          "in_values": [
+            "Takeoff",
+            "Initial Climb",
+            "Climb",
+            "Cruise",
+            "Descent",
+            "Initial Approach",
+            "Final Approach",
+            "Landing",
+            "Taxi"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AccidentEvent",
+      "parents": [
+        "SafetyEvent"
+      ],
+      "is_event": true,
+      "definition": "An NTSB-investigated accident or incident.",
+      "properties": [
+        {
+          "name": "ntsb_number",
+          "datatype": "string",
+          "functional": true
+        },
+        {
+          "name": "ev_type",
+          "datatype": "string"
+        },
+        {
+          "name": "damage",
+          "datatype": "string"
+        },
+        {
+          "name": "fatalities",
+          "datatype": "integer",
+          "dimension": {
+            "count": 1
+          }
+        },
+        {
+          "name": "cause_narrative",
+          "datatype": "text"
+        }
+      ],
+      "shapes": [
+        {
+          "prop": "ev_type",
+          "in_values": [
+            "ACC",
+            "INC"
+          ]
+        },
+        {
+          "prop": "damage",
+          "in_values": [
+            "DEST",
+            "SUBS",
+            "MINR",
+            "NONE"
+          ]
+        },
+        {
+          "prop": "fatalities",
+          "min_value": 0
+        }
+      ]
+    },
+    {
+      "name": "WorkOrder",
+      "parents": [],
+      "is_event": true,
+      "definition": "A maintenance ERP work order on an airframe.",
+      "properties": [
+        {
+          "name": "work_order_id",
+          "datatype": "string",
+          "functional": true
+        },
+        {
+          "name": "aircraft",
+          "is_link": true,
+          "range": "Aircraft"
+        },
+        {
+          "name": "component",
+          "is_link": true,
+          "range": "Component"
+        },
+        {
+          "name": "mechanic",
+          "is_link": true,
+          "range": "Mechanic"
+        },
+        {
+          "name": "operator",
+          "is_link": true,
+          "range": "Operator"
+        },
+        {
+          "name": "action",
+          "datatype": "string"
+        },
+        {
+          "name": "labor_hours",
+          "datatype": "float",
+          "dimension": {
+            "s": 1
+          },
+          "unit": "h"
+        },
+        {
+          "name": "cost",
+          "datatype": "float",
+          "dimension": {
+            "currency": 1
+          },
+          "unit": "USD",
+          "definition": "lexical forms mix 'USD 1,234.56' and '1234.56' (ANVIL bait)"
+        },
+        {
+          "name": "open_date",
+          "datatype": "date"
+        },
+        {
+          "name": "close_date",
+          "datatype": "date"
+        }
+      ],
+      "shapes": [
+        {
+          "prop": "work_order_id",
+          "min_count": 1,
+          "max_count": 1,
+          "pattern": "^WO-[0-9]{6}$"
+        },
+        {
+          "prop": "action",
+          "in_values": [
+            "INSPECTED",
+            "REPLACED",
+            "REPAIRED",
+            "OVERHAULED",
+            "ADJUSTED",
+            "TESTED"
+          ]
+        },
+        {
+          "prop": "labor_hours",
+          "min_value": 0,
+          "max_value": 2000,
+          "unit": "h"
+        },
+        {
+          "prop": "cost",
+          "min_value": 0,
+          "unit": "USD"
+        }
+      ]
+    }
+  ]
+}

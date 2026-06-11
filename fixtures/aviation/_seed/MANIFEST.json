@@ -1,0 +1,20 @@
+{
+  "retrieved_utc": "2026-06-11",
+  "sources": {
+    "airports.dat": {
+      "url": "https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat",
+      "sha256": "9387cdb38df5bd664da823f8ccb69fdd9b33a1888f5b7cca09c34a3cd9ff59f9",
+      "bytes": 1127225
+    },
+    "planes.dat": {
+      "url": "https://raw.githubusercontent.com/jpatokal/openflights/master/data/planes.dat",
+      "sha256": "04ba419335a6ff1fd0e0383d0454ff5162b9e39fc76c0a02271b5fc57483d3ce",
+      "bytes": 8331
+    }
+  },
+  "trimmed": {
+    "airports_us.csv": 1251,
+    "planes.csv": 246
+  },
+  "notes": "OpenFlights downloads succeeded and are pinned here (trimmed). registry.faa.gov returns HTTP 403 to non-browser clients; the NTSB bulk avall.zip is a ~95MB Access database \u2014 both replaced by AMD-0006 schema-faithful generation."
+}

@@ -11,9 +11,9 @@ permuted input yields identical URIs (M4 acceptance test).
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Iterator, Optional
+from typing import Iterator, Optional
 
 from .units import Dimension
 

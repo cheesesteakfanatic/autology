@@ -51,6 +51,10 @@ filterwarnings = ["ignore::DeprecationWarning"]
 line-length = 110
 target-version = "py312"
 
+[tool.ruff.lint.per-file-ignores]
+# contracts/__init__.py is a pure re-export hub; F401 is expected there.
+"src/ontoforge/contracts/__init__.py" = ["F401"]
+
 [tool.mypy]
 python_version = "3.12"
 ignore_missing_imports = true
