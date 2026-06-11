@@ -61,3 +61,22 @@ affected modules, justification referencing acceptance tests, and migration note
 - **GIVEN** §11.3 marks M13/M15/M16 off-path, **THEN** they are deferred from this pass except a
   minimal VISTA (metric layer → ranked Vega-Lite specs). The label-lattice valuation hooks exist in the
   provenance API (valuations are pluggable) but no policy engine ships in v0.
+
+## AMD-0008 — MODIFY §4.2/§11.1 HEARTH substrate: plain Parquet + DuckDB views in v0 (Iceberg deferred)
+
+- **GIVEN** §4.2 specifies Iceberg tables for the canonical RAW/CONFORMED/ENTITY layers (and §11.1
+  lists Apache Iceberg as the open table format), **WHEN** building M6 at AMD-0001 fixture scale with
+  no Iceberg runtime in the approved dependency set, **THEN** the canonical layer is plain Parquet
+  shards queried via DuckDB views, with atomic whole-shard rewrites (temp file + `os.replace`) standing
+  in for Iceberg atomic commits.
+- **Affected:** M6 (HEARTH) layout and commit path; M14 (AMBER) data layer ships the same Parquet
+  schemas. Snapshot/time-travel capability is preserved *logically* by the bi-temporal columns
+  themselves (every historical state reconstructs from the cells); the open-format constraint (P) is
+  satisfied directly — `export_canonical` ships the very schema the store runs on
+  (`tests/m6/test_portability.py`: cell-set equality, hash idempotence, tamper detection).
+- **Justification:** at 10^4–10^5 cells a single atomic rewrite is simpler and safer than
+  delta-file + compaction machinery; append-only is enforced as a *logical* invariant
+  (property-tested I2) rather than a physical-file one. See `src/ontoforge/hearth/README.md`.
+- **Migration note:** Iceberg re-enters with the Rust core (AMD-0001 migration); the cell schema and
+  survivorship ordering are substrate-independent, so the swap is a storage-layer replacement behind
+  the same `Hearth` API.
