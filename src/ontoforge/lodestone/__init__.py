@@ -1,0 +1,248 @@
+"""M12 — LODESTONE: Ontology-Grounded Query Planning over OQIR (§6.2).
+
+Public entry point:
+
+    ask(question, ontology, hearth, ledger, spine) -> contracts.Answer
+
+or the stateful `Lodestone` engine (which additionally supports answering the
+one clarification question LODESTONE may pose).
+"""
+
+from __future__ import annotations
+
+import hashlib
+from typing import Optional
+
+from ontoforge.contracts import (
+    Answer,
+    DecisionKind,
+    DecisionRequest,
+    ModelClient,
+    TierScore,
+)
+from ontoforge.contracts.ontology import Ontology
+from ontoforge.ledger.models import HeuristicAdapter
+
+from .candidates import GENERATE_TASK, CandidateSet, generate_candidates, make_generate_handler
+from .citations import assemble_citations
+from .clarify import Clarification, resolve_choice, structural_diff
+from .execute import EmptyResult, ExecOutcome, execute_candidate
+from .grounding import ValueIndex, build_value_index, ground
+from .model import Candidate
+from .typecheck import typecheck, infer, unit_convertible  # re-export
+
+__all__ = [
+    "Lodestone",
+    "ask",
+    "typecheck",
+    "infer",
+    "unit_convertible",
+    "ground",
+    "build_value_index",
+    "generate_candidates",
+    "make_generate_handler",
+    "GENERATE_TASK",
+]
+
+MIN_COVERAGE = 0.6          # strong-grounding floor below which we abstain
+CONFORMAL_MARGIN = 0.90     # Γ = candidates within this score ratio of the top
+SHARPEN = 4                 # score -> pseudo-probability exponent (uncalibrated)
+ABSTAIN_ID = "__abstain__"
+
+
+class Lodestone:
+    """One engine per (ontology, hearth, ledger, spine) world."""
+
+    def __init__(
+        self,
+        ontology: Ontology,
+        hearth,
+        ledger,
+        spine,
+        model_client: Optional[ModelClient] = None,
+    ) -> None:
+        self.onto = ontology
+        self.hearth = hearth
+        self.ledger = ledger
+        self.spine = spine
+        self.client: ModelClient = model_client or HeuristicAdapter(
+            {GENERATE_TASK: make_generate_handler(ontology)}
+        )
+        self._value_index: Optional[ValueIndex] = None
+        self._pending: Optional[tuple[str, Clarification, float]] = None
+        if hasattr(spine, "register_rule"):
+            spine.register_rule(DecisionKind.QI, _qi_rule)
+
+    # ------------------------------------------------------------ plumbing
+
+    @property
+    def value_index(self) -> ValueIndex:
+        if self._value_index is None:
+            self._value_index = build_value_index(self.hearth, self.onto)
+        return self._value_index
+
+    def refresh_value_index(self) -> None:
+        self._value_index = None
+
+    # ------------------------------------------------------------- asking
+
+    def ask(self, question: str) -> Answer:
+        self._pending = None
+        g = ground(question, self.onto, self.value_index)
+
+        if g.coverage < MIN_COVERAGE:
+            missing = ", ".join(g.unconsumed[:8])
+            return _abstain(
+                f"insufficient grounding (coverage {g.coverage:.2f} < {MIN_COVERAGE}): "
+                f"could not ground: {missing}"
+            )
+
+        cs: CandidateSet = generate_candidates(question, g, self.onto, self.client)
+        if not cs.candidates:
+            if cs.type_errors:
+                msgs = "; ".join(sorted({e.message for e in cs.type_errors}))
+                return _abstain(f"rejected by the OQIR type checker: {msgs}")
+            return _abstain("no well-typed interpretation could be constructed")
+
+        # ---- DecisionKind.QI through the spine
+        decision = self.spine.decide(_qi_request(question, cs.candidates, g.coverage))
+        confidence = round(decision.confidence * g.coverage, 4)
+
+        # ---- conformal-style set over candidate scores
+        top = cs.candidates[0]
+        gamma = [c for c in cs.candidates if c.score >= CONFORMAL_MARGIN * top.score]
+        if decision.outcome == ABSTAIN_ID and len(gamma) == 1:
+            return _abstain(
+                f"interpretation score too weak (grounding coverage {g.coverage:.2f})"
+            )
+
+        # ---- execution-guided re-ranking (§6.2): members of Γ whose plan is
+        # empty even after repair are not viable readings and leave the set
+        if len(gamma) > 1:
+            executed: dict[str, ExecOutcome] = {}
+            viable: list[Candidate] = []
+            for c in gamma:
+                out = execute_candidate(c, self.onto, self.hearth)
+                if isinstance(out, ExecOutcome):
+                    executed[c.cand_id] = out
+                    viable.append(c)
+            distinct_results = {
+                (tuple(executed[c.cand_id].columns),
+                 tuple(tuple(str(v) for v in r) for r in executed[c.cand_id].rows))
+                for c in viable
+            }
+            if len(viable) > 1 and len(distinct_results) > 1:
+                # candidates whose answers AGREE need no clarification — the
+                # minimal-entropy question over an agreeing set is vacuous
+                clar = structural_diff(viable, self.onto)
+                if clar is not None:
+                    self._pending = (question, clar, g.coverage)
+                    a = Answer(confidence=confidence)
+                    a.clarification = clar.question
+                    a.clarification_options = clar.options
+                    return a
+            if viable:
+                # re-rank Γ after execution filtering: the decision is re-posed
+                # over the surviving interpretations only (§6.2 repair re-ranks)
+                redecision = self.spine.decide(
+                    _qi_request(question + " #viable", viable, g.coverage)
+                )
+                confidence = round(redecision.confidence * g.coverage, 4)
+                return self._answer(viable[0], executed[viable[0].cand_id], confidence)
+            # whole Γ empty: fall through to the remaining candidates
+
+        # ---- execute with repair; execution-guided re-ranking on failure
+        return self._execute_ranked(cs.candidates, confidence)
+
+    def answer_clarification(self, choice) -> Answer:
+        """Answer the pending clarification; re-ranks Γ to a singleton."""
+        if self._pending is None:
+            return _abstain("no clarification is pending")
+        question, clar, coverage = self._pending
+        cand = resolve_choice(clar, choice)
+        if cand is None:
+            return _abstain(f"clarification answer {choice!r} matches no offered option")
+        self._pending = None
+        confidence = round(min(0.98, 0.9 + 0.08 * coverage), 4)  # post-clarification singleton
+        return self._execute_ranked([cand], confidence)
+
+    # ------------------------------------------------------------ internal
+
+    def _execute_ranked(self, cands: list[Candidate], confidence: float) -> Answer:
+        first_failure: Optional[EmptyResult] = None
+        for cand in cands:
+            out = execute_candidate(cand, self.onto, self.hearth)
+            if isinstance(out, EmptyResult):
+                first_failure = first_failure or out
+                continue
+            return self._answer(cand, out, confidence)
+        assert first_failure is not None
+        return _abstain(
+            "no data after execution-guided repair; failed at: " + first_failure.leaf
+        )
+
+    def _answer(self, cand: Candidate, out: ExecOutcome, confidence: float) -> Answer:
+        a = Answer(
+            columns=list(out.columns),
+            rows=[list(r) for r in out.rows],
+            confidence=confidence,
+            oqir=cand.term,
+        )
+        a.citations = assemble_citations(out.rows, out.cell_provs, out.columns, self.ledger)
+        return a
+
+
+def _abstain(reason: str) -> Answer:
+    return Answer(abstained=True, abstain_reason=reason, confidence=0.0)
+
+
+def _qi_request(question: str, cands: list[Candidate], coverage: float) -> DecisionRequest:
+    qid = hashlib.sha256(question.encode()).hexdigest()[:16]
+    abstain_score = max(0.25, 1.05 - coverage)
+    features = tuple(
+        [(c.cand_id, round(c.score**SHARPEN, 8)) for c in cands]
+        + [(ABSTAIN_ID, round(abstain_score**SHARPEN, 8))]
+    )
+    return DecisionRequest(
+        kind=DecisionKind.QI,
+        decision_id=f"qi-{qid}",
+        candidates=tuple(c.cand_id for c in cands) + (ABSTAIN_ID,),
+        features=features,
+        context=(("question", question),),
+        impact=1.0,
+    )
+
+
+def _qi_rule(req: DecisionRequest):
+    """T0 rule for QI: candidate scores arrive as features named per candidate
+    (deterministic; the spine normalizes and applies the selective rule)."""
+    fmap = dict(req.features)
+    if not any(c in fmap for c in req.candidates):
+        return None
+    return TierScore(scores={c: max(float(fmap.get(c, 0.0)), 0.0) for c in req.candidates})
+
+
+def ask(
+    question: str,
+    ontology: Ontology,
+    hearth=None,
+    ledger=None,
+    spine=None,
+    *,
+    model_client=None,
+) -> Answer:
+    """Single-shot entry point (§11.2 M12 interface).
+
+    Degrades to an abstention (never an exception) when no HEARTH/ledger/spine
+    world is attached — callers like the CLI render the abstention reason."""
+    if hearth is None or ledger is None:
+        return _abstain(
+            "no entity store attached: LODESTONE answers over a HEARTH + ledger world "
+            "(materialize the estate first)"
+        )
+    if spine is None:
+        from ontoforge.contracts import SpineProfile
+        from ontoforge.spine import DecisionSpine
+
+        spine = DecisionSpine(SpineProfile(), model_client=None)
+    return Lodestone(ontology, hearth, ledger, spine, model_client=model_client).ask(question)
