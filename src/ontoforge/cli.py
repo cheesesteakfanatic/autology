@@ -676,3 +676,18 @@ def status(project: Path = _PROJECT_OPT) -> None:
 
 if __name__ == "__main__":
     app()
+
+
+@app.command()
+def serve(
+    project: Path = _PROJECT_OPT,
+    host: str = typer.Option("127.0.0.1", help="Bind address."),
+    port: int = typer.Option(8765, help="Port."),
+) -> None:
+    """Run the OntoForge web app (REST API + UI) over a project."""
+    try:
+        from ontoforge.server.app import run_server
+    except Exception as exc:
+        console.print(f"[yellow]server not available: {exc}[/]")
+        raise typer.Exit(code=1)
+    run_server(project, host=host, port=port)
