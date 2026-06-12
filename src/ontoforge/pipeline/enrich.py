@@ -149,6 +149,59 @@ def _annotate_definition(onto: Ontology, class_uri: str, table: str, source_id: 
     onto.replace_class(dataclasses.replace(c, definition=definition))
 
 
+def _add_synonyms(onto: Ontology, owner_uri: str, prop_name: str, extra: list[str]) -> None:
+    c = onto.get(owner_uri)
+    if c is None:
+        return
+    new_props = []
+    changed = False
+    for p in c.properties:
+        if p.name == prop_name:
+            add = tuple(s for s in extra if s not in p.synonyms and s != p.name)
+            if add:
+                p = dataclasses.replace(p, synonyms=p.synonyms + add)
+                changed = True
+        new_props.append(p)
+    if changed:
+        onto.replace_class(dataclasses.replace(c, properties=tuple(new_props)))
+
+
+def _identity_synonyms(
+    onto: Ontology, plans: list[ClassPlan], resolutions: dict[str, "ClassResolution"]
+) -> None:
+    """A resolved identity domain PROVES its member columns name the same
+    identifier; the home class's identity property gains the other members'
+    vocabulary (canonical names + raw column names) as synonyms, so questions
+    phrased in ANY member table's terms ground onto the resolved class."""
+    plan_of = {p.table: p for p in plans if p.kind == "table" and p.table is not None}
+
+    def canonical(t: str, c: str) -> Optional[str]:
+        p = plan_of.get(t)
+        if p is None:
+            return None
+        return next((pn for pn, cols in p.prop_columns.items() if c in cols), None)
+
+    for _, res in sorted(resolutions.items()):
+        home = res.domain.home_column
+        home_plan = plan_of.get(home[0]) if home is not None else None
+        if home is None or home_plan is None:
+            continue
+        home_prop = canonical(*home)
+        if home_prop is None:
+            continue
+        extra: list[str] = []
+        for t, c in res.domain.identity_columns:
+            if (t, c) == home:
+                continue
+            for syn in (canonical(t, c), c):
+                if syn and syn != home_prop and syn not in extra:
+                    extra.append(syn)
+        if extra:
+            owner = _owner_of(onto, home_prop, home_plan.class_uri)
+            if owner is not None:
+                _add_synonyms(onto, owner, home_prop, extra)
+
+
 def enrich_ontology(
     onto: Ontology,
     plans: list[ClassPlan],
@@ -160,10 +213,12 @@ def enrich_ontology(
     specs the materializer must emit link cells for."""
     meta = estate["metadata"]["tables"]
 
-    # (4) grounding surface forms
+    # (4) grounding surface forms: source-table markers, ER-proven identity
+    # vocabulary, then synonym phrase expansion over the union
     for plan in plans:
         if plan.table is not None:
             _annotate_definition(onto, plan.class_uri, plan.table, meta[plan.table]["source_id"])
+    _identity_synonyms(onto, plans, resolutions)
     _expand_synonyms(onto)
 
     # (1) + (2): measure patches and unit annotations, only when every column

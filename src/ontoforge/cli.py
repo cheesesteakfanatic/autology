@@ -859,10 +859,6 @@ def status(project: Path = _PROJECT_OPT) -> None:
     console.print(out)
 
 
-if __name__ == "__main__":
-    app()
-
-
 @app.command()
 def serve(
     project: Path = _PROJECT_OPT,
@@ -876,3 +872,7 @@ def serve(
         console.print(f"[yellow]server not available: {exc}[/]")
         raise typer.Exit(code=1)
     run_server(project, host=host, port=port)
+
+
+if __name__ == "__main__":
+    app()

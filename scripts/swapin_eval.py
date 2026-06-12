@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import tempfile
+from collections import Counter
 from datetime import date
 from pathlib import Path
 from typing import Any, Optional
@@ -39,42 +40,82 @@ TAU_HIGH = SpineProfile().tau_high
 #                     semantic the question needs (e.g. bitemporality, dedup)
 REGRESSIONS: dict[str, dict[str, str]] = {
     "CQ-03": {
-        "category": "semantics gap (temporal identity)",
+        "category": "semantics gap (temporal identity) + latent-class name capture",
         "detail": (
-            "'as of 1987-05-20' needs the registry's bitemporal key reuse "
-            "(same tail, different airframes over time). The generic engine "
-            "materializes one entity per (tail|serial) row with Interval(0) "
-            "validity — the gold world encodes the same way, but the gold "
-            "ontology names LAST ACTION DATE in a property the planner can "
-            "filter on; over the induced world the as-of binding does not "
-            "produce the temporally-correct row."
+            "Registry key reuse: tail N44304 names two airframes over time, and "
+            "'as of 1987-05-20' must pick the one registered THEN. The gold "
+            "world-builder hand-encodes the semantic that CERT ISSUE DATE -> "
+            "EXPIRATION DATE is the registration's valid-time window "
+            "(worldbuild.window()), so as-of execution filters correctly. The "
+            "generic engine has no licensed evidence for that reading and "
+            "commits every cell with Interval(0) validity. Compounding it, "
+            "'registrant' grounds most strongly to the induced latent "
+            "Registrant class (the faa_master REGISTRANT NAME 3NF decomp), and "
+            "the planner's Registrant-target candidates die in the type "
+            "checker ('unknown property n_number on class Registrant') — every "
+            "interpretation is rejected and the engine abstains."
         ),
         "strata_fix": (
-            "Induce valid-time hints: when a candidate carries a date column "
-            "FD-correlated with key reuse (same key, disjoint date ranges), "
-            "emit a temporal-anchor annotation LODESTONE can plan as-of "
-            "filters against."
+            "Induce valid-time anchors: when a table shows identifier reuse "
+            "(same non-key identifier, multiple rows) with a paired "
+            "start/end date column whose ranges are disjoint per identifier, "
+            "emit a temporal-window annotation the materializer turns into "
+            "real valid Intervals and LODESTONE plans as-of filters against."
         ),
     },
     "CQ-04": {
         "category": "semantics gap (temporal identity)",
-        "detail": "Same key-reuse-over-time shape as CQ-03 (serial as of 2024-06-01).",
-        "strata_fix": "Same temporal-anchor induction as CQ-03.",
-    },
-    "CQ-12": {
-        "category": "semantics gap (identity arity)",
         "detail": (
-            "'tail numbers with more than one serial' is a question about the "
-            "registry's composite identity itself. The induced Aircraft class "
-            "keys on the composite (tail|serial) row key; a GROUP BY over a "
-            "single key component with HAVING count>1 needs the planner to "
-            "treat the component as a groupable dimension, which the induced "
-            "shape does not expose as such."
+            "Same key-reuse shape as CQ-03. Here the Master-target reading "
+            "survives (grounding 0.83) but with Interval(0) validity BOTH "
+            "registry rows for N44304 project their serials — the correct "
+            "17238197 plus the superseded 28-1997319 — at confidence 0.21, "
+            "far below tau_high: a low-confidence over-answer, not a "
+            "confidently-wrong one."
+        ),
+        "strata_fix": "Same temporal-window induction as CQ-03.",
+    },
+    "CQ-11": {
+        "category": "missing class (latent operator concept has no extent)",
+        "detail": (
+            "The operator property cluster spans three tables (asrs AIRCRAFT 1 "
+            "OPERATOR, erp OPERATOR_NAME, ntsb OPERATOR), but STRATA admits it "
+            "only on a lattice-intersection class (OperatorDateEvent) with NO "
+            "backing candidate — no plan materializes operator entities, and "
+            "because the columns are non-unique in their tables no alternate-"
+            "identity domain forms, so generic ER never folds the ERP spelling "
+            "variants. 'DELTA AIR LINES INC' then matches two different value "
+            "surfaces (an unfolded operator spelling vs registrant_name) and "
+            "the engine asks its one clarification instead of counting over a "
+            "folded identity. Safe behavior, wrong outcome class."
         ),
         "strata_fix": (
-            "Emit component-key properties of composite-key candidates as "
-            "explicitly enumerable dimensions (the FD evidence already "
-            "distinguishes them)."
+            "Admit shared multi-table name-cluster domains as latent entity "
+            "candidates (extent = distinct values of the cluster), so the "
+            "generic ER cascade folds their spelling variants and counts "
+            "group over the folded entity — the schema evidence (3-table "
+            "property cluster) already exists; only candidate emission is "
+            "missing."
+        ),
+    },
+    "CQ-15": {
+        "category": "grounding miss (abbreviation opacity / property drift)",
+        "detail": (
+            "ntsb INJ_TOT_F induces as 'injury_total_f': STRATA's normalizer "
+            "expands INJ->injury and TOT->total, but the trailing 'F' (fatal) "
+            "is semantically opaque without domain knowledge, so 'fatalities' "
+            "cannot ground onto the measure. The planner falls back to the "
+            "well-typed count-rows reading of 'How many ... across NTSB "
+            "events in AK' = 5 at confidence 0.87 — under tau_high 0.92, so "
+            "the calibrated gate holds, but this is the swap-in's most "
+            "uncomfortable miss: a wrong number delivered with citations."
+        ),
+        "strata_fix": (
+            "LLM-tier property naming at induction: escalate opaque column "
+            "abbreviations through the spine (tier-2) for name/synonym "
+            "proposals grounded in the column's value distribution, recorded "
+            "as ordinary PropertyDef synonyms (the same surface the identity-"
+            "synonym enrichment already uses)."
         ),
     },
 }
@@ -258,12 +299,26 @@ def main() -> None:
         w("")
     w("## Honest summary")
     w("")
-    w(f"The induced world answers {i_ok}/15 vs the gold world's {g_ok}/15. Every miss is an")
-    w("ABSTENTION, never a confidently-wrong answer: the safety property (calibrated")
-    w("abstention + 100% atom-level citations) carries over to the swap-in unchanged.")
-    w("The remaining gap is concentrated in temporal identity (key reuse over time) and")
-    w("composite-key introspection — schema-level induction cannot yet see either; both")
-    w("are instance-level evidence the pipeline could lift into STRATA annotations.")
+    miss = Counter(
+        r["status"] for r in induced if r["q"]["answerable"] and r["status"] != "correct"
+    )
+    miss_txt = ", ".join(f"{n} {s}" for s, n in sorted(miss.items())) or "none"
+    w(f"The induced world answers {i_ok}/15 vs the gold world's {g_ok}/15. Misses: {miss_txt}.")
+    if miss.get("wrong"):
+        worst = max(
+            (r["answer"].confidence for r in induced if r["status"] == "wrong"), default=0.0
+        )
+        w(f"Wrong answers stay BELOW tau_high {TAU_HIGH} (max wrong confidence {worst:.2f}),")
+        w("so the calibrated-abstention safety gate holds, but they are real planner misses")
+        w("— low-confidence fallback readings, not silent hallucinations (see per-question")
+        w("analysis above). 100% atom-level citation coverage carries over unchanged.")
+    else:
+        w("No wrong answers at any confidence: every miss abstains or asks to clarify;")
+        w("100% atom-level citation coverage carries over unchanged.")
+    w("The remaining gap is concentrated in vocabulary opacity (abbreviated source columns")
+    w("the induced names cannot expand), latent concepts STRATA admits only as un-extended")
+    w("lattice intersections (the operator domain), and temporal identity (key reuse over")
+    w("time) — instance-level evidence the pipeline could lift into STRATA annotations.")
     w("")
 
     args.out.write_text("\n".join(lines), encoding="utf-8")

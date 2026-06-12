@@ -2,8 +2,10 @@
 the aviation competency suite over the world materialized from the INDUCED
 ontology by the generic engine — no gold ontology, no hand-built mapping.
 
-HARD GATES for the swap-in path:
-  * >= 8/15 answerable questions fully correct over the induced world;
+HARD GATES for the swap-in path (mission floor 8/15; pinned at the achieved
+10/15 so the identity-synonym enrichment that fixed CQ-07/CQ-12 cannot
+silently regress):
+  * >= 10/15 answerable questions fully correct over the induced world;
   * 100% atom-level citation coverage on every answered cell;
   * 0 confidently-wrong (no wrong answer at confidence >= tau_high);
   * both unanswerable questions abstain;
@@ -103,12 +105,29 @@ def test_world_materialized_from_induced_ontology(induced_world):
     assert any(v["method"] == "exact-variant" for v in stats["er"].values())
 
 
-def test_gate_swapin_8_of_15_answerable_correct(scorecard):
+def test_gate_swapin_10_of_15_answerable_correct(scorecard):
     answerable = [r for r in scorecard if r["q"]["answerable"]]
     correct = [r for r in answerable if r["status"] == "correct"]
     detail = {r["q"]["id"]: r["status"] for r in answerable}
     assert len(answerable) == 15
-    assert len(correct) >= 8, f"{len(correct)}/15 correct over induced world: {detail}"
+    assert len(correct) >= 10, f"{len(correct)}/15 correct over induced world: {detail}"
+
+
+def test_identity_synonyms_propagated_from_variant_domain(induced_world):
+    """The variant resolution PROVES faa N-NUMBER / erp TAIL_NUMBER / ntsb
+    ACFT_REGIST_NMBR share one identity domain; the home identity property
+    must carry the member vocabulary so cross-table phrasings ground
+    (this is what makes CQ-07/CQ-12 answerable over the induced world)."""
+    engine, _, _ = induced_world
+    onto = engine.onto
+    for c in onto.iter_classes():
+        for p in c.properties:
+            if p.name == "n_number":
+                assert "tail_number" in p.synonyms or "TAIL_NUMBER" in p.synonyms, (
+                    f"{c.name}.n_number missing identity-domain synonyms: {p.synonyms}"
+                )
+                return
+    raise AssertionError("no induced class carries the n_number identity property")
 
 
 def test_gate_100_percent_citation_coverage_on_answered_cells(scorecard, induced_world):
