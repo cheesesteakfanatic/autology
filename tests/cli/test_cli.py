@@ -104,12 +104,28 @@ def test_resolve_saves_clusters_with_f1(project):
     assert "aircraft" in outputs["resolve"]
 
 
-def test_materialize_commits_into_hearth(project):
+def test_materialize_commits_full_estate_into_hearth(project):
     proj, outputs = project
-    assert "committed" in outputs["materialize"]
-    assert "HEARTH" in outputs["materialize"]
+    out = outputs["materialize"]
+    assert "committed" in out
+    assert "HEARTH" in out
+    assert "gold" in out  # rich may wrap "gold ontology" across lines
+    # the FULL estate world: all five source tables' classes are committed
+    for cls in ("Aircraft", "AircraftModel", "IncidentReport", "AccidentEvent", "WorkOrder"):
+        assert cls in out
+    # the induced ontology stays as an inspection artifact (note printed)
+    assert "inspection" in out
     cells = list((proj / "hearth").rglob("*.parquet"))
     assert cells, "no HEARTH shards written"
+    # state records which ontology the world was materialized under
+    state = json.loads((proj / "state.json").read_text())
+    mat = state["materialized"]
+    assert mat["ontology"] == "gold"
+    assert (proj / mat["ontology_file"]).is_file()
+    # at --limit 60 the world is far bigger than the old 40-aircraft demo slice
+    assert mat["entities"] > 100
+    assert mat["cells"] > mat["entities"]
+    assert mat["links"] > 0
 
 
 def test_dashboard_saves_vega_files(project):
@@ -191,6 +207,23 @@ def test_ask_works_when_lodestone_present(project):
         marker in result.output
         for marker in ("answer", "ABSTAINED", "CLARIFICATION NEEDED", "confidence")
     )
+
+
+def test_ask_answers_with_citations_over_materialized_world(project):
+    """Wave-4 integration: with the FULL estate materialized under the gold
+    ontology, `ask` returns a cited, non-abstained answer."""
+    lodestone = pytest.importorskip("ontoforge.lodestone")
+    if not any(hasattr(lodestone, n) for n in ("ask", "answer", "Lodestone")):
+        pytest.skip("ontoforge.lodestone present but entry points not landed yet")
+    proj, _ = project
+    result = runner.invoke(
+        app, ["ask", "What is the average labor hours of work orders?", "-p", str(proj)]
+    )
+    assert result.exit_code == 0, result.output
+    assert "ABSTAINED" not in result.output
+    assert "answer" in result.output
+    assert "confidence" in result.output
+    assert "citations" in result.output
 
 
 def test_snapshot_works_when_amber_present(project, tmp_path):

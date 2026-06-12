@@ -362,53 +362,61 @@ def resolve(project: Path = _PROJECT_OPT) -> None:
     _write_state(project, state)
 
 
+MATERIALIZED_ONTOLOGY_FILE = "ontology.materialized.json"
+
+
 @app.command()
-def materialize(
-    project: Path = _PROJECT_OPT,
-    max_clusters: int = typer.Option(40, help="Max registry-anchored aircraft clusters to commit."),
-) -> None:
-    """Commit resolved entities into HEARTH with constraint-H provenance (M6)."""
-    from ontoforge.er import extract_mentions
+def materialize(project: Path = _PROJECT_OPT) -> None:
+    """Commit the FULL estate into HEARTH with constraint-H provenance (M6).
+
+    Materializes under the frozen GOLD ontology (whitepaper §11.3 de-risking
+    slice) via the same world builder the M12 competency suite proves.
+    """
     from ontoforge.hearth import Hearth
-    from ontoforge.vista._pipeline import (
-        find_aircraft_class_uri,
-        load_ontology,
-        materialize_aircraft,
-    )
+    from ontoforge.lodestone.worldbuild import build_estate_world, extend_gold_ontology
+    from ontoforge.vista._pipeline import save_ontology
 
     cfg = _load_config(project)
     state = _read_state(project)
-    onto_path = project / "ontology.json"
-    resolved_path = project / "resolved.json"
-    for p, cmd in ((onto_path, "induce"), (resolved_path, "resolve")):
-        if not p.is_file():
-            console.print(f"[red]{p.name} missing — run `ontoforge {cmd}` first[/]")
-            raise typer.Exit(code=1)
-
-    onto = load_ontology(onto_path)
-    resolved = json.loads(resolved_path.read_text(encoding="utf-8"))
+    gold = _gold_ontology(cfg)
+    if gold is None:
+        console.print("[red]gold ontology unavailable — cannot materialize the estate[/]")
+        raise typer.Exit(code=1)
+    onto = extend_gold_ontology(gold)
     estate = _estate_dict(project, cfg, state)
-    mentions_by_id = {m.mention_id: m for m in extract_mentions(estate)}
 
-    class_uri = find_aircraft_class_uri(onto, _gold_ontology(cfg)) or "onto://class/aircraft"
     ledger = _open_ledger(project, cfg)
     try:
         hearth = Hearth(project / cfg["hearth_root"], ledger)
-        n_entities, n_cells = materialize_aircraft(
-            estate,
-            resolved["clusters"].get("aircraft", {}),
-            mentions_by_id,
-            class_uri,
-            hearth,
-            ledger,
-            max_clusters=max_clusters,
-        )
+        stats = build_estate_world(estate, onto, hearth, ledger)
     finally:
         ledger.close()
+
+    # the exact ontology the world was committed under, for `ask` to load
+    save_ontology(onto, project / MATERIALIZED_ONTOLOGY_FILE)
+    state["materialized"] = {
+        "ontology": "gold",
+        "ontology_file": MATERIALIZED_ONTOLOGY_FILE,
+        "entities": stats["entities"],
+        "cells": stats["cells"],
+        "links": stats["links"],
+    }
+
+    out = Table(title="materialized estate (gold ontology)")
+    out.add_column("class")
+    out.add_column("entities")
+    for cls, n in sorted(stats["classes"].items()):
+        out.add_row(cls, str(n))
+    console.print(out)
     console.print(
-        f"[green]committed {n_entities} aircraft entities ({n_cells} cells) "
-        f"into HEARTH under {class_uri}[/]"
+        f"[green]committed {stats['entities']} entities ({stats['cells']} cells, "
+        f"{stats['links']} links) into HEARTH under the gold ontology[/]"
     )
+    if (project / "ontology.json").is_file():
+        console.print(
+            "note: the induced ontology (ontology.json) remains an inspection "
+            "artifact; the STRATA swap-in is the documented next phase"
+        )
     _mark_stage(state, "materialize")
     _write_state(project, state)
 
@@ -441,25 +449,58 @@ def ask(
 def _drive_lodestone(lodestone: Any, question: str, project: Path, cfg: dict[str, Any]) -> Any:
     """Best-effort adapter over the M12 surface (built in parallel): try the
     documented entry points in order. Raises if none fits."""
+    # Answer under the SAME ontology the world was materialized with (gold per
+    # §11.3) when state.json says so; otherwise fall back to the induced one.
     onto = None
-    onto_path = project / "ontology.json"
-    if onto_path.is_file():
-        from ontoforge.vista._pipeline import load_ontology
+    state = _read_state(project)
+    materialized = state.get("materialized") or {}
+    if materialized.get("ontology"):
+        mat_path = project / materialized.get("ontology_file", MATERIALIZED_ONTOLOGY_FILE)
+        if mat_path.is_file():
+            from ontoforge.vista._pipeline import load_ontology
 
-        onto = load_ontology(onto_path)
+            onto = load_ontology(mat_path)
+    if onto is None:
+        onto_path = project / "ontology.json"
+        if onto_path.is_file():
+            from ontoforge.vista._pipeline import load_ontology
+
+            onto = load_ontology(onto_path)
     if onto is None:
         onto = _gold_ontology(cfg)
 
+    # Attach the project's HEARTH + ledger world when materialize has run
+    # (LODESTONE abstains without one — wave-4 integration fix).
+    hearth = None
+    ledger = None
+    hearth_dir = project / cfg.get("hearth_root", "hearth")
+    if hearth_dir.is_dir():
+        from ontoforge.hearth import Hearth
+
+        ledger = _open_ledger(project, cfg)
+        hearth = Hearth(hearth_dir, ledger)
+
     errors: list[str] = []
-    for name in ("ask", "answer"):
-        fn = getattr(lodestone, name, None)
-        if fn is None:
-            continue
-        for args in ((question, onto), (question,)):
-            try:
-                return fn(*args)
-            except TypeError as e:
-                errors.append(f"{name}{args!r}: {e}")
+    try:
+        for name in ("ask", "answer"):
+            fn = getattr(lodestone, name, None)
+            if fn is None:
+                continue
+            arg_variants = (
+                ((question, onto, hearth, ledger), hearth is not None),
+                ((question, onto), True),
+                ((question,), True),
+            )
+            for args, enabled in arg_variants:
+                if not enabled:
+                    continue
+                try:
+                    return fn(*args)
+                except TypeError as e:
+                    errors.append(f"{name}/{len(args)}args: {e}")
+    finally:
+        if ledger is not None:
+            ledger.close()
     cls = getattr(lodestone, "Lodestone", None)
     if cls is not None:
         for kwargs in ({"ontology": onto}, {}):
