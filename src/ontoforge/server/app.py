@@ -1,0 +1,521 @@
+"""The OntoForge web application: REST API + SPA over a project directory.
+
+    create_app(project) -> FastAPI       (mounted SPA at /, API under /api)
+    run_server(project, host, port)      (uvicorn entry the CLI `serve` calls)
+
+Every endpoint is ``async`` ON PURPOSE: FastAPI then runs them on the single
+event-loop thread, which keeps the project's sqlite connection (thread-affine)
+on one thread; ``world.lock`` additionally serializes ledger access.
+
+Review/active-learning loop (§4.8): POST /api/review/{decision_id} appends an
+append-only 'review-verdict' artifact (constraint-H provenance over a minted
+human-review atom). Once a decision kind accumulates
+``REVIEW_RECALIBRATION_THRESHOLD`` (20) verdicts — and at every further
+multiple — all of its verdicts are replayed as contracts.CalibrationSample
+into ``spine.recalibrate(kind, samples)`` and a 'recalibration' artifact is
+recorded whose provenance sums the verdict atoms.
+"""
+
+from __future__ import annotations
+
+import json
+import re
+from collections import Counter
+from pathlib import Path
+from typing import Any
+
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+
+from ontoforge.contracts import Atom, CalibrationSample, DecisionKind, leaf, prov_sum
+from ontoforge.contracts.provenance import ONE, ZERO, Leaf, Prod, ProvTerm, Sum
+from ontoforge.vista import propose, render_with_data
+
+from . import schemas as S
+from .world import REVIEW_RECALIBRATION_THRESHOLD, ProjectError, ProjectWorld, jsonable
+
+STATIC_DIR = Path(__file__).parent / "static"
+
+#: decision kinds the review queue surfaces (per spec: ER + QI judgments).
+REVIEW_KINDS = ("er", "qi")
+REVIEW_CONFIDENCE_FLOOR = 0.7
+
+
+def _kind_of(decision_id: str) -> str:
+    """Decision kind = the decision_id prefix ('er:a||b' -> 'er', 'qi-x' -> 'qi')."""
+    return re.split(r"[:\-/]", decision_id, maxsplit=1)[0].lower()
+
+
+def _term_tree(term: ProvTerm, ledger: Any) -> dict[str, Any]:
+    """contracts term walk -> nested JSON of sums/products/leaf atoms."""
+    if isinstance(term, Leaf):
+        atom = ledger.get_atom(term.atom_id)
+        return {
+            "kind": "atom",
+            "atom_id": term.atom_id,
+            "uri": atom.uri if atom else None,
+            "value": jsonable(atom.value) if atom else None,
+        }
+    if term == ZERO:
+        return {"kind": "zero"}
+    if term == ONE:
+        return {"kind": "one"}
+    if isinstance(term, Sum):
+        return {"kind": "sum", "terms": [_term_tree(t, ledger) for t in term.terms]}
+    if isinstance(term, Prod):
+        return {"kind": "product", "terms": [_term_tree(t, ledger) for t in term.terms]}
+    raise TypeError(f"not a ProvTerm: {term!r}")  # pragma: no cover
+
+
+def create_app(project: Path | str) -> FastAPI:
+    """Build the FastAPI app over one project directory."""
+    world = ProjectWorld(Path(project))
+    app = FastAPI(
+        title="OntoForge",
+        description="Induced ontologies, bitemporal entities, provenance-grounded answers.",
+        version="0.1.0",
+    )
+    app.state.world = world
+
+    def fail(exc: ProjectError) -> HTTPException:
+        return HTTPException(status_code=409, detail=str(exc))
+
+    # ------------------------------------------------------------ status
+
+    @app.get("/api/status", response_model=S.StatusOut)
+    async def api_status() -> S.StatusOut:
+        try:
+            cfg = world.config
+        except ProjectError as exc:
+            raise fail(exc) from exc
+        state = world.state()
+        out = S.StatusOut(
+            project=str(world.project),
+            estate=str(cfg.get("estate", "?")),
+            limit=state.get("limit"),
+            stages=list(state.get("stages", [])),
+            ledger_exists=world.ledger_path.is_file(),
+            materialized=state.get("materialized"),
+        )
+        if not out.ledger_exists:
+            return out
+        with world.lock:
+            conn = world.ledger.connection
+            (out.atoms,) = conn.execute("SELECT COUNT(*) FROM atom").fetchone()
+            for tier, n, deferred, quarantined in conn.execute(
+                "SELECT tier, COUNT(*), SUM(deferred_to_human), SUM(quarantined) "
+                "FROM decision GROUP BY tier ORDER BY tier"
+            ).fetchall():
+                out.decisions_by_tier[str(tier)] = S.TierCount(
+                    count=n, deferred=deferred or 0, quarantined=quarantined or 0
+                )
+            kind_counts: Counter[str] = Counter()
+            for decision_id, n in conn.execute(
+                "SELECT decision_id, COUNT(*) FROM decision GROUP BY decision_id"
+            ).fetchall():
+                kind_counts[_kind_of(str(decision_id))] += n
+            out.decisions_by_kind = dict(sorted(kind_counts.items()))
+            out.artifacts = {
+                str(kind): n
+                for kind, n in conn.execute(
+                    "SELECT kind, COUNT(*) FROM artifact GROUP BY kind ORDER BY kind"
+                ).fetchall()
+            }
+            out.cost_tokens = world.ledger.total_cost_tokens()
+        return out
+
+    @app.post("/api/reload", response_model=S.ReloadOut)
+    async def api_reload() -> S.ReloadOut:
+        world.reload()
+        return S.ReloadOut(reloaded=True)
+
+    # ---------------------------------------------------------- ontology
+
+    def _class_out(c: Any) -> S.ClassOut:
+        return S.ClassOut(
+            uri=c.uri,
+            name=c.name,
+            parents=list(c.parents),
+            properties=[
+                S.PropertyOut(
+                    uri=p.uri,
+                    name=p.name,
+                    datatype=p.datatype.value,
+                    is_link=p.is_link,
+                    range_class=p.range_class,
+                    unit=p.unit,
+                    dimension=list(p.dimension.exps) if p.dimension is not None else None,
+                    cardinality=p.cardinality,
+                    functional=p.functional,
+                    synonyms=list(p.synonyms),
+                    definition=p.definition,
+                )
+                for p in c.properties
+            ],
+            confidence=float(c.confidence),
+            is_event=bool(c.is_event),
+            definition=c.definition,
+            n_shapes=len(c.shapes),
+        )
+
+    @app.get("/api/ontology", response_model=S.OntologyOut)
+    async def api_ontology() -> S.OntologyOut:
+        try:
+            with world.lock:
+                onto = world.ontology
+        except ProjectError as exc:
+            raise fail(exc) from exc
+        classes = [_class_out(c) for _, c in sorted(onto.classes.items(), key=lambda kv: kv[1].name)]
+        edges = [
+            S.EdgeOut(source=c.uri, link=p.name, target=p.range_class)
+            for c, p in onto.link_properties()
+            if p.range_class
+        ]
+        edges.sort(key=lambda e: (e.source, e.link, e.target))
+        return S.OntologyOut(version=onto.version, classes=classes, edges=edges)
+
+    @app.get("/api/ontology/class/{uri:path}", response_model=S.ClassOut)
+    async def api_ontology_class(uri: str) -> S.ClassOut:
+        try:
+            with world.lock:
+                onto = world.ontology
+        except ProjectError as exc:
+            raise fail(exc) from exc
+        c = onto.get(uri)
+        if c is None:
+            raise HTTPException(status_code=404, detail=f"unknown class uri: {uri}")
+        return _class_out(c)
+
+    # --------------------------------------------------------------- ask
+
+    @app.post("/api/ask", response_model=S.AskOut)
+    async def api_ask(body: S.AskIn) -> S.AskOut:
+        try:
+            payload, cached = world.ask(body.question)
+        except ProjectError as exc:
+            raise fail(exc) from exc
+        return S.AskOut(**payload, cached=cached)
+
+    @app.post("/api/ask/clarify", response_model=S.AskOut)
+    async def api_ask_clarify(body: S.ClarifyIn) -> S.AskOut:
+        try:
+            payload = world.clarify(body.question, body.choice)
+        except ProjectError as exc:
+            raise fail(exc) from exc
+        return S.AskOut(**payload, cached=False)
+
+    # ------------------------------------------------- atoms & provenance
+
+    @app.get("/api/atoms/{atom_id}", response_model=S.AtomOut)
+    async def api_atom(atom_id: str) -> S.AtomOut:
+        try:
+            with world.lock:
+                atom = world.ledger.get_atom(atom_id)
+        except ProjectError as exc:
+            raise fail(exc) from exc
+        if atom is None:
+            raise HTTPException(status_code=404, detail=f"unknown atom_id: {atom_id}")
+        return S.AtomOut(atom_id=atom.atom_id, uri=atom.uri, value=jsonable(atom.value))
+
+    @app.get("/api/provenance/{prov_ref}", response_model=S.ProvenanceOut)
+    async def api_provenance(prov_ref: str) -> S.ProvenanceOut:
+        try:
+            with world.lock:
+                ledger = world.ledger
+                try:
+                    term = ledger.resolve(prov_ref)
+                except KeyError as exc:
+                    raise HTTPException(
+                        status_code=404, detail=f"unknown prov_ref: {prov_ref}"
+                    ) from exc
+                atoms = ledger.valuate_ref(prov_ref, "citations")
+                tree = _term_tree(term, ledger)
+        except ProjectError as exc:
+            raise fail(exc) from exc
+        return S.ProvenanceOut(prov_ref=prov_ref, n_atoms=len(atoms), tree=S.ProvNode(**tree))
+
+    # ------------------------------------------------------------ review
+
+    def _verdict_payloads(conn: Any) -> list[dict[str, Any]]:
+        out = []
+        for (payload,) in conn.execute(
+            "SELECT payload FROM artifact WHERE kind = 'review-verdict' ORDER BY seq"
+        ).fetchall():
+            try:
+                out.append(json.loads(payload))
+            except (TypeError, ValueError):
+                continue
+        return out
+
+    @app.get("/api/review", response_model=S.ReviewOut)
+    async def api_review() -> S.ReviewOut:
+        try:
+            with world.lock:
+                conn = world.ledger.connection
+                verdicts = _verdict_payloads(conn)
+                reviewed_ids = {v.get("decision_id") for v in verdicts}
+                verdict_tally = Counter(str(v.get("kind", "?")) for v in verdicts)
+                recal_tally: Counter[str] = Counter()
+                for (payload,) in conn.execute(
+                    "SELECT payload FROM artifact WHERE kind = 'recalibration'"
+                ).fetchall():
+                    try:
+                        recal_tally[str(json.loads(payload).get("kind", "?"))] += 1
+                    except (TypeError, ValueError):
+                        continue
+
+                items: list[S.ReviewItem] = []
+                seen: set[str] = set()
+                rows = conn.execute(
+                    "SELECT decision_id, outcome, confidence, conformal_set, tier, "
+                    "deferred_to_human, quarantined, rationale, prov_atoms, created_at "
+                    "FROM decision ORDER BY seq DESC"
+                ).fetchall()
+                for did, outcome, conf, cset, tier, deferred, quarantined, rationale, patoms, ts in rows:
+                    kind = _kind_of(str(did))
+                    if kind not in REVIEW_KINDS or did in seen:
+                        continue
+                    seen.add(did)
+                    if did in reviewed_ids:
+                        continue
+                    if not (deferred or float(conf) < REVIEW_CONFIDENCE_FLOOR):
+                        continue
+                    items.append(
+                        S.ReviewItem(
+                            decision_id=str(did),
+                            kind=kind,
+                            outcome=str(outcome),
+                            confidence=float(conf),
+                            conformal_set=list(json.loads(cset)),
+                            tier=int(tier),
+                            deferred_to_human=bool(deferred),
+                            quarantined=bool(quarantined),
+                            rationale=str(rationale),
+                            prov_atoms=list(json.loads(patoms)),
+                            created_at=str(ts),
+                        )
+                    )
+
+                artifacts: list[S.ReviewArtifact] = []
+                for aid, payload, prov_ref, ts in conn.execute(
+                    "SELECT artifact_id, payload, prov_ref, created_at FROM artifact "
+                    "WHERE kind = 'review' ORDER BY seq DESC"
+                ).fetchall():
+                    try:
+                        parsed: Any = json.loads(payload)
+                    except (TypeError, ValueError):
+                        parsed = payload
+                    artifacts.append(
+                        S.ReviewArtifact(
+                            artifact_id=str(aid), payload=parsed, prov_ref=str(prov_ref),
+                            created_at=str(ts),
+                        )
+                    )
+        except ProjectError as exc:
+            raise fail(exc) from exc
+        return S.ReviewOut(
+            items=items,
+            artifacts=artifacts,
+            verdicts=dict(sorted(verdict_tally.items())),
+            recalibrations=dict(sorted(recal_tally.items())),
+            threshold=REVIEW_RECALIBRATION_THRESHOLD,
+        )
+
+    @app.post("/api/review/{decision_id:path}", response_model=S.VerdictOut)
+    async def api_review_verdict(decision_id: str, body: S.VerdictIn) -> S.VerdictOut:
+        try:
+            with world.lock:
+                ledger = world.ledger
+                conn = ledger.connection
+                row = conn.execute(
+                    "SELECT outcome, confidence, conformal_set FROM decision "
+                    "WHERE decision_id = ? ORDER BY seq DESC LIMIT 1",
+                    (decision_id,),
+                ).fetchone()
+                if row is None:
+                    raise HTTPException(
+                        status_code=404, detail=f"unknown decision_id: {decision_id}"
+                    )
+                outcome, confidence, cset_json = str(row[0]), float(row[1]), row[2]
+                candidates = [str(c) for c in json.loads(cset_json)]
+                kind = _kind_of(decision_id)
+
+                # ground truth implied by the verdict
+                if body.verdict == "accept":
+                    true_outcome = outcome
+                else:
+                    others = [c for c in candidates if c != outcome]
+                    true_outcome = others[0] if others else "__rejected__"
+                    if true_outcome not in candidates:
+                        candidates.append(true_outcome)
+
+                # constraint-H provenance: the verdict itself is evidence — an atom
+                atom = Atom(
+                    uri=f"atom://human-review/verdict/{decision_id}#verdict",
+                    value=f"{body.verdict}|{body.note}",
+                )
+                ledger.register_atoms([atom])
+                prov_ref = ledger.intern(leaf(atom.atom_id))
+                payload = {
+                    "decision_id": decision_id,
+                    "kind": kind,
+                    "verdict": body.verdict,
+                    "note": body.note,
+                    "outcome": outcome,
+                    "true_outcome": true_outcome,
+                    "candidates": candidates,
+                    "predicted_confidence": confidence,
+                    "atom_id": atom.atom_id,
+                }
+                ledger.append_artifact(
+                    artifact_id=f"review-verdict:{decision_id}",
+                    kind="review-verdict",
+                    payload=json.dumps(payload, sort_keys=True),
+                    prov_ref=prov_ref,
+                )
+
+                # §4.8 loop: recalibrate at every THRESHOLD-multiple of verdicts
+                mine = [v for v in _verdict_payloads(conn) if v.get("kind") == kind]
+                n = len(mine)
+                recalibrated = False
+                if n >= REVIEW_RECALIBRATION_THRESHOLD and n % REVIEW_RECALIBRATION_THRESHOLD == 0:
+                    recalibrated = _recalibrate_kind(world, kind, mine)
+                n_recal = conn.execute(
+                    "SELECT COUNT(*) FROM artifact WHERE kind = 'recalibration' "
+                    "AND payload LIKE ?",
+                    (f'%"kind": "{kind}"%',),
+                ).fetchone()[0]
+        except ProjectError as exc:
+            raise fail(exc) from exc
+        return S.VerdictOut(
+            decision_id=decision_id,
+            kind=kind,
+            verdict=body.verdict,
+            verdicts_for_kind=n,
+            threshold=REVIEW_RECALIBRATION_THRESHOLD,
+            recalibrated=recalibrated,
+            recalibrations_for_kind=int(n_recal),
+        )
+
+    def _recalibrate_kind(world: ProjectWorld, kind: str, verdicts: list[dict[str, Any]]) -> bool:
+        """Replay a kind's verdicts as CalibrationSamples into the spine."""
+        try:
+            dkind = DecisionKind(kind)
+        except ValueError:
+            return False
+        samples = [
+            CalibrationSample(
+                kind=dkind,
+                features=(("confidence", float(v.get("predicted_confidence", 0.0))),),
+                candidates=tuple(v.get("candidates", ())) or ("no", "yes"),
+                true_outcome=str(v.get("true_outcome", "")),
+                predicted_confidence=float(v.get("predicted_confidence", 0.0)),
+            )
+            for v in verdicts
+        ]
+        world.spine.recalibrate(dkind, samples)
+        ledger = world.ledger
+        atom_ids = sorted({str(v["atom_id"]) for v in verdicts if v.get("atom_id")})
+        prov_ref = ledger.intern(prov_sum([leaf(a) for a in atom_ids]))
+        ledger.append_artifact(
+            artifact_id=f"recalibration:{kind}:{len(verdicts)}",
+            kind="recalibration",
+            payload=json.dumps(
+                {
+                    "kind": kind,
+                    "n_samples": len(samples),
+                    "threshold": REVIEW_RECALIBRATION_THRESHOLD,
+                    "fitted": bool(world.spine.calibrator(dkind) and world.spine.calibrator(dkind).fitted),
+                },
+                sort_keys=True,
+            ),
+            prov_ref=prov_ref,
+        )
+        return True
+
+    # -------------------------------------------------------- dashboards
+
+    @app.post("/api/dashboards", response_model=S.DashboardsOut)
+    async def api_dashboards(body: S.DashboardIn) -> S.DashboardsOut:
+        try:
+            with world.lock:
+                onto = world.ontology
+                dashboards = propose(body.utterance, onto, k=3)
+                executor = world.oqir_executor()
+                rendered = [render_with_data(d, executor) for d in dashboards]
+        except ProjectError as exc:
+            raise fail(exc) from exc
+        return S.DashboardsOut(
+            utterance=body.utterance,
+            dashboards=[
+                S.DashboardOut(
+                    title=d.title,
+                    score=float(d.score),
+                    rationale=d.rationale,
+                    charts=[S.ChartOut(title=c.title, vega=c.vega) for c in d.charts],
+                )
+                for d in rendered
+            ],
+        )
+
+    @app.get("/api/dashboards", response_model=S.SavedDashboardsOut)
+    async def api_dashboards_saved() -> S.SavedDashboardsOut:
+        out: list[S.SavedDashboardOut] = []
+        d = world.dashboards_dir
+        if d.is_dir():
+            for f in sorted(d.glob("*.json")):
+                if f.name.endswith(".vl.json"):
+                    continue
+                try:
+                    bundle = json.loads(f.read_text(encoding="utf-8"))
+                except (OSError, ValueError):
+                    continue
+                charts: list[S.ChartOut] = []
+                for c in bundle.get("charts", []):
+                    vf = d / str(c.get("vega_file", ""))
+                    if vf.is_file():
+                        try:
+                            charts.append(
+                                S.ChartOut(
+                                    title=str(c.get("title", vf.name)),
+                                    vega=json.loads(vf.read_text(encoding="utf-8")),
+                                )
+                            )
+                        except (OSError, ValueError):
+                            continue
+                out.append(
+                    S.SavedDashboardOut(
+                        file=f.name,
+                        title=str(bundle.get("title", f.stem)),
+                        score=bundle.get("score"),
+                        rationale=str(bundle.get("rationale", "")),
+                        charts=charts,
+                    )
+                )
+        return S.SavedDashboardsOut(dashboards=out)
+
+    # ----------------------------------------------------------- the SPA
+
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+    @app.get("/", include_in_schema=False)
+    async def index() -> FileResponse:
+        return FileResponse(STATIC_DIR / "index.html")
+
+    return app
+
+
+def run_server(project: Path | str, host: str = "127.0.0.1", port: int = 8765) -> None:
+    """Run the OntoForge web app via uvicorn (the CLI `serve` entry point)."""
+    import sys
+
+    import uvicorn
+
+    project = Path(project)
+    if not (project / "config.json").is_file():
+        print(f"no project at {project} — run `ontoforge init {project}` first", file=sys.stderr)
+        raise SystemExit(1)
+    app = create_app(project)
+    print(f"OntoForge serving {project} on http://{host}:{port}")
+    uvicorn.run(app, host=host, port=port, log_level="info")

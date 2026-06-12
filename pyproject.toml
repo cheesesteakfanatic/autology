@@ -35,6 +35,7 @@ dev = [
     "hypothesis>=6.100",
     "mypy>=1.10",
     "ruff>=0.6",
+    "httpx>=0.27,<0.29",
 ]
 
 [build-system]
@@ -48,6 +49,9 @@ packages = ["src/ontoforge"]
 testpaths = ["tests"]
 addopts = "-q"
 filterwarnings = ["ignore::DeprecationWarning"]
+markers = [
+    "slow: full-corpus end-to-end evaluations (swap-in competency suite)",
+]
 
 [tool.ruff]
 line-length = 110

@@ -90,39 +90,58 @@ def _source_csv(project: Path, cfg: dict[str, Any], table: str, limit: Optional[
     from ontoforge.estates.aviation import TABLES
 
     src = Path(cfg["fixtures_dir"]) / TABLES[table]["file"]
+    return _subsampled(project, src, limit)
+
+
+def _subsampled(project: Path, src: Path, limit: Optional[int]) -> Path:
+    """Head-N subsample of one source file, written once into the project."""
     if limit is None:
         return src
     sub_dir = project / "subsample"
     sub_dir.mkdir(exist_ok=True)
     dst = sub_dir / f"{limit}_{src.name}"
     if not dst.exists():
-        lines = src.read_text(encoding="utf-8", errors="replace").splitlines(keepends=True)
-        dst.write_text("".join(lines[: limit + 1]), encoding="utf-8")  # header + N rows
+        if src.suffix.lower() == ".csv":
+            lines = src.read_text(encoding="utf-8", errors="replace").splitlines(keepends=True)
+            dst.write_text("".join(lines[: limit + 1]), encoding="utf-8")  # header + N rows
+        else:  # parquet
+            import pyarrow.parquet as pq
+
+            pq.write_table(pq.read_table(src).slice(0, limit), dst)
     return dst
 
 
 def _load_tables(project: Path, cfg: dict[str, Any], state: dict[str, Any]):
     """All estate tables as wart-preserving string DataFrames (estate rules),
     respecting the project's active --limit."""
+    return _load_estate(project, cfg, state)["tables"]
+
+
+def _load_estate(project: Path, cfg: dict[str, Any], state: dict[str, Any]) -> dict[str, Any]:
+    """The estate dict for ANY estate kind: the bundled aviation fixtures, or
+    a generic directory discovered by the pipeline package."""
+    limit = state.get("limit")
+    if cfg["estate"] == "generic":
+        from ontoforge.pipeline import discover_sources
+
+        return discover_sources(Path(cfg["source_dir"]), limit=limit)
+    return _aviation_estate(project, cfg, state)
+
+
+def _aviation_estate(project: Path, cfg: dict[str, Any], state: dict[str, Any]) -> dict[str, Any]:
     import pandas as pd
 
-    from ontoforge.estates.aviation import TABLES
+    from ontoforge.estates.aviation import ESTATE_NAME, KEY_SEP, TABLES
 
     limit = state.get("limit")
+    base = Path(cfg["fixtures_dir"])
     tables = {}
     for name in TABLES:
         path = _source_csv(project, cfg, name, limit)
         tables[name] = pd.read_csv(path, dtype=str, keep_default_na=False, encoding="utf-8")
-    return tables
-
-
-def _estate_dict(project: Path, cfg: dict[str, Any], state: dict[str, Any]) -> dict[str, Any]:
-    from ontoforge.estates.aviation import ESTATE_NAME, KEY_SEP, TABLES
-
-    base = Path(cfg["fixtures_dir"])
     return {
         "name": ESTATE_NAME,
-        "tables": _load_tables(project, cfg, state),
+        "tables": tables,
         "metadata": {
             "estate": ESTATE_NAME,
             "fixtures_dir": str(base),
@@ -140,16 +159,16 @@ def _estate_dict(project: Path, cfg: dict[str, Any], state: dict[str, Any]) -> d
     }
 
 
-def _profiles_and_inds(project: Path, cfg: dict[str, Any], state: dict[str, Any]):
-    from ontoforge.estates.aviation import TABLES
-    from ontoforge.profiling import discover_inds, profile_table
+def _estate_dict(project: Path, cfg: dict[str, Any], state: dict[str, Any]) -> dict[str, Any]:
+    return _load_estate(project, cfg, state)
 
-    tables = _load_tables(project, cfg, state)
-    profiles = [
-        profile_table(df, TABLES[name]["source_id"], name) for name, df in tables.items()
-    ]
-    inds = discover_inds(tables)
-    return tables, profiles, inds
+
+def _profiles_and_inds(project: Path, cfg: dict[str, Any], state: dict[str, Any]):
+    from ontoforge.pipeline import profile_estate
+
+    estate = _load_estate(project, cfg, state)
+    profiles, inds = profile_estate(estate)
+    return estate["tables"], profiles, inds
 
 
 # -------------------------------------------------------------------- commands
@@ -159,19 +178,32 @@ def _profiles_and_inds(project: Path, cfg: dict[str, Any], state: dict[str, Any]
 def init(
     project_dir: Path = typer.Argument(DEFAULT_PROJECT, help="Project directory to create."),
     fixtures: Optional[Path] = typer.Option(None, help="Estate fixtures dir (default: bundled aviation)."),
+    source: Optional[Path] = typer.Option(
+        None,
+        "--source",
+        help="ANY directory of *.csv / *.parquet files -> a GENERIC estate "
+        "(tables discovered, keys profiled, ontology induced).",
+    ),
 ) -> None:
     """Create the project layout + config.json."""
-    from ontoforge.estates.aviation import default_fixtures_dir
-
     project_dir.mkdir(parents=True, exist_ok=True)
     (project_dir / "dashboards").mkdir(exist_ok=True)
-    cfg = {
-        "estate": "aviation",
-        "fixtures_dir": str(fixtures if fixtures is not None else default_fixtures_dir()),
+    cfg: dict[str, Any] = {
         "ledger": "ledger.sqlite",
         "hearth_root": "hearth",
         "raw_root": "raw",
     }
+    if source is not None:
+        if not source.is_dir():
+            console.print(f"[red]--source {source} is not a directory[/]")
+            raise typer.Exit(code=1)
+        cfg["estate"] = "generic"
+        cfg["source_dir"] = str(source.resolve())
+    else:
+        from ontoforge.estates.aviation import default_fixtures_dir
+
+        cfg["estate"] = "aviation"
+        cfg["fixtures_dir"] = str(fixtures if fixtures is not None else default_fixtures_dir())
     _config_path(project_dir).write_text(json.dumps(cfg, indent=1, sort_keys=True), encoding="utf-8")
     if not _state_path(project_dir).is_file():
         _write_state(project_dir, {"limit": None, "cdc": {}, "stages": []})
@@ -185,15 +217,39 @@ def ingest(
         None, "--limit", help="Subsample: first N rows per table (sticky across commands)."
     ),
 ) -> None:
-    """CDC-pull the estate CSVs into the ledger + RAW Parquet mirror (M1 x M0)."""
-    from ontoforge.cdc import CsvConnector, RawMirror, ingest as cdc_ingest
-    from ontoforge.estates.aviation import TABLES
+    """CDC-pull the estate sources into the ledger + RAW Parquet mirror (M1 x M0)."""
+    from ontoforge.cdc import CsvConnector, ParquetConnector, RawMirror, ingest as cdc_ingest
 
     cfg = _load_config(project)
     state = _read_state(project)
     if limit is not None:
         state["limit"] = limit
     effective_limit = state.get("limit")
+
+    if cfg["estate"] == "generic":
+        estate = _load_estate(project, cfg, state)
+        connectors = []
+        for name, meta in estate["metadata"]["tables"].items():
+            path = _subsampled(project, Path(meta["file"]), effective_limit)
+            cls = ParquetConnector if meta.get("format") == "parquet" else CsvConnector
+            connectors.append(
+                (name, meta["source_id"],
+                 cls(source_id=meta["source_id"], path=path,
+                     key_columns=meta["key_columns"], object_name=name))
+            )
+    else:
+        from ontoforge.estates.aviation import TABLES
+
+        connectors = [
+            (name, meta["source_id"],
+             CsvConnector(
+                 source_id=meta["source_id"],
+                 path=_source_csv(project, cfg, name, effective_limit),
+                 key_columns=meta["key_columns"],
+                 object_name=name,
+             ))
+            for name, meta in TABLES.items()
+        ]
 
     ledger = _open_ledger(project, cfg)
     mirror = RawMirror(project / cfg["raw_root"])
@@ -202,20 +258,14 @@ def ingest(
         out.add_column(col)
     total_deltas = 0
     try:
-        for name, meta in TABLES.items():
-            connector = CsvConnector(
-                source_id=meta["source_id"],
-                path=_source_csv(project, cfg, name, effective_limit),
-                key_columns=meta["key_columns"],
-                object_name=name,
-            )
+        for name, source_id, connector in connectors:
             batch, new_state = cdc_ingest(connector, ledger, state["cdc"].get(name), mirror=mirror)
             kinds = Counter(d.kind for d in batch.deltas)
             registered = kinds["insert"] + kinds["update"]
             total_deltas += len(batch.deltas)
             state["cdc"][name] = new_state
             out.add_row(
-                name, meta["source_id"], str(batch.cycle),
+                name, source_id, str(batch.cycle),
                 str(kinds["insert"]), str(kinds["update"]), str(kinds["delete"]), str(registered),
             )
         (n_atoms,) = ledger.connection.execute("SELECT COUNT(*) FROM atom").fetchone()
@@ -295,6 +345,8 @@ def induce(project: Path = _PROJECT_OPT) -> None:
 
 
 def _gold_ontology(cfg: dict[str, Any]):
+    if cfg.get("estate") != "aviation":
+        return None  # generic estates have no gold artifacts
     try:
         from ontoforge.estates.aviation import load_gold_ontology
 
@@ -305,11 +357,18 @@ def _gold_ontology(cfg: dict[str, Any]):
 
 @app.command()
 def resolve(project: Path = _PROJECT_OPT) -> None:
-    """ER cascade over the estate mentions (M5); saves resolved.json."""
-    from ontoforge.er import ERCascade, extract_mentions, load_gold, pairwise_prf
+    """ER over the estate (M5); saves resolved.json.
 
+    Aviation runs the estate mention extractors; generic estates resolve the
+    induced classes' cross-table identity domains through the same cascade.
+    """
     cfg = _load_config(project)
     state = _read_state(project)
+    if cfg["estate"] == "generic":
+        _resolve_generic_cmd(project, cfg, state)
+        return
+    from ontoforge.er import ERCascade, extract_mentions, load_gold, pairwise_prf
+
     estate = _estate_dict(project, cfg, state)
     mentions = extract_mentions(estate)
 
@@ -362,15 +421,77 @@ def resolve(project: Path = _PROJECT_OPT) -> None:
     _write_state(project, state)
 
 
+def _resolve_generic_cmd(project: Path, cfg: dict[str, Any], state: dict[str, Any]) -> None:
+    """Generic ER (M5): induce, recover plans, resolve every cross-table
+    identity domain (name-like domains through the cascade, identifier-variant
+    domains exactly); saves resolved.json."""
+    from ontoforge.pipeline import build_plans, induce_estate, resolve_generic
+
+    estate = _load_estate(project, cfg, state)
+    ledger = _open_ledger(project, cfg)
+    try:
+        artifacts = induce_estate(estate, ledger)
+        plans = build_plans(artifacts.strata, artifacts.ontology)
+        resolutions = resolve_generic(estate, artifacts, plans, ledger=ledger)
+    finally:
+        ledger.close()
+
+    class_names = {c.uri: c.name for c in artifacts.ontology.iter_classes()}
+    out = Table(title="entity resolution (M5, generic identity domains)")
+    for col in ("class", "method", "tables", "mentions", "clusters", "identities"):
+        out.add_column(col)
+    for class_uri, res in sorted(resolutions.items(), key=lambda kv: class_names.get(kv[0], kv[0])):
+        out.add_row(
+            class_names.get(class_uri, class_uri),
+            res.method,
+            ", ".join(res.domain.tables),
+            str(len(res.mention_to_uri)),
+            str(len(res.clusters)),
+            str(len(res.value_to_uri)),
+        )
+    console.print(out)
+    if not resolutions:
+        console.print(
+            "no cross-table identity domains found — single-table identities "
+            "use exact-key dedupe at materialization"
+        )
+
+    payload = {
+        "mention_to_uri": {
+            m: u for _, res in sorted(resolutions.items()) for m, u in sorted(res.mention_to_uri.items())
+        },
+        "clusters": {
+            class_names.get(cu, cu): {u: ids for u, ids in sorted(res.clusters.items())}
+            for cu, res in sorted(resolutions.items())
+        },
+        "methods": {class_names.get(cu, cu): res.method for cu, res in sorted(resolutions.items())},
+    }
+    (project / "resolved.json").write_text(json.dumps(payload, indent=1, sort_keys=True), encoding="utf-8")
+    console.print(f"-> {project / 'resolved.json'}")
+    _mark_stage(state, "resolve")
+    _write_state(project, state)
+
+
 MATERIALIZED_ONTOLOGY_FILE = "ontology.materialized.json"
 
 
 @app.command()
-def materialize(project: Path = _PROJECT_OPT) -> None:
+def materialize(
+    project: Path = _PROJECT_OPT,
+    ontology: Optional[str] = typer.Option(
+        None,
+        "--ontology",
+        help="Materialize under 'gold' (aviation default, §11.3 de-risking slice) "
+        "or 'induced' (the STRATA swap-in: the generic engine commits the estate "
+        "from the ontology OntoForge induced; the only choice for generic estates).",
+    ),
+) -> None:
     """Commit the FULL estate into HEARTH with constraint-H provenance (M6).
 
-    Materializes under the frozen GOLD ontology (whitepaper §11.3 de-risking
-    slice) via the same world builder the M12 competency suite proves.
+    Aviation projects default to the frozen GOLD ontology via the proven world
+    builder; ``--ontology induced`` (default for generic estates) runs the
+    STRATA swap-in: the generic pipeline materializes from the INDUCED
+    ontology, and `ask` answers over that world.
     """
     from ontoforge.hearth import Hearth
     from ontoforge.lodestone.worldbuild import build_estate_world, extend_gold_ontology
@@ -378,9 +499,19 @@ def materialize(project: Path = _PROJECT_OPT) -> None:
 
     cfg = _load_config(project)
     state = _read_state(project)
+    which = ontology or ("induced" if cfg["estate"] == "generic" else "gold")
+    if which not in ("gold", "induced"):
+        console.print(f"[red]unknown --ontology {which!r} (expected 'gold' or 'induced')[/]")
+        raise typer.Exit(code=1)
+    if which == "induced":
+        _materialize_induced_cmd(project, cfg, state)
+        return
     gold = _gold_ontology(cfg)
     if gold is None:
-        console.print("[red]gold ontology unavailable — cannot materialize the estate[/]")
+        console.print(
+            "[red]gold ontology unavailable — generic estates materialize from "
+            "the induced ontology (`ontoforge materialize --ontology induced`)[/]"
+        )
         raise typer.Exit(code=1)
     onto = extend_gold_ontology(gold)
     estate = _estate_dict(project, cfg, state)
@@ -415,8 +546,62 @@ def materialize(project: Path = _PROJECT_OPT) -> None:
     if (project / "ontology.json").is_file():
         console.print(
             "note: the induced ontology (ontology.json) remains an inspection "
-            "artifact; the STRATA swap-in is the documented next phase"
+            "artifact; rerun with --ontology induced for the STRATA swap-in"
         )
+    _mark_stage(state, "materialize")
+    _write_state(project, state)
+
+
+def _materialize_induced_cmd(project: Path, cfg: dict[str, Any], state: dict[str, Any]) -> None:
+    """The STRATA swap-in: M3/M4 induction, then the generic engine commits
+    the estate into HEARTH from the INDUCED ontology (generic ER included)."""
+    from ontoforge.hearth import Hearth
+    from ontoforge.pipeline import induce_estate, materialize_induced
+    from ontoforge.vista._pipeline import save_ontology
+
+    estate = _load_estate(project, cfg, state)
+    ledger = _open_ledger(project, cfg)
+    try:
+        hearth = Hearth(project / cfg["hearth_root"], ledger)
+        artifacts = induce_estate(estate, ledger)
+        onto = artifacts.ontology
+        stats = materialize_induced(estate, onto, artifacts, hearth, ledger)
+    finally:
+        ledger.close()
+
+    # the exact (enriched) ontology the world was committed under: what `ask` loads
+    save_ontology(onto, project / MATERIALIZED_ONTOLOGY_FILE)
+    if not (project / "ontology.json").is_file():
+        save_ontology(onto, project / "ontology.json")
+    state["materialized"] = {
+        "ontology": "induced",
+        "ontology_file": MATERIALIZED_ONTOLOGY_FILE,
+        "entities": stats["entities"],
+        "cells": stats["cells"],
+        "links": stats["links"],
+    }
+
+    out = Table(title="materialized estate (induced ontology — STRATA swap-in)")
+    out.add_column("class")
+    out.add_column("entities")
+    for cls, n in sorted(stats["classes"].items()):
+        out.add_row(cls, str(n))
+    console.print(out)
+    er = stats.get("er") or {}
+    if er:
+        ert = Table(title="generic ER over cross-table identity domains")
+        for col in ("class", "method", "clusters", "identities", "tables"):
+            ert.add_column(col)
+        for cls, info in sorted(er.items()):
+            ert.add_row(
+                cls, info["method"], str(info["clusters"]),
+                str(info["identities"]), ", ".join(info["tables"]),
+            )
+        console.print(ert)
+    console.print(
+        f"[green]committed {stats['entities']} entities ({stats['cells']} cells, "
+        f"{stats['links']} links) into HEARTH under the induced ontology[/]"
+    )
     _mark_stage(state, "materialize")
     _write_state(project, state)
 

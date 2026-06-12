@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OntoForge</title>
+<link rel="stylesheet" href="/static/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230b0e12'/%3E%3Cpath d='M3 11h10v2H3zM5 7h6v2H5zM7 3h2v2H7z' fill='%23d97706'/%3E%3C/svg%3E">
+<script src="/static/vendor/vega.min.js" defer></script>
+<script src="/static/vendor/vega-lite.min.js" defer></script>
+<script src="/static/vendor/vega-embed.min.js" defer></script>
+</head>
+<body>
+<div class="frame">
+
+  <header class="masthead">
+    <div class="wordmark">
+      <span class="wm-onto">ONTO</span><span class="wm-dot">&middot;</span><span class="wm-forge">FORGE</span>
+      <span class="wm-sub">provenance-grounded semantic console</span>
+    </div>
+    <div class="masthead-meta" id="masthead-meta">
+      <span class="meta-cell">estate <b id="meta-estate">&mdash;</b></span>
+      <span class="meta-cell">atoms <b id="meta-atoms">&mdash;</b></span>
+      <span class="meta-cell">cost <b id="meta-cost">&mdash;</b><i>tok</i></span>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <a href="#/ask"        data-tab="ask">&sect;1&ensp;Ask</a>
+    <a href="#/ontology"   data-tab="ontology">&sect;2&ensp;Ontology</a>
+    <a href="#/review"     data-tab="review">&sect;3&ensp;Review</a>
+    <a href="#/dashboards" data-tab="dashboards">&sect;4&ensp;Dashboards</a>
+    <a href="#/status"     data-tab="status">&sect;5&ensp;Status</a>
+  </nav>
+
+  <main id="main">
+
+    <!-- ====================================================== ASK -->
+    <section class="tab-panel" id="panel-ask">
+      <div class="section-label">natural-language query &mdash; every cell cites its source atoms</div>
+      <form id="ask-form" class="ask-form" autocomplete="off">
+        <input id="ask-input" class="ask-input" type="text" spellcheck="false"
+               placeholder="How many work orders have component 'LANDING GEAR'?">
+        <button id="ask-button" class="btn btn-accent" type="submit">Ask</button>
+      </form>
+      <div id="ask-history" class="ask-history"></div>
+      <div id="ask-result" class="ask-result"></div>
+      <div id="citation-drawer" class="citation-drawer" hidden></div>
+    </section>
+
+    <!-- ================================================= ONTOLOGY -->
+    <section class="tab-panel" id="panel-ontology" hidden>
+      <div class="section-label">the induced world model O<sup>(t)</sup> &mdash; classes, subsumption, links</div>
+      <div class="onto-split">
+        <div class="onto-tree" id="onto-tree"><div class="loading">loading ontology&hellip;</div></div>
+        <div class="onto-detail" id="onto-detail">
+          <div class="placeholder">select a class to inspect its properties</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================== REVIEW -->
+    <section class="tab-panel" id="panel-review" hidden>
+      <div class="section-label">human adjudication queue &mdash; deferred &amp; low-confidence decisions</div>
+      <div id="review-tally" class="review-tally"></div>
+      <div id="review-queue" class="review-queue"><div class="loading">loading queue&hellip;</div></div>
+    </section>
+
+    <!-- =============================================== DASHBOARDS -->
+    <section class="tab-panel" id="panel-dashboards" hidden>
+      <div class="section-label">vague-spec dashboard synthesis &mdash; VISTA top-3 over the metric layer</div>
+      <form id="dash-form" class="ask-form" autocomplete="off">
+        <input id="dash-input" class="ask-input" type="text" spellcheck="false"
+               placeholder="maintenance cost overview">
+        <button class="btn btn-accent" type="submit">Propose</button>
+      </form>
+      <div id="dash-result" class="dash-result"></div>
+      <div class="section-label" style="margin-top:2rem">saved proposals (dashboards/)</div>
+      <div id="dash-saved" class="dash-saved"></div>
+    </section>
+
+    <!-- =================================================== STATUS -->
+    <section class="tab-panel" id="panel-status" hidden>
+      <div class="section-label">project state &mdash; ledger counters &amp; pipeline stages</div>
+      <div id="status-body" class="status-body"><div class="loading">loading status&hellip;</div></div>
+      <button id="reload-button" class="btn" type="button" title="re-open the project after CLI changes">
+        &#x21bb;&ensp;reload project
+      </button>
+    </section>
+
+  </main>
+
+  <footer class="colophon">
+    <span>OntoForge &mdash; struck from source atoms; nothing asserted without a derivation.</span>
+    <span id="colophon-right"></span>
+  </footer>
+</div>
+
+<script type="module" src="/static/app.js"></script>
+</body>
+</html>
