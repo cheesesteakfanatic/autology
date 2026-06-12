@@ -446,28 +446,29 @@ def ask(
     _render_answer(answer)
 
 
-def _drive_lodestone(lodestone: Any, question: str, project: Path, cfg: dict[str, Any]) -> Any:
-    """Best-effort adapter over the M12 surface (built in parallel): try the
-    documented entry points in order. Raises if none fits."""
-    # Answer under the SAME ontology the world was materialized with (gold per
-    # §11.3) when state.json says so; otherwise fall back to the induced one.
-    onto = None
-    state = _read_state(project)
+def _answering_ontology(project: Path, cfg: dict[str, Any], state: dict[str, Any]):
+    """The ontology queries/exports run under: the one the world was materialized
+    with (gold per §11.3) when state.json says so, else induced, else gold."""
     materialized = state.get("materialized") or {}
     if materialized.get("ontology"):
         mat_path = project / materialized.get("ontology_file", MATERIALIZED_ONTOLOGY_FILE)
         if mat_path.is_file():
             from ontoforge.vista._pipeline import load_ontology
 
-            onto = load_ontology(mat_path)
-    if onto is None:
-        onto_path = project / "ontology.json"
-        if onto_path.is_file():
-            from ontoforge.vista._pipeline import load_ontology
+            return load_ontology(mat_path)
+    onto_path = project / "ontology.json"
+    if onto_path.is_file():
+        from ontoforge.vista._pipeline import load_ontology
 
-            onto = load_ontology(onto_path)
-    if onto is None:
-        onto = _gold_ontology(cfg)
+        return load_ontology(onto_path)
+    return _gold_ontology(cfg)
+
+
+def _drive_lodestone(lodestone: Any, question: str, project: Path, cfg: dict[str, Any]) -> Any:
+    """Best-effort adapter over the M12 surface (built in parallel): try the
+    documented entry points in order. Raises if none fits."""
+    state = _read_state(project)
+    onto = _answering_ontology(project, cfg, state)
 
     # Attach the project's HEARTH + ledger world when materialize has run
     # (LODESTONE abstains without one — wave-4 integration fix).
@@ -597,23 +598,30 @@ def snapshot(
         console.print("[yellow]AMBER not yet available[/]")
         raise typer.Exit(code=0)
 
-    _load_config(project)  # validate the project exists
+    cfg = _load_config(project)
     fn = getattr(amber, "snapshot", None)
     if fn is None:
         # the package exists (M14 lands in parallel) but exposes no entry point yet
         console.print("[yellow]AMBER not yet available[/]")
         raise typer.Exit(code=0)
+
+    state = _read_state(project)
+    hearth_dir = project / cfg.get("hearth_root", "hearth")
+    if not hearth_dir.is_dir():
+        console.print("[yellow]no HEARTH store yet — run `ontoforge materialize` first[/]")
+        raise typer.Exit(code=0)
+    onto = _answering_ontology(project, cfg, state)
+
     try:
-        result = None
-        for args in ((project, out_dir), (str(project), str(out_dir)), (out_dir,)):
-            try:
-                result = fn(*args)
-                break
-            except TypeError:
-                continue
-        else:
-            raise RuntimeError("no compatible amber.snapshot() signature")
-        console.print(f"[green]AMBER bundle written to {out_dir}[/] {result if result is not None else ''}")
+        from ontoforge.hearth import Hearth
+
+        ledger = _open_ledger(project, cfg)
+        try:
+            hearth = Hearth(hearth_dir, ledger)
+            result = fn(out_dir, hearth, onto, ledger)
+        finally:
+            ledger.close()
+        console.print(f"[green]AMBER bundle written to {out_dir}[/] (manifest: {result})")
     except Exception as exc:
         console.print(f"[yellow]AMBER present but snapshot failed: {exc}[/]")
         raise typer.Exit(code=0)
