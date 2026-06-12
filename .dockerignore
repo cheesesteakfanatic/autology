@@ -1,0 +1,16 @@
+# keep the build context to exactly what the wheel needs
+.git
+.venv
+dist
+docs
+fixtures
+scripts
+tests
+onto_project
+**/__pycache__
+**/*.pyc
+*.sqlite
+tmp_*.py
+.pytest_cache
+.ruff_cache
+.mypy_cache

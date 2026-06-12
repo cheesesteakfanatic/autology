@@ -1,0 +1,164 @@
+estate: "meridian"
+version: 1
+generator_seed: 7
+as_of_date: "2026-06-12"
+conventions:
+  engine: "GENERIC ONLY: ontoforge init -p <dir> --source fixtures/meridian (no estate module, no gold ontology)"
+  row_key: "values of the table's candidate-key columns joined with '|'; keyless snapshot tables (site_headcount, retail_pos_sales) use the CDC content-addressed fallback"
+  vendor_id_recovery: "VENDOR_ID with dropped leading zeros zero-pads to 10 digits (affects ~6% of PO rows on 12 designated mid-tail vendors; never on gold-question suppliers)"
+  area_uom_recovery: "blank AREA_UOM resolves by country: US/CA=SF, everywhere else=SQM (1 SQM = 10.7639 SF)"
+  weight_uom_recovery: "GROSS_WEIGHT carries its lexical unit; 1 lb = 0.45359237 kg; WEIGHT_UOM mirrors the suffix"
+  date_locales: "masters ISO 8601; lease commencements DD.MM.YYYY on EU/CN rows; shipments DD-MON-YY; tickets ISO 8601 with mixed timezone offsets"
+  null_tokens:
+    - ""
+    - "NULL"
+    - "N/A"
+    - "-"
+    - "TBD"
+    - "9999-12-31"
+  kpc_trap: "ORDER_UOM=KPC means thousand pieces; NET_PRICE is per PRICE_UNIT pieces in document currency; NET_VALUE_USD is the group-currency bridge"
+  fiscal_calendar: "Meridian fiscal year starts in October: FY2026-Q1 = Oct-Dec 2025"
+  supplier_resolution: "quality SUPPLIER strings resolve via PO_REFERENCE -> VENDOR_ID first, fuzzy legal-name match second; 6 quality-only suppliers are deliberate orphans"
+  float_matching: "numeric answers compare at relative tolerance 1e-6"
+questions:
+  - id: "MQ-01"
+    kinds:
+      - "text_mention"
+      - "aggregation"
+    pattern: "G5 text mention -> supply chain trace (count leg)"
+    question: "How many support tickets describe battery swelling?"
+    answerable: true
+    expected_behavior: "answer"
+    answer: 31
+    evidence_tables:
+      - "support_tickets"
+    notes: "planted cluster: every qualifying DESCRIPTION contains the exact phrase 'battery swelling'; distractor battery tickets use other wordings (swollen / bulging). All cluster tickets sit on model PLS9P whose battery part CMP-BAT-0118 has OPEN quality notifications against Volta Energy (the full G5 trace)."
+  - id: "MQ-02"
+    kinds:
+      - "lookup"
+    pattern: "G9 contract compliance (commitment leg)"
+    question: "What is the annual committed spend on contract MSA-2024-0117?"
+    answerable: true
+    expected_behavior: "answer"
+    answer: 8500000.0
+    evidence_tables:
+      - "supplier_contracts"
+    notes: "USD-denominated commitment; comma-grouped source string."
+  - id: "MQ-03"
+    kinds:
+      - "aggregation"
+      - "name_variants"
+    pattern: "G2 quality-weighted spend (spend leg)"
+    question: "What is the total net value USD of purchase order lines with supplier name 'Hailong Precision Industry Co., Ltd.'?"
+    answerable: true
+    expected_behavior: "answer"
+    answer: 47020502.38
+    evidence_tables:
+      - "purchase_order_lines"
+      - "supplier_contracts"
+    notes: "NET_VALUE_USD is the in-corpus FX bridge (~30% of rows carry a 'USD ' prefix). Hero supplier PO rows are wart-free by design; tail-vendor rows carry spelling variants and stripped vendor ids (recover: zero-pad VENDOR_ID to 10 digits)."
+  - id: "MQ-04"
+    kinds:
+      - "aggregation"
+    pattern: "G6 logistics x purchasing (status leg)"
+    question: "How many shipments with transport mode 'OCEAN' are in shipment status 'CUSTOMS_HOLD'?"
+    answerable: true
+    expected_behavior: "answer"
+    answer: 18
+    evidence_tables:
+      - "shipments"
+    notes: "DD-MON-YY Oracle-style dates and ~5% PO/shipment incoterm conflicts live on this table; the count itself is clean."
+  - id: "MQ-05"
+    kinds:
+      - "aggregation"
+      - "unit_mix"
+    pattern: "G8 facility throughput (unit-normalized weight leg)"
+    question: "What is the total gross weight in kg of shipments with destination MER-DC-NL-01?"
+    answerable: true
+    expected_behavior: "answer"
+    answer: 1357759.8763
+    evidence_tables:
+      - "shipments"
+      - "leases"
+    notes: "GROSS_WEIGHT mixes 'kg' and 'lb' lexical forms (WEIGHT_UOM mirrors them); 1 lb = 0.45359237 kg. Hero DC rows always carry the exact facility code in DESTINATION; other DCs carry name variants ('Tilburg DC', 'MER DC US01') — the documented facility-resolution wart."
+  - id: "MQ-06"
+    kinds:
+      - "temporal_as_of"
+      - "aggregation"
+    pattern: "G3 lease expiry exposure (lease leg)"
+    question: "How many leases with property type 'RETAIL' are expiring before 2027-06-12 and after 2026-06-12?"
+    answerable: true
+    expected_behavior: "answer"
+    answer: 17
+    evidence_tables:
+      - "leases"
+    notes: "as-of discipline: expired predecessor leases fall out of the window on the left edge; superseded amendment rows are explicitly LEASE_STATUS=SUPERSEDED and the in-window leases are unamended, so lease grain equals row grain inside the window. EU/CN rows write LEASE_COMMENCEMENT_DATE as DD.MM.YYYY (recover: day-first locale); EXPIRATION_DATE stays ISO."
+  - id: "MQ-07"
+    kinds:
+      - "lookup"
+    pattern: "G10 economics (catalog leg)"
+    question: "What is the MSRP USD of the product with SKU MER-PLS9P-256-BLK?"
+    answerable: true
+    expected_behavior: "answer"
+    answer: 1099.0
+    evidence_tables:
+      - "products"
+    notes: "GTIN-14 column carries valid GS1 check digits; STORAGE_GB mixes '' and 'N/A' null tokens on non-storage products."
+  - id: "MQ-08"
+    kinds:
+      - "aggregation"
+      - "null_tokens"
+    pattern: "G5 affected-product follow-up (satisfaction leg)"
+    question: "What is the average csat score of support tickets with issue category 'BATTERY'?"
+    answerable: true
+    expected_behavior: "answer"
+    answer: 2.737374
+    evidence_tables:
+      - "support_tickets"
+    notes: "CSAT_SCORE mixes '', 'NULL' null tokens with 1-5 scores; the mean is over non-null scores only (blank-vs-zero discipline)."
+  - id: "MQ-09"
+    kinds:
+      - "aggregation"
+      - "comparison"
+    pattern: "G2 worst-supplier quality (reject-volume leg)"
+    question: "How many quality notifications with status OPEN have quantity rejected above 100?"
+    answerable: true
+    expected_behavior: "answer"
+    answer: 49
+    evidence_tables:
+      - "quality_notifications"
+    notes: "SUPPLIER is name-only on this table (3-5 spelling variants per top supplier; resolvable via PO_REFERENCE on ~40% of rows or fuzzy match to SUPPLIER_LEGAL_NAME); the planted battery cluster is part of the qualifying set."
+  - id: "MQ-10"
+    kinds:
+      - "unanswerable"
+    pattern: "G11 customer churn by region"
+    question: "What is our customer churn rate by region this year?"
+    answerable: false
+    expected_behavior: "abstain"
+    answer: null
+    evidence_tables: []
+    notes: "no customer registry, activation data, or installed-base denominator exists anywhere in the corpus; SUPPORT_TICKETS are anonymous events. Any numeric answer scores zero."
+  - id: "MQ-11"
+    kinds:
+      - "unanswerable"
+    pattern: "G12 owned-factory book value"
+    question: "Which of our factories do we own outright, and what is their combined net book value?"
+    answerable: false
+    expected_behavior: "abstain"
+    answer: null
+    evidence_tables: []
+    notes: "manufacturing is outsourced to supplier plants; the only real-estate system is LEASES (leased premises only) and no fixed-asset register or ownership flag exists in any table."
+  - id: "MQ-12"
+    kinds:
+      - "trick_unit"
+    pattern: "G7 trick-unit: display module pricing"
+    question: "What is the total net price in dollars across purchase order lines for material CMP-DSP-0451?"
+    answerable: false
+    expected_behavior: "reject_unit_mismatch"
+    answer: null
+    evidence_tables:
+      - "purchase_order_lines"
+    notes: "NET_PRICE is a multi-currency document-currency amount quoted per PRICE_UNIT (1|10|100|1000) with ORDER_UOM mixing EA and KPC (thousand pieces): no declared unit exists, so expressing its sum 'in dollars' must be rejected, not coerced. The naive sums a coercing engine would produce are pinned below for grading; the correct per-unit economics use NET_VALUE_USD / qty_each with qty_each = ORDER_QTY*1000 when ORDER_UOM=KPC."
+    naive_wrong_values:
+      - 100520.64
+      - 1909892.16

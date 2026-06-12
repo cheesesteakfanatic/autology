@@ -1,176 +1,205 @@
-# OntoForge UI — the instrument
+# OntoForge OS — the ontology operating system
 
-The web UI (`src/ontoforge/server/static/`) is the product's market edge made visible.
-docs/MARKET_EDGE.md found that what nobody else ships are **trust artifacts**: per-value
-citations, calibrated abstention, bi-temporal per-value provenance, and a testable exit
-guarantee. The interface therefore treats *trust as the aesthetic*: every signature
-interaction drills from a claim to its evidence, and uncertainty is rendered honestly
-instead of hidden.
+The web UI (`src/ontoforge/server/static/`) is no longer a page with tabs.
+It is an **operating surface**: a near-black workspace void where every
+capability is a windowed micro-app, the dock launches and collects them,
+and Spotlight — summoned by `⌘K`, `/`, or just typing on the empty
+workspace — is the front door to everything the estate knows.
 
-Zero frameworks. Vanilla ES modules (`app.js` + `js/constellation.js`, `js/entity.js`,
-`js/dashboards.js`), one stylesheet, vendored Vega for charts only. Non-vendor payload
-≈ 93 KB (budget 120 KB, enforced by `tests/server/test_spa.py`). Every piece of API data
-enters the DOM through `el()`/`document.createTextNode` — `innerHTML` never carries data
-(also test-enforced).
+docs/MARKET_EDGE.md found that what nobody else ships are **trust
+artifacts**: per-value citations, calibrated abstention, bitemporal
+per-value provenance, a testable exit guarantee. The OS shell treats *trust
+as the aesthetic* and *investigation as the workflow*: claims open evidence
+windows beside them; entities open inspectors beside inspectors; nothing
+asserted without a derivation.
+
+Zero frameworks. Vanilla ES modules, one stylesheet, vendored Vega for
+charts only. Non-vendor payload ≈ 150 KB (budget 250 KB, enforced by
+`tests/server/test_spa.py`). Every piece of API data enters the DOM through
+`el()`/`document.createTextNode` — `innerHTML` never carries data (also
+test-enforced).
 
 ---
 
-## 1. Design system
+## 1. Architecture
 
-### Grounds (dark editorial, layered)
+```
+app.js                 boot + intent routing policy (the WM owns routing)
+js/core.js             kernel: el/svgEl/clear/api/store + ontology cache
+js/bus.js              inter-app bus: namespaced intents, disposable subs
+js/wm.js               the window manager
+js/dock.js             the dock
+js/spotlight.js        the search
+js/constellation.js    deterministic star-chart layout engine
+js/apps/registry.js    the app registry (dock order)
+js/apps/{ask,constellation,inspector,evidence,
+         review,dashboards,pulse,exporter}.js
+```
 
-| token | value | use |
+**Apps never import each other.** An app emits intents over the bus —
+`entity:open`, `class:focus`, `evidence:atoms`, `evidence:prov`, `ask:run`,
+`app:launch` — with `sourceWinId` stamped on every payload, and `app.js`
+decides which window answers: focus the existing singleton, re-point an
+existing child, or spawn adjacent to the source. The WM collects every bus
+subscription and disposer a window makes and tears them down on close.
+
+## 2. The window manager (js/wm.js)
+
+Mechanics borrowed from real WMs; chrome native to the web (no traffic
+lights, no aero glass — the uncanny valley is avoided by not entering it):
+
+- **Pointer-capture gestures.** `setPointerCapture` on the titlebar/handle;
+  no document-level mousemove; `pointercancel` runs the same cleanup path.
+  `touch-action: none` on titlebars and handles.
+- **Transform-only motion.** Windows position exclusively via
+  `translate3d`; pointermove coalesces into one rAF-scheduled write per
+  frame; geometry (desktop rect) is read once at gesture start.
+  `will-change: transform` lives only for the gesture's lifetime.
+- **Transitions are for programmatic moves only** (`.win-animate` on snap,
+  `.win-flip` on minimize/restore) and are hard-disabled during
+  pointer-driven gestures (`.win-gesture`) — a window must never rubber-band
+  behind the cursor.
+- **Stack-array z-order.** Focus splices the id to the top and reassigns
+  compact z-indexes (10…) in one pass. Bands: desktop(0) < windows(10–990) <
+  dock(1000) < menubar(1500) < spotlight(2000). Every window root carries
+  `isolation: isolate`; window bodies carry `contain: layout paint`.
+- **Focus-follows-raise.** A capture-phase pointerdown raises the hit
+  window; `.focused` drives the titlebar tint (amber glyph) and the larger
+  shadow (`0 14px 24px @ 40%` — only the focused window). Keyboard routes
+  through the shell to the focused window only; apps attach no global keys.
+- **Snap.** The POINTER (not the window edge) is hit-tested against 18px
+  edge strips: left/right = halves, top = maximize, corners = quarters. A
+  translucent amber preview ghost animates to the slot before release; the
+  pre-snap rect is remembered, so dragging a snapped titlebar restores the
+  original size under the cursor. Double-click the titlebar toggles
+  maximize. Resizing a snapped window unsnaps in place.
+- **Resize.** Eight handles with 12px hit areas extending outside the
+  border, each with the right directional cursor; min sizes clamped in the
+  math; a strip of titlebar always stays reachable.
+- **FLIP minimize.** Window rect → dock-tile rect, inverted
+  translate+scale, 220ms transform/opacity only, `display:none` on settle;
+  restore plays the inverse. `prefers-reduced-motion` collapses everything.
+- **Interaction shield.** `body.wm-gesture` during any gesture:
+  `user-select:none` everywhere, `pointer-events:none` on iframes/canvases
+  (removed on pointerup AND pointercancel).
+- **The workspace breathes.** A ResizeObserver re-tiles snapped windows to
+  the new viewport and clamps floating ones back into reach — which also
+  heals layouts measured while the surface had no size (hidden tab).
+- **Persistence.** Layout (apps, params, rects, snap states, stack order)
+  serializes to `PUT /api/workspace` (debounced 700ms) and localStorage on
+  every change; boot restores server-first, then local, then the first-run
+  default. Zero-size measurements are never persisted. Evidence windows are
+  transient and skipped.
+
+## 3. Spotlight (js/spotlight.js) — the front door
+
+Summoned by `⌘K` (same key closes), `/`, the menubar hint, or **just
+typing on the empty workspace** (the keystroke lands in the field). The
+palette is pre-mounted: open is instant.
+
+- **Local registries filter synchronously on every keystroke** — apps, open
+  windows, recent questions, induced classes and properties — never
+  debounced. Ranking: exact-prefix > word-prefix > substring > fuzzy
+  subsequence with fzy-style bonuses (consecutive runs, word/camelCase
+  starts, gap costs).
+- **`GET /api/search?q=&limit=20`** (the frozen contract: kinds
+  `class|entity|property|question|app`, scored) rides behind a 45ms
+  debounce with AbortController cancellation; results merge by score,
+  deduped by `kind|ref` against local hits.
+- **No query dead-ends.** "Ask the estate — “q”" is pinned as fallback;
+  free text ending in `?` (or matching nothing) makes it the primary row.
+  Empty query shows recents + apps, never a blank panel.
+- **Routing on Enter**: entity → Inspector window; class/property →
+  Constellation focused on it; question → Ask pre-run; app → launch;
+  window → focus.
+- **WAI-ARIA combobox.** DOM focus never leaves the input;
+  `aria-activedescendant` carries the virtual highlight; result counts are
+  `aria-live: polite`; `↑↓⏎esc`, `⌘1–9` jumps; focus returns to the
+  invoker on close.
+
+## 4. The dock
+
+Bottom center, frosted dark (`rgba(14,17,22,.72)` + 14px blur, hairline
+border). One icon per app: glyph, small-caps label floating above on hover,
+an amber ember under running apps. Click = launch, focus, or restore.
+Minimized windows collect on a hairline-separated shelf as titled tiles —
+the FLIP target.
+
+## 5. The micro-apps
+
+| app | glyph | what it is |
 |---|---|---|
-| `--bg0` | `#0b0d10` | page |
-| `--bg1` | `#0e1116` | panels/cards |
-| `--bg2` | `#11141a` | raised cards, chips |
-| `--bg3` | `#161a22` | hover / inset |
+| **Ask** | ❯ | the console reborn in a window: serif question field, history chips, answers as mono headlines/tables with **amber cite-dots**; a dot opens an **Evidence child window beside the answer** (re-pointed, never duplicated); clarifications are `1–9` keystroke chips; abstention renders as the dignified `state-abstained` card — *"OntoForge declines to guess."* |
+| **Evidence** | ⌗ | source-atom chips fetched live from `/api/atoms`, or the full derivation tree from `/api/provenance` (sums = "any of", products = "all of"). A child of its citing window: closing the parent closes it; `esc` dismisses it. Transient — never persisted. |
+| **Constellation** | ✶ | the star chart in a resizable window: deterministic seeded force layout, stars sized by structure, amber luminance = confidence, subsumption hairlines, bowed link arcs; pan/zoom/reset; class detail drawer beneath; `focusClass(uri, prop)` API the WM routes `class:focus` to. Singleton. |
+| **Inspector** | ◈ | one entity: property card under a temporal stance, the **as-of time scrubber** (drag → debounced refetch, changed values flash), per-property **bitemporal history bars** (click → derivation in Evidence), and the **neighbors list** — clicking a neighbor opens *another Inspector beside this one*: the OS moment. Multiple instances are the point; the same URI refocuses instead of duplicating. |
+| **Review** | ⚖ | the adjudication queue: kind/tier badges, ER pairs side-by-side under a serif *"same?"* (sides deep-link to Inspectors), conformal chips, confidence gauge, `j/k/a/r` routed to this window only, and the recalibration arc (`n/20`) per kind. Singleton. |
+| **Dashboards** | ▤ | utterance → VISTA's top-3 proposals with themed Vega-Lite previews; every chart has a `⤢` that expands it into its own window (a single-chart viewer instance). Saved proposals below. |
+| **Pulse** | ◉ | the instrument cluster, live-ish: counters, pipeline stages, by-kind/by-tier tables, polled every 10s while open (interval disposed with the window); project reload lives here and announces `world:reload` on the bus. Singleton. |
+| **Exporter** | ⇲ | portability as a visible feature: one button strikes an AMBER snapshot (`POST /api/export`), the shelf lists bundles (`GET /api/exports`). Degrades to honest CLI guidance if the endpoints are absent. Singleton. |
 
-### Ink & accent
+## 6. Design language
 
-| token | value | use |
-|---|---|---|
-| `--ink` | `#e8e6e1` | primary text, data values |
-| `--ink-dim` / `--ink-faint` | `#9b978e` / `#66635b` | chrome, labels |
-| `--amber` | `#e8a33d` | **the only accent** — provenance/evidence affordances, the live forge identity |
-| `--amber-dim` | `#b97c26` | quiet amber (links, superseded-current bars) |
-| `--verdict-green` / `--verdict-red` | `#5da57f` / `#c2655c` | **only** on accept/reject buttons |
-| `--hairline` | `rgba(232,230,225,.08)` | all borders; `-strong` at `.18` for emphasis |
+The instrument's tokens, unchanged: grounds `#0b0d10 → #161a22`, one warm
+ink at three strengths, **forge amber as the only accent** (provenance,
+evidence, the live identity), verdict green/red only on human verdicts,
+hairline discipline, serif display (`Iowan Old Style…`), system sans
+chrome, mono data, the strict `11/12.5/14/16/20/28` scale.
 
-Discipline: everything else is achromatic. Amber means "this resolves to evidence."
-The only drop shadow in the product is the focused glow on the active evidence trail
-(`.evidence-active`) and the cite-dot/scrub-handle glows that point at it.
+What the OS adds:
 
-### Type
+- **The void.** The workspace is near-black with one barely-there radial
+  amber vignette. No gradients elsewhere, no glassmorphism kitsch — the
+  dock and spotlight panel are the only frosted surfaces, and they are
+  dark, not milky.
+- **Window chrome.** `#11141a` panels, hairline borders, 8px radius; the
+  focused window earns the 24px/40% shadow and the amber-lit glyph;
+  unfocused windows recede. Titlebars are `cursor: default`,
+  `user-select: none`; resize handles carry directional cursors; nothing in
+  the chrome ever shows a text I-beam.
+- **The menubar.** A fixed strip: serif wordmark with the amber spark,
+  "the ontology operating system", live estate/atoms/cost in mono, the
+  `⌘K` hint. No clock — the product's time axes are the interesting ones.
+- **First light.** An empty workspace shows a centered serif epigraph —
+  *"struck from source atoms — nothing asserted without a derivation"* —
+  and *press `/` or just type*. First run opens Ask and the Constellation
+  snapped side by side.
+- **Motion.** One 150ms curve for chrome; 160ms programmatic window moves;
+  220ms FLIP; gauges settle in 420ms; everything collapses under
+  `prefers-reduced-motion`. During a drag there is NO transition — the
+  window is bolted to the cursor.
 
-- `--serif` (`Iowan Old Style, Palatino, …`): the wordmark, questions, clarifications,
-  abstention lines, empty states — the editorial voice.
-- `--sans` (system): chrome, labels, buttons.
-- `--mono` (ui-monospace): **every data value** — answers, URIs, atom paths, timestamps,
-  confidences. Values are sacred; chrome is quiet.
-- Section labels: 11px sans, `letter-spacing .14em`, uppercase — the small-caps voice.
+## 7. Interaction inventory
 
-Strict scale: `11 / 12.5 / 14 / 16 / 20 / 28` px (`--fs-0`…`--fs-5`). 8px spatial grid.
-Motion: one curve, 150ms (`--ease`); gauges/arcs settle in 420ms; `prefers-reduced-motion`
-collapses everything.
+| interaction | mechanics |
+|---|---|
+| Spotlight | `⌘K` toggle, `/`, type-on-empty-workspace; `↑↓⏎`, `⌘1–9`; sub-frame local filtering + 45ms-debounced `/api/search` |
+| Ask / Enter | `POST /api/ask`; skeleton → answer/clarify/abstain states |
+| Cite-dot | spawns/re-points the Evidence child beside the answer window |
+| Derivation tree | history bars → `evidence:prov` → `GET /api/provenance/{ref}` |
+| Clarification | chips or keys `1–9` → `POST /api/ask/clarify` |
+| Window drag | pointer capture, rAF transform, edge-zone snap preview, unsnap memory |
+| Window resize | 8 handles, outside hit areas, math-clamped minima |
+| Minimize / restore | FLIP to/from the dock tile; dock shelf collects them |
+| Double-click titlebar | maximize toggle with pre-snap memory |
+| `esc` | closes Spotlight; else dismisses a focused transient Evidence window |
+| Review keys | `j/k/a/r` routed to the focused Review window only |
+| Neighbors | `GET /api/entities/{uri}/neighbors` → click → another Inspector, adjacent |
+| Time scrubber | pointer-captured drag → debounced as-of refetch; values flash |
+| Chart expand | `⤢` → the chart in its own window |
+| Export | `POST /api/export` + `GET /api/exports` bundle shelf |
+| Workspace | every change → debounced `PUT /api/workspace` + localStorage; restored on boot; re-tiled on viewport resize |
 
----
+## 8. Why this is twenty years ahead
 
-## 2. The four profiles, and what each sees first
-
-**The Evaluator (CDO, first 10 minutes).** Lands on **Ask**: a single huge serif
-question field. Types a question; a skeleton shimmers; the answer *materializes* —
-a one-value answer renders as a 28px mono headline with an amber dot beside it. Clicking
-the dot slides in the evidence rail with the actual source cells
-(`erp › maintenance_erp › WO-100125 #COMPONENT = LANDING GEAR`), and the thin amber
-confidence gauge prints the real number underneath. The magic moment is claim → evidence
-in one click. Asking about unicorns produces the second magic moment: *"OntoForge
-declines to guess."*
-
-**The Analyst (daily).** Keyboard-first. `⌘K` opens the command palette from anywhere:
-ask the typed text, jump to any panel, find a class, re-run a recent question (server
-cache answers instantly, marked "instant — answer cache"). `/` focuses the ask field.
-Clarifications are one-keystroke chips (`1`–`9`). Recent questions persist as chips
-under the field.
-
-**The Steward (data engineer).** **Review** is a queue of decision cards: kind/tier
-badges, the engine's rationale in italic serif, the conformal set as chips with the
-chosen outcome in amber, the calibrated confidence gauge, and — for ER decisions — the
-two records side by side under a serif *"same?"*. `j`/`k` move the amber selection ring,
-`a`/`r` adjudicate. Each verdict ticks the **recalibration arc** (`n/20` around an SVG
-circle) — the human-in-the-loop flywheel made tangible; at 20 the spine refits and the
-card says so. Empty state: *"no review items — the spine is confident today."*
-
-**The Auditor (compliance).** Two rooms. **Entities**: paste/deep-link any `ent://` URI
-and get the property card under a stance plus the **as-of time scrubber** — a track with
-amber ticks at every validity boundary; dragging the handle refetches the card (debounced
-160ms) and changed values flash amber: watch a tail number exist in 1995 and vanish under
-"current". Below, **bitemporal history bars** per property on a shared valid-time axis
-(amber = current belief, grey = superseded/windowed, faded edge = open-ended); every bar
-click opens the **derivation tree** in the evidence rail — sums render as "any of",
-products as "all of", leaves as live atom chips. Constraint H, visible.
-
----
-
-## 3. Panel-by-panel (screenshots in words)
-
-**Masthead.** `Onto●Forge` in serif with a glowing amber spark; small-caps strapline
-*induced ontology · bitemporal provenance · calibrated abstention*; live meta (estate,
-atom count, token cost) in mono; the `⌘K` hint. One hairline under the tab row; the
-active tab is underlined in amber.
-
-**Ask (`#/ask`).** Form → history chips → result. Result states: skeleton (shimmer),
-clarification card (amber-edged, serif question, keystroke chips), abstention card
-(grey-edged `state-abstained`: small-caps ABSTAINED, serif *declines to guess*, mono
-reason, "what would make this answerable" class chips, gauge labelled *below the floor*),
-or the answer card (serif question echo, mono table or headline, amber cite dots,
-confidence gauge). Cited cells get `td.cited` + dot; the active one glows.
-
-**Evidence rail (right, 380px, slides in 150ms).** Header EVIDENCE in amber small-caps +
-context (`row 1 · count_rows = 7`). Two modes: source-atom chips fetched live from
-`/api/atoms` (path + value + content hash), or the recursive provenance tree from
-`/api/provenance`. `esc` closes. The shell narrows on wide screens instead of being
-covered.
-
-**Ontology (`#/ontology[/<class-uri>]`).** **The constellation**: a 960×600 SVG star
-chart of the induced model. A ~80-line deterministic force simulation (mulberry32 seeded
-from class-URI hashes — same ontology, same sky) lays out classes as stars sized by
-structure (`5 + 2.1·√(props+shapes+1)`), with an amber halo whose luminance is the class
-confidence; events wear a dashed ring. Subsumption edges are straight hairlines; link
-properties bow outward as faint amber arcs with hover titles. Hover a star → floating
-property card; click → full class detail below (serif name, badges, definition,
-properties table with amber unit badges and clickable ranges). Drag pans, wheel zooms to
-cursor, double-click resets (viewBox manipulation, no re-layout).
-
-**Entities (`#/entity[/<ent-uri>]`).** URI field (mono), recent-entity chips
-(localStorage), then scrubber + two-column grid: stance card | history bars (above).
-
-**Review (`#/review`).** Recalibration arcs per kind, keyboard legend, then the card
-queue (above).
-
-**Dashboards (`#/dashboards`).** Utterance field → VISTA's top-3 proposals (`№1` serif
-rank, score in mono, rationale) with Vega-Lite charts themed to the instrument: amber
-mark ramp, mono axes, transparent grounds. Saved proposals below; offline fallback
-prints the raw spec.
-
-**Status (`#/status`).** The instrument cluster: hairline-divided counter grid (atoms in
-amber, entities, value cells, links, decisions, artifacts, model cost), the pipeline
-stage checklist with amber ◆ ticks that glow when done, and the by-kind/by-tier/artifact
-tables. Reload re-opens the project after CLI changes.
-
----
-
-## 4. Interaction inventory
-
-| interaction | where | mechanics |
-|---|---|---|
-| Ask / Enter | ask field, palette | `POST /api/ask`; skeleton → answer states |
-| Cite-dot → evidence rail | any cited cell | atoms fetched live; anchor cell glows |
-| Provenance tree | entity history bars, rail | `GET /api/provenance/{ref}`; collapsible any-of/all-of |
-| Clarification chips | ask | click or keys `1`–`9` → `POST /api/ask/clarify` |
-| Abstention guidance | ask | reason verbatim + ontology-class chips into the input |
-| Command palette | global | `⌘K`/`ctrl+K`; ask, navigate, classes, recents; `↑↓⏎esc` |
-| Focus ask | global | `/` |
-| Review keys | review | `j`/`k` select, `a`/`r` verdict → recalibration arc tick |
-| ER pair inspect | review er cards | `a‖b` split side-by-side; `ent://` sides deep-link |
-| Constellation | ontology | hover card, click detail, drag-pan, wheel-zoom, dbl-reset |
-| Time scrubber | entities | drag → debounced as-of refetch; changed values flash |
-| History bars | entities | bar = value cell on valid-time axis; click = derivation |
-| Recent questions/entities | ask, entities | localStorage chips; cached repeats are instant |
-| Deep links | all | `#/ask`, `#/ontology/<uri>`, `#/entity/<uri>`, … |
-| Reload project | status | `POST /api/reload`, caches dropped, constellation redrawn |
-
-Prefetch on load: `/api/status` + `/api/ontology` (so the palette knows the classes and
-the constellation is warm before the tab is opened).
-
----
-
-## 5. Why this is twenty years ahead
-
-Every BI surface on the market renders *answers*. This one renders *epistemology*: what
-is believed, why, since when, on whose evidence, and — crucially — when the system is
-not entitled to an answer. The amber dot is a contract ("this number resolves to source
-cells"); the scrubber makes regulator questions ("what did you believe on date X?") a
-drag gesture; the recalibration arc shows governance running, not promised. No competitor
-surface in MARKET_EDGE.md can draw any of these three, because their platforms don't
-store the artifacts. The UI is thin — it merely refuses to hide what the engine knows.
+Every BI surface on the market renders *answers in a page*. This one gives
+the analyst an *operating system for belief*: questions, evidence,
+entities, time, and governance are spatial objects you arrange, not routes
+you visit. The investigation workflow that defines the product — claim →
+evidence → entity → neighbor → its evidence — is a chain of windows opening
+beside each other, each one a provenance contract. The dock shows
+governance running (Review, Pulse); the Exporter makes leaving a visible
+feature, which is exactly what makes staying credible. No competitor in
+MARKET_EDGE.md can draw any of these windows, because their platforms don't
+store the artifacts. The shell is thin — it merely refuses to hide what the
+engine knows, and now it gives you a desk to spread it out on.

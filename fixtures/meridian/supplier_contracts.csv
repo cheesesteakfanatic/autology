@@ -1,0 +1,298 @@
+CONTRACT_NUMBER,SUPPLIER_ID,SUPPLIER_LEGAL_NAME,DUNS_NUMBER,CONTRACT_TYPE,EFFECTIVE_DATE,EXPIRATION_DATE,AUTO_RENEWAL_FLAG,PAYMENT_TERMS,DEFAULT_INCOTERMS,INCOTERMS_NAMED_PLACE,ANNUAL_COMMITTED_SPEND,COMMITMENT_CURRENCY,REBATE_PCT,SUPPLIER_COUNTRY,GOVERNING_LAW,BUYER_ENTITY,STATUS
+MSA-2019-0101,0000104732,"Hailong Precision Industry Co., Ltd.",604411000,MSA,2019-06-21,2022-06-21,,NET30,FOB,JPNGO port of loading,"5,000,000",USD,1.5,CN,PRC,Meridian Trading (Shanghai) Co.,EXPIRED
+MSA-2024-0117,0000104732,"Hailong Precision Industry Co., Ltd.",604411000,MSA,2024-07-22,2027-07-22,Y,NET30,FOB,Shenzhen Yantian port,"8,500,000",USD,2.0,CN,PRC,Meridian Devices Inc.,ACTIVE
+AMD-2025-0103,0000104732,"Hailong Precision Industry Co., Ltd.",604411000,AMENDMENT,2025-08-23,2027-08-23,N,NET30,FOB,TWTPE port of loading,,USD,2.5,CN,PRC,Meridian International B.V.,ACTIVE
+SOW-2025-0104,0000104732,"Hailong Precision Industry Co., Ltd.",604411000,SOW,2025-09-24,2027-09-24,,NET30,FOB,CNSHA port of loading,,,,CN,New York,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2019-0105,0000104869,Suzhou Brightway Electronics Industrial Corp.,604411977,MSA,2019-10-25,2022-10-25,Y,NET45,FCA,TWKHH port of loading,"5,325,000",USD,0.0,TW,Taiwan,Meridian Devices Inc.,EXPIRED
+MSA-2024-0106,0000104869,Suzhou Brightway Electronics Industrial Corp.,604411977,MSA,2024-11-26,2027-11-26,N,NET45,FCA,VNSGN port of loading,"5,325,000",USD,1.5,TW,Taiwan,Meridian International B.V.,ACTIVE
+AMD-2025-0107,0000104869,Suzhou Brightway Electronics Industrial Corp.,604411977,AMENDMENT,2025-12-27,2027-12-27,,NET45,FCA,KRPUS port of loading,,USD,2.0,TW,Taiwan,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2019-0108,0000105006,Kunshan Polymer Corporation,604412954,MSA,2019-01-01,2022-01-01,Y,NET60,EXW,CNXMN port of loading,"5,650,000",USD,2.5,JP,Japan,Meridian Devices Inc.,EXPIRED
+MSA-2024-0109,0000105006,Kunshan Polymer Corporation,604412954,MSA,2024-02-02,2027-02-02,N,NET60,EXW,TWTPE port of loading,"5,650,000",USD,,JP,Japan,Meridian International B.V.,ACTIVE
+AMD-2025-0110,0000105006,Kunshan Polymer Corporation,604412954,AMENDMENT,2025-03-03,2027-03-03,,NET60,EXW,CNSHA port of loading,,EUR,0.0,JP,Japan,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2019-0111,0000105143,"Volta Energy Co., Ltd.",604413931,MSA,2019-04-04,2022-04-04,Y,2/10NET30,CIF,TWKHH port of loading,"5,975,000",USD,1.5,KR,South Korea,Meridian Devices Inc.,EXPIRED
+MSA-2024-0112,0000105143,"Volta Energy Co., Ltd.",604413931,MSA,2024-05-05,2027-05-05,N,2/10NET30,CIF,VNSGN port of loading,"5,975,000",USD,2.0,KR,South Korea,Meridian International B.V.,ACTIVE
+AMD-2025-0113,0000105143,"Volta Energy Co., Ltd.",604413931,AMENDMENT,2025-06-06,2027-06-06,,2/10NET30,CIF,KRPUS port of loading,,USD,2.5,KR,South Korea,Meridian Trading (Shanghai) Co.,ACTIVE
+SOW-2025-0114,0000105143,"Volta Energy Co., Ltd.",604413931,SOW,2025-07-07,2027-07-07,Y,2/10NET30,CIF,JPNGO port of loading,,,,KR,South Korea,Meridian Devices Inc.,ACTIVE
+MSA-2019-0115,0000105280,Taoyuan Optics Joint Stock Company,604414908,MSA,2019-08-08,2022-08-08,N,NET30,DDP,TWTPE port of loading,"6,300,000",USD,0.0,VN,Vietnam,Meridian International B.V.,EXPIRED
+MSA-2024-0116,0000105280,Taoyuan Optics Joint Stock Company,604414908,MSA,2024-09-09,2027-09-09,,NET30,DDP,CNSHA port of loading,"6,300,000",USD,1.5,VN,Vietnam,Meridian Trading (Shanghai) Co.,ACTIVE
+AMD-2025-0117,0000105280,Taoyuan Optics Joint Stock Company,604414908,AMENDMENT,2025-10-10,2027-10-10,Y,NET30,DDP,CNYTN port of loading,,USD,2.0,VN,New York,Meridian Devices Inc.,ACTIVE
+MSA-2019-0118,0000105417,"Nagoya Metalworks Industry Co., Ltd.",604415885,MSA,2019-11-11,2022-11-11,N,NET45,DAP,VNSGN port of loading,"6,625,000",USD,2.5,CN,PRC,Meridian International B.V.,EXPIRED
+MSA-2024-0119,0000105417,"Nagoya Metalworks Industry Co., Ltd.",604415885,MSA,2024-12-12,2027-12-12,,NET45,DAP,TBD,"6,625,000",USD,,CN,PRC,Meridian Trading (Shanghai) Co.,ACTIVE
+AMD-2025-0120,0000105417,"Nagoya Metalworks Industry Co., Ltd.",604415885,AMENDMENT,2025-01-13,2027-01-13,Y,NET45,DAP,JPNGO port of loading,,USD,0.0,CN,PRC,Meridian Devices Inc.,ACTIVE
+MSA-2019-0121,0000105554,Dongguan Rixin Microsystems Industrial Corp.,604416862,MSA,2019-02-14,2022-02-14,N,NET60,FOB,TWTPE port of loading,"6,950,000",EUR,1.5,TW,Taiwan,Meridian Trading (Shanghai) Co.,EXPIRED
+MSA-2024-0122,0000105554,Dongguan Rixin Microsystems Industrial Corp.,604416862,MSA,2024-03-15,2027-03-15,,NET60,FOB,CNSHA port of loading,"6,950,000",USD,2.0,TW,Taiwan,Meridian Devices Inc.,ACTIVE
+AMD-2025-0123,0000105554,Dongguan Rixin Microsystems Industrial Corp.,604416862,AMENDMENT,2025-04-16,2027-04-16,Y,NET60,FOB,CNYTN port of loading,,USD,2.5,TW,Taiwan,Meridian International B.V.,ACTIVE
+SOW-2025-0124,0000105554,Dongguan Rixin Microsystems Industrial Corp.,604416862,SOW,2025-05-17,2027-05-17,N,NET60,FOB,TWKHH port of loading,,,,TW,Taiwan,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2019-0125,0000105691,Hsinchu Circuit Inc.,604417839,MSA,2019-06-18,2022-06-18,,2/10NET30,FCA,KRPUS port of loading,"7,275,000",USD,0.0,US,New York,Meridian Devices Inc.,EXPIRED
+MSA-2024-0126,0000105691,Hsinchu Circuit Inc.,604417839,MSA,2024-07-19,2027-07-19,Y,2/10NET30,FCA,JPNGO port of loading,"7,275,000",USD,1.5,US,New York,Meridian International B.V.,ACTIVE
+AMD-2025-0127,0000105691,Hsinchu Circuit Inc.,604417839,AMENDMENT,2025-08-20,2027-08-20,N,2/10NET30,FCA,CNXMN port of loading,,USD,2.0,US,New York,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2019-0128,0000105828,"Pusan Display Industry Co., Ltd.",604418816,MSA,2019-09-21,2022-09-21,,NET30,EXW,CNSHA port of loading,"7,600,000",USD,2.5,CN,PRC,Meridian Devices Inc.,EXPIRED
+MSA-2024-0129,0000105828,"Pusan Display Industry Co., Ltd.",604418816,MSA,2024-10-22,2027-10-22,Y,NET30,EXW,CNYTN port of loading,"7,600,000",USD,,CN,PRC,Meridian International B.V.,ACTIVE
+AMD-2025-0130,0000105828,"Pusan Display Industry Co., Ltd.",604418816,AMENDMENT,2025-11-23,2027-11-23,N,NET30,EXW,TWKHH port of loading,,USD,0.0,CN,New York,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2019-0131,0000105965,Hanoi Lotus Acoustics Industrial Corp.,604419793,MSA,2019-12-24,2022-12-24,,NET45,CIF,KRPUS port of loading,"7,925,000",USD,1.5,TW,Taiwan,Meridian Devices Inc.,EXPIRED
+MSA-2024-0132,0000105965,Hanoi Lotus Acoustics Industrial Corp.,604419793,MSA,2024-01-25,2027-01-25,Y,NET45,CIF,JPNGO port of loading,"7,925,000",EUR,2.0,TW,Taiwan,Meridian International B.V.,ACTIVE
+AMD-2025-0133,0000105965,Hanoi Lotus Acoustics Industrial Corp.,604419793,AMENDMENT,2025-02-26,2027-02-26,N,NET45,CIF,CNXMN port of loading,,USD,2.5,TW,Taiwan,Meridian Trading (Shanghai) Co.,ACTIVE
+SOW-2025-0134,0000105965,Hanoi Lotus Acoustics Industrial Corp.,604419793,SOW,2025-03-27,2027-03-27,,NET45,CIF,TWTPE port of loading,,,,TW,Taiwan,Meridian Devices Inc.,ACTIVE
+MSA-2019-0135,0000106102,Ningbo Anchor Tooling Corporation,604420770,MSA,2019-04-01,2022-04-01,Y,NET60,DDP,CNYTN port of loading,"8,250,000",USD,0.0,JP,Japan,Meridian International B.V.,EXPIRED
+MSA-2024-0136,0000106102,Ningbo Anchor Tooling Corporation,604420770,MSA,2024-05-02,2027-05-02,N,NET60,DDP,TBD,"8,250,000",USD,1.5,JP,Japan,Meridian Trading (Shanghai) Co.,ACTIVE
+AMD-2025-0137,0000106102,Ningbo Anchor Tooling Corporation,604420770,AMENDMENT,2025-06-03,2027-06-03,,NET60,DDP,VNSGN port of loading,,USD,2.0,JP,Japan,Meridian Devices Inc.,ACTIVE
+MSA-2019-0138,0000106239,"Chengdu Skylark Components Co., Ltd.",604421747,MSA,2019-07-04,2022-07-04,Y,2/10NET30,DAP,JPNGO port of loading,"8,575,000",USD,2.5,KR,South Korea,Meridian International B.V.,EXPIRED
+MSA-2024-0139,0000106239,"Chengdu Skylark Components Co., Ltd.",604421747,MSA,2024-08-05,2027-08-05,N,2/10NET30,DAP,CNXMN port of loading,"8,575,000",USD,,KR,South Korea,Meridian Trading (Shanghai) Co.,ACTIVE
+AMD-2025-0140,0000106239,"Chengdu Skylark Components Co., Ltd.",604421747,AMENDMENT,2025-09-06,2027-09-06,,2/10NET30,DAP,TWTPE port of loading,,USD,0.0,KR,South Korea,Meridian Devices Inc.,ACTIVE
+MSA-2019-0141,0000106376,Osaka Meiwa Precision Joint Stock Company,604422724,MSA,2019-10-07,2022-10-07,Y,NET30,FOB,CNYTN port of loading,"8,900,000",USD,1.5,VN,Vietnam,Meridian Trading (Shanghai) Co.,EXPIRED
+MSA-2024-0142,0000106376,Osaka Meiwa Precision Joint Stock Company,604422724,MSA,2024-11-08,2027-11-08,N,NET30,FOB,TWKHH port of loading,"8,900,000",USD,2.0,VN,Vietnam,Meridian Devices Inc.,ACTIVE
+AMD-2025-0143,0000106376,Osaka Meiwa Precision Joint Stock Company,604422724,AMENDMENT,2025-12-09,2027-12-09,,NET30,FOB,VNSGN port of loading,,EUR,2.5,VN,New York,Meridian International B.V.,ACTIVE
+SOW-2025-0144,0000106376,Osaka Meiwa Precision Joint Stock Company,604422724,SOW,2025-01-10,2027-01-10,Y,NET30,FOB,KRPUS port of loading,,,,VN,Vietnam,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2019-0145,0000106513,"Gumi Electronics Industry Co., Ltd.",604423701,MSA,2019-02-11,2022-02-11,N,NET45,FCA,CNXMN port of loading,"9,225,000",USD,0.0,CN,PRC,Meridian Devices Inc.,EXPIRED
+MSA-2024-0146,0000106513,"Gumi Electronics Industry Co., Ltd.",604423701,MSA,2024-03-12,2027-03-12,,NET45,FCA,TWTPE port of loading,"9,225,000",USD,1.5,CN,PRC,Meridian International B.V.,ACTIVE
+AMD-2025-0147,0000106513,"Gumi Electronics Industry Co., Ltd.",604423701,AMENDMENT,2025-04-13,2027-04-13,Y,NET45,FCA,CNSHA port of loading,,USD,2.0,CN,PRC,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2019-0148,0000106650,Da Nang Polymer Industrial Corp.,604424678,MSA,2019-05-14,2022-05-14,N,NET60,EXW,TWKHH port of loading,"9,550,000",USD,2.5,TW,Taiwan,Meridian Devices Inc.,EXPIRED
+MSA-2024-0149,0000106650,Da Nang Polymer Industrial Corp.,604424678,MSA,2024-06-15,2027-06-15,,NET60,EXW,VNSGN port of loading,"9,550,000",USD,,TW,Taiwan,Meridian International B.V.,ACTIVE
+AMD-2025-0150,0000106650,Da Nang Polymer Industrial Corp.,604424678,AMENDMENT,2025-07-16,2027-07-16,Y,NET60,EXW,KRPUS port of loading,,USD,0.0,TW,Taiwan,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2019-0151,0000106787,Xiamen Harbor Energy Inc.,604425655,MSA,2019-08-17,2022-08-17,N,2/10NET30,CIF,CNXMN port of loading,"9,875,000",USD,1.5,US,New York,Meridian Devices Inc.,EXPIRED
+MSA-2024-0152,0000106787,Xiamen Harbor Energy Inc.,604425655,MSA,2024-09-18,2027-09-18,,2/10NET30,CIF,TWTPE port of loading,"9,875,000",USD,2.0,US,New York,Meridian International B.V.,ACTIVE
+AMD-2025-0153,0000106787,Xiamen Harbor Energy Inc.,604425655,AMENDMENT,2025-10-19,2027-10-19,Y,2/10NET30,CIF,TBD,,USD,2.5,US,New York,Meridian Trading (Shanghai) Co.,ACTIVE
+SOW-2025-0154,0000106787,Xiamen Harbor Energy Inc.,604425655,SOW,2025-11-20,2027-11-20,N,2/10NET30,CIF,CNYTN port of loading,,,,US,New York,Meridian Devices Inc.,ACTIVE
+MSA-2019-0155,0000106924,"Wuxi Crane Optics Industry Co., Ltd.",604426632,MSA,2019-12-21,2022-12-21,,NET30,DDP,VNSGN port of loading,"10,200,000",USD,0.0,CN,PRC,Meridian International B.V.,EXPIRED
+MSA-2024-0156,0000106924,"Wuxi Crane Optics Industry Co., Ltd.",604426632,MSA,2024-01-22,2027-01-22,Y,NET30,DDP,KRPUS port of loading,"10,200,000",USD,1.5,CN,New York,Meridian Trading (Shanghai) Co.,ACTIVE
+AMD-2025-0157,0000106924,"Wuxi Crane Optics Industry Co., Ltd.",604426632,AMENDMENT,2025-02-23,2027-02-23,N,NET30,DDP,JPNGO port of loading,,USD,2.0,CN,PRC,Meridian Devices Inc.,ACTIVE
+MSA-2019-0158,0000107061,Tainan Metalworks Industrial Corp.,604427609,MSA,2019-03-24,2022-03-24,,NET45,DAP,TWTPE port of loading,"10,525,000",USD,2.5,TW,Taiwan,Meridian International B.V.,EXPIRED
+MSA-2024-0159,0000107061,Tainan Metalworks Industrial Corp.,604427609,MSA,2024-04-25,2027-04-25,Y,NET45,DAP,CNSHA port of loading,"10,525,000",USD,,TW,Taiwan,Meridian Trading (Shanghai) Co.,ACTIVE
+AMD-2025-0160,0000107061,Tainan Metalworks Industrial Corp.,604427609,AMENDMENT,2025-05-26,2027-05-26,N,NET45,DAP,CNYTN port of loading,,USD,0.0,TW,Taiwan,Meridian Devices Inc.,ACTIVE
+MSA-2019-0161,0000107198,Yokohama Kiyo Microsystems Corporation,604428586,MSA,2019-06-27,2022-06-27,,NET60,FOB,VNSGN port of loading,"10,850,000",USD,1.5,JP,Japan,Meridian Trading (Shanghai) Co.,EXPIRED
+MSA-2024-0162,0000107198,Yokohama Kiyo Microsystems Corporation,604428586,MSA,2024-07-01,2027-07-01,Y,NET60,FOB,KRPUS port of loading,"10,850,000",USD,2.0,JP,Japan,Meridian Devices Inc.,ACTIVE
+AMD-2025-0163,0000107198,Yokohama Kiyo Microsystems Corporation,604428586,AMENDMENT,2025-08-02,2027-08-02,N,NET60,FOB,JPNGO port of loading,,USD,2.5,JP,Japan,Meridian International B.V.,ACTIVE
+SOW-2025-0164,0000107198,Yokohama Kiyo Microsystems Corporation,604428586,SOW,2025-09-03,2027-09-03,,NET60,FOB,CNXMN port of loading,,,,JP,Japan,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2019-0165,0000107335,"Incheon Circuit Co., Ltd.",604429563,MSA,2019-10-04,2022-10-04,Y,2/10NET30,FCA,CNSHA port of loading,"11,175,000",EUR,0.0,KR,South Korea,Meridian Devices Inc.,EXPIRED
+MSA-2024-0166,0000107335,"Incheon Circuit Co., Ltd.",604429563,MSA,2024-11-05,2027-11-05,N,2/10NET30,FCA,CNYTN port of loading,"11,175,000",USD,1.5,KR,South Korea,Meridian International B.V.,ACTIVE
+AMD-2025-0167,0000107335,"Incheon Circuit Co., Ltd.",604429563,AMENDMENT,2025-12-06,2027-12-06,,2/10NET30,FCA,TWKHH port of loading,,USD,2.0,KR,South Korea,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2019-0168,0000107472,Qingdao Pearl Display Joint Stock Company,604430540,MSA,2019-01-07,2022-01-07,Y,NET30,EXW,KRPUS port of loading,"11,500,000",USD,2.5,VN,Vietnam,Meridian Devices Inc.,EXPIRED
+MSA-2024-0169,0000107472,Qingdao Pearl Display Joint Stock Company,604430540,MSA,2024-02-08,2027-02-08,N,NET30,EXW,JPNGO port of loading,"11,500,000",USD,,VN,New York,Meridian International B.V.,ACTIVE
+AMD-2025-0170,0000107472,Qingdao Pearl Display Joint Stock Company,604430540,AMENDMENT,2025-03-09,2027-03-09,,NET30,EXW,TBD,,USD,0.0,VN,Vietnam,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2019-0171,0000107609,"Zhuhai Coral Acoustics Industry Co., Ltd.",604431517,MSA,2019-04-10,2022-04-10,Y,NET45,CIF,CNSHA port of loading,"11,825,000",USD,1.5,CN,PRC,Meridian Devices Inc.,EXPIRED
+MSA-2024-0172,0000107609,"Zhuhai Coral Acoustics Industry Co., Ltd.",604431517,MSA,2024-05-11,2027-05-11,N,NET45,CIF,CNYTN port of loading,"11,825,000",USD,2.0,CN,PRC,Meridian International B.V.,ACTIVE
+AMD-2025-0173,0000107609,"Zhuhai Coral Acoustics Industry Co., Ltd.",604431517,AMENDMENT,2025-06-12,2027-06-12,,NET45,CIF,TWKHH port of loading,,USD,2.5,CN,PRC,Meridian Trading (Shanghai) Co.,ACTIVE
+SOW-2025-0174,0000107609,"Zhuhai Coral Acoustics Industry Co., Ltd.",604431517,SOW,2025-07-13,2027-07-13,Y,NET45,CIF,VNSGN port of loading,,,,CN,PRC,Meridian Devices Inc.,ACTIVE
+MSA-2019-0175,0000107746,Kaohsiung Tooling Industrial Corp.,604432494,MSA,2019-08-14,2022-08-14,N,NET60,DDP,JPNGO port of loading,"12,150,000",USD,0.0,TW,Taiwan,Meridian International B.V.,EXPIRED
+MSA-2024-0176,0000107746,Kaohsiung Tooling Industrial Corp.,604432494,MSA,2024-09-15,2027-09-15,,NET60,DDP,CNXMN port of loading,"12,150,000",EUR,1.5,TW,Taiwan,Meridian Trading (Shanghai) Co.,ACTIVE
+AMD-2025-0177,0000107746,Kaohsiung Tooling Industrial Corp.,604432494,AMENDMENT,2025-10-16,2027-10-16,Y,NET60,DDP,TWTPE port of loading,,USD,2.0,TW,Taiwan,Meridian Devices Inc.,ACTIVE
+MSA-2019-0178,0000107883,Sendai Components Inc.,604433471,MSA,2019-11-17,2022-11-17,N,2/10NET30,DAP,CNYTN port of loading,"12,475,000",USD,2.5,US,New York,Meridian International B.V.,EXPIRED
+MSA-2024-0179,0000107883,Sendai Components Inc.,604433471,MSA,2024-12-18,2027-12-18,,2/10NET30,DAP,TWKHH port of loading,"12,475,000",USD,,US,New York,Meridian Trading (Shanghai) Co.,ACTIVE
+AMD-2025-0180,0000107883,Sendai Components Inc.,604433471,AMENDMENT,2025-01-19,2027-01-19,Y,2/10NET30,DAP,VNSGN port of loading,,USD,0.0,US,New York,Meridian Devices Inc.,ACTIVE
+MSA-2019-0181,0000108020,"Ulsan Precision Industry Co., Ltd.",604434448,MSA,2019-02-20,2022-02-20,N,NET30,FOB,JPNGO port of loading,"12,800,000",USD,1.5,CN,PRC,Meridian Trading (Shanghai) Co.,EXPIRED
+MSA-2024-0182,0000108020,"Ulsan Precision Industry Co., Ltd.",604434448,MSA,2024-03-21,2027-03-21,,NET30,FOB,CNXMN port of loading,"12,800,000",USD,2.0,CN,New York,Meridian Devices Inc.,ACTIVE
+AMD-2025-0183,0000108020,"Ulsan Precision Industry Co., Ltd.",604434448,AMENDMENT,2025-04-22,2027-04-22,Y,NET30,FOB,TWTPE port of loading,,USD,2.5,CN,PRC,Meridian International B.V.,ACTIVE
+SOW-2025-0184,0000108020,"Ulsan Precision Industry Co., Ltd.",604434448,SOW,2025-05-23,2027-05-23,N,NET30,FOB,CNSHA port of loading,,,,CN,PRC,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2019-0185,0000108157,Haiphong Electronics Industrial Corp.,604435425,MSA,2019-06-24,2022-06-24,,NET45,FCA,TWKHH port of loading,"13,125,000",USD,0.0,TW,Taiwan,Meridian Devices Inc.,EXPIRED
+MSA-2024-0186,0000108157,Haiphong Electronics Industrial Corp.,604435425,MSA,2024-07-25,2027-07-25,Y,NET45,FCA,VNSGN port of loading,"13,125,000",USD,1.5,TW,Taiwan,Meridian International B.V.,ACTIVE
+AMD-2025-0187,0000108157,Haiphong Electronics Industrial Corp.,604435425,AMENDMENT,2025-08-26,2027-08-26,N,NET45,FCA,TBD,,EUR,2.0,TW,Taiwan,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2019-0188,0000108294,Foshan Ridge Polymer Corporation,604436402,MSA,2019-09-27,2022-09-27,,NET60,EXW,CNXMN port of loading,"13,450,000",USD,2.5,JP,Japan,Meridian Devices Inc.,EXPIRED
+MSA-2024-0189,0000108294,Foshan Ridge Polymer Corporation,604436402,MSA,2024-10-01,2027-10-01,Y,NET60,EXW,TWTPE port of loading,"13,450,000",USD,,JP,Japan,Meridian International B.V.,ACTIVE
+AMD-2025-0190,0000108294,Foshan Ridge Polymer Corporation,604436402,AMENDMENT,2025-11-02,2027-11-02,N,NET60,EXW,CNSHA port of loading,,USD,0.0,JP,Japan,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2019-0191,0000108431,"Taichung Energy Co., Ltd.",604437379,MSA,2019-12-03,2022-12-03,,2/10NET30,CIF,TWKHH port of loading,"13,775,000",USD,1.5,KR,South Korea,Meridian Devices Inc.,EXPIRED
+MSA-2024-0192,0000108431,"Taichung Energy Co., Ltd.",604437379,MSA,2024-01-04,2027-01-04,Y,2/10NET30,CIF,VNSGN port of loading,"13,775,000",USD,2.0,KR,South Korea,Meridian International B.V.,ACTIVE
+AMD-2025-0193,0000108431,"Taichung Energy Co., Ltd.",604437379,AMENDMENT,2025-02-05,2027-02-05,N,2/10NET30,CIF,KRPUS port of loading,,USD,2.5,KR,South Korea,Meridian Trading (Shanghai) Co.,ACTIVE
+SOW-2025-0194,0000108431,"Taichung Energy Co., Ltd.",604437379,SOW,2025-03-06,2027-03-06,,2/10NET30,CIF,JPNGO port of loading,,,,KR,South Korea,Meridian Devices Inc.,ACTIVE
+MSA-2019-0195,0000108568,Kyoto Hana Optics Joint Stock Company,604438356,MSA,2019-04-07,2022-04-07,Y,NET30,DDP,TWTPE port of loading,"14,100,000",USD,0.0,VN,New York,Meridian International B.V.,EXPIRED
+MSA-2024-0196,0000108568,Kyoto Hana Optics Joint Stock Company,604438356,MSA,2024-05-08,2027-05-08,N,NET30,DDP,CNSHA port of loading,"14,100,000",USD,1.5,VN,Vietnam,Meridian Trading (Shanghai) Co.,ACTIVE
+AMD-2025-0197,0000108568,Kyoto Hana Optics Joint Stock Company,604438356,AMENDMENT,2025-06-09,2027-06-09,,NET30,DDP,CNYTN port of loading,,USD,2.0,VN,Vietnam,Meridian Devices Inc.,ACTIVE
+MSA-2019-0198,0000108705,"Daegu Metalworks Industry Co., Ltd.",604439333,MSA,2019-07-10,2022-07-10,Y,NET45,DAP,VNSGN port of loading,"14,425,000",EUR,2.5,CN,PRC,Meridian International B.V.,EXPIRED
+MSA-2024-0199,0000108705,"Daegu Metalworks Industry Co., Ltd.",604439333,MSA,2024-08-11,2027-08-11,N,NET45,DAP,KRPUS port of loading,"14,425,000",USD,,CN,PRC,Meridian Trading (Shanghai) Co.,ACTIVE
+AMD-2025-0200,0000108705,"Daegu Metalworks Industry Co., Ltd.",604439333,AMENDMENT,2025-09-12,2027-09-12,,NET45,DAP,JPNGO port of loading,,USD,0.0,CN,PRC,Meridian Devices Inc.,ACTIVE
+MSA-2019-0201,0000108842,Binh Duong Microsystems Industrial Corp.,604440310,MSA,2019-10-13,2022-10-13,Y,NET60,FOB,TWTPE port of loading,"14,750,000",USD,1.5,TW,Taiwan,Meridian Trading (Shanghai) Co.,EXPIRED
+MSA-2024-0202,0000108842,Binh Duong Microsystems Industrial Corp.,604440310,MSA,2024-11-14,2027-11-14,N,NET60,FOB,CNSHA port of loading,"14,750,000",USD,2.0,TW,Taiwan,Meridian Devices Inc.,ACTIVE
+AMD-2025-0203,0000108842,Binh Duong Microsystems Industrial Corp.,604440310,AMENDMENT,2025-12-15,2027-12-15,,NET60,FOB,CNYTN port of loading,,USD,2.5,TW,Taiwan,Meridian International B.V.,ACTIVE
+SOW-2025-0204,0000108842,Binh Duong Microsystems Industrial Corp.,604440310,SOW,2025-01-16,2027-01-16,Y,NET60,FOB,TBD,,,,TW,Taiwan,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2019-0205,0000108979,Hefei Summit Circuit Inc.,604441287,MSA,2019-02-17,2022-02-17,N,2/10NET30,FCA,KRPUS port of loading,"15,075,000",USD,0.0,US,New York,Meridian Devices Inc.,EXPIRED
+MSA-2024-0206,0000108979,Hefei Summit Circuit Inc.,604441287,MSA,2024-03-18,2027-03-18,,2/10NET30,FCA,JPNGO port of loading,"15,075,000",USD,1.5,US,New York,Meridian International B.V.,ACTIVE
+AMD-2025-0207,0000108979,Hefei Summit Circuit Inc.,604441287,AMENDMENT,2025-04-19,2027-04-19,Y,2/10NET30,FCA,CNXMN port of loading,,USD,2.0,US,New York,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2019-0208,0000109116,"Hangzhou Lake Display Industry Co., Ltd.",604442264,MSA,2019-05-20,2022-05-20,N,NET30,EXW,CNSHA port of loading,"15,400,000",USD,2.5,CN,New York,Meridian Devices Inc.,EXPIRED
+MSA-2024-0209,0000109116,"Hangzhou Lake Display Industry Co., Ltd.",604442264,MSA,2024-06-21,2027-06-21,,NET30,EXW,CNYTN port of loading,"15,400,000",EUR,,CN,PRC,Meridian International B.V.,ACTIVE
+AMD-2025-0210,0000109116,"Hangzhou Lake Display Industry Co., Ltd.",604442264,AMENDMENT,2025-07-22,2027-07-22,Y,NET30,EXW,TWKHH port of loading,,USD,0.0,CN,PRC,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2019-0211,0000109253,Keelung Acoustics Industrial Corp.,604443241,MSA,2019-08-23,2022-08-23,N,NET45,CIF,KRPUS port of loading,"15,725,000",USD,1.5,TW,Taiwan,Meridian Devices Inc.,EXPIRED
+MSA-2024-0212,0000109253,Keelung Acoustics Industrial Corp.,604443241,MSA,2024-09-24,2027-09-24,,NET45,CIF,JPNGO port of loading,"15,725,000",USD,2.0,TW,Taiwan,Meridian International B.V.,ACTIVE
+AMD-2025-0213,0000109253,Keelung Acoustics Industrial Corp.,604443241,AMENDMENT,2025-10-25,2027-10-25,Y,NET45,CIF,CNXMN port of loading,,USD,2.5,TW,Taiwan,Meridian Trading (Shanghai) Co.,ACTIVE
+SOW-2025-0214,0000109253,Keelung Acoustics Industrial Corp.,604443241,SOW,2025-11-26,2027-11-26,N,NET45,CIF,TWTPE port of loading,,,,TW,Taiwan,Meridian Devices Inc.,ACTIVE
+MSA-2019-0215,0000109390,Nara Tooling Corporation,604444218,MSA,2019-12-27,2022-12-27,,NET60,DDP,CNYTN port of loading,"16,050,000",USD,0.0,JP,Japan,Meridian International B.V.,EXPIRED
+MSA-2024-0216,0000109390,Nara Tooling Corporation,604444218,MSA,2024-01-01,2027-01-01,Y,NET60,DDP,TWKHH port of loading,"16,050,000",USD,1.5,JP,Japan,Meridian Trading (Shanghai) Co.,ACTIVE
+AMD-2025-0217,0000109390,Nara Tooling Corporation,604444218,AMENDMENT,2025-02-02,2027-02-02,N,NET60,DDP,VNSGN port of loading,,USD,2.0,JP,Japan,Meridian Devices Inc.,ACTIVE
+MSA-2019-0218,0000109527,"Suwon Components Co., Ltd.",604445195,MSA,2019-03-03,2022-03-03,,2/10NET30,DAP,JPNGO port of loading,"16,375,000",USD,2.5,KR,South Korea,Meridian International B.V.,EXPIRED
+MSA-2024-0219,0000109527,"Suwon Components Co., Ltd.",604445195,MSA,2024-04-04,2027-04-04,Y,2/10NET30,DAP,CNXMN port of loading,"16,375,000",USD,,KR,South Korea,Meridian Trading (Shanghai) Co.,ACTIVE
+AMD-2025-0220,0000109527,"Suwon Components Co., Ltd.",604445195,AMENDMENT,2025-05-05,2027-05-05,N,2/10NET30,DAP,TWTPE port of loading,,EUR,0.0,KR,South Korea,Meridian Devices Inc.,ACTIVE
+MSA-2019-0221,0000109664,Can Tho Precision Joint Stock Company,604446172,MSA,2019-06-06,2022-06-06,,NET30,FOB,TBD,"16,700,000",USD,1.5,VN,New York,Meridian Trading (Shanghai) Co.,EXPIRED
+MSA-2024-0222,0000109664,Can Tho Precision Joint Stock Company,604446172,MSA,2024-07-07,2027-07-07,Y,NET30,FOB,TWKHH port of loading,"16,700,000",USD,2.0,VN,Vietnam,Meridian Devices Inc.,ACTIVE
+AMD-2025-0223,0000109664,Can Tho Precision Joint Stock Company,604446172,AMENDMENT,2025-08-08,2027-08-08,N,NET30,FOB,VNSGN port of loading,,USD,2.5,VN,Vietnam,Meridian International B.V.,ACTIVE
+SOW-2025-0224,0000109664,Can Tho Precision Joint Stock Company,604446172,SOW,2025-09-09,2027-09-09,,NET30,FOB,KRPUS port of loading,,,,VN,Vietnam,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2019-0225,0000109801,"Tianjin Gate Electronics Industry Co., Ltd.",604447149,MSA,2019-10-10,2022-10-10,Y,NET45,FCA,CNXMN port of loading,"17,025,000",USD,0.0,CN,PRC,Meridian Devices Inc.,EXPIRED
+MSA-2024-0226,0000109801,"Tianjin Gate Electronics Industry Co., Ltd.",604447149,MSA,2024-11-11,2027-11-11,N,NET45,FCA,TWTPE port of loading,"17,025,000",USD,1.5,CN,PRC,Meridian International B.V.,ACTIVE
+AMD-2025-0227,0000109801,"Tianjin Gate Electronics Industry Co., Ltd.",604447149,AMENDMENT,2025-12-12,2027-12-12,,NET45,FCA,CNSHA port of loading,,USD,2.0,CN,PRC,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2019-0228,0000109938,Shaoxing Polymer Industrial Corp.,604448126,MSA,2019-01-13,2022-01-13,Y,NET60,EXW,TWKHH port of loading,"17,350,000",USD,2.5,TW,Taiwan,Meridian Devices Inc.,EXPIRED
+MSA-2024-0229,0000109938,Shaoxing Polymer Industrial Corp.,604448126,MSA,2024-02-14,2027-02-14,N,NET60,EXW,VNSGN port of loading,"17,350,000",USD,,TW,Taiwan,Meridian International B.V.,ACTIVE
+AMD-2025-0230,0000109938,Shaoxing Polymer Industrial Corp.,604448126,AMENDMENT,2025-03-15,2027-03-15,,NET60,EXW,KRPUS port of loading,,USD,0.0,TW,Taiwan,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2019-0231,0000110075,Chiayi Energy Inc.,604449103,MSA,2019-04-16,2022-04-16,Y,2/10NET30,CIF,CNXMN port of loading,"17,675,000",EUR,1.5,US,New York,Meridian Devices Inc.,EXPIRED
+MSA-2024-0232,0000110075,Chiayi Energy Inc.,604449103,MSA,2024-05-17,2027-05-17,N,2/10NET30,CIF,TWTPE port of loading,"17,675,000",USD,2.0,US,New York,Meridian International B.V.,ACTIVE
+AMD-2025-0233,0000110075,Chiayi Energy Inc.,604449103,AMENDMENT,2025-06-18,2027-06-18,,2/10NET30,CIF,CNSHA port of loading,,USD,2.5,US,New York,Meridian Trading (Shanghai) Co.,ACTIVE
+SOW-2025-0234,0000110075,Chiayi Energy Inc.,604449103,SOW,2025-07-19,2027-07-19,Y,2/10NET30,CIF,CNYTN port of loading,,,,US,New York,Meridian Devices Inc.,ACTIVE
+MSA-2024-0235,0000110212,"Kobe Mira Optics Industry Co., Ltd.",604450080,MSA,2024-08-20,2027-08-20,N,NET30,DDP,VNSGN port of loading,"87,000",USD,0.0,CN,PRC,Meridian International B.V.,ACTIVE
+MSA-2025-0236,0000110349,Gwangju Metalworks Industrial Corp.,604451057,MSA,2025-09-21,2028-09-21,,NET45,DAP,JPNGO port of loading,"760,000",USD,1.5,TW,Taiwan,Meridian Trading (Shanghai) Co.,ACTIVE
+PA-2023-0237,0000110486,Vinh Phuc Microsystems Corporation,604452034,PRICING_AGREEMENT,2023-10-22,2025-10-22,Y,NET60,FOB,TWTPE port of loading,,USD,2.0,JP,Japan,Meridian International B.V.,ACTIVE
+MSA-2024-0238,0000110623,"Zhongshan Circuit Co., Ltd.",604453011,MSA,2024-11-23,2027-11-23,N,2/10NET30,FCA,TBD,"808,000",USD,2.5,KR,South Korea,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2025-0239,0000110760,Changshu Display Joint Stock Company,604453988,MSA,2025-12-24,2028-12-24,,NET30,EXW,VNSGN port of loading,"583,000",USD,,VN,Vietnam,Meridian Devices Inc.,ACTIVE
+PA-2023-0240,0000110897,"Miaoli Acoustics Industry Co., Ltd.",604454965,PRICING_AGREEMENT,2023-01-25,2025-01-25,Y,NET45,CIF,JPNGO port of loading,,USD,0.0,CN,PRC,Meridian International B.V.,TERMINATED
+MSA-2024-0241,0000111034,Fukuoka Tooling Industrial Corp.,604455942,MSA,2024-02-26,2027-02-26,N,NET60,DDP,TWTPE port of loading,"674,000",USD,1.5,TW,Taiwan,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2025-0242,0000111171,Jeonju Components Inc.,604456919,MSA,2025-03-27,2028-03-27,,2/10NET30,DAP,CNYTN port of loading,"740,000",EUR,2.0,US,New York,Meridian Devices Inc.,ACTIVE
+PA-2023-0243,0000111308,"Quang Nam Precision Industry Co., Ltd.",604457896,PRICING_AGREEMENT,2023-04-01,2025-04-01,Y,NET30,FOB,VNSGN port of loading,,USD,2.5,CN,PRC,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2024-0244,0000111445,Dalian Crest Electronics Industrial Corp.,604458873,MSA,2024-05-02,2027-05-02,N,NET45,FCA,JPNGO port of loading,"168,000",USD,,TW,Taiwan,Meridian Devices Inc.,ACTIVE
+MSA-2025-0245,0000111582,Jiaxing Polymer Corporation,604459850,MSA,2025-06-03,2028-06-03,,NET60,EXW,TWTPE port of loading,"495,000",USD,0.0,JP,Japan,Meridian International B.V.,ACTIVE
+PA-2023-0246,0000111719,"Pingtung Energy Co., Ltd.",604460827,PRICING_AGREEMENT,2023-07-04,2025-07-04,Y,2/10NET30,CIF,CNYTN port of loading,,USD,1.5,KR,South Korea,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2024-0247,0000111856,Sapporo Optics Joint Stock Company,604461804,MSA,2024-08-05,2027-08-05,N,NET30,DDP,VNSGN port of loading,"479,000",USD,2.0,VN,New York,Meridian Devices Inc.,ACTIVE
+MSA-2025-0248,0000111993,"Cheonan Metalworks Industry Co., Ltd.",604462781,MSA,2025-09-06,2028-09-06,,NET45,DAP,JPNGO port of loading,"760,000",USD,2.5,CN,PRC,Meridian International B.V.,ACTIVE
+PA-2023-0249,0000112130,Long An Microsystems Industrial Corp.,604463758,PRICING_AGREEMENT,2023-10-07,2025-10-07,Y,NET60,FOB,TWTPE port of loading,,USD,,TW,Taiwan,Meridian Devices Inc.,TERMINATED
+MSA-2024-0250,0000112267,Nantong Circuit Inc.,604464735,MSA,2024-11-08,2027-11-08,N,2/10NET30,FCA,CNYTN port of loading,"734,000",USD,0.0,US,New York,Meridian International B.V.,ACTIVE
+MSA-2025-0251,0000112404,"Yilan Display Industry Co., Ltd.",604465712,MSA,2025-12-09,2028-12-09,,NET30,EXW,VNSGN port of loading,"752,000",USD,1.5,CN,PRC,Meridian Trading (Shanghai) Co.,ACTIVE
+PA-2023-0252,0000112541,Hailong Acoustics Industrial Corp.,604466689,PRICING_AGREEMENT,2023-01-10,2025-01-10,Y,NET45,CIF,JPNGO port of loading,,USD,2.0,TW,Taiwan,Meridian Devices Inc.,ACTIVE
+MSA-2024-0253,0000112678,Suzhou Brightway Tooling Corporation,604467666,MSA,2024-02-11,2027-02-11,N,NET60,DDP,TWTPE port of loading,"546,000",EUR,2.5,JP,Japan,Meridian International B.V.,ACTIVE
+MSA-2025-0254,0000112815,"Kunshan Components Co., Ltd.",604468643,MSA,2025-03-12,2028-03-12,,2/10NET30,DAP,CNYTN port of loading,"809,000",USD,,KR,South Korea,Meridian Trading (Shanghai) Co.,ACTIVE
+PA-2023-0255,0000112952,Volta Precision Joint Stock Company,604469620,PRICING_AGREEMENT,2023-04-13,2025-04-13,Y,NET30,FOB,TBD,,USD,0.0,VN,Vietnam,Meridian International B.V.,ACTIVE
+MSA-2024-0256,0000113089,"Taoyuan Electronics Industry Co., Ltd.",604470597,MSA,2024-05-14,2027-05-14,N,NET45,FCA,JPNGO port of loading,"630,000",USD,1.5,CN,PRC,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2025-0257,0000113226,Nagoya Polymer Industrial Corp.,604471574,MSA,2025-06-15,2028-06-15,,NET60,EXW,TWTPE port of loading,"639,000",USD,2.0,TW,Taiwan,Meridian Devices Inc.,ACTIVE
+PA-2023-0258,0000113363,Dongguan Rixin Energy Inc.,604472551,PRICING_AGREEMENT,2023-07-16,2025-07-16,Y,2/10NET30,CIF,CNYTN port of loading,,USD,2.5,US,New York,Meridian International B.V.,TERMINATED
+MSA-2024-0259,0000113500,"Hsinchu Optics Industry Co., Ltd.",604473528,MSA,2024-08-17,2027-08-17,N,NET30,DDP,VNSGN port of loading,"245,000",USD,,CN,PRC,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2025-0260,0000113637,Pusan Metalworks Industrial Corp.,604474505,MSA,2025-09-18,2028-09-18,,NET45,DAP,JPNGO port of loading,"76,000",USD,0.0,TW,New York,Meridian Devices Inc.,ACTIVE
+PA-2023-0261,0000113774,Hanoi Lotus Microsystems Corporation,604475482,PRICING_AGREEMENT,2023-10-19,2025-10-19,Y,NET60,FOB,TWTPE port of loading,,USD,1.5,JP,Japan,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2024-0262,0000113911,"Ningbo Anchor Circuit Co., Ltd.",604476459,MSA,2024-11-20,2027-11-20,N,2/10NET30,FCA,CNYTN port of loading,"163,000",USD,2.0,KR,South Korea,Meridian Devices Inc.,ACTIVE
+MSA-2025-0263,0000114048,Chengdu Skylark Display Joint Stock Company,604477436,MSA,2025-12-21,2028-12-21,,NET30,EXW,VNSGN port of loading,"357,000",USD,2.5,VN,Vietnam,Meridian International B.V.,ACTIVE
+PA-2023-0264,0000114185,"Osaka Meiwa Acoustics Industry Co., Ltd.",604478413,PRICING_AGREEMENT,2023-01-22,2025-01-22,Y,NET45,CIF,JPNGO port of loading,,EUR,,CN,PRC,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2024-0265,0000114322,Gumi Tooling Industrial Corp.,604479390,MSA,2024-02-23,2027-02-23,N,NET60,DDP,TWTPE port of loading,"139,000",USD,0.0,TW,Taiwan,Meridian Devices Inc.,ACTIVE
+MSA-2025-0266,0000114459,Da Nang Components Inc.,604480367,MSA,2025-03-24,2028-03-24,,2/10NET30,DAP,CNYTN port of loading,"760,000",USD,1.5,US,New York,Meridian International B.V.,ACTIVE
+PA-2023-0267,0000114596,"Xiamen Harbor Precision Industry Co., Ltd.",604481344,PRICING_AGREEMENT,2023-04-25,2025-04-25,Y,NET30,FOB,VNSGN port of loading,,USD,2.0,CN,PRC,Meridian Devices Inc.,TERMINATED
+MSA-2024-0268,0000114733,Wuxi Crane Electronics Industrial Corp.,604482321,MSA,2024-05-26,2027-05-26,N,NET45,FCA,JPNGO port of loading,"525,000",USD,2.5,TW,Taiwan,Meridian International B.V.,ACTIVE
+MSA-2025-0269,0000114870,Tainan Polymer Corporation,604483298,MSA,2025-06-27,2028-06-27,,NET60,EXW,TWTPE port of loading,"584,000",USD,,JP,Japan,Meridian Trading (Shanghai) Co.,ACTIVE
+PA-2023-0270,0000115007,"Yokohama Kiyo Energy Co., Ltd.",604484275,PRICING_AGREEMENT,2023-07-01,2025-07-01,Y,2/10NET30,CIF,CNYTN port of loading,,USD,0.0,KR,South Korea,Meridian Devices Inc.,ACTIVE
+MSA-2024-0271,0000115144,Incheon Optics Joint Stock Company,604485252,MSA,2024-08-02,2027-08-02,N,NET30,DDP,VNSGN port of loading,"582,000",USD,1.5,VN,Vietnam,Meridian International B.V.,ACTIVE
+MSA-2025-0272,0000115281,"Qingdao Pearl Metalworks Industry Co., Ltd.",604486229,MSA,2025-09-03,2028-09-03,,NET45,DAP,TBD,"629,000",USD,2.0,CN,PRC,Meridian Trading (Shanghai) Co.,ACTIVE
+PA-2023-0273,0000115418,Zhuhai Coral Microsystems Industrial Corp.,604487206,PRICING_AGREEMENT,2023-10-04,2025-10-04,Y,NET60,FOB,TWTPE port of loading,,USD,2.5,TW,New York,Meridian International B.V.,ACTIVE
+MSA-2024-0274,0000115555,Kaohsiung Circuit Inc.,604488183,MSA,2024-11-05,2027-11-05,N,2/10NET30,FCA,CNYTN port of loading,"466,000",USD,,US,New York,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2025-0275,0000115692,"Sendai Display Industry Co., Ltd.",604489160,MSA,2025-12-06,2028-12-06,,NET30,EXW,VNSGN port of loading,"53,000",EUR,0.0,CN,PRC,Meridian Devices Inc.,ACTIVE
+PA-2023-0276,0000115829,Ulsan Acoustics Industrial Corp.,604490137,PRICING_AGREEMENT,2023-01-07,2025-01-07,Y,NET45,CIF,JPNGO port of loading,,USD,1.5,TW,Taiwan,Meridian International B.V.,TERMINATED
+MSA-2024-0277,0000115966,Haiphong Tooling Corporation,604491114,MSA,2024-02-08,2027-02-08,N,NET60,DDP,TWTPE port of loading,"728,000",USD,2.0,JP,Japan,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2025-0278,0000116103,"Foshan Ridge Components Co., Ltd.",604492091,MSA,2025-03-09,2028-03-09,,2/10NET30,DAP,CNYTN port of loading,"686,000",USD,2.5,KR,South Korea,Meridian Devices Inc.,ACTIVE
+PA-2023-0279,0000116240,Taichung Precision Joint Stock Company,604493068,PRICING_AGREEMENT,2023-04-10,2025-04-10,Y,NET30,FOB,VNSGN port of loading,,USD,,VN,Vietnam,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2024-0280,0000116377,"Kyoto Hana Electronics Industry Co., Ltd.",604494045,MSA,2024-05-11,2027-05-11,N,NET45,FCA,JPNGO port of loading,"478,000",USD,0.0,CN,PRC,Meridian Devices Inc.,ACTIVE
+MSA-2025-0281,0000116514,Daegu Polymer Industrial Corp.,604495022,MSA,2025-06-12,2028-06-12,,NET60,EXW,TWTPE port of loading,"505,000",USD,1.5,TW,Taiwan,Meridian International B.V.,ACTIVE
+PA-2023-0282,0000116651,Binh Duong Energy Inc.,604495999,PRICING_AGREEMENT,2023-07-13,2025-07-13,Y,2/10NET30,CIF,CNYTN port of loading,,USD,2.0,US,New York,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2024-0283,0000116788,"Hefei Summit Optics Industry Co., Ltd.",604496976,MSA,2024-08-14,2027-08-14,N,NET30,DDP,VNSGN port of loading,"610,000",USD,2.5,CN,PRC,Meridian Devices Inc.,ACTIVE
+MSA-2025-0284,0000116925,Hangzhou Lake Metalworks Industrial Corp.,604497953,MSA,2025-09-15,2028-09-15,,NET45,DAP,JPNGO port of loading,"106,000",USD,,TW,Taiwan,Meridian International B.V.,ACTIVE
+PA-2023-0285,0000117062,Keelung Microsystems Corporation,604498930,PRICING_AGREEMENT,2023-10-16,2025-10-16,Y,NET60,FOB,TWTPE port of loading,,USD,0.0,JP,Japan,Meridian Devices Inc.,TERMINATED
+MSA-2024-0286,0000117199,"Nara Circuit Co., Ltd.",604499907,MSA,2024-11-17,2027-11-17,N,2/10NET30,FCA,CNYTN port of loading,"676,000",EUR,1.5,KR,New York,Meridian International B.V.,ACTIVE
+MSA-2025-0287,0000117336,Suwon Display Joint Stock Company,604500884,MSA,2025-12-18,2028-12-18,,NET30,EXW,VNSGN port of loading,"264,000",USD,2.0,VN,Vietnam,Meridian Trading (Shanghai) Co.,ACTIVE
+PA-2023-0288,0000117473,"Can Tho Acoustics Industry Co., Ltd.",604501861,PRICING_AGREEMENT,2023-01-19,2025-01-19,Y,NET45,CIF,JPNGO port of loading,,USD,2.5,CN,PRC,Meridian Devices Inc.,ACTIVE
+MSA-2024-0289,0000117610,Tianjin Gate Tooling Industrial Corp.,604502838,MSA,2024-02-20,2027-02-20,N,NET60,DDP,TBD,"113,000",USD,,TW,Taiwan,Meridian International B.V.,ACTIVE
+MSA-2025-0290,0000117747,Shaoxing Components Inc.,604503815,MSA,2025-03-21,2028-03-21,,2/10NET30,DAP,CNYTN port of loading,"276,000",USD,0.0,US,New York,Meridian Trading (Shanghai) Co.,ACTIVE
+PA-2023-0291,0000117884,"Chiayi Precision Industry Co., Ltd.",604504792,PRICING_AGREEMENT,2023-04-22,2025-04-22,Y,NET30,FOB,VNSGN port of loading,,USD,1.5,CN,PRC,Meridian International B.V.,ACTIVE
+MSA-2024-0292,0000118021,Kobe Mira Electronics Industrial Corp.,604505769,MSA,2024-05-23,2027-05-23,N,NET45,FCA,JPNGO port of loading,"670,000",USD,2.0,TW,Taiwan,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2025-0293,0000118158,Gwangju Polymer Corporation,604506746,MSA,2025-06-24,2028-06-24,,NET60,EXW,TWTPE port of loading,"224,000",USD,2.5,JP,Japan,Meridian Devices Inc.,ACTIVE
+PA-2023-0294,0000118295,"Vinh Phuc Energy Co., Ltd.",604507723,PRICING_AGREEMENT,2023-07-25,2025-07-25,Y,2/10NET30,CIF,CNYTN port of loading,,USD,,KR,South Korea,Meridian International B.V.,TERMINATED
+MSA-2024-0295,0000118432,Zhongshan Optics Joint Stock Company,604508700,MSA,2024-08-26,2027-08-26,N,NET30,DDP,VNSGN port of loading,"679,000",USD,0.0,VN,Vietnam,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2025-0296,0000118569,"Changshu Metalworks Industry Co., Ltd.",604509677,MSA,2025-09-27,2028-09-27,,NET45,DAP,JPNGO port of loading,"879,000",USD,1.5,CN,PRC,Meridian Devices Inc.,ACTIVE
+PA-2023-0297,0000118706,Miaoli Microsystems Industrial Corp.,604510654,PRICING_AGREEMENT,2023-10-01,2025-10-01,Y,NET60,FOB,TWTPE port of loading,,EUR,2.0,TW,Taiwan,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2024-0298,0000118843,Fukuoka Circuit Inc.,604511631,MSA,2024-11-02,2027-11-02,N,2/10NET30,FCA,CNYTN port of loading,"470,000",USD,2.5,US,New York,Meridian Devices Inc.,ACTIVE
+MSA-2025-0299,0000118980,"Jeonju Display Industry Co., Ltd.",604512608,MSA,2025-12-03,2028-12-03,,NET30,EXW,VNSGN port of loading,"375,000",USD,,CN,New York,Meridian International B.V.,ACTIVE
+PA-2023-0300,0000119117,Quang Nam Acoustics Industrial Corp.,604513585,PRICING_AGREEMENT,2023-01-04,2025-01-04,Y,NET45,CIF,JPNGO port of loading,,USD,0.0,TW,Taiwan,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2024-0301,0000119254,Dalian Crest Tooling Corporation,604514562,MSA,2024-02-05,2027-02-05,N,NET60,DDP,TWTPE port of loading,"457,000",USD,1.5,JP,Japan,Meridian Devices Inc.,ACTIVE
+MSA-2025-0302,0000119391,"Jiaxing Components Co., Ltd.",604515539,MSA,2025-03-06,2028-03-06,,2/10NET30,DAP,CNYTN port of loading,"631,000",USD,2.0,KR,South Korea,Meridian International B.V.,ACTIVE
+PA-2023-0303,0000119528,Pingtung Precision Joint Stock Company,604516516,PRICING_AGREEMENT,2023-04-07,2025-04-07,Y,NET30,FOB,VNSGN port of loading,,USD,2.5,VN,Vietnam,Meridian Devices Inc.,TERMINATED
+MSA-2024-0304,0000119665,"Sapporo Electronics Industry Co., Ltd.",604517493,MSA,2024-05-08,2027-05-08,N,NET45,FCA,JPNGO port of loading,"702,000",USD,,CN,PRC,Meridian International B.V.,ACTIVE
+MSA-2025-0305,0000119802,Cheonan Polymer Industrial Corp.,604518470,MSA,2025-06-09,2028-06-09,,NET60,EXW,TWTPE port of loading,"574,000",USD,0.0,TW,Taiwan,Meridian Trading (Shanghai) Co.,ACTIVE
+PA-2023-0306,0000119939,Long An Energy Inc.,604519447,PRICING_AGREEMENT,2023-07-10,2025-07-10,Y,2/10NET30,CIF,TBD,,USD,1.5,US,New York,Meridian Devices Inc.,ACTIVE
+MSA-2024-0307,0000120076,"Nantong Optics Industry Co., Ltd.",604520424,MSA,2024-08-11,2027-08-11,N,NET30,DDP,VNSGN port of loading,"596,000",USD,2.0,CN,PRC,Meridian International B.V.,ACTIVE
+MSA-2025-0308,0000120213,Yilan Metalworks Industrial Corp.,604521401,MSA,2025-09-12,2028-09-12,,NET45,DAP,JPNGO port of loading,"116,000",EUR,2.5,TW,Taiwan,Meridian Trading (Shanghai) Co.,ACTIVE
+PA-2023-0309,0000120350,Hailong Microsystems Corporation,604522378,PRICING_AGREEMENT,2023-10-13,2025-10-13,Y,NET60,FOB,TWTPE port of loading,,USD,,JP,Japan,Meridian International B.V.,ACTIVE
+MSA-2024-0310,0000120487,"Suzhou Brightway Circuit Co., Ltd.",604523355,MSA,2024-11-14,2027-11-14,N,2/10NET30,FCA,CNYTN port of loading,"175,000",USD,0.0,KR,South Korea,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2025-0311,0000120624,Kunshan Display Joint Stock Company,604524332,MSA,2025-12-15,2028-12-15,,NET30,EXW,VNSGN port of loading,"266,000",USD,1.5,VN,Vietnam,Meridian Devices Inc.,ACTIVE
+PA-2023-0312,0000120761,"Volta Acoustics Industry Co., Ltd.",604525309,PRICING_AGREEMENT,2023-01-16,2025-01-16,Y,NET45,CIF,JPNGO port of loading,,USD,2.0,CN,New York,Meridian International B.V.,TERMINATED
+MSA-2024-0313,0000120898,Taoyuan Tooling Industrial Corp.,604526286,MSA,2024-02-17,2027-02-17,N,NET60,DDP,TWTPE port of loading,"682,000",USD,2.5,TW,Taiwan,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2025-0314,0000121035,Nagoya Components Inc.,604527263,MSA,2025-03-18,2028-03-18,,2/10NET30,DAP,CNYTN port of loading,"309,000",USD,,US,New York,Meridian Devices Inc.,ACTIVE
+PA-2023-0315,0000121172,"Dongguan Rixin Precision Industry Co., Ltd.",604528240,PRICING_AGREEMENT,2023-04-19,2025-04-19,Y,NET30,FOB,VNSGN port of loading,,USD,0.0,CN,PRC,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2024-0316,0000121309,Hsinchu Electronics Industrial Corp.,604529217,MSA,2024-05-20,2027-05-20,N,NET45,FCA,JPNGO port of loading,"533,000",USD,1.5,TW,Taiwan,Meridian Devices Inc.,ACTIVE
+MSA-2025-0317,0000121446,Pusan Polymer Corporation,604530194,MSA,2025-06-21,2028-06-21,,NET60,EXW,TWTPE port of loading,"61,000",USD,2.0,JP,Japan,Meridian International B.V.,ACTIVE
+PA-2023-0318,0000121583,"Hanoi Lotus Energy Co., Ltd.",604531171,PRICING_AGREEMENT,2023-07-22,2025-07-22,Y,2/10NET30,CIF,CNYTN port of loading,,USD,2.5,KR,South Korea,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2024-0319,0000121720,Ningbo Anchor Optics Joint Stock Company,604532148,MSA,2024-08-23,2027-08-23,N,NET30,DDP,VNSGN port of loading,"102,000",EUR,,VN,Vietnam,Meridian Devices Inc.,ACTIVE
+MSA-2025-0320,0000121857,"Chengdu Skylark Metalworks Industry Co., Ltd.",604533125,MSA,2025-09-24,2028-09-24,,NET45,DAP,JPNGO port of loading,"278,000",USD,0.0,CN,PRC,Meridian International B.V.,ACTIVE
+PA-2023-0321,0000121994,Osaka Meiwa Microsystems Industrial Corp.,604534102,PRICING_AGREEMENT,2023-10-25,2025-10-25,Y,NET60,FOB,TWTPE port of loading,,USD,1.5,TW,Taiwan,Meridian Devices Inc.,TERMINATED
+MSA-2024-0322,0000122131,Gumi Circuit Inc.,604535079,MSA,2024-11-26,2027-11-26,N,2/10NET30,FCA,CNYTN port of loading,"621,000",USD,2.0,US,New York,Meridian International B.V.,ACTIVE
+MSA-2025-0323,0000122268,"Da Nang Display Industry Co., Ltd.",604536056,MSA,2025-12-27,2028-12-27,,NET30,EXW,TBD,"638,000",USD,2.5,CN,PRC,Meridian Trading (Shanghai) Co.,ACTIVE
+PA-2023-0324,0000122405,Xiamen Harbor Acoustics Industrial Corp.,604537033,PRICING_AGREEMENT,2023-01-01,2025-01-01,Y,NET45,CIF,JPNGO port of loading,,USD,,TW,Taiwan,Meridian Devices Inc.,ACTIVE
+MSA-2024-0325,0000122542,Wuxi Crane Tooling Corporation,604538010,MSA,2024-02-02,2027-02-02,N,NET60,DDP,TWTPE port of loading,"624,000",USD,0.0,JP,New York,Meridian International B.V.,ACTIVE
+MSA-2025-0326,0000122679,"Tainan Components Co., Ltd.",604538987,MSA,2025-03-03,2028-03-03,,2/10NET30,DAP,CNYTN port of loading,"297,000",USD,1.5,KR,South Korea,Meridian Trading (Shanghai) Co.,ACTIVE
+PA-2023-0327,0000122816,Yokohama Kiyo Precision Joint Stock Company,604539964,PRICING_AGREEMENT,2023-04-04,2025-04-04,Y,NET30,FOB,VNSGN port of loading,,USD,2.0,VN,Vietnam,Meridian International B.V.,ACTIVE
+MSA-2024-0328,0000122953,"Incheon Electronics Industry Co., Ltd.",604540941,MSA,2024-05-05,2027-05-05,N,NET45,FCA,JPNGO port of loading,"489,000",USD,2.5,CN,PRC,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2025-0329,0000123090,Qingdao Pearl Polymer Industrial Corp.,604541918,MSA,2025-06-06,2028-06-06,,NET60,EXW,TWTPE port of loading,"445,000",USD,,TW,Taiwan,Meridian Devices Inc.,ACTIVE
+PA-2023-0330,0000123227,Zhuhai Coral Energy Inc.,604542895,PRICING_AGREEMENT,2023-07-07,2025-07-07,Y,2/10NET30,CIF,CNYTN port of loading,,EUR,0.0,US,New York,Meridian International B.V.,TERMINATED
+MSA-2024-0331,0000123364,"Kaohsiung Optics Industry Co., Ltd.",604543872,MSA,2024-08-08,2027-08-08,N,NET30,DDP,VNSGN port of loading,"446,000",USD,1.5,CN,PRC,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2025-0332,0000123501,Sendai Metalworks Industrial Corp.,604544849,MSA,2025-09-09,2028-09-09,,NET45,DAP,JPNGO port of loading,"151,000",USD,2.0,TW,Taiwan,Meridian Devices Inc.,ACTIVE
+PA-2023-0333,0000123638,Ulsan Microsystems Corporation,604545826,PRICING_AGREEMENT,2023-10-10,2025-10-10,Y,NET60,FOB,TWTPE port of loading,,USD,2.5,JP,Japan,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2024-0334,0000123775,"Haiphong Circuit Co., Ltd.",604546803,MSA,2024-11-11,2027-11-11,N,2/10NET30,FCA,CNYTN port of loading,"810,000",USD,,KR,South Korea,Meridian Devices Inc.,ACTIVE
+MSA-2025-0335,0000123912,Foshan Ridge Display Joint Stock Company,604547780,MSA,2025-12-12,2028-12-12,,NET30,EXW,VNSGN port of loading,"219,000",USD,0.0,VN,Vietnam,Meridian International B.V.,ACTIVE
+PA-2023-0336,0000124049,"Taichung Acoustics Industry Co., Ltd.",604548757,PRICING_AGREEMENT,2023-01-13,2025-01-13,Y,NET45,CIF,JPNGO port of loading,,USD,1.5,CN,PRC,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2024-0337,0000124186,Kyoto Hana Tooling Industrial Corp.,604549734,MSA,2024-02-14,2027-02-14,N,NET60,DDP,TWTPE port of loading,"881,000",USD,2.0,TW,Taiwan,Meridian Devices Inc.,ACTIVE
+MSA-2025-0338,0000124323,Daegu Components Inc.,604550711,MSA,2025-03-15,2028-03-15,,2/10NET30,DAP,CNYTN port of loading,"846,000",USD,2.5,US,New York,Meridian International B.V.,ACTIVE
+PA-2023-0339,0000124460,"Binh Duong Precision Industry Co., Ltd.",604551688,PRICING_AGREEMENT,2023-04-16,2025-04-16,Y,NET30,FOB,VNSGN port of loading,,USD,,CN,PRC,Meridian Devices Inc.,TERMINATED
+MSA-2024-0340,0000124597,Hefei Summit Electronics Industrial Corp.,604552665,MSA,2024-05-17,2027-05-17,N,NET45,FCA,TBD,"65,000",USD,0.0,TW,Taiwan,Meridian International B.V.,ACTIVE
+MSA-2025-0341,0000124734,Hangzhou Lake Polymer Corporation,604553642,MSA,2025-06-18,2028-06-18,,NET60,EXW,TWTPE port of loading,"440,000",EUR,1.5,JP,Japan,Meridian Trading (Shanghai) Co.,ACTIVE
+PA-2023-0342,0000124871,"Keelung Energy Co., Ltd.",604554619,PRICING_AGREEMENT,2023-07-19,2025-07-19,Y,2/10NET30,CIF,CNYTN port of loading,,USD,2.0,KR,South Korea,Meridian Devices Inc.,ACTIVE
+MSA-2024-0343,0000125008,Nara Optics Joint Stock Company,604555596,MSA,2024-08-20,2027-08-20,N,NET30,DDP,VNSGN port of loading,"747,000",USD,2.5,VN,Vietnam,Meridian International B.V.,ACTIVE
+MSA-2025-0344,0000125145,"Suwon Metalworks Industry Co., Ltd.",604556573,MSA,2025-09-21,2028-09-21,,NET45,DAP,JPNGO port of loading,"873,000",USD,,CN,PRC,Meridian Trading (Shanghai) Co.,ACTIVE
+PA-2023-0345,0000125282,Can Tho Microsystems Industrial Corp.,604557550,PRICING_AGREEMENT,2023-10-22,2025-10-22,Y,NET60,FOB,TWTPE port of loading,,USD,0.0,TW,Taiwan,Meridian International B.V.,ACTIVE
+MSA-2024-0346,0000125419,Tianjin Gate Circuit Inc.,604558527,MSA,2024-11-23,2027-11-23,N,2/10NET30,FCA,CNYTN port of loading,"432,000",USD,1.5,US,New York,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2025-0347,0000125556,"Shaoxing Display Industry Co., Ltd.",604559504,MSA,2025-12-24,2028-12-24,,NET30,EXW,VNSGN port of loading,"278,000",USD,2.0,CN,PRC,Meridian Devices Inc.,ACTIVE
+PA-2023-0348,0000125693,Chiayi Acoustics Industrial Corp.,604560481,PRICING_AGREEMENT,2023-01-25,2025-01-25,Y,NET45,CIF,JPNGO port of loading,,USD,2.5,TW,Taiwan,Meridian International B.V.,TERMINATED
+MSA-2024-0349,0000125830,Kobe Mira Tooling Corporation,604561458,MSA,2024-02-26,2027-02-26,N,NET60,DDP,TWTPE port of loading,"228,000",USD,,JP,Japan,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2025-0350,0000125967,"Gwangju Components Co., Ltd.",604562435,MSA,2025-03-27,2028-03-27,,2/10NET30,DAP,CNYTN port of loading,"854,000",USD,0.0,KR,South Korea,Meridian Devices Inc.,ACTIVE
+PA-2023-0351,0000126104,Vinh Phuc Precision Joint Stock Company,604563412,PRICING_AGREEMENT,2023-04-01,2025-04-01,Y,NET30,FOB,VNSGN port of loading,,USD,1.5,VN,New York,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2024-0352,0000126241,"Zhongshan Electronics Industry Co., Ltd.",604564389,MSA,2024-05-02,2027-05-02,N,NET45,FCA,JPNGO port of loading,"229,000",EUR,2.0,CN,PRC,Meridian Devices Inc.,ACTIVE
+MSA-2025-0353,0000126378,Changshu Polymer Industrial Corp.,604565366,MSA,2025-06-03,2028-06-03,,NET60,EXW,TWTPE port of loading,"544,000",USD,2.5,TW,Taiwan,Meridian International B.V.,ACTIVE
+PA-2023-0354,0000126515,Miaoli Energy Inc.,604566343,PRICING_AGREEMENT,2023-07-04,2025-07-04,Y,2/10NET30,CIF,CNYTN port of loading,,USD,,US,New York,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2024-0355,0000126652,"Fukuoka Optics Industry Co., Ltd.",604567320,MSA,2024-08-05,2027-08-05,N,NET30,DDP,VNSGN port of loading,"170,000",USD,0.0,CN,PRC,Meridian Devices Inc.,ACTIVE
+MSA-2025-0356,0000126789,Jeonju Metalworks Industrial Corp.,604568297,MSA,2025-09-06,2028-09-06,,NET45,DAP,JPNGO port of loading,"495,000",USD,1.5,TW,Taiwan,Meridian International B.V.,ACTIVE
+PA-2023-0357,0000126926,Quang Nam Microsystems Corporation,604569274,PRICING_AGREEMENT,2023-10-07,2025-10-07,Y,NET60,FOB,TBD,,USD,2.0,JP,Japan,Meridian Devices Inc.,TERMINATED
+MSA-2024-0358,0000127063,"Dalian Crest Circuit Co., Ltd.",604570251,MSA,2024-11-08,2027-11-08,N,2/10NET30,FCA,CNYTN port of loading,"860,000",USD,2.5,KR,South Korea,Meridian International B.V.,ACTIVE
+MSA-2025-0359,0000127200,Jiaxing Display Joint Stock Company,604571228,MSA,2025-12-09,2028-12-09,,NET30,EXW,VNSGN port of loading,"163,000",USD,,VN,Vietnam,Meridian Trading (Shanghai) Co.,ACTIVE
+PA-2023-0360,0000127337,"Pingtung Acoustics Industry Co., Ltd.",604572205,PRICING_AGREEMENT,2023-01-10,2025-01-10,Y,NET45,CIF,JPNGO port of loading,,USD,0.0,CN,PRC,Meridian Devices Inc.,ACTIVE
+MSA-2024-0361,0000127474,Sapporo Tooling Industrial Corp.,604573182,MSA,2024-02-11,2027-02-11,N,NET60,DDP,TWTPE port of loading,"747,000",USD,1.5,TW,Taiwan,Meridian International B.V.,ACTIVE
+MSA-2025-0362,0000127611,Cheonan Components Inc.,604574159,MSA,2025-03-12,2028-03-12,,2/10NET30,DAP,CNYTN port of loading,"482,000",USD,2.0,US,New York,Meridian Trading (Shanghai) Co.,ACTIVE
+PA-2023-0363,0000127748,"Long An Precision Industry Co., Ltd.",604575136,PRICING_AGREEMENT,2023-04-13,2025-04-13,Y,NET30,FOB,VNSGN port of loading,,EUR,2.5,CN,PRC,Meridian International B.V.,ACTIVE
+MSA-2024-0364,0000127885,Nantong Electronics Industrial Corp.,604576113,MSA,2024-05-14,2027-05-14,N,NET45,FCA,JPNGO port of loading,"804,000",USD,,TW,New York,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2025-0365,0000128022,Yilan Polymer Corporation,604577090,MSA,2025-06-15,2028-06-15,,NET60,EXW,TWTPE port of loading,"648,000",USD,0.0,JP,Japan,Meridian Devices Inc.,ACTIVE
+PA-2023-0366,0000128159,"Hailong Energy Co., Ltd.",604578067,PRICING_AGREEMENT,2023-07-16,2025-07-16,Y,2/10NET30,CIF,CNYTN port of loading,,USD,1.5,KR,South Korea,Meridian International B.V.,TERMINATED
+MSA-2024-0367,0000128296,Suzhou Brightway Optics Joint Stock Company,604579044,MSA,2024-08-17,2027-08-17,N,NET30,DDP,VNSGN port of loading,"247,000",USD,2.0,VN,Vietnam,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2025-0368,0000128433,"Kunshan Metalworks Industry Co., Ltd.",604580021,MSA,2025-09-18,2028-09-18,,NET45,DAP,JPNGO port of loading,"813,000",USD,2.5,CN,PRC,Meridian Devices Inc.,ACTIVE
+PA-2023-0369,0000128570,Volta Microsystems Industrial Corp.,604580998,PRICING_AGREEMENT,2023-10-19,2025-10-19,Y,NET60,FOB,TWTPE port of loading,,USD,,TW,Taiwan,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2024-0370,0000128707,Taoyuan Circuit Inc.,604581975,MSA,2024-11-20,2027-11-20,N,2/10NET30,FCA,CNYTN port of loading,"463,000",USD,0.0,US,New York,Meridian Devices Inc.,ACTIVE
+MSA-2025-0371,0000128844,"Nagoya Display Industry Co., Ltd.",604582952,MSA,2025-12-21,2028-12-21,,NET30,EXW,VNSGN port of loading,"71,000",USD,1.5,CN,PRC,Meridian International B.V.,ACTIVE
+PA-2023-0372,0000128981,Dongguan Rixin Acoustics Industrial Corp.,604583929,PRICING_AGREEMENT,2023-01-22,2025-01-22,Y,NET45,CIF,JPNGO port of loading,,USD,2.0,TW,Taiwan,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2024-0373,0000129118,Hsinchu Tooling Corporation,604584906,MSA,2024-02-23,2027-02-23,N,NET60,DDP,TWTPE port of loading,"53,000",USD,2.5,JP,Japan,Meridian Devices Inc.,ACTIVE
+MSA-2025-0374,0000129255,"Pusan Components Co., Ltd.",604585883,MSA,2025-03-24,2028-03-24,,2/10NET30,DAP,TBD,"468,000",EUR,,KR,South Korea,Meridian International B.V.,ACTIVE
+PA-2023-0375,0000129392,Hanoi Lotus Precision Joint Stock Company,604586860,PRICING_AGREEMENT,2023-04-25,2025-04-25,Y,NET30,FOB,VNSGN port of loading,,USD,0.0,VN,Vietnam,Meridian Devices Inc.,TERMINATED
+MSA-2024-0376,0000129529,"Ningbo Anchor Electronics Industry Co., Ltd.",604587837,MSA,2024-05-26,2027-05-26,N,NET45,FCA,JPNGO port of loading,"433,000",USD,1.5,CN,PRC,Meridian International B.V.,ACTIVE
+MSA-2025-0377,0000129666,Chengdu Skylark Polymer Industrial Corp.,604588814,MSA,2025-06-27,2028-06-27,,NET60,EXW,TWTPE port of loading,"307,000",USD,2.0,TW,New York,Meridian Trading (Shanghai) Co.,ACTIVE
+PA-2023-0378,0000129803,Osaka Meiwa Energy Inc.,604589791,PRICING_AGREEMENT,2023-07-01,2025-07-01,Y,2/10NET30,CIF,CNYTN port of loading,,USD,2.5,US,New York,Meridian Devices Inc.,ACTIVE
+MSA-2024-0379,0000129940,"Gumi Optics Industry Co., Ltd.",604590768,MSA,2024-08-02,2027-08-02,N,NET30,DDP,VNSGN port of loading,"170,000",USD,,CN,PRC,Meridian International B.V.,ACTIVE
+MSA-2025-0380,0000130077,Da Nang Metalworks Industrial Corp.,604591745,MSA,2025-09-03,2028-09-03,,NET45,DAP,JPNGO port of loading,"342,000",USD,0.0,TW,Taiwan,Meridian Trading (Shanghai) Co.,ACTIVE
+PA-2023-0381,0000130214,Xiamen Harbor Microsystems Corporation,604592722,PRICING_AGREEMENT,2023-10-04,2025-10-04,Y,NET60,FOB,TWTPE port of loading,,USD,1.5,JP,Japan,Meridian International B.V.,ACTIVE
+MSA-2024-0382,0000130351,"Wuxi Crane Circuit Co., Ltd.",604593699,MSA,2024-11-05,2027-11-05,N,2/10NET30,FCA,CNYTN port of loading,"319,000",USD,2.0,KR,South Korea,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2025-0383,0000130488,Tainan Display Joint Stock Company,604594676,MSA,2025-12-06,2028-12-06,,NET30,EXW,VNSGN port of loading,"764,000",USD,2.5,VN,Vietnam,Meridian Devices Inc.,ACTIVE
+PA-2023-0384,0000130625,"Yokohama Kiyo Acoustics Industry Co., Ltd.",604595653,PRICING_AGREEMENT,2023-01-07,2025-01-07,Y,NET45,CIF,JPNGO port of loading,,USD,,CN,PRC,Meridian International B.V.,TERMINATED
+MSA-2024-0385,0000130762,Incheon Tooling Industrial Corp.,604596630,MSA,2024-02-08,2027-02-08,N,NET60,DDP,TWTPE port of loading,"51,000",EUR,0.0,TW,Taiwan,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2025-0386,0000130899,Qingdao Pearl Components Inc.,604597607,MSA,2025-03-09,2028-03-09,,2/10NET30,DAP,CNYTN port of loading,"688,000",USD,1.5,US,New York,Meridian Devices Inc.,ACTIVE
+PA-2023-0387,0000131036,"Zhuhai Coral Precision Industry Co., Ltd.",604598584,PRICING_AGREEMENT,2023-04-10,2025-04-10,Y,NET30,FOB,VNSGN port of loading,,USD,2.0,CN,PRC,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2024-0388,0000131173,Kaohsiung Electronics Industrial Corp.,604599561,MSA,2024-05-11,2027-05-11,N,NET45,FCA,JPNGO port of loading,"763,000",USD,2.5,TW,Taiwan,Meridian Devices Inc.,ACTIVE
+MSA-2025-0389,0000131310,Sendai Polymer Corporation,604600538,MSA,2025-06-12,2028-06-12,,NET60,EXW,TWTPE port of loading,"152,000",USD,,JP,Japan,Meridian International B.V.,ACTIVE
+PA-2023-0390,0000131447,"Ulsan Energy Co., Ltd.",604601515,PRICING_AGREEMENT,2023-07-13,2025-07-13,Y,2/10NET30,CIF,CNYTN port of loading,,USD,0.0,KR,New York,Meridian Trading (Shanghai) Co.,ACTIVE
+MSA-2024-0391,0000131584,Haiphong Optics Joint Stock Company,604602492,MSA,2024-08-14,2027-08-14,N,NET30,DDP,TBD,"837,000",USD,1.5,VN,Vietnam,Meridian Devices Inc.,ACTIVE
+MSA-2025-0392,0000131721,"Foshan Ridge Metalworks Industry Co., Ltd.",604603469,MSA,2025-09-15,2028-09-15,,NET45,DAP,JPNGO port of loading,"656,000",USD,2.0,CN,PRC,Meridian International B.V.,ACTIVE
+PA-2023-0393,0000131858,Taichung Microsystems Industrial Corp.,604604446,PRICING_AGREEMENT,2023-10-16,2025-10-16,Y,NET60,FOB,TWTPE port of loading,,USD,2.5,TW,Taiwan,Meridian Devices Inc.,TERMINATED
+MSA-2024-0394,0000131995,Kyoto Hana Circuit Inc.,604605423,MSA,2024-11-17,2027-11-17,N,2/10NET30,FCA,CNYTN port of loading,"816,000",USD,,US,New York,Meridian International B.V.,ACTIVE
+MSA-2026-0395,0000125282,Can Tho Microsystems Industrial Corp.,604557550,MSA,2026-12-18,2029-12-18,,NET60,FOB,CNYTN port of loading,"296,000",USD,0.0,TW,Taiwan,Meridian Devices Inc.,DRAFT
+MSA-2026-0396,0000125419,Tianjin Gate Circuit Inc.,604558527,MSA,2026-01-19,2029-01-19,Y,2/10NET30,FCA,VNSGN port of loading,"366,000",EUR,1.5,US,New York,Meridian International B.V.,DRAFT
+MSA-2026-0397,0000125556,"Shaoxing Display Industry Co., Ltd.",604559504,MSA,2026-02-20,2029-02-20,N,NET30,EXW,JPNGO port of loading,"384,000",USD,2.0,CN,PRC,Meridian Trading (Shanghai) Co.,DRAFT

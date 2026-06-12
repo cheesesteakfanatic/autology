@@ -23,12 +23,14 @@ import re
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+
+from ontoforge.amber import AmberError
 
 from ontoforge.contracts import (
     Atom,
@@ -44,6 +46,7 @@ from ontoforge.contracts.provenance import ONE, ZERO, Leaf, Prod, ProvTerm, Sum
 from ontoforge.vista import propose, render_with_data
 
 from . import schemas as S
+from .search import run_search
 from .world import REVIEW_RECALIBRATION_THRESHOLD, ProjectError, ProjectWorld, jsonable
 
 STATIC_DIR = Path(__file__).parent / "static"
@@ -237,6 +240,73 @@ def create_app(project: Path | str) -> FastAPI:
             raise HTTPException(status_code=404, detail=f"unknown class uri: {uri}")
         return _class_out(c)
 
+    # ------------------------------------------------------------- search
+
+    @app.get("/api/search", response_model=S.SearchOut)
+    async def api_search(q: str = "", limit: int = 20) -> S.SearchOut:
+        """Federated search (the frozen Cmd+K contract): classes, entities,
+        properties, saved questions, and the static app registry, interleaved
+        by score. Each source degrades independently — a project without a
+        ledger still searches its apps and ontology."""
+        query = q.strip()
+        if not query:
+            return S.SearchOut(results=[])
+        with world.lock:
+            try:
+                ontology = world.ontology
+            except ProjectError:
+                ontology = None
+            try:
+                index = world.search_index
+            except ProjectError:
+                index = None
+            try:
+                questions = world.recent_questions()
+            except ProjectError:
+                questions = []
+            results = run_search(
+                query, limit, ontology=ontology, index=index, questions=questions
+            )
+        return S.SearchOut(results=[S.SearchResult(**r) for r in results])
+
+    # ---------------------------------------------------------- workspace
+
+    @app.get("/api/workspace")
+    async def api_workspace_get() -> Any:
+        """The persisted window-layout blob ({} when never saved)."""
+        return world.read_workspace()
+
+    @app.put("/api/workspace")
+    async def api_workspace_put(request: Request) -> Any:
+        """Persist an arbitrary JSON blob atomically; echoes what was stored."""
+        try:
+            blob = json.loads(await request.body() or b"null")
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=f"body is not JSON: {exc}") from exc
+        world.write_workspace(blob)
+        return blob
+
+    # ------------------------------------------------------------- export
+
+    @app.post("/api/export", response_model=S.ExportBundleOut)
+    async def api_export(body: Optional[S.ExportIn] = None) -> S.ExportBundleOut:
+        """Run amber.snapshot into <project>/exports/<n>/ (or body.out_dir,
+        resolved under the project) and summarize the verified-by-construction
+        bundle."""
+        try:
+            summary = world.export_bundle((body.out_dir if body else None) or None)
+        except ProjectError as exc:
+            raise fail(exc) from exc
+        except AmberError as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        return S.ExportBundleOut(**summary)
+
+    @app.get("/api/exports", response_model=S.ExportsOut)
+    async def api_exports() -> S.ExportsOut:
+        return S.ExportsOut(
+            exports=[S.ExportBundleOut(**b) for b in world.list_exports()]
+        )
+
     # --------------------------------------------------------------- ask
 
     @app.post("/api/ask", response_model=S.AskOut)
@@ -256,6 +326,19 @@ def create_app(project: Path | str) -> FastAPI:
         return S.AskOut(**payload, cached=False)
 
     # ----------------------------------------------------------- entities
+
+    # NOTE: registered BEFORE the greedy /api/entities/{uri:path} card route —
+    # Starlette matches in declaration order and entity uris contain slashes.
+    @app.get("/api/entities/{uri:path}/neighbors", response_model=S.NeighborsOut)
+    async def api_entity_neighbors(uri: str) -> S.NeighborsOut:
+        """Current-stance link neighborhood for the inspector's graph view."""
+        try:
+            links = world.neighbors(uri)
+        except ProjectError as exc:
+            raise fail(exc) from exc
+        if links is None:
+            raise HTTPException(status_code=404, detail=f"unknown entity uri: {uri}")
+        return S.NeighborsOut(links=[S.NeighborLink(**link) for link in links])
 
     @app.get("/api/entities/{uri:path}", response_model=S.EntityOut)
     async def api_entity(uri: str, stance: str = "current") -> S.EntityOut:

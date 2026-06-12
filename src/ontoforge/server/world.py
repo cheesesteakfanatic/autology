@@ -14,12 +14,23 @@ induced ontology.json, else the estate's gold ontology.
 
 from __future__ import annotations
 
+import hashlib
 import json
+import os
 import threading
 from pathlib import Path
 from typing import Any, Callable, Optional
 
-from ontoforge.contracts import FOREVER, Layer, SpineProfile, Stance, ValueCell, from_instant
+from ontoforge.contracts import (
+    FOREVER,
+    Atom,
+    Layer,
+    SpineProfile,
+    Stance,
+    ValueCell,
+    from_instant,
+    leaf,
+)
 from ontoforge.contracts.ontology import Ontology
 from ontoforge.contracts.oqir import Answer, OQIRTerm
 from ontoforge.hearth import Hearth
@@ -55,6 +66,9 @@ class ProjectWorld:
         self._ontology: Optional[Ontology] = None
         self._spine: Optional[DecisionSpine] = None
         self._engine: Optional[Lodestone] = None
+        #: lazy federated-search value index (see server.search); dropped on
+        #: reload() so /api/reload refreshes what search can see.
+        self._search_index: Optional[Any] = None
         #: server-side answer cache: question -> serialized answer dict.
         #: Invalidated by reload(); clarification answers are never cached
         #: (they carry pending engine state).
@@ -86,6 +100,14 @@ class ProjectWorld:
     @property
     def dashboards_dir(self) -> Path:
         return self.project / "dashboards"
+
+    @property
+    def workspace_path(self) -> Path:
+        return self.project / "workspace.json"
+
+    @property
+    def exports_dir(self) -> Path:
+        return self.project / "exports"
 
     # -------------------------------------------------------- lazy world
 
@@ -154,19 +176,77 @@ class ProjectWorld:
                 self._engine = Lodestone(self.ontology, self.hearth, self.ledger, self.spine)
             return self._engine
 
+    @property
+    def search_index(self) -> Any:
+        """The lazy federated-search value index (server.search.WorldIndex)."""
+        from .search import build_index
+
+        with self.lock:
+            if self._search_index is None:
+                self._search_index = build_index(self.hearth, self.ontology)
+            return self._search_index
+
     # ------------------------------------------------------------- asking
 
     def ask(self, question: str) -> tuple[dict[str, Any], bool]:
-        """Answer through the cache; returns (payload, was_cached)."""
+        """Answer through the cache; returns (payload, was_cached).
+
+        Every NEW question is recorded in the ledger as an artifact of kind
+        'question' (constraint-H provenance over a minted question atom), so
+        search kind=question survives server restarts. Cache hits skip the
+        write — the question was recorded when first asked."""
         key = question.strip()
         with self.lock:
             if key in self.answer_cache:
                 return self.answer_cache[key], True
             answer = self.engine.ask(key)
+            self.record_question(key)
             payload = serialize_answer(key, answer)
             if answer.clarification is None:
                 self.answer_cache[key] = payload
             return payload, False
+
+    def record_question(self, question: str) -> None:
+        """Idempotently persist one asked question as a ledger artifact."""
+        qid = hashlib.sha256(question.encode("utf-8")).hexdigest()[:16]
+        artifact_id = f"question:{qid}"
+        with self.lock:
+            ledger = self.ledger
+            row = ledger.connection.execute(
+                "SELECT 1 FROM artifact WHERE artifact_id = ? AND kind = 'question' LIMIT 1",
+                (artifact_id,),
+            ).fetchone()
+            if row is not None:
+                return
+            atom = Atom(uri=f"atom://question/{qid}", value=question)
+            ledger.register_atoms([atom])
+            prov_ref = ledger.intern(leaf(atom.atom_id))
+            ledger.append_artifact(
+                artifact_id=artifact_id,
+                kind="question",
+                payload=json.dumps({"question": question}, sort_keys=True),
+                prov_ref=prov_ref,
+            )
+
+    def recent_questions(self, limit: int = 500) -> list[str]:
+        """Saved/recent asks, newest first, deduplicated (search kind=question)."""
+        with self.lock:
+            if not self.ledger_path.is_file():
+                return []
+            rows = self.ledger.connection.execute(
+                "SELECT payload FROM artifact WHERE kind = 'question' "
+                "ORDER BY seq DESC LIMIT ?",
+                (int(limit),),
+            ).fetchall()
+        out: list[str] = []
+        for (payload,) in rows:
+            try:
+                text = json.loads(payload).get("question")
+            except (TypeError, ValueError):
+                continue
+            if text and text not in out:
+                out.append(str(text))
+        return out
 
     def clarify(self, question: str, choice: int | str) -> dict[str, Any]:
         """Re-ask to (re)establish the pending clarification deterministically,
@@ -207,6 +287,84 @@ class ProjectWorld:
             }
         return {"uri": uri, "classes": classes, "properties": properties, "history": history}
 
+    def entity_label(self, uri: str) -> str:
+        """A human display label for an entity (best name-ish current value,
+        falling back to the uri tail)."""
+        return self.search_index.label(uri)
+
+    def neighbors(self, uri: str) -> Optional[list[dict[str, Any]]]:
+        """Current-stance link neighborhood for the inspector's graph view:
+        [{predicate, direction in|out, target_uri, target_label}].
+        None = the uri is unknown to the world (no cells, no links)."""
+        with self.lock:
+            hearth = self.hearth
+            index = self.search_index
+            fwd = hearth.links.neighbors(uri)
+            rev = hearth.links.neighbors(uri, reverse=True)
+            if uri not in index.class_of and not fwd and not rev:
+                return None
+            links = [
+                {
+                    "predicate": pred,
+                    "direction": direction,
+                    "target_uri": target,
+                    "target_label": index.label(target),
+                }
+                for direction, pairs in (("out", fwd), ("in", rev))
+                for pred, target in pairs
+            ]
+        links.sort(key=lambda lk: (lk["predicate"], lk["direction"], lk["target_uri"]))
+        return links
+
+    # ---------------------------------------------------------- workspace
+
+    def read_workspace(self) -> Any:
+        """The persisted window-layout blob; {} when never saved."""
+        with self.lock:
+            if not self.workspace_path.is_file():
+                return {}
+            return json.loads(self.workspace_path.read_text(encoding="utf-8"))
+
+    def write_workspace(self, blob: Any) -> None:
+        """Atomically persist the arbitrary JSON layout blob (tmp + rename,
+        so a crashed write can never leave a torn workspace.json)."""
+        with self.lock:
+            write_json_atomic(self.workspace_path, blob)
+
+    # ------------------------------------------------------------- export
+
+    def export_bundle(self, out_dir: Optional[str] = None) -> dict[str, Any]:
+        """Run amber.snapshot into <project>/exports/<n>/ (or a caller-named
+        directory under the project) and summarize the bundle."""
+        from ontoforge.amber import snapshot
+
+        with self.lock:
+            if out_dir:
+                dest = (self.project / out_dir).resolve()
+                if not dest.is_relative_to(self.project.resolve()):
+                    raise ProjectError(f"out_dir escapes the project: {out_dir!r}")
+            else:
+                self.exports_dir.mkdir(parents=True, exist_ok=True)
+                taken = [
+                    int(p.name)
+                    for p in self.exports_dir.iterdir()
+                    if p.is_dir() and p.name.isdigit()
+                ]
+                dest = self.exports_dir / str(max(taken, default=0) + 1)
+            manifest_path = snapshot(dest, self.hearth, self.ontology, self.ledger)
+        return bundle_summary(dest, manifest_path)
+
+    def list_exports(self) -> list[dict[str, Any]]:
+        """Past bundles under <project>/exports/, in numeric-then-name order."""
+        from ontoforge.amber import MANIFEST_NAME
+
+        d = self.exports_dir
+        if not d.is_dir():
+            return []
+        dirs = [p for p in d.iterdir() if p.is_dir() and (p / MANIFEST_NAME).is_file()]
+        dirs.sort(key=lambda p: (0, int(p.name)) if p.name.isdigit() else (1, p.name))
+        return [bundle_summary(p, p / MANIFEST_NAME) for p in dirs]
+
     def oqir_executor(self) -> Callable[[OQIRTerm], list[dict[str, Any]]]:
         """The VISTA data seam: lower an OQIR term through this world.
 
@@ -243,7 +401,31 @@ class ProjectWorld:
             self._ontology = None
             self._spine = None
             self._engine = None
+            self._search_index = None
             self.answer_cache.clear()
+
+
+# ----------------------------------------------------------------- file utils
+
+
+def write_json_atomic(path: Path, blob: Any) -> None:
+    """Write JSON via tmp-file + os.replace (atomic on POSIX): readers see
+    either the old blob or the new one, never a torn file."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(f".{path.name}.tmp")
+    tmp.write_text(json.dumps(blob, sort_keys=True, indent=1), encoding="utf-8")
+    os.replace(tmp, path)
+
+
+def bundle_summary(bundle_dir: Path, manifest_path: Path) -> dict[str, Any]:
+    """{bundle_dir, manifest_path, files, total_bytes} measured from disk."""
+    files = [p for p in bundle_dir.rglob("*") if p.is_file()]
+    return {
+        "bundle_dir": str(bundle_dir),
+        "manifest_path": str(manifest_path),
+        "files": len(files),
+        "total_bytes": sum(p.stat().st_size for p in files),
+    }
 
 
 # ------------------------------------------------------------- serialization

@@ -14,7 +14,12 @@ typed amendments in [docs/DEVIATIONS.md](docs/DEVIATIONS.md).
 
 ```bash
 uv sync --all-extras
-uv run pytest tests/ -q          # full suite (960+ tests)
+uv run pytest tests/ -q          # full suite (1030+ tests)
+
+# One line, zero setup — the Meridian enterprise estate (10 tables, ~9,000 rows
+# of supply-chain/retail/quality data, regenerated from code, full pipeline):
+uv run ontoforge demo meridian /tmp/meridian
+uv run ontoforge serve -p /tmp/meridian      # → http://localhost:8765 — OntoForge OS
 
 # Point it at YOUR data — any directory of CSV/Parquet files:
 uv run ontoforge init myproject --source /path/to/your/data
@@ -40,11 +45,30 @@ Every `ask` answer carries per-cell citations resolving to content-addressed sou
 the provenance semiring; unanswerable questions are abstained, not guessed; unit-incoherent
 questions ("altitude in dollars") are rejected statically by the OQIR type checker.
 
-**The web app** (`ontoforge serve`) is an evidence-first instrument: an Ask console where every
-value carries an amber cite-dot that opens its source atoms, the induced ontology drawn as an
-interactive constellation, a bitemporal time scrubber on entity pages, a review queue that feeds
-spine recalibration, and a ⌘K command palette. Design system in [docs/UI_DESIGN.md](docs/UI_DESIGN.md);
-competitive positioning in [docs/MARKET_EDGE.md](docs/MARKET_EDGE.md).
+**OntoForge OS** (`ontoforge serve`) is the web surface: not pages, an operating system for an
+induced ontology. A window manager (drag, 8-handle resize, edge snap with preview ghost,
+minimize-to-dock) hosts eight micro-apps — **Ask** (cited answers whose amber cite-dots spawn an
+Evidence child window of source atoms), **Evidence** (atoms + derivation tree), **Constellation**
+(the ontology star chart), **Inspector** (bitemporal time scrubber + neighbors, where clicking a
+neighbor opens a second Inspector beside it), **Review** (j/k/a/r verdict queue feeding spine
+recalibration), **Dashboards**, **Pulse** (live ledger counters), and **Exporter** (AMBER bundles).
+**Spotlight** (⌘K, `/`, or just start typing) is the front door: one search box over classes,
+entities, properties, saved questions, and apps, backed by `GET /api/search` with ranked,
+interleaved results — and an "Ask the estate" fallback so no query dead-ends. Layouts persist via
+`/api/workspace`. Vanilla ES modules, no build chain, <250 KB payload (test-enforced). Design
+system in [docs/UI_DESIGN.md](docs/UI_DESIGN.md); shell internals in
+[src/ontoforge/server/static/README.md](src/ontoforge/server/static/README.md); competitive
+positioning in [docs/MARKET_EDGE.md](docs/MARKET_EDGE.md).
+
+## Portability
+
+OntoForge ships as a **wheel** (`uv build` — no fixture data inside; the Meridian estate
+regenerates byte-identically from code, so `ontoforge demo meridian` works from a bare install
+in a clean venv), as a **Docker image** (`docker build -t ontoforge . && docker run -p 8765:8765
+-v ontoforge-data:/data ontoforge` — materializes the Meridian demo on first start, then serves
+OntoForge OS), and any materialized world exports as an **AMBER bundle** — an open-format
+freeze-frame with full provenance, replayable without OntoForge. Details and verification story
+in [docs/PORTABILITY.md](docs/PORTABILITY.md).
 
 ## Architecture
 
@@ -67,9 +91,15 @@ competitive positioning in [docs/MARKET_EDGE.md](docs/MARKET_EDGE.md).
 | AMBER freeze-frame snapshot | M14 | `ontoforge.amber` |
 | Shared typed contracts (frozen interfaces) | — | `ontoforge.contracts` |
 
-Test estate: a schema-faithful aviation corpus (FAA registry / ASRS narratives / NTSB events /
+Test estates: a schema-faithful aviation corpus (FAA registry / ASRS narratives / NTSB events /
 maintenance ERP layouts) under `fixtures/aviation/` with gold ontology, gold ER pairs, and an
-18-question competency suite including abstention and trick-unit traps.
+18-question competency suite including abstention and trick-unit traps; and **Meridian**, a
+10-table enterprise estate (~9,000 rows of POs, contracts, quality notifications, shipments,
+leases, tickets) generated deterministically by `ontoforge.estates.meridian_gen` (seed 7) with a
+full wart program — unit mixes, date locales, name variants, stripped vendor ids, mojibake,
+re-keyed double entries — and a 12-question gold suite under `fixtures/meridian/gold/` (9
+answerable, 2 abstention traps, 1 trick-unit) that the generic engine answers fully cited with
+zero estate-specific code.
 
 ## Measured results (fixture scale, deterministic, zero network)
 
@@ -86,6 +116,8 @@ maintenance ERP layouts) under `fixtures/aviation/` with gold ontology, gold ER 
 | Citation coverage on answers | 100% | **100%** |
 | Confidently-wrong answers | 0 | **0** |
 | AMBER executable completeness (bundle-only replay) | 100% equality | **100%** |
+| Meridian gold questions (generic engine, induced ontology) | ≥ 7/9 cited-correct | **9/9** + both unanswerables abstained |
+| `/api/search` p95 on the demo world | < 150 ms | **104 ms** |
 
 ## Development
 

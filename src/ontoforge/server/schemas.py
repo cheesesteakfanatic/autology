@@ -238,6 +238,55 @@ class SavedDashboardsOut(BaseModel):
     dashboards: list[SavedDashboardOut]
 
 
+# --------------------------------------------------------------------- search
+
+
+class SearchResult(BaseModel):
+    """One hit of the federated search (the frozen Cmd+K contract)."""
+
+    kind: Literal["class", "entity", "property", "question", "app"]
+    title: str
+    subtitle: str
+    ref: str
+    score: float
+
+
+class SearchOut(BaseModel):
+    results: list[SearchResult]
+
+
+# ------------------------------------------------------------------ neighbors
+
+
+class NeighborLink(BaseModel):
+    predicate: str
+    direction: Literal["out", "in"]
+    target_uri: str
+    target_label: str
+
+
+class NeighborsOut(BaseModel):
+    links: list[NeighborLink]
+
+
+# --------------------------------------------------------------------- export
+
+
+class ExportIn(BaseModel):
+    out_dir: Optional[str] = None
+
+
+class ExportBundleOut(BaseModel):
+    bundle_dir: str
+    manifest_path: str
+    files: int
+    total_bytes: int
+
+
+class ExportsOut(BaseModel):
+    exports: list[ExportBundleOut]
+
+
 # --------------------------------------------------------------------- reload
 
 

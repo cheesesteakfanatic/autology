@@ -78,10 +78,23 @@ def _mark_stage(state: dict[str, Any], stage: str) -> None:
         state["stages"].append(stage)
 
 
+#: in-process pipeline memo, ACTIVE ONLY inside `ontoforge demo` (one process
+#: runs every stage; recomputing discovery/profiling/induction per stage would
+#: only repeat identical deterministic work). Individual commands keep their
+#: stand-alone behavior: the memo is None outside demo.
+_DEMO_MEMO: Optional[dict[Any, Any]] = None
+
+
 def _open_ledger(project: Path, cfg: dict[str, Any]):
     from ontoforge.ledger import SqliteLedger
 
-    return SqliteLedger(str(project / cfg["ledger"]))
+    ledger = SqliteLedger(str(project / cfg["ledger"]))
+    if _DEMO_MEMO is not None:
+        # demo projects trade crash-durability for startup speed (the corpus
+        # and every artifact regenerate deterministically from one command)
+        ledger.connection.execute("PRAGMA synchronous = OFF")
+        ledger.connection.execute("PRAGMA journal_mode = MEMORY")
+    return ledger
 
 
 def _source_csv(project: Path, cfg: dict[str, Any], table: str, limit: Optional[int]) -> Path:
@@ -124,7 +137,13 @@ def _load_estate(project: Path, cfg: dict[str, Any], state: dict[str, Any]) -> d
     if cfg["estate"] == "generic":
         from ontoforge.pipeline import discover_sources
 
-        return discover_sources(Path(cfg["source_dir"]), limit=limit)
+        key = ("estate", cfg["source_dir"], limit)
+        if _DEMO_MEMO is not None and key in _DEMO_MEMO:
+            return _DEMO_MEMO[key]
+        estate = discover_sources(Path(cfg["source_dir"]), limit=limit)
+        if _DEMO_MEMO is not None:
+            _DEMO_MEMO[key] = estate
+        return estate
     return _aviation_estate(project, cfg, state)
 
 
@@ -167,8 +186,25 @@ def _profiles_and_inds(project: Path, cfg: dict[str, Any], state: dict[str, Any]
     from ontoforge.pipeline import profile_estate
 
     estate = _load_estate(project, cfg, state)
-    profiles, inds = profile_estate(estate)
+    if _DEMO_MEMO is not None and "profiles" in _DEMO_MEMO:
+        profiles, inds = _DEMO_MEMO["profiles"]
+    else:
+        profiles, inds = profile_estate(estate)
+        if _DEMO_MEMO is not None:
+            _DEMO_MEMO["profiles"] = (profiles, inds)
     return estate["tables"], profiles, inds
+
+
+def _induced_artifacts(estate: dict[str, Any], ledger):
+    """Generic induction with the demo memo (one induction per demo run)."""
+    from ontoforge.pipeline import induce_estate
+
+    if _DEMO_MEMO is not None and "artifacts" in _DEMO_MEMO:
+        return _DEMO_MEMO["artifacts"]
+    artifacts = induce_estate(estate, ledger)
+    if _DEMO_MEMO is not None:
+        _DEMO_MEMO["artifacts"] = artifacts
+    return artifacts
 
 
 # -------------------------------------------------------------------- commands
@@ -317,7 +353,16 @@ def induce(project: Path = _PROJECT_OPT) -> None:
 
     ledger = _open_ledger(project, cfg)
     try:
-        result = Strata(ledger=ledger).induce(profiles, inds)
+        if _DEMO_MEMO is not None and "artifacts" in _DEMO_MEMO:
+            result = _DEMO_MEMO["artifacts"].strata
+        else:
+            result = Strata(ledger=ledger).induce(profiles, inds)
+            if _DEMO_MEMO is not None:
+                from ontoforge.pipeline import InducedArtifacts
+
+                _DEMO_MEMO["artifacts"] = InducedArtifacts(
+                    profiles=list(profiles), inds=list(inds), strata=result
+                )
     finally:
         ledger.close()
     onto = result.ontology
@@ -425,14 +470,16 @@ def _resolve_generic_cmd(project: Path, cfg: dict[str, Any], state: dict[str, An
     """Generic ER (M5): induce, recover plans, resolve every cross-table
     identity domain (name-like domains through the cascade, identifier-variant
     domains exactly); saves resolved.json."""
-    from ontoforge.pipeline import build_plans, induce_estate, resolve_generic
+    from ontoforge.pipeline import build_plans, resolve_generic
 
     estate = _load_estate(project, cfg, state)
     ledger = _open_ledger(project, cfg)
     try:
-        artifacts = induce_estate(estate, ledger)
+        artifacts = _induced_artifacts(estate, ledger)
         plans = build_plans(artifacts.strata, artifacts.ontology)
         resolutions = resolve_generic(estate, artifacts, plans, ledger=ledger)
+        if _DEMO_MEMO is not None:
+            _DEMO_MEMO["resolutions"] = resolutions
     finally:
         ledger.close()
 
@@ -556,16 +603,19 @@ def _materialize_induced_cmd(project: Path, cfg: dict[str, Any], state: dict[str
     """The STRATA swap-in: M3/M4 induction, then the generic engine commits
     the estate into HEARTH from the INDUCED ontology (generic ER included)."""
     from ontoforge.hearth import Hearth
-    from ontoforge.pipeline import induce_estate, materialize_induced
+    from ontoforge.pipeline import materialize_induced
     from ontoforge.vista._pipeline import save_ontology
 
     estate = _load_estate(project, cfg, state)
     ledger = _open_ledger(project, cfg)
     try:
         hearth = Hearth(project / cfg["hearth_root"], ledger)
-        artifacts = induce_estate(estate, ledger)
+        artifacts = _induced_artifacts(estate, ledger)
         onto = artifacts.ontology
-        stats = materialize_induced(estate, onto, artifacts, hearth, ledger)
+        stats = materialize_induced(
+            estate, onto, artifacts, hearth, ledger,
+            resolutions=(_DEMO_MEMO or {}).get("resolutions"),
+        )
     finally:
         ledger.close()
 
@@ -857,6 +907,96 @@ def status(project: Path = _PROJECT_OPT) -> None:
         out.add_row(f"artifacts {kind}", str(n))
     out.add_row("cost (tokens)", str(cost))
     console.print(out)
+
+
+@app.command()
+def demo(
+    estate: str = typer.Argument(..., help="Demo estate: 'meridian' (generic engine) or 'aviation'."),
+    project_dir: Path = typer.Argument(DEFAULT_PROJECT, help="Project directory to create."),
+) -> None:
+    """One-command demo: init -> ingest -> profile -> induce -> resolve ->
+    materialize, then print how to serve the result.
+
+    'meridian' regenerates the bundled 10-table enterprise corpus from code
+    (works from an installed wheel; no fixture files needed) and runs the
+    GENERIC engine over it — no estate module, no gold ontology. 'aviation'
+    uses the repo's aviation fixtures (source checkout).
+    """
+    estate = estate.strip().lower()
+    if estate not in ("meridian", "aviation"):
+        console.print(f"[red]unknown demo estate {estate!r} (expected 'meridian' or 'aviation')[/]")
+        raise typer.Exit(code=1)
+
+    global _DEMO_MEMO
+    _DEMO_MEMO = {}  # one process runs every stage: share the deterministic work
+    try:
+        _run_demo(estate, project_dir)
+    finally:
+        _DEMO_MEMO = None
+
+
+def _run_demo(estate: str, project_dir: Path) -> None:
+    stages = 7 if estate == "meridian" else 6
+    step = 0
+
+    def banner(title: str) -> None:
+        nonlocal step
+        step += 1
+        console.rule(f"[bold cyan]demo {step}/{stages}: {title}")
+
+    if estate == "meridian":
+        from ontoforge.estates.meridian_gen import build_corpus
+
+        source_dir = project_dir / "meridian_source"
+        banner("generate the Meridian corpus (seed 7, byte-reproducible)")
+        manifest = build_corpus(source_dir)
+        console.print(
+            f"10 tables, {sum(manifest['rows'].values())} rows, "
+            f"{manifest['total_bytes']} bytes -> {source_dir}"
+        )
+        console.print(f"gold questions: {source_dir / 'gold' / 'questions.yaml'}")
+        banner("init (generic estate — the ontology will be INDUCED)")
+        init(project_dir, fixtures=None, source=source_dir)
+    else:
+        from ontoforge.estates.aviation import default_fixtures_dir
+
+        fixtures_dir = default_fixtures_dir()
+        if not fixtures_dir.is_dir():
+            console.print(
+                f"[red]aviation fixtures not found at {fixtures_dir} — the aviation demo "
+                "needs a source checkout (fixtures are not shipped in the wheel). "
+                "Use `ontoforge demo meridian` instead: its corpus regenerates from code.[/]"
+            )
+            raise typer.Exit(code=1)
+        banner("init (aviation estate)")
+        init(project_dir, fixtures=None, source=None)
+
+    banner("ingest (CDC -> ledger + RAW mirror)")
+    ingest(project=project_dir, limit=None)
+    banner("profile (keys, FDs, INDs, units)")
+    profile(project=project_dir)
+    banner("induce (STRATA ontology induction)")
+    induce(project=project_dir)
+    banner("resolve (entity resolution)")
+    resolve(project=project_dir)
+    banner("materialize (commit the world into HEARTH)")
+    materialize(project=project_dir, ontology=None)
+
+    console.rule("[bold green]demo ready")
+    if estate == "meridian":
+        console.print("try, with citations on every answered cell:")
+        console.print(
+            f'  ontoforge ask -p {project_dir} "How many support tickets describe battery swelling?"'
+        )
+        console.print(
+            f'  ontoforge ask -p {project_dir} "What is the annual committed spend on contract MSA-2024-0117?"'
+        )
+    else:
+        console.print(
+            f'try:\n  ontoforge ask -p {project_dir} "Which manufacturer name does the FAA aircraft '
+            'reference record for the model of the aircraft registered with tail number N4669X?"'
+        )
+    console.print(f"\nweb app:\n  ontoforge serve -p {project_dir}")
 
 
 @app.command()
