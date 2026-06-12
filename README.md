@@ -14,8 +14,16 @@ typed amendments in [docs/DEVIATIONS.md](docs/DEVIATIONS.md).
 
 ```bash
 uv sync --all-extras
-uv run pytest tests/ -q          # full suite (~880 tests)
+uv run pytest tests/ -q          # full suite (960+ tests)
 
+# Point it at YOUR data — any directory of CSV/Parquet files:
+uv run ontoforge init myproject --source /path/to/your/data
+uv run ontoforge ingest -p myproject && uv run ontoforge profile -p myproject
+uv run ontoforge induce -p myproject && uv run ontoforge resolve -p myproject
+uv run ontoforge materialize -p myproject
+uv run ontoforge serve -p myproject        # → http://localhost:8765 — the full web app
+
+# Or the bundled aviation demo estate:
 uv run ontoforge init demo
 uv run ontoforge ingest -p demo --limit 300   # CDC pull into the ledger + RAW mirror
 uv run ontoforge profile -p demo              # sketches, FDs, INDs, units
@@ -31,6 +39,12 @@ uv run ontoforge status -p demo
 Every `ask` answer carries per-cell citations resolving to content-addressed source atoms through
 the provenance semiring; unanswerable questions are abstained, not guessed; unit-incoherent
 questions ("altitude in dollars") are rejected statically by the OQIR type checker.
+
+**The web app** (`ontoforge serve`) is an evidence-first instrument: an Ask console where every
+value carries an amber cite-dot that opens its source atoms, the induced ontology drawn as an
+interactive constellation, a bitemporal time scrubber on entity pages, a review queue that feeds
+spine recalibration, and a ⌘K command palette. Design system in [docs/UI_DESIGN.md](docs/UI_DESIGN.md);
+competitive positioning in [docs/MARKET_EDGE.md](docs/MARKET_EDGE.md).
 
 ## Architecture
 
