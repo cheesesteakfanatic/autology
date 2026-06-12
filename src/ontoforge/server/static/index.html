@@ -5,84 +5,125 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>OntoForge</title>
 <link rel="stylesheet" href="/static/style.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230b0e12'/%3E%3Cpath d='M3 11h10v2H3zM5 7h6v2H5zM7 3h2v2H7z' fill='%23d97706'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230b0d10'/%3E%3Ccircle cx='8' cy='8' r='3' fill='%23e8a33d'/%3E%3Ccircle cx='3' cy='4' r='1.2' fill='%23b97c26'/%3E%3Ccircle cx='13' cy='12' r='1.2' fill='%23b97c26'/%3E%3Cpath d='M4 4.8 6.5 6.9M9.5 9.1 12 11.2' stroke='%23b97c26' stroke-width='.6'/%3E%3C/svg%3E">
+<link rel="modulepreload" href="/static/app.js">
+<link rel="modulepreload" href="/static/js/constellation.js">
+<link rel="modulepreload" href="/static/js/entity.js">
+<link rel="modulepreload" href="/static/js/dashboards.js">
 <script src="/static/vendor/vega.min.js" defer></script>
 <script src="/static/vendor/vega-lite.min.js" defer></script>
 <script src="/static/vendor/vega-embed.min.js" defer></script>
 </head>
 <body>
-<div class="frame">
+
+<div class="shell">
 
   <header class="masthead">
-    <div class="wordmark">
-      <span class="wm-onto">ONTO</span><span class="wm-dot">&middot;</span><span class="wm-forge">FORGE</span>
-      <span class="wm-sub">provenance-grounded semantic console</span>
-    </div>
+    <a class="wordmark" href="#/ask" title="OntoForge">
+      <span class="wm-onto">Onto</span><span class="wm-spark" aria-hidden="true">&#9679;</span><span class="wm-forge">Forge</span>
+    </a>
+    <span class="wm-sub">induced ontology &middot; bitemporal provenance &middot; calibrated abstention</span>
     <div class="masthead-meta" id="masthead-meta">
       <span class="meta-cell">estate <b id="meta-estate">&mdash;</b></span>
       <span class="meta-cell">atoms <b id="meta-atoms">&mdash;</b></span>
-      <span class="meta-cell">cost <b id="meta-cost">&mdash;</b><i>tok</i></span>
+      <span class="meta-cell">cost <b id="meta-cost">&mdash;</b><i>&thinsp;tok</i></span>
+      <button class="palette-hint" id="palette-open" type="button" title="command palette">
+        <kbd>&#8984;K</kbd>
+      </button>
     </div>
   </header>
 
-  <nav class="tabs" id="tabs">
-    <a href="#/ask"        data-tab="ask">&sect;1&ensp;Ask</a>
-    <a href="#/ontology"   data-tab="ontology">&sect;2&ensp;Ontology</a>
-    <a href="#/review"     data-tab="review">&sect;3&ensp;Review</a>
-    <a href="#/dashboards" data-tab="dashboards">&sect;4&ensp;Dashboards</a>
-    <a href="#/status"     data-tab="status">&sect;5&ensp;Status</a>
+  <nav class="tabs" id="tabs" aria-label="panels">
+    <a href="#/ask"        data-tab="ask">Ask</a>
+    <a href="#/ontology"   data-tab="ontology">Ontology</a>
+    <a href="#/entity"     data-tab="entity">Entities</a>
+    <a href="#/review"     data-tab="review">Review</a>
+    <a href="#/dashboards" data-tab="dashboards">Dashboards</a>
+    <a href="#/status"     data-tab="status">Status</a>
   </nav>
 
   <main id="main">
 
-    <!-- ====================================================== ASK -->
+    <!-- ============================================================ ASK -->
     <section class="tab-panel" id="panel-ask">
-      <div class="section-label">natural-language query &mdash; every cell cites its source atoms</div>
       <form id="ask-form" class="ask-form" autocomplete="off">
-        <input id="ask-input" class="ask-input" type="text" spellcheck="false"
-               placeholder="How many work orders have component 'LANDING GEAR'?">
-        <button id="ask-button" class="btn btn-accent" type="submit">Ask</button>
+        <label class="section-label" for="ask-input">ask the estate &mdash; every value in the answer cites its source atoms</label>
+        <div class="ask-field">
+          <input id="ask-input" class="ask-input" type="text" spellcheck="false" autofocus
+                 placeholder="How many work orders have component &lsquo;LANDING GEAR&rsquo;?">
+          <button id="ask-button" class="btn btn-forge" type="submit">Ask</button>
+        </div>
       </form>
-      <div id="ask-history" class="ask-history"></div>
-      <div id="ask-result" class="ask-result"></div>
-      <div id="citation-drawer" class="citation-drawer" hidden></div>
+      <div id="ask-history" class="ask-history" aria-label="recent questions"></div>
+      <div id="ask-result" class="ask-result" aria-live="polite"></div>
     </section>
 
-    <!-- ================================================= ONTOLOGY -->
+    <!-- ======================================================= ONTOLOGY -->
     <section class="tab-panel" id="panel-ontology" hidden>
-      <div class="section-label">the induced world model O<sup>(t)</sup> &mdash; classes, subsumption, links</div>
-      <div class="onto-split">
-        <div class="onto-tree" id="onto-tree"><div class="loading">loading ontology&hellip;</div></div>
-        <div class="onto-detail" id="onto-detail">
-          <div class="placeholder">select a class to inspect its properties</div>
+      <div class="section-label">the induced world model &mdash; classes, subsumption, links, drawn as the machine built them</div>
+      <div class="constellation-wrap" id="constellation-wrap">
+        <svg id="constellation" class="constellation" viewBox="0 0 960 600"
+             role="img" aria-label="ontology constellation"></svg>
+        <div class="constellation-legend">
+          <span><i class="lg-node"></i> class &middot; sized by structure</span>
+          <span><i class="lg-lum"></i> amber luminance = confidence</span>
+          <span><i class="lg-sub"></i> subsumption</span>
+          <span><i class="lg-link"></i> link property</span>
+          <span class="lg-hint">drag to pan &middot; wheel to zoom &middot; double-click to reset</span>
         </div>
+        <div class="node-card" id="node-card" hidden></div>
+      </div>
+      <div class="class-detail" id="class-detail">
+        <div class="empty-note">select a star to inspect the class beneath it</div>
       </div>
     </section>
 
-    <!-- =================================================== REVIEW -->
-    <section class="tab-panel" id="panel-review" hidden>
-      <div class="section-label">human adjudication queue &mdash; deferred &amp; low-confidence decisions</div>
-      <div id="review-tally" class="review-tally"></div>
-      <div id="review-queue" class="review-queue"><div class="loading">loading queue&hellip;</div></div>
+    <!-- ======================================================== ENTITIES -->
+    <section class="tab-panel" id="panel-entity" hidden>
+      <div class="section-label">entity inspector &mdash; one record, every value it ever held, and when we believed it</div>
+      <form id="entity-form" class="entity-form" autocomplete="off">
+        <input id="entity-input" class="entity-input mono" type="text" spellcheck="false"
+               placeholder="ent://aircraft/&hellip;  (paste a URI from an export, the CLI, or a review pair)">
+        <button class="btn btn-forge" type="submit">Inspect</button>
+      </form>
+      <div id="entity-recent" class="entity-recent"></div>
+      <div id="time-scrubber" class="time-scrubber" hidden></div>
+      <div id="entity-body" class="entity-body">
+        <div class="empty-note">no entity loaded &mdash; the as-of scrubber appears when one is</div>
+      </div>
     </section>
 
-    <!-- =============================================== DASHBOARDS -->
+    <!-- ========================================================== REVIEW -->
+    <section class="tab-panel" id="panel-review" hidden>
+      <div class="section-label">human adjudication &mdash; deferred &amp; low-confidence decisions; verdicts feed recalibration</div>
+      <div id="review-tally" class="review-tally"></div>
+      <div class="review-keys">
+        <span><kbd>j</kbd>/<kbd>k</kbd> move</span>
+        <span><kbd>a</kbd> accept</span>
+        <span><kbd>r</kbd> reject</span>
+      </div>
+      <div id="review-queue" class="review-queue"><div class="skeleton-card"></div></div>
+    </section>
+
+    <!-- ====================================================== DASHBOARDS -->
     <section class="tab-panel" id="panel-dashboards" hidden>
-      <div class="section-label">vague-spec dashboard synthesis &mdash; VISTA top-3 over the metric layer</div>
       <form id="dash-form" class="ask-form" autocomplete="off">
-        <input id="dash-input" class="ask-input" type="text" spellcheck="false"
-               placeholder="maintenance cost overview">
-        <button class="btn btn-accent" type="submit">Propose</button>
+        <label class="section-label" for="dash-input">vague-spec synthesis &mdash; VISTA grounds an utterance in the metric layer</label>
+        <div class="ask-field">
+          <input id="dash-input" class="ask-input" type="text" spellcheck="false"
+                 placeholder="maintenance cost overview">
+          <button class="btn btn-forge" type="submit">Propose</button>
+        </div>
       </form>
       <div id="dash-result" class="dash-result"></div>
-      <div class="section-label" style="margin-top:2rem">saved proposals (dashboards/)</div>
+      <div class="section-label dash-saved-label">saved proposals (dashboards/)</div>
       <div id="dash-saved" class="dash-saved"></div>
     </section>
 
-    <!-- =================================================== STATUS -->
+    <!-- ========================================================== STATUS -->
     <section class="tab-panel" id="panel-status" hidden>
-      <div class="section-label">project state &mdash; ledger counters &amp; pipeline stages</div>
-      <div id="status-body" class="status-body"><div class="loading">loading status&hellip;</div></div>
+      <div class="section-label">the instrument cluster &mdash; ledger counters, pipeline stages, decision tiers</div>
+      <div id="status-body" class="status-body"><div class="skeleton-card"></div></div>
       <button id="reload-button" class="btn" type="button" title="re-open the project after CLI changes">
         &#x21bb;&ensp;reload project
       </button>
@@ -91,9 +132,33 @@
   </main>
 
   <footer class="colophon">
-    <span>OntoForge &mdash; struck from source atoms; nothing asserted without a derivation.</span>
-    <span id="colophon-right"></span>
+    <span>struck from source atoms &mdash; nothing asserted without a derivation</span>
+    <span id="colophon-right" class="mono"></span>
   </footer>
+</div>
+
+<!-- evidence rail: the provenance drill — atoms behind any cited value -->
+<aside id="evidence-rail" class="evidence-rail" hidden aria-label="evidence">
+  <div class="rail-head">
+    <span class="section-label rail-title">evidence</span>
+    <span class="rail-context mono" id="rail-context"></span>
+    <button class="rail-close" id="rail-close" type="button" title="close (esc)">&times;</button>
+  </div>
+  <div class="rail-body" id="rail-body"></div>
+</aside>
+
+<!-- command palette -->
+<div id="cmdk" class="cmdk" hidden role="dialog" aria-label="command palette">
+  <div class="cmdk-box">
+    <input id="cmdk-input" class="cmdk-input" type="text" spellcheck="false"
+           placeholder="ask a question, jump to a panel, find a class&hellip;">
+    <div id="cmdk-list" class="cmdk-list"></div>
+    <div class="cmdk-foot">
+      <span><kbd>&uarr;</kbd><kbd>&darr;</kbd> select</span>
+      <span><kbd>&crarr;</kbd> run</span>
+      <span><kbd>esc</kbd> close</span>
+    </div>
+  </div>
 </div>
 
 <script type="module" src="/static/app.js"></script>

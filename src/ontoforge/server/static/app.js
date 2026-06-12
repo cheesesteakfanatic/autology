@@ -1,24 +1,41 @@
-/* OntoForge console — vanilla ES module, no build chain.
-   Every piece of interpolated data flows through el()/text nodes —
-   nothing from the API is ever assigned to innerHTML. */
+/* OntoForge — the instrument. Vanilla ES modules, no build chain, no framework.
+   SECURITY INVARIANT: every piece of API data enters the DOM through el()/
+   document.createTextNode — nothing interpolated is ever assigned to innerHTML. */
 
-"use strict";
+import { createConstellation } from "./js/constellation.js";
+import { createEntityPanel } from "./js/entity.js";
+import { createDashboardsPanel } from "./js/dashboards.js";
 
-// ------------------------------------------------------------------ helpers
+// ─────────────────────────────────────────────────────────────── helpers
 
-const $ = (sel) => document.querySelector(sel);
+const $ = (sel, root = document) => root.querySelector(sel);
 
-/** Build a DOM element; children that are strings become TEXT nodes (XSS-safe). */
+/** Build an element; string/number children become TEXT nodes (XSS-safe). */
 function el(tag, attrs = {}, ...children) {
   const node = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {
+    if (v === null || v === undefined) continue;
     if (k === "class") node.className = v;
     else if (k === "dataset") Object.assign(node.dataset, v);
-    else if (k.startsWith("on") && typeof v === "function") {
-      node.addEventListener(k.slice(2), v);
-    } else if (v !== null && v !== undefined) node.setAttribute(k, v);
+    else if (k.startsWith("on") && typeof v === "function") node.addEventListener(k.slice(2), v);
+    else node.setAttribute(k, v);
   }
-  for (const c of children.flat()) {
+  for (const c of children.flat(Infinity)) {
+    if (c === null || c === undefined || c === false) continue;
+    node.append(c instanceof Node ? c : document.createTextNode(String(c)));
+  }
+  return node;
+}
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+function svgEl(tag, attrs = {}, ...children) {
+  const node = document.createElementNS(SVG_NS, tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v === null || v === undefined) continue;
+    if (k.startsWith("on") && typeof v === "function") node.addEventListener(k.slice(2), v);
+    else node.setAttribute(k, v);
+  }
+  for (const c of children.flat(Infinity)) {
     if (c === null || c === undefined) continue;
     node.append(c instanceof Node ? c : document.createTextNode(String(c)));
   }
@@ -51,10 +68,133 @@ async function api(path, body) {
 }
 
 function errorNote(err) {
-  return el("div", { class: "error-note" }, String(err.message || err));
+  return el("div", { class: "error-note" }, String((err && err.message) || err));
 }
 
-// ------------------------------------------------------------------ masthead
+/** The honest confidence gauge: thin amber fill + the number, always. */
+function confGauge(confidence, label = "confidence") {
+  const pct = Math.max(0, Math.min(1, confidence)) * 100;
+  const fill = el("div", { class: "gauge-fill", style: "width:0%" });
+  requestAnimationFrame(() => requestAnimationFrame(() => { fill.style.width = `${pct}%`; }));
+  return el("div", { class: "conf-gauge" },
+    el("span", { class: "gauge-label" }, label),
+    el("div", { class: "gauge-track" }, fill),
+    el("span", { class: "gauge-value" }, `${(confidence * 100).toFixed(1)}%`));
+}
+
+function skeletonCard(widths = [42, 68, 55]) {
+  return el("div", { class: "answer-card", "aria-busy": "true" },
+    widths.map((w) => el("div", { class: "skeleton", style: `width:${w}%` })));
+}
+
+// ───────────────────────────────────────────────────────── evidence rail
+// The provenance drill: any cited value opens its source atoms; any
+// prov_ref opens the full derivation tree (sum = any-of, product = all-of).
+
+const rail = $("#evidence-rail");
+const railBody = $("#rail-body");
+const railContext = $("#rail-context");
+let evidenceAnchor = null;
+
+function anchorEvidence(node) {
+  if (evidenceAnchor) evidenceAnchor.classList.remove("evidence-active");
+  evidenceAnchor = node || null;
+  if (evidenceAnchor) evidenceAnchor.classList.add("evidence-active");
+}
+
+function openRail(contextLabel, anchor) {
+  rail.hidden = false;
+  requestAnimationFrame(() => rail.classList.add("open"));
+  document.body.classList.add("rail-open");
+  railContext.textContent = contextLabel || "";
+  anchorEvidence(anchor);
+  clear(railBody);
+}
+
+function closeRail() {
+  rail.classList.remove("open");
+  document.body.classList.remove("rail-open");
+  anchorEvidence(null);
+  setTimeout(() => { if (!rail.classList.contains("open")) rail.hidden = true; }, 180);
+}
+
+const ATOM_URI_RE = /^atom:\/\/([^/]+)\/([^/]+)\/(.+?)(?:#(.*))?$/;
+
+/** source › table › row # column — the atom URI rendered as a path. */
+function atomPath(uri) {
+  const m = ATOM_URI_RE.exec(uri || "");
+  if (!m) return el("div", { class: "atom-path" }, uri || "");
+  const [, source, table, row, column] = m;
+  return el("div", { class: "atom-path" },
+    source, el("span", { class: "sep" }, "›"),
+    table, el("span", { class: "sep" }, "›"),
+    row,
+    column ? el("span", { class: "col" }, ` #${column}`) : null);
+}
+
+function atomChip(atom) {
+  return el("div", { class: "atom-chip" },
+    atomPath(atom.uri),
+    el("div", { class: "atom-value" }, atom.value === null ? "∅" : String(atom.value)),
+    el("div", { class: "atom-id" }, `⌗ ${atom.atom_id}`));
+}
+
+/** Atom chips fetched live from /api/atoms — the rail's ground truth. */
+async function railShowAtoms(atomIds, contextLabel, anchor) {
+  openRail(contextLabel, anchor);
+  railBody.append(el("div", { class: "section-label" },
+    `${atomIds.length} source atom${atomIds.length === 1 ? "" : "s"}`));
+  for (const id of atomIds) {
+    const slot = el("div", { class: "atom-chip" },
+      el("div", { class: "atom-id" }, `⌗ ${id}`),
+      el("div", { class: "skeleton", style: "width:70%" }));
+    railBody.append(slot);
+    api(`/api/atoms/${encodeURIComponent(id)}`)
+      .then((atom) => slot.replaceWith(atomChip(atom)))
+      .catch((e) => slot.replaceWith(el("div", { class: "atom-chip" },
+        el("div", { class: "atom-id" }, `⌗ ${id}`), errorNote(e))));
+  }
+}
+
+/** The derivation tree behind a prov_ref: collapsible sums/products. */
+function provNodeView(node) {
+  if (node.kind === "atom") {
+    return atomChip({ uri: node.uri, value: node.value, atom_id: node.atom_id });
+  }
+  if (node.kind === "one" || node.kind === "zero") {
+    return el("div", { class: "atom-id" }, node.kind === "one" ? "⊤ (trivially derived)" : "⊥ (no support)");
+  }
+  const label = node.kind === "sum" ? "any of" : "all of";
+  const kids = el("div", { class: "prov-children" }, node.terms.map(provNodeView));
+  const twist = el("span", { class: "twist" }, "▾");
+  const head = el("button", {
+    class: "prov-op", type: "button",
+    onclick: () => {
+      const open = !kids.hidden;
+      kids.hidden = open;
+      twist.textContent = open ? "▸" : "▾";
+    },
+  }, twist, label, el("span", { class: "arity" }, `(${node.terms.length})`));
+  return el("div", { class: "prov-node" }, head, kids);
+}
+
+async function railShowProvenance(provRef, contextLabel, anchor) {
+  openRail(contextLabel, anchor);
+  railBody.append(el("div", { class: "skeleton", style: "width:55%" }));
+  try {
+    const out = await api(`/api/provenance/${encodeURIComponent(provRef)}`);
+    clear(railBody).append(
+      el("div", { class: "section-label" },
+        `derivation — ${out.n_atoms} atom${out.n_atoms === 1 ? "" : "s"} · ref ${out.prov_ref}`),
+      provNodeView(out.tree));
+  } catch (e) {
+    clear(railBody).append(errorNote(e));
+  }
+}
+
+$("#rail-close").addEventListener("click", closeRail);
+
+// ─────────────────────────────────────────────────────────────── masthead
 
 async function refreshMasthead() {
   try {
@@ -68,113 +208,134 @@ async function refreshMasthead() {
   }
 }
 
-// ---------------------------------------------------------------------- ask
+// ──────────────────────────────────────────────────────────────────── ask
 
-const askHistory = [];
+const RECENT_KEY = "ontoforge.recent.questions";
+let recentQuestions = [];
+try { recentQuestions = JSON.parse(localStorage.getItem(RECENT_KEY) || "[]"); } catch { /* fresh */ }
 
-function confMeter(confidence) {
-  const pct = Math.max(0, Math.min(1, confidence)) * 100;
-  const fill = el("div", { class: "conf-fill", style: "width:0%" });
-  requestAnimationFrame(() => { fill.style.width = `${pct}%`; });
-  return el("div", { class: "conf-meter" },
-    el("span", { class: "label" }, "confidence"),
-    el("div", { class: "conf-track" }, fill),
-    el("span", { class: "conf-value" }, `${(confidence * 100).toFixed(1)}%`));
+let activeClarify = null;   // {question, options} while a clarification is on screen
+
+function renderHistory() {
+  const box = clear($("#ask-history"));
+  for (const q of recentQuestions.slice(0, 8)) {
+    box.append(el("button", { class: "chip history-chip", title: q, onclick: () => ask(q) }, q));
+  }
 }
 
-async function openCitationDrawer(atomIds, cellLabel) {
-  const drawer = $("#citation-drawer");
-  clear(drawer);
-  drawer.hidden = false;
-  drawer.append(el("div", { class: "drawer-head" },
-    el("span", { class: "drawer-title" }, `source atoms — ${cellLabel}`),
-    el("button", { class: "drawer-close", onclick: () => { drawer.hidden = true; } }, "close ×")));
-  for (const id of atomIds) {
-    const row = el("div", { class: "atom-row" }, el("span", { class: "atom-id" }, id), " loading…");
-    drawer.append(row);
-    try {
-      const atom = await api(`/api/atoms/${encodeURIComponent(id)}`);
-      clear(row).append(
-        el("div", {}, el("span", { class: "atom-id" }, `⌗ ${atom.atom_id}`)),
-        el("div", { class: "atom-uri" }, atom.uri),
-        el("div", { class: "atom-val" }, "= ", String(atom.value)));
-    } catch (e) {
-      clear(row).append(el("span", { class: "atom-id" }, id), " ", errorNote(e));
-    }
-  }
-  drawer.scrollIntoView({ behavior: "smooth", block: "nearest" });
+function pushHistory(question) {
+  recentQuestions = [question, ...recentQuestions.filter((q) => q !== question)].slice(0, 24);
+  try { localStorage.setItem(RECENT_KEY, JSON.stringify(recentQuestions)); } catch { /* private mode */ }
+  renderHistory();
+}
+
+function abstainHelp() {
+  const chips = (state.ontology ? state.ontology.classes : [])
+    .slice()
+    .sort((a, b) => b.properties.length - a.properties.length)
+    .slice(0, 6)
+    .map((c) => el("button", {
+      class: "chip", title: c.uri,
+      onclick: () => {
+        const input = $("#ask-input");
+        input.value = `${input.value.trim()} ${c.name}`.trim();
+        input.focus();
+      },
+    }, c.name));
+  return [
+    el("p", { class: "abstain-help" },
+      "what would make this answerable — ground the question in the induced ontology ",
+      el("a", { href: "#/ontology" }, "(open the constellation)"),
+      chips.length ? " or build on one of its classes:" : ""),
+    chips.length ? el("div", { class: "clarify-options" }, chips) : null,
+  ];
 }
 
 function renderAnswer(out) {
   const target = clear($("#ask-result"));
-  $("#citation-drawer").hidden = true;
+  activeClarify = null;
 
+  // — clarification: one question, one keystroke ————————————————
   if (out.clarification) {
+    activeClarify = { question: out.question, options: out.clarification_options };
     target.append(el("div", { class: "clarify-card" },
-      el("div", { class: "section-label" }, "one clarification, then an answer"),
+      el("span", { class: "section-label" }, "one clarification, then an answer"),
       el("p", { class: "clarify-q" }, out.clarification),
       el("div", { class: "clarify-options" },
         out.clarification_options.map((opt, i) =>
-          el("button", { class: "clarify-option", onclick: () => clarify(out.question, i) },
-            el("span", { class: "idx" }, `${i + 1}.`), opt)))));
+          el("button", { class: "clarify-option", onclick: () => clarifyChoice(i) },
+            el("kbd", {}, String(i + 1)), opt)))));
     return;
   }
 
+  // — abstention: a dignified first-class state, never an error ————
   if (out.abstained) {
-    target.append(el("div", { class: "abstained-card" },
-      el("span", { class: "abstained-mark" }, "— abstained —"),
-      el("p", { class: "abstained-reason" }, out.abstain_reason || "the engine declined to answer"),
-      el("div", { class: "abstained-note" },
-        "nothing asserted without a derivation — abstention is the honest result")));
+    target.append(el("div", { class: "answer-card state-abstained" },
+      el("span", { class: "abstain-mark" }, "abstained"),
+      el("p", { class: "abstain-line" }, "OntoForge declines to guess."),
+      el("p", { class: "abstain-reason" }, out.abstain_reason || "no derivation reached the answer floor"),
+      abstainHelp(),
+      confGauge(out.confidence, "confidence · below the floor")));
     return;
   }
 
-  // citations indexed by row|column
+  // — the answer: every cited value carries its amber dot ——————————
   const cites = new Map();
   for (const c of out.citations) cites.set(`${c.row}|${c.column}`, c.atom_ids);
 
-  const thead = el("tr", {}, out.columns.map((c) => el("th", {}, c)));
-  const tbody = out.rows.map((row, ri) =>
-    el("tr", {}, row.map((v, ci) => {
-      const col = out.columns[ci];
-      const ids = cites.get(`${ri}|${col}`);
-      const td = el("td", {}, v === null ? "∅" : String(v));
-      if (ids && ids.length) {
-        td.append(el("button", {
-          class: "cite-chip",
-          title: `${ids.length} source atom${ids.length > 1 ? "s" : ""}`,
-          onclick: () => openCitationDrawer(ids, `row ${ri + 1}, ${col}`),
-        }, `⌗${ids.length}`));
-      }
-      return td;
-    })));
-
-  target.append(el("div", { class: "answer-card" },
-    el("p", { class: "answer-q" }, out.question,
-      out.cached ? el("span", { class: "cached-mark" }, "· cached") : null),
-    el("table", { class: "data" }, el("thead", {}, thead), el("tbody", {}, tbody)),
-    confMeter(out.confidence)));
-}
-
-function pushHistory(question) {
-  const i = askHistory.indexOf(question);
-  if (i !== -1) askHistory.splice(i, 1);
-  askHistory.unshift(question);
-  if (askHistory.length > 8) askHistory.pop();
-  const box = clear($("#ask-history"));
-  for (const q of askHistory) {
-    box.append(el("button", { class: "history-chip", title: q, onclick: () => ask(q) }, q));
+  function citeDot(ids, label, holder) {
+    return el("button", {
+      class: "cite-dot",
+      title: `${ids.length} source atom${ids.length === 1 ? "" : "s"} — click for evidence`,
+      "aria-label": `evidence for ${label}`,
+      onclick: () => railShowAtoms(ids, label, holder),
+    });
   }
+
+  const card = el("div", { class: "answer-card" },
+    el("p", { class: "answer-q" }, out.question,
+      out.cached ? el("span", { class: "cached-mark" }, "· instant — answer cache") : null));
+
+  if (out.rows.length === 1 && out.columns.length === 1) {
+    // a single value is a headline, not a table
+    const v = out.rows[0][0];
+    const ids = cites.get(`0|${out.columns[0]}`);
+    const headline = el("div", { class: "answer-headline" },
+      el("span", {}, v === null ? "∅" : String(v)),
+      el("span", { class: "headline-col" }, out.columns[0]));
+    if (ids && ids.length) headline.append(citeDot(ids, `${out.columns[0]} = ${v}`, headline));
+    card.append(headline);
+  } else {
+    const thead = el("tr", {}, out.columns.map((c) => el("th", {}, c)));
+    const tbody = out.rows.map((row, ri) =>
+      el("tr", {}, row.map((v, ci) => {
+        const col = out.columns[ci];
+        const ids = cites.get(`${ri}|${col}`);
+        const td = el("td", {}, v === null ? "∅" : String(v));
+        if (ids && ids.length) {
+          td.classList.add("cited");
+          td.append(citeDot(ids, `row ${ri + 1} · ${col} = ${v}`, td));
+        }
+        return td;
+      })));
+    card.append(el("div", { class: "answer-table-wrap" },
+      el("table", { class: "data" }, el("thead", {}, thead), el("tbody", {}, tbody))));
+  }
+
+  card.append(confGauge(out.confidence));
+  target.append(card);
 }
 
 async function ask(question) {
-  question = question.trim();
+  question = String(question || "").trim();
   if (!question) return;
+  if (location.hash.indexOf("#/ask") !== 0) location.hash = "#/ask";
   $("#ask-input").value = question;
   const btn = $("#ask-button");
   btn.disabled = true;
+  closeRail();
   const target = clear($("#ask-result"));
-  target.append(el("div", { class: "loading" }, "deriving…"));
+  target.append(skeletonCard());
   try {
     const out = await api("/api/ask", { question });
     pushHistory(question);
@@ -186,9 +347,12 @@ async function ask(question) {
   }
 }
 
-async function clarify(question, choice) {
+async function clarifyChoice(choice) {
+  if (!activeClarify) return;
+  const { question } = activeClarify;
+  activeClarify = null;
   const target = clear($("#ask-result"));
-  target.append(el("div", { class: "loading" }, "resolving clarification…"));
+  target.append(skeletonCard([60, 35, 50]));
   try {
     const out = await api("/api/ask/clarify", { question, choice });
     renderAnswer(out);
@@ -197,144 +361,157 @@ async function clarify(question, choice) {
   }
 }
 
-// ----------------------------------------------------------------- ontology
+// ─────────────────────────────────────────────────────────────── ontology
 
-let ontoCache = null;
-let selectedClassUri = null;
+const state = { ontology: null };
+let ontologyPromise = null;
 
-function classBadges(c) {
-  const badges = [];
-  if (c.is_event) badges.push(el("span", { class: "badge badge-amber" }, "event"));
-  return badges;
+function loadOntology() {
+  if (!ontologyPromise) {
+    ontologyPromise = api("/api/ontology").then((o) => { state.ontology = o; return o; });
+  }
+  return ontologyPromise;
 }
 
+let constellation = null;
+
 function renderClassDetail(c) {
-  selectedClassUri = c.uri;
-  for (const b of document.querySelectorAll(".tree-name")) {
-    b.classList.toggle("selected", b.dataset.uri === c.uri);
-  }
-  const byUri = new Map(ontoCache.classes.map((k) => [k.uri, k]));
-  const target = clear($("#onto-detail"));
+  const onto = state.ontology;
+  const byUri = new Map(onto.classes.map((k) => [k.uri, k]));
+  const target = clear($("#class-detail"));
+
+  const jump = (uri) => {
+    const k = byUri.get(uri);
+    if (k) { constellation && constellation.select(uri); renderClassDetail(k); }
+  };
+
   target.append(
     el("div", { class: "class-uri" }, c.uri),
-    el("h2", {}, c.name, classBadges(c)),
+    el("h2", {}, c.name,
+      c.is_event ? el("span", { class: "badge" }, "event") : null,
+      el("span", { class: "badge badge-amber" }, `confidence ${c.confidence.toFixed(2)}`)),
     c.definition ? el("p", { class: "class-def" }, c.definition) : null,
-    el("div", { class: "review-meta" },
-      "confidence ", el("b", {}, c.confidence.toFixed(2)),
-      " · shapes ", el("b", {}, String(c.n_shapes)),
-      c.parents.length
-        ? el("span", {}, " · parents ", el("b", {},
-            c.parents.map((p) => (byUri.get(p) || { name: p }).name).join(", ")))
-        : null));
+    el("div", { class: "detail-meta" },
+      el("b", {}, String(c.n_shapes)), " validation shape", c.n_shapes === 1 ? "" : "s",
+      c.parents.length ? [" · subclass of ", c.parents.map((p, i) => [
+        i ? ", " : null,
+        byUri.has(p)
+          ? el("button", { class: "range-link", onclick: () => jump(p) }, byUri.get(p).name)
+          : p,
+      ])] : null));
 
   if (!c.properties.length) {
-    target.append(el("div", { class: "placeholder" }, "no properties on this class"));
+    target.append(el("div", { class: "empty-note" }, "no properties induced on this class"));
     return;
   }
-  const rows = c.properties.map((p) => {
-    const range = p.range_class && byUri.has(p.range_class)
-      ? el("button", { class: "range-link", onclick: () => renderClassDetail(byUri.get(p.range_class)) },
-          byUri.get(p.range_class).name)
-      : (p.range_class || "");
-    return el("tr", {},
-      el("td", {}, p.name,
-        p.is_link ? el("span", { class: "badge", style: "margin-left:0.5em" }, "→ link") : null),
+  const rows = c.properties.map((p) =>
+    el("tr", {},
+      el("td", {}, p.name, p.is_link ? el("span", { class: "badge", style: "margin-left:0.625em" }, "→ link") : null),
       el("td", {}, p.datatype),
       el("td", {}, p.unit ? el("span", { class: "badge badge-amber" }, p.unit) : ""),
       el("td", {}, p.cardinality, p.functional ? " · fn" : ""),
-      el("td", {}, range));
-  });
+      el("td", {}, p.range_class && byUri.has(p.range_class)
+        ? el("button", { class: "range-link", onclick: () => jump(p.range_class) }, byUri.get(p.range_class).name)
+        : (p.range_class || ""))));
   target.append(el("table", { class: "data" },
     el("thead", {}, el("tr", {},
       el("th", {}, "property"), el("th", {}, "datatype"), el("th", {}, "unit"),
-      el("th", {}, "card"), el("th", {}, "range"))),
+      el("th", {}, "cardinality"), el("th", {}, "range"))),
     el("tbody", {}, rows)));
 }
 
-function renderTree(onto) {
-  const byUri = new Map(onto.classes.map((c) => [c.uri, c]));
-  const children = new Map();
-  const placed = new Set();
-  for (const c of onto.classes) {
-    const parent = c.parents.find((p) => byUri.has(p));
-    if (parent) {
-      if (!children.has(parent)) children.set(parent, []);
-      children.get(parent).push(c);
-      placed.add(c.uri);
-    }
-  }
-  const roots = onto.classes.filter((c) => !placed.has(c.uri));
-
-  function node(c) {
-    const kids = (children.get(c.uri) || []).slice().sort((a, b) => a.name.localeCompare(b.name));
-    const row = el("div", { class: "tree-row" });
-    const box = el("div", { class: "tree-node" }, row);
-    if (kids.length) {
-      const sub = el("div", { class: "tree-children" }, kids.map(node));
-      const toggle = el("button", { class: "tree-toggle", title: "collapse / expand" }, "▾");
-      toggle.addEventListener("click", () => {
-        const open = !sub.hidden;
-        sub.hidden = open;
-        toggle.textContent = open ? "▸" : "▾";
-      });
-      row.append(toggle);
-      box.append(sub);
-    } else {
-      row.append(el("span", { class: "tree-leaf-dot" }, "·"));
-    }
-    row.append(
-      el("button", { class: "tree-name", dataset: { uri: c.uri }, onclick: () => renderClassDetail(c) },
-        c.name),
-      ...classBadges(c),
-      el("span", { class: "tree-conf" }, c.confidence.toFixed(2)));
-    return box;
-  }
-
-  const target = clear($("#onto-tree"));
-  target.append(el("div", { class: "review-meta" },
-    "ontology v", el("b", {}, String(onto.version)),
-    " · ", el("b", {}, String(onto.classes.length)), " classes",
-    " · ", el("b", {}, String(onto.edges.length)), " links"));
-  for (const r of roots.slice().sort((a, b) => a.name.localeCompare(b.name))) target.append(node(r));
-}
-
-async function enterOntology() {
-  if (ontoCache) return;
+async function enterOntology(rest) {
+  let onto;
   try {
-    ontoCache = await api("/api/ontology");
-    renderTree(ontoCache);
-    const first = ontoCache.classes.find((c) => c.uri === selectedClassUri) || ontoCache.classes[0];
-    if (first) renderClassDetail(first);
+    onto = await loadOntology();
   } catch (e) {
-    clear($("#onto-tree")).append(errorNote(e));
+    clear($("#class-detail")).append(errorNote(e));
+    return;
+  }
+  if (!constellation) {
+    constellation = createConstellation({
+      svg: $("#constellation"),
+      wrap: $("#constellation-wrap"),
+      card: $("#node-card"),
+      svgEl, el, clear,
+      onSelect: renderClassDetail,
+    });
+    constellation.render(onto);
+  }
+  if (rest) {
+    const uri = decodeURIComponent(rest);
+    const c = onto.classes.find((k) => k.uri === uri || k.name === uri);
+    if (c) { constellation.select(c.uri); renderClassDetail(c); }
   }
 }
 
-// ------------------------------------------------------------------- review
+// ───────────────────────────────────────────────────────────────── review
+
+let reviewItems = [];
+let reviewSel = -1;
+
+function tallyArc(toward, threshold, recals) {
+  const r = 20, C = 2 * Math.PI * r;
+  const frac = Math.max(0, Math.min(1, toward / threshold));
+  const fill = svgEl("circle", {
+    class: "arc-fill", cx: 26, cy: 26, r,
+    "stroke-width": 3, "stroke-dasharray": C.toFixed(2), "stroke-dashoffset": C.toFixed(2),
+    transform: "rotate(-90 26 26)",
+  });
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    fill.setAttribute("stroke-dashoffset", (C * (1 - frac)).toFixed(2));
+  }));
+  return svgEl("svg", { class: "tally-arc", width: 52, height: 52, viewBox: "0 0 52 52" },
+    svgEl("circle", { class: "arc-track", cx: 26, cy: 26, r, "stroke-width": 1 }),
+    fill,
+    svgEl("text", { x: 26, y: 27 }, `${toward}/${threshold}`),
+    svgEl("text", { x: 26, y: 39, style: "font-size:8px;fill:var(--ink-faint)" },
+      recals ? `↻${recals}` : ""));
+}
 
 function renderTally(data) {
   const target = clear($("#review-tally"));
   const kinds = new Set([...Object.keys(data.verdicts), ...Object.keys(data.recalibrations)]);
   for (const it of data.items) kinds.add(it.kind);
-  if (!kinds.size) return;
   for (const kind of [...kinds].sort()) {
     const n = data.verdicts[kind] || 0;
     const toward = n % data.threshold;
     const recals = data.recalibrations[kind] || 0;
-    const pct = (toward / data.threshold) * 100;
     target.append(el("div", { class: "tally-block" },
-      el("div", { class: "tally-kind" }, `${kind} — verdicts toward recalibration`),
-      el("div", { class: "tally-progress" },
-        el("div", { class: "tally-track" },
-          el("div", { class: "tally-fill", style: `width:${pct}%` })),
-        el("span", { class: "tally-count" }, `${toward} / ${data.threshold}`)),
-      el("div", { class: "tally-recal" },
-        `${n} total verdict${n === 1 ? "" : "s"} · ${recals} recalibration${recals === 1 ? "" : "s"} recorded`)));
+      tallyArc(toward, data.threshold, recals),
+      el("div", {},
+        el("div", { class: "tally-kind" }, `${kind} — toward recalibration`),
+        el("div", { class: "tally-sub" },
+          `${n} verdict${n === 1 ? "" : "s"} · ${recals} recalibration${recals === 1 ? "" : "s"} · refit at every ${data.threshold}`))));
   }
 }
 
-function reviewCard(item) {
-  const note = el("input", { class: "note-input", placeholder: "reviewer note (optional)", spellcheck: "false" });
+const ER_PAIR_RE = /^er:([^:]+):(.+)\|\|(.+)$/;
+
+function evidencePair(item) {
+  const m = ER_PAIR_RE.exec(item.decision_id);
+  if (!m) return null;
+  const [, , a, b] = m;
+  const side = (label, uri) => el("div", { class: "pair-side" },
+    el("span", { class: "pair-label" }, label),
+    uri,
+    uri.startsWith("ent://")
+      ? el("div", {}, el("button", {
+          class: "range-link", style: "font-size:var(--fs-0)",
+          onclick: () => { location.hash = `#/entity/${uri}`; },
+        }, "inspect entity →"))
+      : null);
+  return el("div", { class: "pair-grid" },
+    side("left record", a),
+    el("span", { class: "pair-vs" }, "same?"),
+    side("right record", b));
+}
+
+function reviewCard(item, idx) {
+  const note = el("input", {
+    class: "note-input", type: "text",
+    placeholder: "reviewer note (optional)", spellcheck: "false",
+  });
   const actions = el("div", { class: "review-actions" });
 
   async function verdict(v) {
@@ -342,10 +519,11 @@ function reviewCard(item) {
     try {
       const out = await api(`/api/review/${encodeURIComponent(item.decision_id)}`,
         { verdict: v, note: note.value });
-      clear(actions).append(el("span", { class: "verdict-result" },
-        `${v}ed · ${out.verdicts_for_kind} ${out.kind} verdict${out.verdicts_for_kind === 1 ? "" : "s"}`
-        + (out.recalibrated ? ` · ⚒ recalibrated ${out.kind}` : "")));
-      setTimeout(enterReview, 900);
+      const msg = `${v === "accept" ? "accepted" : "rejected"} · ${out.verdicts_for_kind} ${out.kind} verdict${out.verdicts_for_kind === 1 ? "" : "s"}`;
+      clear(actions).append(el("span", {
+        class: `verdict-result${out.recalibrated ? " recalibrated" : ""}`,
+      }, msg, out.recalibrated ? ` · ⚒ ${out.kind} recalibrated` : ""));
+      setTimeout(enterReview, 750);
     } catch (e) {
       actions.append(errorNote(e));
       for (const b of actions.querySelectorAll("button")) b.disabled = false;
@@ -353,188 +531,129 @@ function reviewCard(item) {
   }
 
   actions.append(
-    el("button", { class: "btn btn-accent", onclick: () => verdict("accept") }, "accept"),
-    el("button", { class: "btn", onclick: () => verdict("reject") }, "reject"),
+    el("button", { class: "btn btn-accept", onclick: () => verdict("accept") }, "accept (a)"),
+    el("button", { class: "btn btn-reject", onclick: () => verdict("reject") }, "reject (r)"),
     note);
 
-  return el("div", { class: "review-card" },
-    el("div", { class: "head" },
+  const card = el("div", { class: "review-card", dataset: { idx: String(idx) }, onclick: () => selectReview(idx, false) },
+    el("div", { class: "review-head" },
       el("span", { class: "badge badge-amber" }, item.kind),
-      el("span", { class: "review-id" }, item.decision_id),
       item.deferred_to_human ? el("span", { class: "badge" }, "deferred") : null,
       item.quarantined ? el("span", { class: "badge" }, "quarantined") : null,
-      el("span", { class: "badge" }, `tier ${item.tier}`)),
+      el("span", { class: "badge" }, `tier ${item.tier}`),
+      el("span", { class: "review-id" }, item.decision_id)),
+    evidencePair(item),
     item.rationale ? el("p", { class: "review-rationale" }, item.rationale) : null,
     el("div", { class: "review-meta" },
       "outcome ", el("b", {}, item.outcome),
-      " · confidence ", el("b", {}, item.confidence.toFixed(3)),
-      " · ", item.created_at),
-    el("div", {},
-      item.conformal_set.map((c) =>
-        el("span", { class: `conformal-chip${c === item.outcome ? " chosen" : ""}` }, c))),
-    confMeter(item.confidence),
+      " · ", item.created_at,
+      item.prov_atoms.length
+        ? el("button", {
+            class: "range-link", style: "margin-left:0.75em",
+            onclick: (ev) => {
+              railShowAtoms(item.prov_atoms, item.decision_id, ev.currentTarget.closest(".review-card"));
+            },
+          }, `evidence ⌗${item.prov_atoms.length}`)
+        : null),
+    el("div", {}, item.conformal_set.map((c) =>
+      el("span", { class: `conformal-chip${c === item.outcome ? " chosen" : ""}` }, c))),
+    confGauge(item.confidence),
     actions);
+  card._verdict = verdict;
+  return card;
+}
+
+function selectReview(idx, scroll = true) {
+  const cards = document.querySelectorAll("#review-queue .review-card");
+  if (!cards.length) { reviewSel = -1; return; }
+  reviewSel = Math.max(0, Math.min(cards.length - 1, idx));
+  cards.forEach((c, i) => c.classList.toggle("selected", i === reviewSel));
+  if (scroll) cards[reviewSel].scrollIntoView({ block: "nearest", behavior: "smooth" });
 }
 
 async function enterReview() {
   try {
     const data = await api("/api/review");
     renderTally(data);
+    reviewItems = data.items;
     const queue = clear($("#review-queue"));
     if (!data.items.length) {
-      queue.append(el("div", { class: "queue-empty" },
-        "the queue is clear — no deferred or low-confidence decisions await adjudication"));
+      queue.append(el("div", { class: "empty-note" },
+        "no review items — the spine is confident today"));
+      reviewSel = -1;
       return;
     }
-    for (const item of data.items) queue.append(reviewCard(item));
+    data.items.forEach((item, i) => queue.append(reviewCard(item, i)));
+    selectReview(reviewSel === -1 ? 0 : reviewSel, false);
   } catch (e) {
     clear($("#review-queue")).append(errorNote(e));
   }
 }
 
-// --------------------------------------------------------------- dashboards
-
-const VEGA_CONFIG = {
-  background: "transparent",
-  view: { stroke: "transparent" },
-  axis: {
-    labelColor: "#9a958a", titleColor: "#9a958a",
-    gridColor: "rgba(232,228,218,0.07)", domainColor: "rgba(232,228,218,0.25)",
-    tickColor: "rgba(232,228,218,0.25)",
-    labelFont: "monospace", titleFont: "monospace", labelFontSize: 10, titleFontSize: 10,
-  },
-  legend: { labelColor: "#9a958a", titleColor: "#9a958a" },
-  title: { color: "#e8e4da", font: "Georgia, serif" },
-  range: { category: ["#d97706", "#f59e0b", "#b45309", "#92400e", "#fbbf24"] },
-  mark: { color: "#d97706" },
-  bar: { fill: "#d97706" },
-  line: { stroke: "#f59e0b" },
-  point: { fill: "#f59e0b" },
-  area: { fill: "#d97706" },
-  arc: { fill: "#d97706" },
-  text: { fill: "#e8e4da", font: "monospace" },
-};
-
-function renderChart(cell, spec) {
-  const mount = el("div", { class: "chart-vega" });
-  cell.append(mount);
-  if (typeof window.vegaEmbed === "function") {
-    window.vegaEmbed(mount, spec, { actions: false, renderer: "svg", config: VEGA_CONFIG })
-      .catch((e) => { mount.replaceWith(errorNote(e)); });
-  } else {
-    cell.append(
-      el("div", { class: "offline-note" },
-        "vega vendor scripts unavailable (offline) — showing the raw Vega-Lite spec"),
-      el("pre", { class: "chart-fallback" }, JSON.stringify(spec, null, 2)));
-    mount.remove();
+function reviewKey(key) {
+  const cards = document.querySelectorAll("#review-queue .review-card");
+  if (!cards.length) return false;
+  if (key === "j") { selectReview(reviewSel + 1); return true; }
+  if (key === "k") { selectReview(reviewSel - 1); return true; }
+  if ((key === "a" || key === "r") && reviewSel >= 0) {
+    cards[reviewSel]._verdict(key === "a" ? "accept" : "reject");
+    return true;
   }
+  return false;
 }
 
-function dashboardBlock(d, rank) {
-  const block = el("div", { class: "dash-proposal" },
-    el("div", { class: "dash-head" },
-      rank ? el("span", { class: "dash-rank" }, `№${rank}`) : null,
-      el("span", { class: "dash-title" }, d.title),
-      d.score !== null && d.score !== undefined
-        ? el("span", { class: "dash-score" }, `score ${Number(d.score).toFixed(3)}`)
-        : null),
-    d.rationale ? el("p", { class: "dash-rationale" }, d.rationale) : null);
-  const grid = el("div", { class: "chart-grid" });
-  block.append(grid);
-  for (const chart of d.charts) {
-    const cell = el("div", { class: "chart-cell" }, el("div", { class: "chart-title" }, chart.title));
-    grid.append(cell);
-    renderChart(cell, chart.vega);
-  }
-  return block;
-}
-
-async function proposeDashboards(utterance) {
-  const target = clear($("#dash-result"));
-  target.append(el("div", { class: "loading" }, "synthesizing dashboards…"));
-  try {
-    const out = await api("/api/dashboards", { utterance });
-    clear(target);
-    if (!out.dashboards.length) {
-      target.append(el("div", { class: "queue-empty" }, "no dashboards could be grounded in this ontology"));
-      return;
-    }
-    out.dashboards.forEach((d, i) => target.append(dashboardBlock(d, i + 1)));
-  } catch (e) {
-    clear(target).append(errorNote(e));
-  }
-}
-
-let savedLoaded = false;
-async function enterDashboards() {
-  if (savedLoaded) return;
-  savedLoaded = true;
-  try {
-    const out = await api("/api/dashboards");
-    const target = clear($("#dash-saved"));
-    if (!out.dashboards.length) {
-      target.append(el("div", { class: "queue-empty" }, "no saved proposals — run `ontoforge dashboard`"));
-      return;
-    }
-    for (const d of out.dashboards) target.append(dashboardBlock(d, null));
-  } catch (e) {
-    clear($("#dash-saved")).append(errorNote(e));
-  }
-}
-
-// ------------------------------------------------------------------- status
+// ───────────────────────────────────────────────────────────────── status
 
 const PIPELINE = ["ingest", "profile", "induce", "resolve", "materialize"];
 
 function kvTable(title, entries, valueOf) {
-  const rows = entries.map(([k, v]) =>
-    el("tr", {}, el("td", {}, k), el("td", {}, valueOf ? valueOf(v) : fmt(v))));
   return el("div", {},
-    el("div", { class: "section-label" }, title),
+    el("span", { class: "section-label" }, title),
     entries.length
-      ? el("table", { class: "data" }, el("tbody", {}, rows))
-      : el("div", { class: "queue-empty" }, "none recorded"));
+      ? el("table", { class: "data" }, el("tbody", {}, entries.map(([k, v]) =>
+          el("tr", {}, el("td", {}, k), el("td", {}, valueOf ? valueOf(v) : fmt(v))))))
+      : el("div", { class: "empty-note", style: "padding:0.5rem 0;text-align:left" }, "none recorded"));
 }
 
 async function enterStatus() {
   const target = clear($("#status-body"));
-  target.append(el("div", { class: "loading" }, "reading the ledger…"));
+  target.append(skeletonCard([30, 60, 45]));
   try {
     const s = await api("/api/status");
     clear(target);
 
-    target.append(el("div", { class: "status-project" }, `${s.project} · estate: ${s.estate}`
-      + (s.limit ? ` · limit ${s.limit}` : "")));
+    target.append(el("div", { class: "status-project" },
+      `${s.project} · estate ${s.estate}` + (s.limit ? ` · row limit ${s.limit}` : "")));
 
     const totalDecisions = Object.values(s.decisions_by_kind).reduce((a, b) => a + b, 0);
     const totalArtifacts = Object.values(s.artifacts).reduce((a, b) => a + b, 0);
+    const m = s.materialized || {};
+    const counter = (label, value, accent) => el("div", { class: "counter-cell" },
+      el("div", { class: "counter-label" }, label),
+      el("div", { class: `counter-value${accent ? " accent" : ""}` }, value));
     target.append(el("div", { class: "counter-grid" },
-      el("div", { class: "counter-cell" },
-        el("div", { class: "counter-label" }, "atoms"),
-        el("div", { class: "counter-value accent" }, s.ledger_exists ? fmt(s.atoms) : "—")),
-      el("div", { class: "counter-cell" },
-        el("div", { class: "counter-label" }, "decisions"),
-        el("div", { class: "counter-value" }, fmt(totalDecisions))),
-      el("div", { class: "counter-cell" },
-        el("div", { class: "counter-label" }, "artifacts"),
-        el("div", { class: "counter-value" }, fmt(totalArtifacts))),
+      counter("atoms", s.ledger_exists ? fmt(s.atoms) : "—", true),
+      counter("entities", m.entities !== undefined ? fmt(m.entities) : "—"),
+      counter("value cells", m.cells !== undefined ? fmt(m.cells) : "—"),
+      counter("links", m.links !== undefined ? fmt(m.links) : "—"),
+      counter("decisions", fmt(totalDecisions)),
+      counter("artifacts", fmt(totalArtifacts)),
       el("div", { class: "counter-cell" },
         el("div", { class: "counter-label" }, "model cost"),
         el("div", { class: "counter-value" }, fmt(s.cost_tokens), el("small", {}, " tok")))));
 
-    const stages = el("div", { class: "stage-list" });
     const known = new Set(s.stages);
+    const stages = el("div", { class: "stage-list" });
     for (const st of PIPELINE) {
       stages.append(el("span", { class: `stage-item${known.has(st) ? " done" : ""}` },
         el("span", { class: "tick" }, known.has(st) ? "◆" : "◇"), st));
     }
     for (const st of s.stages) {
       if (!PIPELINE.includes(st)) {
-        stages.append(el("span", { class: "stage-item done" },
-          el("span", { class: "tick" }, "◆"), st));
+        stages.append(el("span", { class: "stage-item done" }, el("span", { class: "tick" }, "◆"), st));
       }
     }
-    target.append(el("div", { class: "section-label" }, "pipeline stages"), stages);
+    target.append(el("span", { class: "section-label" }, "pipeline stages"), stages);
 
     target.append(el("div", { class: "status-tables" },
       kvTable("decisions by kind", Object.entries(s.decisions_by_kind)),
@@ -546,47 +665,193 @@ async function enterStatus() {
   }
 }
 
-// ------------------------------------------------------------------- router
+// ──────────────────────────────────────────────────────── feature modules
 
-const TABS = {
+const ctx = {
+  $, el, svgEl, clear, fmt, api, errorNote, confGauge,
+  openAtoms: railShowAtoms, openProvenance: railShowProvenance, closeRail,
+};
+
+const entityPanel = createEntityPanel(ctx);
+const dashboardsPanel = createDashboardsPanel(ctx);
+
+// ──────────────────────────────────────────────────────── command palette
+
+const cmdk = $("#cmdk");
+const cmdkInput = $("#cmdk-input");
+const cmdkList = $("#cmdk-list");
+let cmdkItems = [];
+let cmdkSel = 0;
+
+const NAV_COMMANDS = [
+  { kind: "go", label: "Ask — cited answers", hash: "#/ask" },
+  { kind: "go", label: "Ontology — the constellation", hash: "#/ontology" },
+  { kind: "go", label: "Entities — time-travel inspector", hash: "#/entity" },
+  { kind: "go", label: "Review — adjudication queue", hash: "#/review" },
+  { kind: "go", label: "Dashboards — vague-spec synthesis", hash: "#/dashboards" },
+  { kind: "go", label: "Status — instrument cluster", hash: "#/status" },
+];
+
+function buildCmdkItems(q) {
+  const needle = q.trim().toLowerCase();
+  const items = [];
+  if (needle) {
+    items.push({ kind: "ask", label: `“${q.trim()}”`, run: () => ask(q.trim()) });
+    if (q.trim().startsWith("ent://")) {
+      items.push({ kind: "entity", label: q.trim(), mono: true,
+        run: () => { location.hash = `#/entity/${q.trim()}`; } });
+    }
+  }
+  for (const c of NAV_COMMANDS) {
+    if (!needle || c.label.toLowerCase().includes(needle)) {
+      items.push({ kind: "go to", label: c.label, run: () => { location.hash = c.hash; } });
+    }
+  }
+  for (const question of recentQuestions) {
+    if (items.length >= 14) break;
+    if (!needle || question.toLowerCase().includes(needle)) {
+      items.push({ kind: "recent", label: question, serif: true, run: () => ask(question) });
+    }
+  }
+  if (state.ontology) {
+    for (const c of state.ontology.classes) {
+      if (items.length >= 18) break;
+      if (needle && c.name.toLowerCase().includes(needle)) {
+        items.push({ kind: "class", label: c.name, run: () => { location.hash = `#/ontology/${encodeURIComponent(c.uri)}`; } });
+      }
+    }
+  }
+  return items;
+}
+
+function renderCmdk() {
+  clear(cmdkList);
+  if (!cmdkItems.length) {
+    cmdkList.append(el("div", { class: "cmdk-empty" }, "nothing matches — press enter to ask it as a question"));
+    return;
+  }
+  cmdkItems.forEach((item, i) => {
+    cmdkList.append(el("button", {
+      class: `cmdk-item${i === cmdkSel ? " active" : ""}`,
+      onclick: () => { closePalette(); item.run(); },
+    },
+      el("span", { class: "ci-kind" }, item.kind),
+      el("span", { class: `ci-label${item.serif ? " serif" : ""}${item.mono ? " mono" : ""}` }, item.label)));
+  });
+  const active = cmdkList.children[cmdkSel];
+  if (active) active.scrollIntoView({ block: "nearest" });
+}
+
+function openPalette() {
+  cmdk.hidden = false;
+  cmdkInput.value = "";
+  cmdkSel = 0;
+  cmdkItems = buildCmdkItems("");
+  renderCmdk();
+  cmdkInput.focus();
+}
+
+function closePalette() {
+  cmdk.hidden = true;
+  cmdkInput.blur();
+}
+
+cmdkInput.addEventListener("input", () => {
+  cmdkSel = 0;
+  cmdkItems = buildCmdkItems(cmdkInput.value);
+  renderCmdk();
+});
+
+cmdkInput.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowDown") { e.preventDefault(); cmdkSel = Math.min(cmdkItems.length - 1, cmdkSel + 1); renderCmdk(); }
+  else if (e.key === "ArrowUp") { e.preventDefault(); cmdkSel = Math.max(0, cmdkSel - 1); renderCmdk(); }
+  else if (e.key === "Enter") {
+    e.preventDefault();
+    const item = cmdkItems[cmdkSel] || (cmdkInput.value.trim() && { run: () => ask(cmdkInput.value.trim()) });
+    if (item) { closePalette(); item.run(); }
+  }
+});
+
+cmdk.addEventListener("mousedown", (e) => { if (e.target === cmdk) closePalette(); });
+$("#palette-open").addEventListener("click", openPalette);
+
+// ───────────────────────────────────────────────────────────────── router
+
+const PANELS = {
   ask: () => {},
   ontology: enterOntology,
+  entity: (rest) => entityPanel.enter(rest),
   review: enterReview,
-  dashboards: enterDashboards,
+  dashboards: () => dashboardsPanel.enter(),
   status: enterStatus,
 };
 
+let currentTab = "ask";
+
 function route() {
-  const tab = (location.hash.replace(/^#\//, "") || "ask").split("/")[0];
-  const active = TABS[tab] ? tab : "ask";
+  const raw = location.hash.replace(/^#\//, "");
+  const slash = raw.indexOf("/");
+  const tab = slash === -1 ? raw : raw.slice(0, slash);
+  const rest = slash === -1 ? "" : raw.slice(slash + 1);
+  currentTab = PANELS[tab] ? tab : "ask";
   for (const a of document.querySelectorAll(".tabs a")) {
-    a.classList.toggle("active", a.dataset.tab === active);
+    a.classList.toggle("active", a.dataset.tab === currentTab);
   }
   for (const p of document.querySelectorAll(".tab-panel")) {
-    p.hidden = p.id !== `panel-${active}`;
+    p.hidden = p.id !== `panel-${currentTab}`;
   }
-  TABS[active]();
+  PANELS[currentTab](rest);
 }
 
-// -------------------------------------------------------------------- wires
+// ─────────────────────────────────────────────────────────────── keyboard
+
+document.addEventListener("keydown", (e) => {
+  const a = document.activeElement;
+  const typing = a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA" || a.isContentEditable);
+
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+    e.preventDefault();
+    cmdk.hidden ? openPalette() : closePalette();
+    return;
+  }
+  if (e.key === "Escape") {
+    if (!cmdk.hidden) closePalette();
+    else closeRail();
+    return;
+  }
+  if (typing || !cmdk.hidden || e.metaKey || e.ctrlKey || e.altKey) return;
+
+  if (e.key === "/") {
+    e.preventDefault();
+    location.hash = "#/ask";
+    $("#ask-input").focus();
+    return;
+  }
+  if (currentTab === "ask" && activeClarify && /^[1-9]$/.test(e.key)) {
+    const i = Number(e.key) - 1;
+    if (i < activeClarify.options.length) { e.preventDefault(); clarifyChoice(i); }
+    return;
+  }
+  if (currentTab === "review" && reviewKey(e.key)) e.preventDefault();
+});
+
+// ──────────────────────────────────────────────────────────────────── wire
 
 $("#ask-form").addEventListener("submit", (e) => {
   e.preventDefault();
   ask($("#ask-input").value);
 });
 
-$("#dash-form").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const utterance = $("#dash-input").value.trim();
-  if (utterance) proposeDashboards(utterance);
-});
-
 $("#reload-button").addEventListener("click", async () => {
   try {
     await api("/api/reload", {});
-    ontoCache = null;
-    savedLoaded = false;
+    ontologyPromise = null;
+    state.ontology = null;
+    constellation = null;
+    clear($("#constellation"));
+    dashboardsPanel.reset();
     await refreshMasthead();
+    await loadOntology();
     await enterStatus();
   } catch (e) {
     clear($("#status-body")).append(errorNote(e));
@@ -595,5 +860,8 @@ $("#reload-button").addEventListener("click", async () => {
 
 window.addEventListener("hashchange", route);
 
+// prefetch the world on load: status + ontology warm before the first click
 refreshMasthead();
+loadOntology().catch(() => { /* surfaces on the ontology panel */ });
+renderHistory();
 route();
