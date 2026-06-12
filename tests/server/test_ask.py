@@ -7,6 +7,8 @@ from __future__ import annotations
 ANSWERABLE = "How many work orders have component 'LANDING GEAR'?"
 # ungroundable terms -> abstention (no unicorns in aviation maintenance)
 UNANSWERABLE = "What is the average lifespan of a unicorn?"
+# the M12 scope ambiguity: 'events' = NTSB AccidentEvent | any SafetyEvent
+AMBIGUOUS = "How many events are recorded for DELTA AIR LINES INC?"
 
 
 def test_ask_returns_a_cited_answer(client):
@@ -49,6 +51,51 @@ def test_unanswerable_question_abstains_with_a_reason(client):
     assert a["abstain_reason"], "abstention always explains itself"
     assert a["rows"] == []
     assert a["citations"] == []
+
+
+def test_ambiguous_question_asks_one_clarification(client):
+    out = client.post("/api/ask", json={"question": AMBIGUOUS})
+    assert out.status_code == 200
+    a = out.json()
+    assert a["abstained"] is False
+    assert a["clarification"], "scope ambiguity surfaces as a question, not a guess"
+    assert len(a["clarification_options"]) >= 2
+    joined = " ".join(a["clarification_options"])
+    assert "AccidentEvent" in joined and "SafetyEvent" in joined
+    assert a["rows"] == []
+    assert a["cached"] is False, "clarification answers are never cached"
+
+
+def test_clarify_resolves_the_ambiguity_to_a_cited_answer(client):
+    first = client.post("/api/ask", json={"question": AMBIGUOUS}).json()
+    assert first["clarification"]
+    out = client.post(
+        "/api/ask/clarify", json={"question": AMBIGUOUS, "choice": "AccidentEvent"}
+    )
+    assert out.status_code == 200
+    a = out.json()
+    assert a["clarification"] is None
+    assert a["abstained"] is False
+    assert a["rows"], "the chosen reading executes to a real answer"
+    assert a["citations"] and all(c["atom_ids"] for c in a["citations"])
+
+    # the OTHER branch carries information: a different (wider) count
+    again = client.post("/api/ask", json={"question": AMBIGUOUS}).json()
+    assert again["clarification"]
+    b = client.post(
+        "/api/ask/clarify", json={"question": AMBIGUOUS, "choice": "SafetyEvent"}
+    ).json()
+    assert b["abstained"] is False
+    assert b["rows"] != a["rows"], "structurally different readings, different answers"
+
+
+def test_clarify_with_an_unoffered_choice_abstains(client):
+    assert client.post("/api/ask", json={"question": AMBIGUOUS}).json()["clarification"]
+    out = client.post("/api/ask/clarify", json={"question": AMBIGUOUS, "choice": "teapot"})
+    assert out.status_code == 200
+    a = out.json()
+    assert a["abstained"] is True
+    assert "option" in a["abstain_reason"]
 
 
 def test_clarify_without_ambiguity_just_answers(client):

@@ -21,14 +21,25 @@ from __future__ import annotations
 import json
 import re
 from collections import Counter
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from ontoforge.contracts import Atom, CalibrationSample, DecisionKind, leaf, prov_sum
+from ontoforge.contracts import (
+    Atom,
+    CalibrationSample,
+    DecisionKind,
+    Stance,
+    from_instant,
+    leaf,
+    prov_sum,
+    to_instant,
+)
 from ontoforge.contracts.provenance import ONE, ZERO, Leaf, Prod, ProvTerm, Sum
 from ontoforge.vista import propose, render_with_data
 
@@ -45,6 +56,37 @@ REVIEW_CONFIDENCE_FLOOR = 0.7
 def _kind_of(decision_id: str) -> str:
     """Decision kind = the decision_id prefix ('er:a||b' -> 'er', 'qi-x' -> 'qi')."""
     return re.split(r"[:\-/]", decision_id, maxsplit=1)[0].lower()
+
+
+def _parse_stance(raw: str) -> Stance:
+    """``stance`` query param -> temporal Stance.
+
+    'current' (default)               -> the open-interval read
+    'as_of:<ISO-8601 timestamp>'      -> what we now believe held at that time
+    """
+    s = (raw or "current").strip()
+    if s == "current":
+        return Stance()
+    if s.startswith("as_of:"):
+        ts = s[len("as_of:"):]
+        try:
+            dt = datetime.fromisoformat(ts)
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=422, detail=f"bad as_of timestamp (ISO 8601 expected): {ts!r}"
+            ) from exc
+        return Stance(kind="as_of", valid_at=to_instant(dt))
+    raise HTTPException(
+        status_code=422,
+        detail=f"bad stance {raw!r} — use 'current' or 'as_of:<ISO-8601 timestamp>'",
+    )
+
+
+def _stance_label(stance: Stance) -> str:
+    """The normalized echo of the stance the card was read under."""
+    if stance.kind == "current":
+        return "current"
+    return f"as_of:{from_instant(stance.valid_at).isoformat()}"  # type: ignore[arg-type]
 
 
 def _term_tree(term: ProvTerm, ledger: Any) -> dict[str, Any]:
@@ -77,6 +119,14 @@ def create_app(project: Path | str) -> FastAPI:
         version="0.1.0",
     )
     app.state.world = world
+
+    # The UI is served same-origin; CORS admits localhost dev servers only.
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     def fail(exc: ProjectError) -> HTTPException:
         return HTTPException(status_code=409, detail=str(exc))
@@ -204,6 +254,21 @@ def create_app(project: Path | str) -> FastAPI:
         except ProjectError as exc:
             raise fail(exc) from exc
         return S.AskOut(**payload, cached=False)
+
+    # ----------------------------------------------------------- entities
+
+    @app.get("/api/entities/{uri:path}", response_model=S.EntityOut)
+    async def api_entity(uri: str, stance: str = "current") -> S.EntityOut:
+        """Entity property card under a temporal stance + full per-property
+        history — the time-travel read (HEARTH §4.4)."""
+        st = _parse_stance(stance)
+        try:
+            payload = world.entity(uri, st)
+        except ProjectError as exc:
+            raise fail(exc) from exc
+        if payload is None:
+            raise HTTPException(status_code=404, detail=f"unknown entity uri: {uri}")
+        return S.EntityOut(**payload, stance=_stance_label(st))
 
     # ------------------------------------------------- atoms & provenance
 

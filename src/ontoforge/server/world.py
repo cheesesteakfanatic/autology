@@ -19,7 +19,7 @@ import threading
 from pathlib import Path
 from typing import Any, Callable, Optional
 
-from ontoforge.contracts import SpineProfile
+from ontoforge.contracts import FOREVER, Layer, SpineProfile, Stance, ValueCell, from_instant
 from ontoforge.contracts.ontology import Ontology
 from ontoforge.contracts.oqir import Answer, OQIRTerm
 from ontoforge.hearth import Hearth
@@ -180,6 +180,33 @@ class ProjectWorld:
             resolved = self.engine.answer_clarification(choice)
             return serialize_answer(key, resolved)
 
+    # ------------------------------------------------------------ entities
+
+    def entity(self, uri: str, stance: Stance) -> Optional[dict[str, Any]]:
+        """The entity property card under a stance + full per-property history
+        (every cell ever written, the §4.4 audit trail). None = unknown URI."""
+        with self.lock:
+            hearth = self.hearth
+            shards = [
+                s
+                for s in hearth.value_shard_items()
+                if s.layer is Layer.ENTITY and uri in s.by_entity
+            ]
+            if not shards:
+                return None
+            classes = sorted({s.class_uri for s in shards})
+            properties = {
+                prop: jsonable(value) for prop, value in sorted(hearth.read(uri, stance).items())
+            }
+            props_ever = sorted(
+                {s.cells[seq].prop for s in shards for seq in s.by_entity.get(uri, ())}
+            )
+            history = {
+                prop: [serialize_cell(c) for c in hearth.history(uri, prop)]
+                for prop in props_ever
+            }
+        return {"uri": uri, "classes": classes, "properties": properties, "history": history}
+
     def oqir_executor(self) -> Callable[[OQIRTerm], list[dict[str, Any]]]:
         """The VISTA data seam: lower an OQIR term through this world.
 
@@ -226,6 +253,28 @@ def jsonable(value: Any) -> Any:
     if value is None or isinstance(value, (bool, int, float, str)):
         return value
     return str(value)
+
+
+def instant_iso(i: int) -> Optional[str]:
+    """Instant -> ISO-8601 UTC string; the open end (FOREVER) maps to None."""
+    if i >= FOREVER:
+        return None
+    return from_instant(i).isoformat()
+
+
+def serialize_cell(c: ValueCell) -> dict[str, Any]:
+    """One HEARTH cell as the API exposes it (bitemporal bounds + provenance)."""
+    return {
+        "value": jsonable(c.value),
+        "valid_from": instant_iso(c.valid.start),
+        "valid_to": instant_iso(c.valid.end),
+        "system_from": instant_iso(c.system.start),
+        "system_to": instant_iso(c.system.end),
+        "confidence": float(c.confidence),
+        "src_rank": int(c.src_rank),
+        "prov_ref": c.prov_ref,
+        "is_current": bool(c.is_current),
+    }
 
 
 def serialize_answer(question: str, answer: Answer) -> dict[str, Any]:

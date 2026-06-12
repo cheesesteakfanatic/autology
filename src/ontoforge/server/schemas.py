@@ -176,6 +176,32 @@ class VerdictOut(BaseModel):
     recalibrations_for_kind: int
 
 
+# ------------------------------------------------------------------- entities
+
+
+class HistoryCellOut(BaseModel):
+    """One HEARTH value cell: bitemporal bounds (None = open/FOREVER), source
+    rank, confidence, and the interned provenance ref (/api/provenance takes it)."""
+
+    value: Any = None
+    valid_from: Optional[str] = None
+    valid_to: Optional[str] = None
+    system_from: Optional[str] = None
+    system_to: Optional[str] = None
+    confidence: float
+    src_rank: int
+    prov_ref: str
+    is_current: bool
+
+
+class EntityOut(BaseModel):
+    uri: str
+    classes: list[str]
+    stance: str                       # 'current' | 'as_of:<ISO-8601, UTC>'
+    properties: dict[str, Any]        # the property card under the stance
+    history: dict[str, list[HistoryCellOut]]  # prop -> every cell ever written
+
+
 # ----------------------------------------------------------------- dashboards
 
 

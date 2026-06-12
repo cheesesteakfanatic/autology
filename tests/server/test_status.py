@@ -33,6 +33,13 @@ def test_status_decision_and_artifact_tallies_are_dicts(client):
         assert isinstance(kind, str) and n >= 1
 
 
+def test_cors_admits_localhost_dev_origins(client):
+    out = client.get("/api/status", headers={"Origin": "http://localhost:5173"})
+    assert out.headers.get("access-control-allow-origin") == "http://localhost:5173"
+    out = client.get("/api/status", headers={"Origin": "https://evil.example.com"})
+    assert "access-control-allow-origin" not in out.headers
+
+
 def test_reload_reopens_the_project(client):
     out = client.post("/api/reload")
     assert out.status_code == 200
