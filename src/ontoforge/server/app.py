@@ -240,6 +240,42 @@ def create_app(project: Path | str) -> FastAPI:
             raise HTTPException(status_code=404, detail=f"unknown class uri: {uri}")
         return _class_out(c)
 
+    # -------------------------------------------------------------- atlas
+
+    def _atlas_or_404() -> dict[str, Any]:
+        atlas = world.read_atlas()
+        if atlas is None:
+            raise HTTPException(
+                status_code=404,
+                detail=(
+                    "atlas not built — run: "
+                    f"python -m ontoforge.pipeline.atlas {world.project}"
+                ),
+            )
+        return atlas
+
+    @app.get("/api/atlas", response_model=S.AtlasOut)
+    async def api_atlas() -> S.AtlasOut:
+        """The connection atlas (<project>/atlas.json): islands of
+        confirmed-connected classes plus every tiered join arc with its
+        evidence. 404 until built; /api/reload drops the cache."""
+        return S.AtlasOut(**_atlas_or_404())
+
+    @app.get("/api/atlas/link", response_model=S.AtlasLinksOut)
+    async def api_atlas_link(src: str, dst: str) -> S.AtlasLinksOut:
+        """Every atlas arc between two class URIs (either direction), with
+        full evidence — the evidence-card deep link."""
+        atlas = _atlas_or_404()
+        links = [
+            lk
+            for lk in atlas.get("links", [])
+            if (lk.get("src_class") == src and lk.get("dst_class") == dst)
+            or (lk.get("src_class") == dst and lk.get("dst_class") == src)
+        ]
+        return S.AtlasLinksOut(
+            src=src, dst=dst, links=[S.AtlasLink(**lk) for lk in links]
+        )
+
     # ------------------------------------------------------------- search
 
     @app.get("/api/search", response_model=S.SearchOut)

@@ -131,12 +131,67 @@ the FLIP target.
 |---|---|---|
 | **Ask** | ❯ | the console reborn in a window: serif question field, history chips, answers as mono headlines/tables with **amber cite-dots**; a dot opens an **Evidence child window beside the answer** (re-pointed, never duplicated); clarifications are `1–9` keystroke chips; abstention renders as the dignified `state-abstained` card — *"OntoForge declines to guess."* |
 | **Evidence** | ⌗ | source-atom chips fetched live from `/api/atoms`, or the full derivation tree from `/api/provenance` (sums = "any of", products = "all of"). A child of its citing window: closing the parent closes it; `esc` dismisses it. Transient — never persisted. |
-| **Constellation** | ✶ | the star chart in a resizable window: deterministic seeded force layout, stars sized by structure, amber luminance = confidence, subsumption hairlines, bowed link arcs; pan/zoom/reset; class detail drawer beneath; `focusClass(uri, prop)` API the WM routes `class:focus` to. Singleton. |
+| **Constellation / Atlas** | ✶ | the star chart in a resizable window: deterministic seeded force layout, stars sized by structure, amber luminance = confidence, subsumption hairlines, bowed link arcs; pan/zoom/reset; class detail drawer beneath; `focusClass(uri, prop)` API the WM routes `class:focus` to. When `GET /api/atlas` is built it becomes **THE ATLAS** (see §5a) and retitles itself *"Atlas — N islands · M silos"*. Singleton. |
 | **Inspector** | ◈ | one entity: property card under a temporal stance, the **as-of time scrubber** (drag → debounced refetch, changed values flash), per-property **bitemporal history bars** (click → derivation in Evidence), and the **neighbors list** — clicking a neighbor opens *another Inspector beside this one*: the OS moment. Multiple instances are the point; the same URI refocuses instead of duplicating. |
 | **Review** | ⚖ | the adjudication queue: kind/tier badges, ER pairs side-by-side under a serif *"same?"* (sides deep-link to Inspectors), conformal chips, confidence gauge, `j/k/a/r` routed to this window only, and the recalibration arc (`n/20`) per kind. Singleton. |
 | **Dashboards** | ▤ | utterance → VISTA's top-3 proposals with themed Vega-Lite previews; every chart has a `⤢` that expands it into its own window (a single-chart viewer instance). Saved proposals below. |
 | **Pulse** | ◉ | the instrument cluster, live-ish: counters, pipeline stages, by-kind/by-tier tables, polled every 10s while open (interval disposed with the window); project reload lives here and announces `world:reload` on the bus. Singleton. |
 | **Exporter** | ⇲ | portability as a visible feature: one button strikes an AMBER snapshot (`POST /api/export`), the shelf lists bundles (`GET /api/exports`). Degrades to honest CLI guidance if the endpoints are absent. Singleton. |
+
+## 5a. The Atlas — the visual grammar of certainty
+
+The Constellation's second sky. Pointed at hundreds of wild internet
+datasets, the question the screen must answer at a glance is *how much of
+this did the engine autonomously join, and how honest is it about the
+rest?* The Atlas encodes **certainty as visual weight** — nothing is
+colored "right" or "wrong"; things are *warmer* the more the engine has
+earned belief in them.
+
+**The contract.** `GET /api/atlas` →
+`{components: [{id, label, class_uris, dataset_count, is_silo}], links:
+[{src_class, dst_class, src_prop, dst_prop, tier, score, evidence}],
+stats}`. The endpoint may 404 while its crew lands: `loadAtlas()` resolves
+`null` and the app falls back to the plain ontology sky with a quiet
+*"atlas not built — induced ontology shown"* note. Never an error state.
+
+**Islands.** Each connected component lays out as its own island — an
+intra-component seeded force sim (same deterministic physics, scaled to
+the island's size), packed on a loose golden-angle spiral, largest first.
+The hull is a barely-visible rounded boundary (amber at 2% fill, hairline
+stroke) — a coastline, not a border. The island label is small-caps serif
+with its `dataset_count`, counterscaled so it reads at every zoom;
+clicking it flies the view to fit the island.
+
+**The grammar of joins.**
+
+| tier | rendering | reading |
+|---|---|---|
+| `confirmed` | solid amber-dim hairline arc | settled knowledge — quiet, load-bearing |
+| `likely` | **dashed amber**, stroke-opacity ∝ score | a hypothesis carrying its own weight; breathes slightly on hover only |
+| `hint` | nearly invisible dotted, **off by default** | static at the edge of hearing |
+
+Hovering a likely arc opens the **evidence card**: tier, score, coverage
+%, overlap count, the two column names and up to five sample shared
+values in mono. Click pins it; click the void (or ×) releases it. The
+legend chips are **filter toggles** (confirmed / likely / hint / silos)
+carrying live counts from `stats`.
+
+**The archipelago.** Silos — classes nothing joined — collect in a dimmer
+band along the bottom under a hairline and the label *"archipelago — N
+silos · honest and unjoined"*. They are quieter (ink-stroked, no halo)
+but **dignified**: never error-red, because an honest silo is a finding,
+not a failure.
+
+**Scale discipline** (the ATLAS SCALE GUARD comment in
+`js/constellation.js`, enforced by `tests/server/test_spa.py` against a
+committed 250-node / 620-arc fixture,
+`tests/server/fixtures/atlas_synthetic_250.json`): the sim settles once
+per island at render (iterations shrink as islands grow); the settled sky
+is static SVG; pan/zoom touch only the `viewBox`; hover and click ride one
+delegated listener set on the `<svg>` — hairline arcs get invisible
+9px-wide hit twins; class labels hide below the zoom threshold while
+island labels counterscale; arcs hold 1px at every altitude via
+`vector-effect: non-scaling-stroke`.
 
 ## 6. Design language
 

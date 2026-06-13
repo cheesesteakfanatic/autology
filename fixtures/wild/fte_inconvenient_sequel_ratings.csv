@@ -1,0 +1,151 @@
+timestamp,respondents,category,link,average,mean,median,1_votes,1_pct
+2017-07-17 12:28:32.785639,402,Males,http://www.imdb.com/title/tt6322922/ratings-male,4.6,5.0,2,197,49.0
+2017-07-17 12:28:33.025600,78,Females,http://www.imdb.com/title/tt6322922/ratings-female,6.9,7.7,10,16,20.5
+2017-07-17 12:28:33.273919,4,Aged under 18,http://www.imdb.com/title/tt6322922/ratings-age_1,4.2,4.2,3,2,50.0
+2017-07-17 12:28:33.495325,4,Males under 18,http://www.imdb.com/title/tt6322922/ratings-male_age_1,4.2,4.2,3,2,50.0
+2017-07-17 12:28:33.722849,130,Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-age_2,6.3,6.5,9,41,31.5
+2017-07-17 12:28:33.970009,108,Males Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-male_age_2,6.2,6.2,9,37,34.3
+2017-07-17 12:28:34.199847,17,Females Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-female_age_2,7.7,8.4,10,2,11.8
+2017-07-17 12:28:34.381001,196,Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-age_3,4.3,5.0,2,92,46.9
+2017-07-17 12:28:34.590224,164,Males Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-male_age_3,4.1,4.5,1,85,51.8
+2017-07-17 12:28:34.807101,25,Females Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-female_age_3,7.2,8.2,10,5,20.0
+2017-07-17 12:28:35.055251,105,Aged 45+,http://www.imdb.com/title/tt6322922/ratings-age_4,4.2,4.9,1,54,51.4
+2017-07-17 12:28:35.326192,79,Males Aged 45+,http://www.imdb.com/title/tt6322922/ratings-male_age_4,3.6,4.3,1,47,59.5
+2017-07-17 12:28:35.610367,24,Females Aged 45+,http://www.imdb.com/title/tt6322922/ratings-female_age_4,6.3,6.4,8,7,29.2
+2017-07-17 12:28:35.837364,2,IMDb staff,http://www.imdb.com/title/tt6322922/ratings-imdb_staff,8.0,8.0,8,0,0.0
+2017-07-17 12:28:36.023600,23,Top 1000 voters,http://www.imdb.com/title/tt6322922/ratings-top_1000,5.8,5.8,6,4,17.4
+2017-07-17 12:28:36.286318,219,US users,http://www.imdb.com/title/tt6322922/ratings-usa,4.2,4.9,1,111,50.7
+2017-07-17 12:28:36.493883,143,Non-US users,http://www.imdb.com/title/tt6322922/ratings-international,5.9,6.5,9,39,27.3
+2017-07-17 12:28:36.697246,678,IMDb users,http://www.imdb.com/title/tt6322922/ratings,4.9,5.4,5,304,44.8
+2017-07-17 12:34:17.770310,402,Males,http://www.imdb.com/title/tt6322922/ratings-male,4.6,5.0,2,197,49.0
+2017-07-17 12:34:17.963319,78,Females,http://www.imdb.com/title/tt6322922/ratings-female,6.9,7.7,10,16,20.5
+2017-07-17 12:34:18.189098,4,Aged under 18,http://www.imdb.com/title/tt6322922/ratings-age_1,4.2,4.2,3,2,50.0
+2017-07-17 12:34:18.378583,4,Males under 18,http://www.imdb.com/title/tt6322922/ratings-male_age_1,4.2,4.2,3,2,50.0
+2017-07-17 12:34:18.596179,130,Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-age_2,6.3,6.5,9,41,31.5
+2017-07-17 12:34:18.818522,108,Males Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-male_age_2,6.2,6.2,9,37,34.3
+2017-07-17 12:34:19.004680,17,Females Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-female_age_2,7.7,8.4,10,2,11.8
+2017-07-17 12:34:19.225794,196,Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-age_3,4.3,5.0,2,92,46.9
+2017-07-17 12:34:19.408369,164,Males Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-male_age_3,4.1,4.5,1,85,51.8
+2017-07-17 12:34:19.605521,25,Females Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-female_age_3,7.2,8.2,10,5,20.0
+2017-07-17 12:34:19.804607,105,Aged 45+,http://www.imdb.com/title/tt6322922/ratings-age_4,4.2,4.9,1,54,51.4
+2017-07-17 12:34:19.995748,79,Males Aged 45+,http://www.imdb.com/title/tt6322922/ratings-male_age_4,3.6,4.3,1,47,59.5
+2017-07-17 12:34:20.208971,24,Females Aged 45+,http://www.imdb.com/title/tt6322922/ratings-female_age_4,6.3,6.4,8,7,29.2
+2017-07-17 12:34:20.443747,2,IMDb staff,http://www.imdb.com/title/tt6322922/ratings-imdb_staff,8.0,8.0,8,0,0.0
+2017-07-17 12:34:20.634563,23,Top 1000 voters,http://www.imdb.com/title/tt6322922/ratings-top_1000,5.8,5.8,6,4,17.4
+2017-07-17 12:34:20.859957,219,US users,http://www.imdb.com/title/tt6322922/ratings-usa,4.2,4.9,1,111,50.7
+2017-07-17 12:34:21.046032,143,Non-US users,http://www.imdb.com/title/tt6322922/ratings-international,5.9,6.5,9,39,27.3
+2017-07-17 12:34:21.250099,678,IMDb users,http://www.imdb.com/title/tt6322922/ratings,4.9,5.4,5,304,44.8
+2017-07-17 13:00:02.497484,402,Males,http://www.imdb.com/title/tt6322922/ratings-male,4.6,5.0,2,197,49.0
+2017-07-17 13:00:02.744275,78,Females,http://www.imdb.com/title/tt6322922/ratings-female,6.9,7.7,10,16,20.5
+2017-07-17 13:00:02.970767,4,Aged under 18,http://www.imdb.com/title/tt6322922/ratings-age_1,4.2,4.2,3,2,50.0
+2017-07-17 13:00:03.215790,4,Males under 18,http://www.imdb.com/title/tt6322922/ratings-male_age_1,4.2,4.2,3,2,50.0
+2017-07-17 13:00:03.446507,130,Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-age_2,6.3,6.5,9,41,31.5
+2017-07-17 13:00:03.689107,108,Males Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-male_age_2,6.2,6.2,9,37,34.3
+2017-07-17 13:00:03.935254,17,Females Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-female_age_2,7.7,8.4,10,2,11.8
+2017-07-17 13:00:04.149143,196,Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-age_3,4.3,5.0,2,92,46.9
+2017-07-17 13:00:04.397977,164,Males Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-male_age_3,4.1,4.5,1,85,51.8
+2017-07-17 13:00:04.621567,25,Females Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-female_age_3,7.2,8.2,10,5,20.0
+2017-07-17 13:00:04.809004,105,Aged 45+,http://www.imdb.com/title/tt6322922/ratings-age_4,4.2,4.9,1,54,51.4
+2017-07-17 13:00:05.000525,79,Males Aged 45+,http://www.imdb.com/title/tt6322922/ratings-male_age_4,3.6,4.3,1,47,59.5
+2017-07-17 13:00:05.237028,24,Females Aged 45+,http://www.imdb.com/title/tt6322922/ratings-female_age_4,6.3,6.4,8,7,29.2
+2017-07-17 13:00:05.465123,2,IMDb staff,http://www.imdb.com/title/tt6322922/ratings-imdb_staff,8.0,8.0,8,0,0.0
+2017-07-17 13:00:05.723314,23,Top 1000 voters,http://www.imdb.com/title/tt6322922/ratings-top_1000,5.8,5.8,6,4,17.4
+2017-07-17 13:00:05.946547,219,US users,http://www.imdb.com/title/tt6322922/ratings-usa,4.2,4.9,1,111,50.7
+2017-07-17 13:00:06.227421,143,Non-US users,http://www.imdb.com/title/tt6322922/ratings-international,5.9,6.5,9,39,27.3
+2017-07-17 13:00:06.506688,678,IMDb users,http://www.imdb.com/title/tt6322922/ratings,4.9,5.4,5,304,44.8
+2017-07-17 14:00:02.990387,403,Males,http://www.imdb.com/title/tt6322922/ratings-male,4.6,4.9,2,198,49.1
+2017-07-17 14:00:03.286461,78,Females,http://www.imdb.com/title/tt6322922/ratings-female,6.9,7.7,10,16,20.5
+2017-07-17 14:00:03.468142,4,Aged under 18,http://www.imdb.com/title/tt6322922/ratings-age_1,4.2,4.2,3,2,50.0
+2017-07-17 14:00:03.698958,4,Males under 18,http://www.imdb.com/title/tt6322922/ratings-male_age_1,4.2,4.2,3,2,50.0
+2017-07-17 14:00:03.905531,130,Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-age_2,6.3,6.5,9,41,31.5
+2017-07-17 14:00:04.141609,108,Males Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-male_age_2,6.2,6.2,9,37,34.3
+2017-07-17 14:00:04.334787,17,Females Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-female_age_2,7.7,8.4,10,2,11.8
+2017-07-17 14:00:04.529081,197,Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-age_3,4.3,4.9,2,93,47.2
+2017-07-17 14:00:04.759648,165,Males Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-male_age_3,4.1,4.4,1,86,52.1
+2017-07-17 14:00:04.988566,25,Females Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-female_age_3,7.2,8.2,10,5,20.0
+2017-07-17 14:00:05.173280,105,Aged 45+,http://www.imdb.com/title/tt6322922/ratings-age_4,4.2,4.9,1,54,51.4
+2017-07-17 14:00:05.372424,79,Males Aged 45+,http://www.imdb.com/title/tt6322922/ratings-male_age_4,3.6,4.3,1,47,59.5
+2017-07-17 14:00:05.639891,24,Females Aged 45+,http://www.imdb.com/title/tt6322922/ratings-female_age_4,6.3,6.4,8,7,29.2
+2017-07-17 14:00:05.832519,2,IMDb staff,http://www.imdb.com/title/tt6322922/ratings-imdb_staff,8.0,8.0,8,0,0.0
+2017-07-17 14:00:06.060565,24,Top 1000 voters,http://www.imdb.com/title/tt6322922/ratings-top_1000,5.6,5.6,5,5,20.8
+2017-07-17 14:00:06.333970,219,US users,http://www.imdb.com/title/tt6322922/ratings-usa,4.2,4.9,1,111,50.7
+2017-07-17 14:00:06.521676,144,Non-US users,http://www.imdb.com/title/tt6322922/ratings-international,5.9,6.5,9,40,27.8
+2017-07-17 14:00:06.727742,679,IMDb users,http://www.imdb.com/title/tt6322922/ratings,4.9,5.3,5,305,44.9
+2017-07-17 15:00:02.218990,403,Males,http://www.imdb.com/title/tt6322922/ratings-male,4.6,4.9,2,198,49.1
+2017-07-17 15:00:02.487315,78,Females,http://www.imdb.com/title/tt6322922/ratings-female,6.9,7.7,10,16,20.5
+2017-07-17 15:00:02.710950,4,Aged under 18,http://www.imdb.com/title/tt6322922/ratings-age_1,4.2,4.2,3,2,50.0
+2017-07-17 15:00:02.949891,4,Males under 18,http://www.imdb.com/title/tt6322922/ratings-male_age_1,4.2,4.2,3,2,50.0
+2017-07-17 15:00:03.141086,130,Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-age_2,6.3,6.5,9,41,31.5
+2017-07-17 15:00:03.378500,108,Males Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-male_age_2,6.2,6.2,9,37,34.3
+2017-07-17 15:00:03.601912,17,Females Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-female_age_2,7.7,8.4,10,2,11.8
+2017-07-17 15:00:03.785215,197,Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-age_3,4.3,4.9,2,93,47.2
+2017-07-17 15:00:03.967412,165,Males Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-male_age_3,4.1,4.4,1,86,52.1
+2017-07-17 15:00:04.196606,25,Females Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-female_age_3,7.2,8.2,10,5,20.0
+2017-07-17 15:00:04.433548,105,Aged 45+,http://www.imdb.com/title/tt6322922/ratings-age_4,4.2,4.9,1,54,51.4
+2017-07-17 15:00:04.655709,79,Males Aged 45+,http://www.imdb.com/title/tt6322922/ratings-male_age_4,3.6,4.3,1,47,59.5
+2017-07-17 15:00:04.926084,24,Females Aged 45+,http://www.imdb.com/title/tt6322922/ratings-female_age_4,6.3,6.4,8,7,29.2
+2017-07-17 15:00:05.113087,2,IMDb staff,http://www.imdb.com/title/tt6322922/ratings-imdb_staff,8.0,8.0,8,0,0.0
+2017-07-17 15:00:05.394490,24,Top 1000 voters,http://www.imdb.com/title/tt6322922/ratings-top_1000,5.6,5.6,5,5,20.8
+2017-07-17 15:00:05.619197,219,US users,http://www.imdb.com/title/tt6322922/ratings-usa,4.2,4.9,1,111,50.7
+2017-07-17 15:00:05.859066,144,Non-US users,http://www.imdb.com/title/tt6322922/ratings-international,5.9,6.5,9,40,27.8
+2017-07-17 15:00:06.055125,679,IMDb users,http://www.imdb.com/title/tt6322922/ratings,4.9,5.3,5,305,44.9
+2017-07-17 16:00:02.165460,403,Males,http://www.imdb.com/title/tt6322922/ratings-male,4.6,4.9,2,198,49.1
+2017-07-17 16:00:02.403711,78,Females,http://www.imdb.com/title/tt6322922/ratings-female,6.9,7.7,10,16,20.5
+2017-07-17 16:00:02.664556,4,Aged under 18,http://www.imdb.com/title/tt6322922/ratings-age_1,4.2,4.2,3,2,50.0
+2017-07-17 16:00:02.900861,4,Males under 18,http://www.imdb.com/title/tt6322922/ratings-male_age_1,4.2,4.2,3,2,50.0
+2017-07-17 16:00:03.084958,130,Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-age_2,6.3,6.5,9,41,31.5
+2017-07-17 16:00:03.307444,108,Males Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-male_age_2,6.2,6.2,9,37,34.3
+2017-07-17 16:00:03.541977,17,Females Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-female_age_2,7.7,8.4,10,2,11.8
+2017-07-17 16:00:03.783810,197,Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-age_3,4.3,4.9,2,93,47.2
+2017-07-17 16:00:03.980770,165,Males Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-male_age_3,4.1,4.4,1,86,52.1
+2017-07-17 16:00:04.211852,25,Females Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-female_age_3,7.2,8.2,10,5,20.0
+2017-07-17 16:00:04.405376,105,Aged 45+,http://www.imdb.com/title/tt6322922/ratings-age_4,4.2,4.9,1,54,51.4
+2017-07-17 16:00:04.653076,79,Males Aged 45+,http://www.imdb.com/title/tt6322922/ratings-male_age_4,3.6,4.3,1,47,59.5
+2017-07-17 16:00:04.888141,24,Females Aged 45+,http://www.imdb.com/title/tt6322922/ratings-female_age_4,6.3,6.4,8,7,29.2
+2017-07-17 16:00:05.104331,2,IMDb staff,http://www.imdb.com/title/tt6322922/ratings-imdb_staff,8.0,8.0,8,0,0.0
+2017-07-17 16:00:05.347863,24,Top 1000 voters,http://www.imdb.com/title/tt6322922/ratings-top_1000,5.6,5.6,5,5,20.8
+2017-07-17 16:00:05.534777,219,US users,http://www.imdb.com/title/tt6322922/ratings-usa,4.2,4.9,1,111,50.7
+2017-07-17 16:00:05.752114,144,Non-US users,http://www.imdb.com/title/tt6322922/ratings-international,5.9,6.5,9,40,27.8
+2017-07-17 16:00:06.023053,679,IMDb users,http://www.imdb.com/title/tt6322922/ratings,4.9,5.3,5,305,44.9
+2017-07-17 17:00:02.466381,403,Males,http://www.imdb.com/title/tt6322922/ratings-male,4.6,4.9,2,198,49.1
+2017-07-17 17:00:02.650483,78,Females,http://www.imdb.com/title/tt6322922/ratings-female,6.9,7.7,10,16,20.5
+2017-07-17 17:00:02.895005,4,Aged under 18,http://www.imdb.com/title/tt6322922/ratings-age_1,4.2,4.2,3,2,50.0
+2017-07-17 17:00:03.090618,4,Males under 18,http://www.imdb.com/title/tt6322922/ratings-male_age_1,4.2,4.2,3,2,50.0
+2017-07-17 17:00:03.315093,130,Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-age_2,6.3,6.5,9,41,31.5
+2017-07-17 17:00:03.558544,108,Males Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-male_age_2,6.2,6.2,9,37,34.3
+2017-07-17 17:00:03.758360,17,Females Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-female_age_2,7.7,8.4,10,2,11.8
+2017-07-17 17:00:03.985068,197,Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-age_3,4.3,4.9,2,93,47.2
+2017-07-17 17:00:04.220987,165,Males Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-male_age_3,4.1,4.4,1,86,52.1
+2017-07-17 17:00:04.462887,25,Females Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-female_age_3,7.2,8.2,10,5,20.0
+2017-07-17 17:00:04.646149,105,Aged 45+,http://www.imdb.com/title/tt6322922/ratings-age_4,4.2,4.9,1,54,51.4
+2017-07-17 17:00:04.879717,79,Males Aged 45+,http://www.imdb.com/title/tt6322922/ratings-male_age_4,3.6,4.3,1,47,59.5
+2017-07-17 17:00:05.061590,24,Females Aged 45+,http://www.imdb.com/title/tt6322922/ratings-female_age_4,6.3,6.4,8,7,29.2
+2017-07-17 17:00:05.297523,2,IMDb staff,http://www.imdb.com/title/tt6322922/ratings-imdb_staff,8.0,8.0,8,0,0.0
+2017-07-17 17:00:05.486278,24,Top 1000 voters,http://www.imdb.com/title/tt6322922/ratings-top_1000,5.6,5.6,5,5,20.8
+2017-07-17 17:00:05.730588,219,US users,http://www.imdb.com/title/tt6322922/ratings-usa,4.2,4.9,1,111,50.7
+2017-07-17 17:00:05.947114,144,Non-US users,http://www.imdb.com/title/tt6322922/ratings-international,5.9,6.5,9,40,27.8
+2017-07-17 17:00:06.142993,679,IMDb users,http://www.imdb.com/title/tt6322922/ratings,4.9,5.3,5,305,44.9
+2017-07-17 18:00:02.761381,403,Males,http://www.imdb.com/title/tt6322922/ratings-male,4.6,4.9,2,198,49.1
+2017-07-17 18:00:02.952763,78,Females,http://www.imdb.com/title/tt6322922/ratings-female,6.9,7.7,10,16,20.5
+2017-07-17 18:00:03.151123,4,Aged under 18,http://www.imdb.com/title/tt6322922/ratings-age_1,4.2,4.2,3,2,50.0
+2017-07-17 18:00:03.386448,4,Males under 18,http://www.imdb.com/title/tt6322922/ratings-male_age_1,4.2,4.2,3,2,50.0
+2017-07-17 18:00:03.615780,130,Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-age_2,6.3,6.5,9,41,31.5
+2017-07-17 18:00:03.808867,108,Males Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-male_age_2,6.2,6.2,9,37,34.3
+2017-07-17 18:00:04.082598,17,Females Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-female_age_2,7.7,8.4,10,2,11.8
+2017-07-17 18:00:04.311686,197,Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-age_3,4.3,4.9,2,93,47.2
+2017-07-17 18:00:04.543333,165,Males Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-male_age_3,4.1,4.4,1,86,52.1
+2017-07-17 18:00:04.774641,25,Females Aged 30-44,http://www.imdb.com/title/tt6322922/ratings-female_age_3,7.2,8.2,10,5,20.0
+2017-07-17 18:00:05.050037,105,Aged 45+,http://www.imdb.com/title/tt6322922/ratings-age_4,4.2,4.9,1,54,51.4
+2017-07-17 18:00:05.289548,79,Males Aged 45+,http://www.imdb.com/title/tt6322922/ratings-male_age_4,3.6,4.3,1,47,59.5
+2017-07-17 18:00:05.474071,24,Females Aged 45+,http://www.imdb.com/title/tt6322922/ratings-female_age_4,6.3,6.4,8,7,29.2
+2017-07-17 18:00:05.654651,2,IMDb staff,http://www.imdb.com/title/tt6322922/ratings-imdb_staff,8.0,8.0,8,0,0.0
+2017-07-17 18:00:05.848178,24,Top 1000 voters,http://www.imdb.com/title/tt6322922/ratings-top_1000,5.6,5.6,5,5,20.8
+2017-07-17 18:00:06.030328,219,US users,http://www.imdb.com/title/tt6322922/ratings-usa,4.2,4.9,1,111,50.7
+2017-07-17 18:00:06.245340,144,Non-US users,http://www.imdb.com/title/tt6322922/ratings-international,5.9,6.5,9,40,27.8
+2017-07-17 18:00:06.510891,680,IMDb users,http://www.imdb.com/title/tt6322922/ratings,4.9,5.3,5,306,45.0
+2017-07-17 19:00:02.633552,403,Males,http://www.imdb.com/title/tt6322922/ratings-male,4.6,4.9,2,198,49.1
+2017-07-17 19:00:02.835447,78,Females,http://www.imdb.com/title/tt6322922/ratings-female,6.9,7.7,10,16,20.5
+2017-07-17 19:00:03.078711,4,Aged under 18,http://www.imdb.com/title/tt6322922/ratings-age_1,4.2,4.2,3,2,50.0
+2017-07-17 19:00:03.330255,4,Males under 18,http://www.imdb.com/title/tt6322922/ratings-male_age_1,4.2,4.2,3,2,50.0
+2017-07-17 19:00:03.547446,130,Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-age_2,6.3,6.5,9,41,31.5
+2017-07-17 19:00:03.811256,108,Males Aged 18-29,http://www.imdb.com/title/tt6322922/ratings-male_age_2,6.2,6.2,9,37,34.3

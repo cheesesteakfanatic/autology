@@ -49,6 +49,7 @@ from ontoforge.spine import DecisionSpine
 REVIEW_RECALIBRATION_THRESHOLD = 20
 
 MATERIALIZED_ONTOLOGY_FILE = "ontology.materialized.json"
+ATLAS_FILE = "atlas.json"
 
 
 class ProjectError(Exception):
@@ -73,6 +74,8 @@ class ProjectWorld:
         #: Invalidated by reload(); clarification answers are never cached
         #: (they carry pending engine state).
         self.answer_cache: dict[str, dict[str, Any]] = {}
+        #: parsed <project>/atlas.json keyed by mtime; dropped on reload()
+        self._atlas_cache: Optional[tuple[int, dict[str, Any]]] = None
 
     # ----------------------------------------------------------- project IO
 
@@ -108,6 +111,28 @@ class ProjectWorld:
     @property
     def exports_dir(self) -> Path:
         return self.project / "exports"
+
+    @property
+    def atlas_path(self) -> Path:
+        return self.project / ATLAS_FILE
+
+    # --------------------------------------------------------------- atlas
+
+    def read_atlas(self) -> Optional[dict[str, Any]]:
+        """The persisted connection atlas (<project>/atlas.json), parsed once
+        per file mtime; None when not built. /api/reload drops the cache, and
+        a rewritten file invalidates it by mtime anyway."""
+        with self.lock:
+            p = self.atlas_path
+            if not p.is_file():
+                self._atlas_cache = None
+                return None
+            mtime = p.stat().st_mtime_ns
+            if self._atlas_cache is not None and self._atlas_cache[0] == mtime:
+                return self._atlas_cache[1]
+            payload = json.loads(p.read_text(encoding="utf-8"))
+            self._atlas_cache = (mtime, payload)
+            return payload
 
     # -------------------------------------------------------- lazy world
 
@@ -402,6 +427,7 @@ class ProjectWorld:
             self._spine = None
             self._engine = None
             self._search_index = None
+            self._atlas_cache = None
             self.answer_cache.clear()
 
 

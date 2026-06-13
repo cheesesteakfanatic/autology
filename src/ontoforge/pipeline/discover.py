@@ -20,7 +20,11 @@ plus a ``"profiles"`` cache so downstream stages do not re-profile.
 
 from __future__ import annotations
 
+import math
+import multiprocessing
+import os
 import re
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import Any, Optional
 
@@ -59,11 +63,75 @@ def load_table(path: Path, limit: Optional[int] = None) -> pd.DataFrame:
     return df
 
 
-def discover_sources(source_dir: str | Path, *, limit: Optional[int] = None) -> dict[str, Any]:
+# profile_table's FD/key search is a TANE-class lattice ascent: with the default
+# max_lhs=3 it visits attribute sets up to size 4, so per-table cost scales like
+# C(cols, 4) x rows — a corpus's profiling bill concentrates in its few widest
+# tables. The proxy below only gates serial-vs-pool and orders submissions; it
+# never changes what is computed.
+_LATTICE_NODE_SIZE = 4
+# ~ a few seconds of serial profiling work: below this a process pool's
+# spawn+import overhead costs more than it saves.
+_PARALLEL_COST_THRESHOLD = 2_000_000
+
+
+def _lattice_cost(df: pd.DataFrame) -> int:
+    c = df.shape[1]
+    return math.comb(c, min(c, _LATTICE_NODE_SIZE)) * max(len(df), 1)
+
+
+def _profile_tables(
+    jobs: list[tuple[pd.DataFrame, str, str]], max_workers: Optional[int]
+) -> list[TableProfile]:
+    """``profile_table`` over independent (df, source_id, name) jobs, in job order.
+
+    Results are byte-identical to the serial loop: each profile is a pure
+    function of its own table, workers receive the exact DataFrames the estate
+    keeps, and results are reassembled by job index. The spawn context avoids
+    fork-while-threaded hazards at the price of a one-time worker import,
+    amortized across the whole corpus.
+    """
+    # the wall clock can never beat the single longest table, so the pool only
+    # pays when the OTHER tables' work (sum minus max) amortizes worker spawn
+    costs = [_lattice_cost(df) for df, _, _ in jobs]
+    serial = (
+        max_workers in (0, 1)
+        or len(jobs) < 2
+        or (
+            max_workers is None
+            and (
+                (os.cpu_count() or 1) < 2
+                or sum(costs) - max(costs) < _PARALLEL_COST_THRESHOLD
+            )
+        )
+    )
+    if serial:
+        return [profile_table(df, source_id, name) for df, source_id, name in jobs]
+
+    # widest-first submission: the single most expensive table bounds the wall
+    # clock, so it must start immediately, not sit behind cheap tables.
+    order = sorted(range(len(jobs)), key=lambda i: (-costs[i], i))
+    results: list[Optional[TableProfile]] = [None] * len(jobs)
+    ctx = multiprocessing.get_context("spawn")
+    with ProcessPoolExecutor(max_workers=max_workers, mp_context=ctx) as ex:
+        futures = {i: ex.submit(profile_table, *jobs[i]) for i in order}
+        for i, fut in futures.items():
+            results[i] = fut.result()
+    return results  # type: ignore[return-value]  # every slot filled above
+
+
+def discover_sources(
+    source_dir: str | Path, *, limit: Optional[int] = None, max_workers: Optional[int] = None
+) -> dict[str, Any]:
     """Discover every tabular source under ``source_dir`` -> estate dict.
 
     ``limit`` keeps only the first N rows of each table (the CLI's sticky
     ``--limit`` subsample semantics).
+
+    ``max_workers`` controls per-table profiling parallelism: ``None`` (the
+    default) auto-selects — a process pool when the corpus's estimated
+    FD-lattice bill amortizes worker startup, serial otherwise; ``0``/``1``
+    force serial; ``n >= 2`` forces a pool of ``n`` processes. The estate dict
+    is identical either way.
     """
     base = Path(source_dir)
     files = sorted(
@@ -73,16 +141,21 @@ def discover_sources(source_dir: str | Path, *, limit: Optional[int] = None) -> 
     if not files:
         raise FileNotFoundError(f"no *.csv / *.parquet sources found in {base}")
 
+    loaded: list[tuple[str, Path, pd.DataFrame]] = []  # (name, path, df) in file order
+    for path in files:
+        name = path.stem
+        if any(name == n for n, _, _ in loaded):  # foo.csv + foo.parquet: keep both, suffix the later
+            name = f"{name}_{path.suffix.lstrip('.')}"
+        loaded.append((name, path, load_table(path, limit)))
+
+    jobs = [(df, slugify(path.stem), name) for name, path, df in loaded]
+    profiled = _profile_tables(jobs, max_workers)
+
     tables: dict[str, pd.DataFrame] = {}
     meta_tables: dict[str, dict[str, Any]] = {}
     profiles: dict[str, TableProfile] = {}
-    for path in files:
-        name = path.stem
-        if name in tables:  # foo.csv + foo.parquet: keep both, suffix the later
-            name = f"{name}_{path.suffix.lstrip('.')}"
-        df = load_table(path, limit)
+    for (name, path, df), tp in zip(loaded, profiled):
         source_id = slugify(path.stem)
-        tp = profile_table(df, source_id, name)
         key = choose_key(tp)
         text_columns = [
             c for c, cp in tp.columns.items() if cp.inferred_type is Datatype.TEXT

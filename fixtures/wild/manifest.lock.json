@@ -1,0 +1,2645 @@
+{
+ "datasets": [
+  {
+   "cols": 13,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "753238de381dc0e85c415103b5fc82be0aa44036216b5d6cad425564f8e91d78",
+   "slug": "ds_airport_codes",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/airport-codes/main/data/airport-codes.csv"
+  },
+  {
+   "cols": 24,
+   "license_note": "CC-BY-4.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "e60bf544a4628d8bc2bd8ceb53000a057e8243a4a3f49843a60d501cbb1d5922",
+   "slug": "ds_atp_world_tour_tennis_data_match_scores_1877_1967_unindexed",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/atp-world-tour-tennis-data/main/csv/2_match_scores/match_scores_1877-1967_UNINDEXED.csv"
+  },
+  {
+   "cols": 24,
+   "license_note": "CC-BY-4.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "e0e5e9159290508856a514af040b61ceb0d952d500e93e6238c150e2ad41b095",
+   "slug": "ds_atp_world_tour_tennis_data_match_scores_1968_1990_unindexed",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/atp-world-tour-tennis-data/main/csv/2_match_scores/match_scores_1968-1990_UNINDEXED.csv"
+  },
+  {
+   "cols": 24,
+   "license_note": "CC-BY-4.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "dc5001208adac3025e712b16356da92dd41cafecc7be5279a2203952cc90ea20",
+   "slug": "ds_atp_world_tour_tennis_data_tournaments_1877_2017_unindexed",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/atp-world-tour-tennis-data/main/csv/1_tournaments/tournaments_1877-2017_UNINDEXED.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "93b7d0f2355c5d93b6328f735093a3d5e98bf182dda43f8007b4cff7f05d23da",
+   "slug": "ds_bond_yields_gov_long_term_us_10y",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/bond-yields-gov-long-term/main/data/us-10y.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "public_domain_dedication_and_license (datapackage.json)",
+   "rows_kept": 42,
+   "sha256": "91ea53a0724069a0f80790737313b3cf95b0b1e93be3561fa7518f9efdd1e4b4",
+   "slug": "ds_bond_yields_uk_10y_annual",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/bond-yields-uk-10y/main/data/annual.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "public_domain_dedication_and_license (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "32971d6c346fa8987a1b7428382e3886bae765a0a2215ae7d063a14fcda9889f",
+   "slug": "ds_bond_yields_uk_10y_quarterly",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/bond-yields-uk-10y/main/data/quarterly.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "open_data_commons_public_domain_dedication_and_license_v1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "306033085164b13d469917272727d9a19e1c1384d211a7f1966eb79065444940",
+   "slug": "ds_bond_yields_us_10y_monthly",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/bond-yields-us-10y/main/data/monthly.csv"
+  },
+  {
+   "cols": 10,
+   "license_note": "open data (see repo; datasets-org packages are typically PDDL/CC0/ODC-BY)",
+   "rows_kept": 150,
+   "sha256": "270f65d76015c448845182d46da29a60a1e766348519de373bd45437c7536bc8",
+   "slug": "ds_breast_cancer",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/breast-cancer/main/data/breast-cancer.csv"
+  },
+  {
+   "cols": 10,
+   "license_note": "Public Domain Dedication and License (datapackage.json)",
+   "rows_kept": 137,
+   "sha256": "eefc62a561db5a1bb1f285ae8d891ee4c617ea4ef11bba5c5bfc6a611276c3cb",
+   "slug": "ds_browser_stats",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/browser-stats/main/data.csv"
+  },
+  {
+   "cols": 6,
+   "license_note": "Public Domain Dedication and License (datapackage.json)",
+   "rows_kept": 137,
+   "sha256": "4defd6da6a9407dae7aedb71f4efb91af4f8366cd616a0939823be61f44dc5dc",
+   "slug": "ds_browser_stats_data_extant",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/browser-stats/main/data-extant.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "66792e98b899aa664d7af8f93d81f84f8754ae3d86e370af51f89f4f3125f5be",
+   "slug": "ds_cash_surplus_deficit_cash_surp_def",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/cash-surplus-deficit/main/data/cash-surp-def.csv"
+  },
+  {
+   "cols": 36,
+   "license_note": "open data (see repo; datasets-org packages are typically PDDL/CC0/ODC-BY)",
+   "rows_kept": 150,
+   "sha256": "ed7f9721d4ac33aa03b539c9f3d47f3bc79d7b2bc1f84a3cf43a9b34d1c3009d",
+   "slug": "ds_cervical_cancer",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/cervical-cancer/main/data/cervical-cancer.csv"
+  },
+  {
+   "cols": 14,
+   "license_note": "open data (see repo; datasets-org packages are typically PDDL/CC0/ODC-BY)",
+   "rows_kept": 150,
+   "sha256": "2f405f41465260a7fb74793e84f39edd0cb0f53d9f38922c6368be3f4571b3be",
+   "slug": "ds_cirp_survey_of_freshmen_freshmen_survey",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/cirp-survey-of-freshmen/main/data/freshmen-survey.csv"
+  },
+  {
+   "cols": 6,
+   "license_note": "open data (see repo; datasets-org packages are typically PDDL/CC0/ODC-BY)",
+   "rows_kept": 150,
+   "sha256": "ff55673271a441506d99c893e7b268b47eec4d902736bbaf52023fa9a5016e0d",
+   "slug": "ds_cirp_survey_of_freshmen_institutions",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/cirp-survey-of-freshmen/main/data/institutions.csv"
+  },
+  {
+   "cols": 10,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "dde6871ba91666f9121f06bd22138093082a7ac0451a46bc4bbcab409ffcdbc2",
+   "slug": "ds_co2_fossil_by_nation_fossil_fuel_co2_emissions_by_nation",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/co2-fossil-by-nation/main/data/fossil-fuel-co2-emissions-by-nation.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "ac9b32afbd003f879113ee622bd33dbad872ec1d9a2ca72b6cda657c859cd18f",
+   "slug": "ds_co2_fossil_by_nation_top_emitters",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/co2-fossil-by-nation/main/data/top-emitters.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "d6f7488d17d9008c8b432cbc8d98ec258411ea1759b406be9530736c8195091e",
+   "slug": "ds_co2_fossil_global_fuel_breakdown",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/co2-fossil-global/main/data/fuel-breakdown.csv"
+  },
+  {
+   "cols": 8,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "3fa41817483a1ecfb0836d65e18b08c20bac0c416514c1c9cc25dc2623435649",
+   "slug": "ds_co2_fossil_global_global",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/co2-fossil-global/main/data/global.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 67,
+   "sha256": "b1548ededea6f9b7eecac370753de8d8da6e0afafe1041f749a11db78c2e33c4",
+   "slug": "ds_co2_ppm_co2_annmean_mlo",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/co2-ppm/main/data/co2-annmean-mlo.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 67,
+   "sha256": "46b508500ff84f248888b8b456dfc44e4cbbe223fcd238db63be6346dd141cfc",
+   "slug": "ds_co2_ppm_co2_gr_mlo",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/co2-ppm/main/data/co2-gr-mlo.csv"
+  },
+  {
+   "cols": 6,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "23639c23c7f95d4409956f13bb3200ac7f413e4e67ebcfdbe01784303e0a5220",
+   "slug": "ds_co2_ppm_co2_mm_mlo",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/co2-ppm/main/data/co2-mm-mlo.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "open data (see repo; datasets-org packages are typically PDDL/CC0/ODC-BY)",
+   "rows_kept": 150,
+   "sha256": "e267e00893f491ee98266b2f6b27eadc77faa7e3caa368f02c297801d9c59bdf",
+   "slug": "ds_co2_ppm_daily",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/co2-ppm-daily/main/data/co2-ppm-daily.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "504347cb98e6770fce98c86cd6c22aa2a4c205c9cbbd89801eb146bf44a47c9a",
+   "slug": "ds_cofog",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/cofog/main/data/cofog.csv"
+  },
+  {
+   "cols": 11,
+   "license_note": "odc-pddl (datapackage.json)",
+   "rows_kept": 74,
+   "sha256": "6e994d930fc77a59fc972491339089ff743590de1504e40cd5b26fb14af607b7",
+   "slug": "ds_core_datasets_core_list",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/core-datasets/main/core-list.csv"
+  },
+  {
+   "cols": 55,
+   "license_note": "open data (see repo; datasets-org packages are typically PDDL/CC0/ODC-BY)",
+   "rows_kept": 150,
+   "sha256": "afb694e69d86284c13017a3ebbfdd0eb3d761287fd7aa06118d43740287abd6a",
+   "slug": "ds_country_codes",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/country-codes/main/data/country-codes.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "ODC-PDDL (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "eb98264eb053ddc47b023636bf77d2cec61357aae2b1c59af3c9feb587641df7",
+   "slug": "ds_covid_19_countries_aggregated",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/covid-19/main/data/countries-aggregated.csv"
+  },
+  {
+   "cols": 9,
+   "license_note": "ODC-PDDL (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "79e3113eaf552461afad38f2621bc78a84bad82474660175ca189ec380e46376",
+   "slug": "ds_covid_19_key_countries_pivoted",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/covid-19/main/data/key-countries-pivoted.csv"
+  },
+  {
+   "cols": 11,
+   "license_note": "ODC-PDDL (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "b57c8c6ad33a4cfeafbf1e34ef0ca9f4f2ade42792231f2317d2b72e12653fec",
+   "slug": "ds_covid_19_reference",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/covid-19/main/data/reference.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "9fa15425adf221226f0831a725066fc486a73db55ce9d580a2035c5fbdabb7f0",
+   "slug": "ds_cpi",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/cpi/main/data/cpi.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "16a70d8a552cd930a2db4d771d9d58549cfdedcbae64982f007de60d1bf40af9",
+   "slug": "ds_cpi_gb_cpi_uk_annual",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/cpi-gb/main/data/cpi-uk-annual.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "c2402de6a2c7184b93f62e2b0b0602a838e92e7c710528ed99cd14ae22bedbfd",
+   "slug": "ds_cpi_gb_cpi_uk_monthly",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/cpi-gb/main/data/cpi-uk-monthly.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "6311212f2364c25dac4001c1629995e93ce75fb3d24dce227a0f7cfdf7a22dca",
+   "slug": "ds_cpi_gb_inflation_uk",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/cpi-gb/main/data/inflation-uk.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "c5094c5e1ba2bcfd61ec8fada4cd0a8a4b3646a13dbeba35ce93ee09303d81ef",
+   "slug": "ds_cpi_us_cpiai",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/cpi-us/main/data/cpiai.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 44,
+   "sha256": "8515573ca196673229c83b01613472aed42d3db07f88cbc8bdbeec8a13edee0c",
+   "slug": "ds_crime_uk_forces",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/crime-uk/main/data/forces.csv"
+  },
+  {
+   "cols": 8,
+   "license_note": "CC-BY-4.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "35538b3893175858d8a7d4a1f3685b0eaff80961337f96fa86c5d0878f5606af",
+   "slug": "ds_crunchcrawl_companydata",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/crunchcrawl/main/companydata.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "CC-BY-4.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "b8edbdb613884951b1d153d2d88f5c70be9e430dd74fab3e9aec4e2566abdd77",
+   "slug": "ds_crunchcrawl_zips_by_amount",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/crunchcrawl/main/zips_by_amount.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "CC-BY-4.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "df55d5532f66e47134169b9db161ba4c48cb09ad0b433ec2a0feee9591777d09",
+   "slug": "ds_crunchcrawl_zips_by_numbers",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/crunchcrawl/main/zips_by_numbers.csv"
+  },
+  {
+   "cols": 6,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "a1473c17ab5c23e2bfcfabd3ae951a0dffcdda485916a7310309cbcfa005878d",
+   "slug": "ds_currency_codes_codes_all",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/currency-codes/main/data/codes-all.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 33,
+   "sha256": "e569c05678f5e4a010db36032710e95c35c1e96e93c113d3059c4f98136acb79",
+   "slug": "ds_dac_and_crs_code_lists_dac_members",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/dac-and-crs-code-lists/main/data/dac_members.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 85,
+   "sha256": "67885ac6a6712c6991e409d1b34e1865e3b316035702965a36edafa23211401f",
+   "slug": "ds_dac_and_crs_code_lists_non_dac_donors",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/dac-and-crs-code-lists/main/data/non_dac_donors.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "2ae9fc3f82e615afbd1b6054e24b84176c8185f75bd3d861379b5287676bc10c",
+   "slug": "ds_datapackage_factory_openmv_aeration_rate",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/datapackage-factory-openMV/main/aeration-rate/data/aeration-rate.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "5375c8ae8f8d599c3ea9e16375d7cad3871cc1a5d2de7d36c5eec7755b947e0f",
+   "slug": "ds_datapackage_factory_openmv_ammonia_concentration",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/datapackage-factory-openMV/main/ammonia-concentration/data/ammonia-concentration.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "cbb8696099428a9681c3889caf57c7d810074d9da99b8badedfb1164debfeeec",
+   "slug": "ds_datapackage_factory_openmv_batch_yield_purity",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/datapackage-factory-openMV/main/batch-yield-purity/data/batch-yield-purity.csv"
+  },
+  {
+   "cols": 35,
+   "license_note": "odc-pddl (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "df00be83a8a588adecd42b690291f9fad06e9081e095976cd07fdd3c66297c62",
+   "slug": "ds_dermatology",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/dermatology/main/data/dermatology.csv"
+  },
+  {
+   "cols": 7,
+   "license_note": "odc-pddl (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "263fbd5f074701eedae312259f3ae0dc7232e5e89028970b4dc850b0f590b1d9",
+   "slug": "ds_eeg_eye_state",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/eeg-eye-state/main/data/eeg-eye-state.csv"
+  },
+  {
+   "cols": 7,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "162554ad9c9a4c4ea8d6977cccb2c211505561280295498bcf607a494edceccc",
+   "slug": "ds_emojis",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/emojis/main/emojis.csv"
+  },
+  {
+   "cols": 12,
+   "license_note": "odc-pddl (datapackage.json)",
+   "rows_kept": 86,
+   "sha256": "33f6a6cd08c36da15896fb76ca60a59df1b8393b8e5df5a7188abf7ed8010dad",
+   "slug": "ds_employment_us_aat1",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/employment-us/main/data/aat1.csv"
+  },
+  {
+   "cols": 6,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "32ba74c12dbed12292a33d447c2e0f9a53741d0d49e62edcb97ed713a034a89e",
+   "slug": "ds_eu_emissions_trading_system_eu_ets",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/eu-emissions-trading-system/main/data/eu-ets.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "28971a5097e104967b16a46fc6de12beee1a4f00e0cfe89d027a130002cb1e0f",
+   "slug": "ds_eu_emissions_trading_system_eu_ets_sector_emissions",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/eu-emissions-trading-system/main/data/eu-ets-sector-emissions.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 24,
+   "sha256": "e4b92b6feb5d2cd519ee379855304217970017f9face6456dfa9f6006061ed5f",
+   "slug": "ds_euribor_euribor_10m_monthly",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/euribor/main/data/euribor-10m-monthly.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 24,
+   "sha256": "5b774dd78a5e38d6fc0677dccc6f286ab08abe374af21ff71bee466126d72ae1",
+   "slug": "ds_euribor_euribor_11m_monthly",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/euribor/main/data/euribor-11m-monthly.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 149,
+   "sha256": "748e58991a7315a6ee63c808ea9f5d0d951d8d5c86bf4c1715ede7e77dd09da0",
+   "slug": "ds_euribor_euribor_12m_monthly",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/euribor/main/data/euribor-12m-monthly.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "public_domain_dedication_and_license (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "2c1e7397c3ffdd2fe06a966a7f5acf1a1b56a1227765eb61ca337fbe111901b5",
+   "slug": "ds_exchange_rates_annual",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/exchange-rates/main/data/annual.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "public_domain_dedication_and_license (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "fc1c2d86ae231972494ca59f8466405958ac31d6a35d9a179a9917781cc02415",
+   "slug": "ds_exchange_rates_daily",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/exchange-rates/main/data/daily.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "public_domain_dedication_and_license (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "7bdd449b0c3e469e26173b6df432c83e38b02f3e69853a84ed900e5c5111bba4",
+   "slug": "ds_exchange_rates_monthly",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/exchange-rates/main/data/monthly.csv"
+  },
+  {
+   "cols": 14,
+   "license_note": "odc-pddl (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "529afb855afc7878ab054b5cb58b4af45c7abb73960ca26109d0e68cbc81af97",
+   "slug": "ds_expenditure_on_research_and_development_expenditure",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/expenditure-on-research-and-development/main/data/expenditure.csv"
+  },
+  {
+   "cols": 10,
+   "license_note": "open data (see repo; datasets-org packages are typically PDDL/CC0/ODC-BY)",
+   "rows_kept": 100,
+   "sha256": "4f3ed78a3e6a85e59a272c31955b18aa43140ebd0b28a752633c3f2308cb31ea",
+   "slug": "ds_fertility",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/fertility/main/data/fertility.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "8892de583074b472a378d75cea3760238010d857dd1ff9c1a821b31f8da0b982",
+   "slug": "ds_finance_vix_vix_daily",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/finance-vix/main/data/vix-daily.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "cf6574f4a0926b3b0589b4cb65a46f463023bf16a3ffe36afe078e4b349dc44b",
+   "slug": "ds_finance_vix_vix_monthly",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/finance-vix/main/data/vix-monthly.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "open data (see repo; datasets-org packages are typically PDDL/CC0/ODC-BY)",
+   "rows_kept": 150,
+   "sha256": "84bf091e67d296fecd708c786c80a831d61dfaa91cdf0da6c2fc4bebfaffc3b8",
+   "slug": "ds_fips_10_4",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/fips-10-4/main/data/data.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "fea8e26c9187af14324b46c9e0f8390884fac3cdc0f66af9d41af1ddfd4a81bd",
+   "slug": "ds_five_thirty_eight_datasets_drinks",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/five-thirty-eight-datasets/main/datasets/alcohol-consumption/data/drinks.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "CC-BY-4.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "7474270e26cd7b6194da73a686075d98082047aa0032ac6f718bc0258173c6c3",
+   "slug": "ds_gdp",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/gdp/main/data/gdp.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "CC-BY-4.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "548d723c154a8c876eb0da65e641ca5b6de2531333763755e9e713e7d3c53733",
+   "slug": "ds_gdp_top_economies",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/gdp/main/data/top-economies.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 77,
+   "sha256": "fe61126747a32777c2fb5e7586c0762a562f17ad2dd7da0fcb78f3b66b52a7f7",
+   "slug": "ds_gdp_uk",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/gdp-uk/main/data/data.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "38714354fa28e9fc70f675f4dbe5ce75ce4cc8b8ab34fe2eee3006e5b5f0b9fa",
+   "slug": "ds_gdp_us_quarter",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/gdp-us/main/data/quarter.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 95,
+   "sha256": "52db2be37a3119c8d6c057813fc631dfb0a773098624666d8453c006cb311181",
+   "slug": "ds_gdp_us_year",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/gdp-us/main/data/year.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 78,
+   "sha256": "5efdb526b412d640274d7c3983e3b44485b31b1436a7f2a56d294e2c600bd407",
+   "slug": "ds_genome_sequencing_costs_sequencing_costs",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/genome-sequencing-costs/main/data/sequencing_costs.csv"
+  },
+  {
+   "cols": 8,
+   "license_note": "odc-pddl (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "8dec91c2ec58418e8ba1074e538ed60b6e3e7b972416eb39cf5b7746db66730a",
+   "slug": "ds_geoip2_ipv4",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/geoip2-ipv4/main/data/geoip2-ipv4.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "odc-pddl (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "59784f9337e892c398fefa5050467d350d815a8a756208924a6fbeac90878bae",
+   "slug": "ds_gini_index",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/gini-index/main/data/gini-index.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "odc-pddl (datapackage.json)",
+   "rows_kept": 84,
+   "sha256": "136b2d375c440f3e9a64e0c815430f4c9912082b6c7458dd6c01159f75ebc82b",
+   "slug": "ds_gini_index_gini_index_2014",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/gini-index/main/data/gini-index-2014.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "odc-pddl (datapackage.json)",
+   "rows_kept": 86,
+   "sha256": "72256eede09b8cfcdae3bd8a030b00c4aff6a17f144745d39b16ed88a7d9b4f0",
+   "slug": "ds_gini_index_gini_index_2015",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/gini-index/main/data/gini-index-2015.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 68,
+   "sha256": "0402cc71208195a22ac8141fbd9125e33631ccc8a4c14dbe02c7417b700581e5",
+   "slug": "ds_glacier_mass_balance_glaciers",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/glacier-mass-balance/main/data/glaciers.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "CC-BY-4.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "4f229397e44da6097b3df2e0705cce60d601cd6d3ea0c658784eb51190196cf0",
+   "slug": "ds_global_temp_annual",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/global-temp/main/data/annual.csv"
+  },
+  {
+   "cols": 6,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 136,
+   "sha256": "08602a5202097d66dda76d9d84b5fc6ee1d7cfc0089e8da0cb98194efab342a5",
+   "slug": "ds_global_temp_anomalies_global_temp_5yr",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/global-temp-anomalies/main/data/global-temp-5yr.csv"
+  },
+  {
+   "cols": 6,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 136,
+   "sha256": "1fd80960bde8460e130804fd4db9ce279f4311eedd16cf419027c963f85f83e2",
+   "slug": "ds_global_temp_anomalies_global_temp_annual",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/global-temp-anomalies/main/data/global-temp-annual.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "CC-BY-4.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "f17dcfdcf184eb57814911a37f60d04c3707512a3556cf1048c7783ccfb89b89",
+   "slug": "ds_global_temp_monthly",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/global-temp/main/data/monthly.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "91cb530b5ba34b239569cc07e9ba31e6e35789f6b17e5b2dbf65f5b60f2430d5",
+   "slug": "ds_gold_prices_annual",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/gold-prices/main/data/annual.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "bc5d5eeeb10486962869bb42c45ba6ffbe18a409bfb532aa418abf76b6a828db",
+   "slug": "ds_gold_prices_monthly",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/gold-prices/main/data/monthly.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "897816ac17371edc5ed25b3f026740c9ca31052429fe584562f7a4ed6b134464",
+   "slug": "ds_gold_prices_monthly_processed",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/gold-prices/main/data/monthly-processed.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "0f4be78b3af032d1f6112ffc2d0756cb79ee605bf348541ffc0d0499258214a4",
+   "slug": "ds_harmonized_system",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/harmonized-system/main/data/harmonized-system.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 21,
+   "sha256": "7dfa7b05ef5534f8143dc145db16c829a76f075dae7aa3148d0b9e02516d6477",
+   "slug": "ds_harmonized_system_sections",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/harmonized-system/main/data/sections.csv"
+  },
+  {
+   "cols": 20,
+   "license_note": "odc-pddl (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "b2c6e1bdec3dd7e01abe98afb06098c01349ee30752fbad983ef2bc370558a00",
+   "slug": "ds_hepatitis",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/hepatitis/main/data/hepatitis.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "c1f78ccda2da495ea85b47ffe8e8e372500fe13219db54a889e8ac5308a26f7b",
+   "slug": "ds_house_prices_fr_paris",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/house-prices-fr/main/data/paris.csv"
+  },
+  {
+   "cols": 9,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "10d0b30515373670df581b5f1cd44210ecd94ccc2872cc35fd56aac910224579",
+   "slug": "ds_house_prices_uk",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/house-prices-uk/main/data/data.csv"
+  },
+  {
+   "cols": 23,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "929032f4dd26c6c65d25e3487a6dc9bea18fd13345b6d8fad6278a47687d6d8b",
+   "slug": "ds_house_prices_us_cities_month_nsa",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/house-prices-us/main/data/cities-month-NSA.csv"
+  },
+  {
+   "cols": 23,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "ed5e477cf6f2591f7e2c44f8c908425ef20604cd32c2a7d3a4e0260a8d2376a5",
+   "slug": "ds_house_prices_us_cities_month_sa",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/house-prices-us/main/data/cities-month-SA.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "c5773d466dfba1c4f35f863323b3e4b8ad3300bdf7b4206c149fed792e3cf526",
+   "slug": "ds_house_prices_us_national_month",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/house-prices-us/main/data/national-month.csv"
+  },
+  {
+   "cols": 7,
+   "license_note": "open data (see repo; datasets-org packages are typically PDDL/CC0/ODC-BY)",
+   "rows_kept": 54,
+   "sha256": "6bb966450c17b952184ddd27d542a63e52e09cbb59b8bae536703ff202684a48",
+   "slug": "ds_household_income_us_historical",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/household-income-us-historical/main/data/household-income-us-historical.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 44,
+   "sha256": "c19c5ec5f424552157226b08093ffd63ff34180ff9d42ee511d9517b6ff45257",
+   "slug": "ds_imf_weo_indicators",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/imf-weo/main/data/indicators.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "a6a36268aae5d9eb50b9b785478b017df98e3f4576fdbe8e2c69e8297a2963d0",
+   "slug": "ds_imf_weo_values",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/imf-weo/main/data/values.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 20,
+   "sha256": "242a5d60701b0d15ce4d21e981724c7f53bf83b4f1e8bb923fcfa7ef3178f33e",
+   "slug": "ds_imo_imdg_codes",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/IMO-IMDG-Codes/main/data/data.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "dd960b33a687d3b92950031dd5d631f3bcb475327768dcdea868aae52fda5fac",
+   "slug": "ds_inflation_inflation_consumer",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/inflation/main/data/inflation-consumer.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "7230f265b43c1988f33b4f94cebeb8d0dd9855c6d30ad9725e39ef070791d918",
+   "slug": "ds_inflation_inflation_gdp",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/inflation/main/data/inflation-gdp.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "odc-pddl (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "94c89c30072f37e2d11a07ad91c21a990783b2370710adca92216af068dffb70",
+   "slug": "ds_interest_rates_gb",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/interest-rates-gb/main/data/data.csv"
+  },
+  {
+   "cols": 9,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 75,
+   "sha256": "0f21cc219e62ea9f84a4ff73bf2abc009b96c11df5e745b4ce80a9ecf8fd524d",
+   "slug": "ds_investor_flow_of_funds_us_monthly",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/investor-flow-of-funds-us/main/data/monthly.csv"
+  },
+  {
+   "cols": 9,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 118,
+   "sha256": "1a8eeab327c477092069cf09cdc816d2f9c14c2a3ca32f67094c1ae53b705cb8",
+   "slug": "ds_investor_flow_of_funds_us_weekly",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/investor-flow-of-funds-us/main/data/weekly.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "ab25e4b9d99dc6f0344bd24658c9d112e291f0f08cb2487e23d8d200fd9baa7e",
+   "slug": "ds_iso_container_codes",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/ISO-Container-Codes/main/data/iso-container-codes.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 28,
+   "sha256": "4d685a3a8f2d6de78ad68f002423fc97d6191ceb6c16c3abe18eb2cef5f67067",
+   "slug": "ds_iso_container_codes_iso_container_groups",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/ISO-Container-Codes/main/data/iso-container-groups.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "a1f496043a7f8cd81df217b6d8a4426eeab0e427202b19c9068fe5e7443e7535",
+   "slug": "ds_language_codes",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/language-codes/main/data/language-codes.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "b5ac26929105fd9513971a3620f311ef66ec419f9d84c5edfe90f55c9a462ebe",
+   "slug": "ds_language_codes_language_codes_3b2",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/language-codes/main/data/language-codes-3b2.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "ff2d44bc3fc10db7b8e57b3f37d0bf284c6c42848bdc50efbce298d721c6f97c",
+   "slug": "ds_language_codes_language_codes_full",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/language-codes/main/data/language-codes-full.csv"
+  },
+  {
+   "cols": 13,
+   "license_note": "OGL (datapackage.json)",
+   "rows_kept": 132,
+   "sha256": "ac4d6fc89882f1ba79313ba363f7d2e5f36489b2164c02f586fd67e2fbefb779",
+   "slug": "ds_london_air_quality_monthly_averages",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/london-air-quality/main/data/monthly-averages.csv"
+  },
+  {
+   "cols": 14,
+   "license_note": "OGL (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "7760797b92e66f0c3d2c4bc50bdff3560c901f6d1ba959229ce485915c88f1ee",
+   "slug": "ds_london_air_quality_time_of_day_per_month",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/london-air-quality/main/data/time-of-day-per-month.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "OGL (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "752a052a722df8dc4154d1f2b10ace71f243dc9cb4bc9f4ca590e3aa20b18779",
+   "slug": "ds_london_crime_crime_rates",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/london-crime/main/data/crime-rates.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "OGL (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "7233c3895fda5f1f08d3be5b83546eafb7f85cc452c3d9d1708fdae88f6decf3",
+   "slug": "ds_london_crime_recorded_offences",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/london-crime/main/data/recorded-offences.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "open data (see repo; datasets-org packages are typically PDDL/CC0/ODC-BY)",
+   "rows_kept": 150,
+   "sha256": "1fc354ca83302784f760ee092d2f3e8961749460ff5cb935a274d23fecd1f804",
+   "slug": "ds_london_gva_gva",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/london-gva/main/data/gva.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "OGL (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "51b8a08a9c74db8c9d291fdc9a6fc031e28560c57df6d4dd19806bb5c2503024",
+   "slug": "ds_london_life_expectancy_female_life_expectancy",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/london-life-expectancy/main/data/female-life-expectancy.csv"
+  },
+  {
+   "cols": 19,
+   "license_note": "OGL (datapackage.json)",
+   "rows_kept": 44,
+   "sha256": "3f3950f937b4b86b5402dba3526157ba25b6eadc67c7049048cb621cba4e200a",
+   "slug": "ds_london_life_expectancy_life_expectancy_at_65",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/london-life-expectancy/main/data/life-expectancy-at-65.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "OGL (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "54c6530e82eeb785765ccbe4480a0a8a1fdf8f505796ef6de4c9c9b7a16ba0c0",
+   "slug": "ds_london_life_expectancy_male_life_expectancy",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/london-life-expectancy/main/data/male-life-expectancy.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "open data (see repo; datasets-org packages are typically PDDL/CC0/ODC-BY)",
+   "rows_kept": 150,
+   "sha256": "465a3dbdc30256651e6a8fd0136cb5f0ae1f351abddd30c6507ee164f20ab799",
+   "slug": "ds_london_median_housing_affordability_london_home_price_index",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/london-median-housing-affordability/main/data/london-home-price-index.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "OGL (datapackage.json)",
+   "rows_kept": 55,
+   "sha256": "4fa7c271ca35f9a5f7cc97cd8c1e237a4ab736c374a60a981ba74c072708eb83",
+   "slug": "ds_london_population_london_population_history",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/london-population/main/data/london-population-history.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "OGL (datapackage.json)",
+   "rows_kept": 40,
+   "sha256": "99ec43be7e101aa088e1e9eaeb5ddc323e9ec38e9639548b60970ae13b0968b0",
+   "slug": "ds_london_population_london_population_projection",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/london-population/main/data/london-population-projection.csv"
+  },
+  {
+   "cols": 12,
+   "license_note": "Open Government Licence v3.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "0aba083d63d26f370cdfc988a0c0f18363a0c001a93aaa52cb0ffcb584cef183",
+   "slug": "ds_london_transport_public_transport_journeys",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/london-transport/main/data/data/public-transport-journeys.csv"
+  },
+  {
+   "cols": 9,
+   "license_note": "Open Government Licence v3.0 (datapackage.json)",
+   "rows_kept": 119,
+   "sha256": "583960bb3cb367baa0c0f7ffc33ca6d63b9fabd6040e4f092ee80fb6b19c0898",
+   "slug": "ds_london_underground_report_key_trends",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/london-underground-report/main/data/data/key-trends.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "Open Government Licence v3.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "a0538142c41a725aab7b5fe8dd82cbf878acb431640e5c22912a656df87bbfa8",
+   "slug": "ds_london_unemployment_unemployment_rate",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/london-unemployment/main/data/data/unemployment-rate.csv"
+  },
+  {
+   "cols": 19,
+   "license_note": "odc-pddl (datapackage.json)",
+   "rows_kept": 148,
+   "sha256": "d864d2b464c7f2449c428ee1f3ff4ac39f1d1ba33fe6176fe89475c67313e485",
+   "slug": "ds_lymph",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/lymph/main/data/lymph.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "f9f182102f304d884a871998a93a660330524e1e06042b86ae88a75624b2384c",
+   "slug": "ds_media_types",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/media-types/main/data/media-types.csv"
+  },
+  {
+   "cols": 6,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "0f0a70d6318b59a075f6d85cd530eb3193320a35629006fec81bad3c2adca12f",
+   "slug": "ds_membership_to_copyright_treaties",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/membership-to-copyright-treaties/main/data/membership-to-copyright-treaties.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "e1bcb246e2b0d1d6aff9362cf8142b577a42acbad5ec7d64d299e61f1b4fe386",
+   "slug": "ds_nasdaq_listings_nasdaq_listed",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/nasdaq-listings/main/data/nasdaq-listed.csv"
+  },
+  {
+   "cols": 9,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "95cc1cb4d1f7dd662b0e227027a2be3ab99a7482bd7d3119794a69abbb8f2ceb",
+   "slug": "ds_nasdaq_listings_nasdaq_listed_symbols",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/nasdaq-listings/main/data/nasdaq-listed-symbols.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "e3992887878cf3de36ce89d79830ff59a0ee83408e7fca8c951ca0abfac9ff4c",
+   "slug": "ds_natural_gas_daily",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/natural-gas/main/data/daily.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "050397f25a571821dad813b442945d5cc7ed38366009c2fd0dad241572633f39",
+   "slug": "ds_natural_gas_monthly",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/natural-gas/main/data/monthly.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "0da86d3d75b3b8a0313be9499b69801b8a452894414642e05217202120fae95e",
+   "slug": "ds_natural_gas_monthly_processed",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/natural-gas/main/data/monthly-processed.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "bd8aa84ed26be3f3aa96320b579daea2fca3e80fde5565b723effa81f2764de9",
+   "slug": "ds_nyse_other_listings_nyse_listed",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/nyse-other-listings/main/data/nyse-listed.csv"
+  },
+  {
+   "cols": 9,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "b35a2583699429a4221c84f0a36cb0898b05f2ca6531db8aad1aa71cd62401c4",
+   "slug": "ds_nyse_other_listings_other_listed",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/nyse-other-listings/main/data/other-listed.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "c0e4d025aab932de82d14f299b9759e0a4028937c7a3889e936a8caeebb44645",
+   "slug": "ds_oil_prices_brent_daily",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/oil-prices/main/data/brent-daily.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "6210f4e34e3a403d7c40055b8036eb3c92c9635d64423177eaf4145c79fddf7a",
+   "slug": "ds_oil_prices_brent_monthly",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/oil-prices/main/data/brent-monthly.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "bd1284eb24eea3b254b651554285ef57b390fcf57d1961e641b95d7ba3e9acc9",
+   "slug": "ds_oil_prices_brent_weekly",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/oil-prices/main/data/brent-weekly.csv"
+  },
+  {
+   "cols": 9,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "a970e6d8543b6a9724f00c8230fe157257497ec6eeaf3a86cec0c418501f9a1b",
+   "slug": "ds_openml_datasets_abalone",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/openml-datasets/main/data/abalone/abalone.csv"
+  },
+  {
+   "cols": 15,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "f02f6f45b4fd5bea40b48bc1a365762c439ef3e362805d564030dceb2a2f63f8",
+   "slug": "ds_openml_datasets_adult",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/openml-datasets/main/data/adult/adult.csv"
+  },
+  {
+   "cols": 8,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "c2811292aa7e65722f5f039911007e97d2613ecbcce56cb7d226043a92ffd029",
+   "slug": "ds_openml_datasets_airlines",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/openml-datasets/main/data/airlines/airlines.csv"
+  },
+  {
+   "cols": 6,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "ec4f474f7591f84af73db44904ec14165c8159bd2eb71ea2657d5cf329602b73",
+   "slug": "ds_pharmaceutical_drug_spending",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/pharmaceutical-drug-spending/main/data/data.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "15f6953817824414ace49c5443612636012c883be1e755a5be08f7ca668aaae5",
+   "slug": "ds_political_geography_uk_eng",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/political_geography/main/data/uk_eng.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "8590811bb2cb86b27b714baca178e7ae650515a722c7fd6e3ca7b5c25abf2ae3",
+   "slug": "ds_population",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/population/main/data/population.csv"
+  },
+  {
+   "cols": 11,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "b1518b58601204d6975567502449c224bc20268b04e652c39162b203e1d9dc2d",
+   "slug": "ds_population_city_unsd_citypopulation_year_both",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/population-city/main/data/unsd-citypopulation-year-both.csv"
+  },
+  {
+   "cols": 11,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "5344eb98cdda064d2bce0d2e4725a35cb65ff3ef92d2df24e3af20f108a7661c",
+   "slug": "ds_population_city_unsd_citypopulation_year_fm",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/population-city/main/data/unsd-citypopulation-year-fm.csv"
+  },
+  {
+   "cols": 11,
+   "license_note": "odc-pddl (datapackage.json)",
+   "rows_kept": 54,
+   "sha256": "ef667704ca5f40646e0c26980a16882d7dd9f7de530294f9ea463a11b6c00d2a",
+   "slug": "ds_population_global_historical_population",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/population-global-historical/main/data/population.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "open data (see repo; datasets-org packages are typically PDDL/CC0/ODC-BY)",
+   "rows_kept": 150,
+   "sha256": "ac3a04f8b2404a56946e91624269c493ba11c14f622f1f5e75b1c3866f57818f",
+   "slug": "ds_population_growth_estimates_and_projections_population_estimates",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/population-growth-estimates-and-projections/main/data/population-estimates.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "open data (see repo; datasets-org packages are typically PDDL/CC0/ODC-BY)",
+   "rows_kept": 150,
+   "sha256": "9f2a7e28d21ee2578a13c8b93f38341a326e59d4ea52d4b45ac0242472e07ca8",
+   "slug": "ds_population_growth_estimates_and_projections_population_low_fertility",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/population-growth-estimates-and-projections/main/data/population-low-fertility.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "open data (see repo; datasets-org packages are typically PDDL/CC0/ODC-BY)",
+   "rows_kept": 150,
+   "sha256": "0f875357779ebbf12ce67cc6141a50ffe75b17784f912a5693fe55589c138a41",
+   "slug": "ds_population_growth_estimates_and_projections_population_medium_fertility",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/population-growth-estimates-and-projections/main/data/population-medium-fertility.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "1d806dc2574d1063d1434d79ca7d8e90c0f666350c1bc805dd43c02a79e0ebff",
+   "slug": "ds_population_reference_bureau_international_age15",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/population-reference-bureau/main/data/international/age15/data/international-age15.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "d25116d0504afd1f2c552e9c5d4903b7a32700b40380188b2b9e447b22b0867a",
+   "slug": "ds_population_reference_bureau_international_age65",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/population-reference-bureau/main/data/international/age65/data/international-age65.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "8a4ec0b23fdd2819f525c61fe52b6094d075f51471942055e7acb128885b7fbd",
+   "slug": "ds_population_reference_bureau_international_births",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/population-reference-bureau/main/data/international/births/data/international-births.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "70d5ac1fd4d35d4f43709896ebde303ba6cb88bfa73620d85d2f6c37258c853c",
+   "slug": "ds_ppp_ppp_gdp",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/ppp/main/data/ppp-gdp.csv"
+  },
+  {
+   "cols": 18,
+   "license_note": "open data (see repo; datasets-org packages are typically PDDL/CC0/ODC-BY)",
+   "rows_kept": 150,
+   "sha256": "ef668b1ae5d446071972e7c07c9bc850ee4e0578bb40d0c98113a7d18aa9cd01",
+   "slug": "ds_primary_tumor",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/primary-tumor/main/data/primary-tumor.csv"
+  },
+  {
+   "cols": 18,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "475824c4b67336ee6e9f1b0ac53bc3ab0332088b324c41dd690f27f54b57986a",
+   "slug": "ds_publicbodies_br",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/publicbodies/main/data/br.csv"
+  },
+  {
+   "cols": 18,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "c6dab824fb26fa51050a1d069ca44fcc42167fd3efb07626e547b28e27367d18",
+   "slug": "ds_publicbodies_ch",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/publicbodies/main/data/ch.csv"
+  },
+  {
+   "cols": 18,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "e3990f46b453b8c4eeaebb796279e72f9d427ec285dbe38ee75c83bac992b838",
+   "slug": "ds_publicbodies_de",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/publicbodies/main/data/de.csv"
+  },
+  {
+   "cols": 12,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "d94d7a4f691520d893fb56ca71c0c7db6741ae6630a98f812b2eceb49cbf99f3",
+   "slug": "ds_rio2016_athletes",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/rio2016/main/athletes.csv"
+  },
+  {
+   "cols": 6,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "5399ebe66eead44612eae76ebe3066eeb0ea7f79cf4f96dab1a1684a4a7ec698",
+   "slug": "ds_rio2016_events",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/rio2016/main/events.csv"
+  },
+  {
+   "cols": 10,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "77a96d9f1664572325ea05c1824f6137dfcdfeb7ca2d95ddf1c33e32bc96d23b",
+   "slug": "ds_s_and_p_500",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/s-and-p-500/main/data/data.csv"
+  },
+  {
+   "cols": 8,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "81cea1eff9ea74b613ae73284ae2da12e20335484d0f22353bb9e511b7ceda3c",
+   "slug": "ds_s_and_p_500_companies_constituents",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/s-and-p-500-companies/main/data/constituents.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "ee16cd133961580a37ca76401bced20b940ddfc91798a9d5fd1403ab30562707",
+   "slug": "ds_s_and_p_500_companies_financials_constituents",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/s-and-p-500-companies-financials/main/data/constituents.csv"
+  },
+  {
+   "cols": 14,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "600729b044192bac57c040732778fb4ed2f42573b7d6366925df9cc77e87717a",
+   "slug": "ds_s_and_p_500_companies_financials_constituents_financials",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/s-and-p-500-companies-financials/main/data/constituents-financials.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "90aecf371e70474394ec98d4ee487582b394765cb26e242a0000398bbe10e8e8",
+   "slug": "ds_s_and_p_500_companies_financials_scatter_data",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/s-and-p-500-companies-financials/main/data/scatter-data.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "565cd4624b023bb81de50d005d98f0f33b4f153c9ea2111faf51d67d7cd6c728",
+   "slug": "ds_sea_level_rise_csiro_alt_seas_inc",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/sea-level-rise/main/data/CSIRO_Alt_seas_inc.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 27,
+   "sha256": "334ec497a5294de66de96dd58d481906332e03dd7864271e5e773a2b193c5cd5",
+   "slug": "ds_sea_level_rise_csiro_alt_yearly",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/sea-level-rise/main/data/CSIRO_Alt_yearly.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "91257fd9d608e86ba9fa59079531e1e127c3f9447ed8eb012a6f69ff0eafd813",
+   "slug": "ds_sea_level_rise_csiro_recons_gmsl_mo_2015",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/sea-level-rise/main/data/CSIRO_Recons_gmsl_mo_2015.csv"
+  },
+  {
+   "cols": 12,
+   "license_note": "open data (see repo; datasets-org packages are typically PDDL/CC0/ODC-BY)",
+   "rows_kept": 150,
+   "sha256": "73a645b068cebd81b26f6a4132d6dc4e854d7375b32fb68eb27c24829632f3aa",
+   "slug": "ds_seismic_bumps",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/seismic-bumps/main/data/seismic-bumps.csv"
+  },
+  {
+   "cols": 12,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "6d90849d4d9c012f95d6af9b7d5b43a2aafb74504f8cd55896da76a1c2c519dd",
+   "slug": "ds_smdg_master_terminal_facilities_list",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/smdg-master-terminal-facilities-list/main/data/smdg-master-terminal-facilities-list.csv"
+  },
+  {
+   "cols": 14,
+   "license_note": "open data (see repo; datasets-org packages are typically PDDL/CC0/ODC-BY)",
+   "rows_kept": 150,
+   "sha256": "61d839bd54f835e773ea1c143e4de88f3feeb1ed342e00bb1c7b9ca759e94158",
+   "slug": "ds_threatened_species",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/threatened-species/main/data/threatened-species.csv"
+  },
+  {
+   "cols": 10,
+   "license_note": "open data (see repo; datasets-org packages are typically PDDL/CC0/ODC-BY)",
+   "rows_kept": 150,
+   "sha256": "e6f30bf21a659513d4f7bf4f84c290c9b3eb0c059e534455cea7af0ce619ed72",
+   "slug": "ds_tic_tac_toe",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/tic-tac-toe/main/data/tic-tac-toe.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "08f9a5eb1ade0450ce1839675c857eaa1c57a9f686c0c56c7682af9671ec7f90",
+   "slug": "ds_top_level_domain_names",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/top-level-domain-names/main/data/top-level-domain-names.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "open data (see repo; datasets-org packages are typically PDDL/CC0/ODC-BY)",
+   "rows_kept": 150,
+   "sha256": "7a151726c4ae535dd3a871ca8e0f8dcecb3828851eb33a63ff6472e1bd67b0b3",
+   "slug": "ds_uk_sic_2007_condensed",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/uk-sic-2007-condensed/main/data/uk-sic-2007-condensed.csv"
+  },
+  {
+   "cols": 12,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "ba67b144415af2a80c8ff8e8e5d3521c65b3ae81614afe6f569400fed9f7f188",
+   "slug": "ds_un_locode_code_list",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/un-locode/main/data/code-list.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "5e8c3a6d675ad1bf5ccf192b8456de915df62cc4550c805b027571179b0e58f0",
+   "slug": "ds_un_locode_country_codes",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/un-locode/main/data/country-codes.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "open data (see repo; datasets-org packages are typically PDDL/CC0/ODC-BY)",
+   "rows_kept": 150,
+   "sha256": "d8d3764b4d902da1fb861bbaf76341c72b34c1fd6dcf3fc055cb80b52b0345df",
+   "slug": "ds_unece_package_codes",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/unece-package-codes/main/data/data.csv"
+  },
+  {
+   "cols": 7,
+   "license_note": "ODC-PDDL-1.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "11ce5d60a356cf26f6f6ad217a1b80e4c647115477b73a654c619e53fa01dfee",
+   "slug": "ds_unece_units_of_measure_units_of_measure",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/unece-units-of-measure/main/data/units-of-measure.csv"
+  },
+  {
+   "cols": 15,
+   "license_note": "ODC-PDDL (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "70b3dac3bc70218c5ca89624b7d8f70c1e7bec5ad63e815e70bc240326ee7118",
+   "slug": "ds_unicode_characters",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/unicode-characters/main/data/unicode-characters.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "odc-pddl (datapackage.json)",
+   "rows_kept": 48,
+   "sha256": "cc988253e0edfd426f43e1cc2c901885674478025439c7c99aff290eb3b3483e",
+   "slug": "ds_usa_education_budget_analysis",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/usa-education-budget-analysis/main/data/data.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "odc-pddl (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "03926c9ba7e75a912b157d735efe02997dec0e93e6e26b4267558d5e4e1de2d3",
+   "slug": "ds_usa_education_budget_analysis_budget",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/usa-education-budget-analysis/main/data/budget.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "CC-BY-4.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "4db7e6abe7fb3d98e91ae34cbc3db023df1f2b2dcdad49b32f403b5975c8216f",
+   "slug": "ds_world_cities",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/world-cities/main/data/world-cities.csv"
+  },
+  {
+   "cols": 11,
+   "license_note": "CC-BY-4.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "79b4ed6e40563b6abd75dab48105c0579f5367d550a586da4df7291279bad13a",
+   "slug": "ds_world_religion_projections_rounded_percentage",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/world-religion-projections/main/rounded_percentage.csv"
+  },
+  {
+   "cols": 12,
+   "license_note": "CC-BY-4.0 (datapackage.json)",
+   "rows_kept": 150,
+   "sha256": "01ae472ba7d8450784a0349bf29f363ffb79603f8d98695c41bd1dde427769dd",
+   "slug": "ds_world_religion_projections_rounded_population",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/world-religion-projections/main/rounded_population.csv"
+  },
+  {
+   "cols": 11,
+   "license_note": "open data (see repo; datasets-org packages are typically PDDL/CC0/ODC-BY)",
+   "rows_kept": 150,
+   "sha256": "f0d0ca8ba26bd5b5a63274fdfe03e27895b373b7a1735da93d99dc3626e9f964",
+   "slug": "ds_zopa_market_quote_report",
+   "source": "datasets-org",
+   "url": "https://raw.githubusercontent.com/datasets/zopa/main/data/market_quote_report.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 56,
+   "sha256": "7fff6b95d617bd5134858e5fc7dab3fd8e6db975e6a8c70fda8cb2d58c08ce73",
+   "slug": "fte_airline_safety",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/airline-safety/airline-safety.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "1265f81d29673b4436ca42fb288862971dc6fa5c909452a870000cd1d0612af0",
+   "slug": "fte_alcohol_consumption_drinks",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/alcohol-consumption/drinks.csv"
+  },
+  {
+   "cols": 9,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "7385770abe2d7df7088f02c1f68409bbb03b0afb5b8e0288c785445e11ded8f9",
+   "slug": "fte_antiquities_act_actions_under_antiquities_act",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/antiquities-act/actions_under_antiquities_act.csv"
+  },
+  {
+   "cols": 11,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "6f4c567855632b5bb43b4860d871ac6c9d68736fcaf64e6f5cd441aa887a7dfb",
+   "slug": "fte_august_senate_polls",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/august-senate-polls/august_senate_polls.csv"
+  },
+  {
+   "cols": 13,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "af8142d497d40069d5fa19b76ffdc4b09bff23868c5b1dce3653cd1f7e9b4b86",
+   "slug": "fte_avengers",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/avengers/avengers.csv"
+  },
+  {
+   "cols": 8,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 51,
+   "sha256": "853b5d6bfba17a61918ff9d24a4bb997c54ce73de348c45d32413d2cc047b595",
+   "slug": "fte_bad_drivers",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/bad-drivers/bad-drivers.csv"
+  },
+  {
+   "cols": 12,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "461b2341479edf2efca64fc6a86e6a75ac35c57f0f2ca2e1794416fb2dbdf0a0",
+   "slug": "fte_bechdel_movies",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/bechdel/movies.csv"
+  },
+  {
+   "cols": 14,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "b027681586e52d1b35242648d0df6681388418577d432b590f8fefe498f6f493",
+   "slug": "fte_biopics",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/biopics/biopics.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "dc4fff6becbfd42ff7471901fa9c3a5599cba7817ef296da383f8a41d4c9ab3a",
+   "slug": "fte_births_us_births_1994_2003_cdc_nchs",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/births/US_births_1994-2003_CDC_NCHS.csv"
+  },
+  {
+   "cols": 9,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "766cdb553b741eb34e48a63311709b3945b2ff267e1a151d0996cf7bfb47c788",
+   "slug": "fte_cabinet_turnover",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/cabinet-turnover/cabinet-turnover.csv"
+  },
+  {
+   "cols": 13,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 85,
+   "sha256": "46c17cdb8c0212bc3e0cee2a9617a75d1ce642cd1559c332b1d9a2c4ed19b8cb",
+   "slug": "fte_candy_power_ranking_candy_data",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/candy-power-ranking/candy-data.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "223afac6a30a226b613160f3c351d06c0cde9c78f7f442feef23bb8d9024d66d",
+   "slug": "fte_chess_transfers_transfers",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/chess-transfers/transfers.csv"
+  },
+  {
+   "cols": 10,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "236c22ee9c2f9a90171b30ab56317db2a32f5bf5685775f5760bcfe4b2cbbc59",
+   "slug": "fte_college_majors_all_ages",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/college-majors/all-ages.csv"
+  },
+  {
+   "cols": 13,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "fa2612908f03bcabb527e5d936b557942e2a173472a520a2b953d7e6b0c8f89b",
+   "slug": "fte_comic_characters_dc_wikia_data",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/comic-characters/dc-wikia-data.csv"
+  },
+  {
+   "cols": 13,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "8b513b9d0cbc8076dc41dbb4507eed86f5384e7a00d6daef89b2c8dda28069f2",
+   "slug": "fte_comma_survey",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/comma-survey/comma-survey.csv"
+  },
+  {
+   "cols": 13,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "ab9267cbdd2f6788def29887c532ead95d1866b73e22834c5ec88e9e37aea581",
+   "slug": "fte_congress_age_congress_terms",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/congress-age/congress-terms.csv"
+  },
+  {
+   "cols": 13,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "e676d4313c4a16bd0ba0f8a5887efbe4518772b4fc187df6cfae22c701dcda33",
+   "slug": "fte_congress_demographics_data_aging_congress",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/congress-demographics/data_aging_congress.csv"
+  },
+  {
+   "cols": 9,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "79ff9714225cde0f52bbfaa0e22dd91f0246433af4684c7716a6b4e2c1dd2a36",
+   "slug": "fte_congress_generic_ballot_generic_topline_historical",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/congress-generic-ballot/generic_topline_historical.csv"
+  },
+  {
+   "cols": 8,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "9315e5bed1247b432f0a964e3101cb6e80c5daf2ddcc64a6a3f9303e734469b5",
+   "slug": "fte_congress_resignations_congressional_resignations",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/congress-resignations/congressional_resignations.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 70,
+   "sha256": "ea0a45f5792e7227fe1a28b336e5eb248a46444ab3fbbb72889576963f8397cd",
+   "slug": "fte_cousin_marriage_cousin_marriage_data",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/cousin-marriage/cousin-marriage-data.csv"
+  },
+  {
+   "cols": 7,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 136,
+   "sha256": "bcf17ff3c1838af4e5f89f02b04cf26f0236d5865ee1507f0f42a0173fd6a256",
+   "slug": "fte_covid_geography_mmsa_icu_beds",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/covid-geography/mmsa-icu-beds.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "e2c6a1d8e774c99c0131605b0d5816045357e73589d94840fe4e22744b86b379",
+   "slug": "fte_daily_show_guests",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/daily-show-guests/daily_show_guests.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 67,
+   "sha256": "60615c71bee8935679095d678cda3681b51e4c819a2ad222f6f158c9e82b23a7",
+   "slug": "fte_democratic_bench",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/democratic-bench/democratic-bench.csv"
+  },
+  {
+   "cols": 10,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "9baa454dc9854259fe844d48ef4afcb8affe58db7bc037423a956df79ec1ab36",
+   "slug": "fte_district_urbanization_index_2022_urbanization_index_2022",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/district-urbanization-index-2022/urbanization-index-2022.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 107,
+   "sha256": "2c1abef2df6602cf88711579b22aaac9da6b7ec33888482465b2f9b2910d2f0c",
+   "slug": "fte_early_senate_polls",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/early-senate-polls/early-senate-polls.csv"
+  },
+  {
+   "cols": 9,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "72980a2b8f9244e9266724ae70ca9eada427ec05580feef838c55d7f854cd00f",
+   "slug": "fte_election_deniers_fivethirtyeight_election_deniers",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/election-deniers/fivethirtyeight_election_deniers.csv"
+  },
+  {
+   "cols": 7,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "e55221af21fd53c0c9f1d336a740030d463b76d621d48010643b9a2af952f178",
+   "slug": "fte_elo_blatter",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/elo-blatter/elo_blatter.csv"
+  },
+  {
+   "cols": 9,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 109,
+   "sha256": "50ad4d80de6d06cab3ae82d051615d5948f05bba33647f186470ddcc18438b08",
+   "slug": "fte_endorsements_june_30",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/endorsements-june-30/endorsements-june-30.csv"
+  },
+  {
+   "cols": 22,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 146,
+   "sha256": "f7d626fe7bf22f65f7e862e0aad68c9f228cb05951ce24d862b1638bf70f51f1",
+   "slug": "fte_fandango_fandango_score_comparison",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/fandango/fandango_score_comparison.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "5b8890c3051d0c762bfc8b27a350c786290e3a9eee6c43a3c1ebe50d7ec5526e",
+   "slug": "fte_fifa_fifa_countries_audience",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/fifa/fifa_countries_audience.csv"
+  },
+  {
+   "cols": 23,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 65,
+   "sha256": "7de0a52050894e9edca666c04a100c8b6c4bfb23c3306964da180b61e22ea1ad",
+   "slug": "fte_fight_songs",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/fight-songs/fight-songs.csv"
+  },
+  {
+   "cols": 27,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "7dab4d63137ddff91407efe2a98d942def2e7018e2f0e2b98bb07af143067333",
+   "slug": "fte_flying_etiquette_survey_flying_etiquette",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/flying-etiquette-survey/flying-etiquette.csv"
+  },
+  {
+   "cols": 48,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "5b33977a9b7fae568606ae4a5ffcdba0ba0b5f3b955f55282e04b231e04339f0",
+   "slug": "fte_food_world_cup_food_world_cup_data",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/food-world-cup/food-world-cup-data.csv"
+  },
+  {
+   "cols": 6,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "185f959c5dfb45054e95d2ba4386a069dfbf349933b3ffc0942b8a8751fa02c5",
+   "slug": "fte_forecast_methodology_historical_senate_predictions",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/forecast-methodology/historical-senate-predictions.csv"
+  },
+  {
+   "cols": 11,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "07d4eb9ed5c171d9ad4e31b7af4e96334e8a679077a88a3b8bf4803405e3cfea",
+   "slug": "fte_forecast_review_forecast_results_2018",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/forecast-review/forecast_results_2018.csv"
+  },
+  {
+   "cols": 7,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "b02deb9cc2ec3a9f76f24f69ce13e2ec6acc5de23bd342b107ab4a8cf51f1eca",
+   "slug": "fte_foul_balls",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/foul-balls/foul-balls.csv"
+  },
+  {
+   "cols": 12,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "c1957bb5772727c0480b0a74ea00d135fba8c302e8777f4c7c53924ed0c91f9a",
+   "slug": "fte_goose_goose_rawdata",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/goose/goose_rawdata.csv"
+  },
+  {
+   "cols": 7,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "9a336c6955b4a1c2c52f634b5c976d13b93586a4fe093d42eaa414bfe561f9c9",
+   "slug": "fte_gop_candidate_visits_2024_candidate_visits",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/gop-candidate-visits-2024/candidate_visits.csv"
+  },
+  {
+   "cols": 12,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 56,
+   "sha256": "24663fbdd27a516a6f795a2c382f104030b83c362125834ca3854a3d9a407cac",
+   "slug": "fte_gop_delegate_benchmarks_2024_delegate_targets",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/gop-delegate-benchmarks-2024/delegate_targets.csv"
+  },
+  {
+   "cols": 12,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 51,
+   "sha256": "cf3b31821a2788b2d5860d975b03f48bd3d1fed69aebc52e324ca2c6f4b0d9b5",
+   "slug": "fte_hate_crimes",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/hate-crimes/hate_crimes.csv"
+  },
+  {
+   "cols": 9,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "bb75e72cd2f77e6d19ed49c83975d378b18bc2f6ecbe315593fe3355d3c82e60",
+   "slug": "fte_hip_hop_candidate_lyrics_genius_hip_hop_lyrics",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/hip-hop-candidate-lyrics/genius_hip_hop_lyrics.csv"
+  },
+  {
+   "cols": 6,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "544afeda47894e2aa98eb705459b32157a7ddcc7e3f33a31e5019fa0e96665fe",
+   "slug": "fte_historical_ncaa_forecasts_historical_538_ncaa_tournament_model_results",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/historical-ncaa-forecasts/historical-538-ncaa-tournament-model-results.csv"
+  },
+  {
+   "cols": 24,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "85db9d89df9e8f076ab47c538b662516f961f697daea6a32b05562d91413f099",
+   "slug": "fte_impeachment_polls",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/impeachment-polls/impeachment_polls.csv"
+  },
+  {
+   "cols": 9,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "67425af53ca53eac09a738a72f35b1403f0ed45e188794eebcc17195199a334d",
+   "slug": "fte_inconvenient_sequel_ratings",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/inconvenient-sequel/ratings.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 53,
+   "sha256": "9037113ef2c1c488aa4d5f5f38cf01440d35a1b6d5373e7a3d495807aeeda08f",
+   "slug": "fte_infrastructure_jobs_payroll_states",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/infrastructure-jobs/payroll-states.csv"
+  },
+  {
+   "cols": 6,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "b7996bdc7ce93f0fad2f93f7e0f55137c19cb20c1cc0320133129dff6cdfb05d",
+   "slug": "fte_librarians_librarians_by_msa",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/librarians/librarians-by-msa.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "e5466a0efe75b50fc7e13742e59fc9a356f5015f41cc4e21f79db47e5c78fb44",
+   "slug": "fte_mad_men_performer_scores",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/mad-men/performer-scores.csv"
+  },
+  {
+   "cols": 8,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 68,
+   "sha256": "c0ce666b1f7294fa76fac5a8789eb18ded1bb4bcd84d5cc4a72b7d3ad37679a7",
+   "slug": "fte_march_madness_predictions_bracket_00",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/march-madness-predictions/bracket-00.csv"
+  },
+  {
+   "cols": 7,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "f8bd571a6ef886c03a349de2f5f5edc9b09e7635580d650a5e1a83e4a7c7e141",
+   "slug": "fte_masculinity_survey",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/masculinity-survey/masculinity-survey.csv"
+  },
+  {
+   "cols": 7,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "30be343936a6ea151735ffa0aca0fdfd93f1bd329153a15fe27057b887f717fd",
+   "slug": "fte_mayweather_mcgregor_tweets",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/mayweather-mcgregor/tweets.csv"
+  },
+  {
+   "cols": 7,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "decc5970971f3b1b7cd92b2cbe125043eae0a6d574ac61fe784fcc2a3d5cae5a",
+   "slug": "fte_media_mentions_2020_cable_weekly",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/media-mentions-2020/cable_weekly.csv"
+  },
+  {
+   "cols": 15,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "5d1ac16a8f6f333f42e1c4bd11a2d7d1e3c7b598950ce19d82a48a6f14a260e7",
+   "slug": "fte_mlb_allstar_teams_allstar_player_talent",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/mlb-allstar-teams/allstar_player_talent.csv"
+  },
+  {
+   "cols": 16,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "b0f112cf3df164f306fefefb64a4b2b65739d625bd3907b2b21cdf31f638f44d",
+   "slug": "fte_mlb_quasi_win_shares_quasi_winshares",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/mlb-quasi-win-shares/quasi_winshares.csv"
+  },
+  {
+   "cols": 7,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "3487badd2b5bfbc25791195fe1318f90c87a00cc1dda38315df90d061cadc092",
+   "slug": "fte_most_common_name_adjusted_name_combinations_list",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/most-common-name/adjusted-name-combinations-list.csv"
+  },
+  {
+   "cols": 12,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 65,
+   "sha256": "b39dd50250946c6f8cd8a234b6165f3a0de021c1af7b09da292bc67ebc171018",
+   "slug": "fte_mueller_polls_mueller_approval_polls",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/mueller-polls/mueller-approval-polls.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 83,
+   "sha256": "c4b2c815c2da1232a83f8684b985f39a105fbfb127a4448a6d15f0ad1850b646",
+   "slug": "fte_murder_2016_murder_2015_final",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/murder_2016/murder_2015_final.csv"
+  },
+  {
+   "cols": 9,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "8212850b86e38707d9ee6f45b674130ab7f58cdfcc68c183ddd7f363d18e0280",
+   "slug": "fte_nba_draft_2015_historical_projections",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/nba-draft-2015/historical_projections.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "c1f92f2d8e6a72af0a3440859ff09be6d52d460320cc45170adac4813e0a913c",
+   "slug": "fte_nba_draymond_draymond",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/nba-draymond/draymond.csv"
+  },
+  {
+   "cols": 23,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "c56b452bf61115f59bc28b81d8127808990abfb4617146535e56cac3926b7ae0",
+   "slug": "fte_nba_elo_nbaallelo",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/nba-elo/nbaallelo.csv"
+  },
+  {
+   "cols": 15,
+   "license_note": "CC BY 4.0 \u2014 github.com/fivethirtyeight/data",
+   "rows_kept": 150,
+   "sha256": "e484f056ddfc559517b0375fefd65a0b3cc8bda3fa31169a45c231030e3559ab",
+   "slug": "fte_nba_raptor_historical_raptor_by_player",
+   "source": "fivethirtyeight",
+   "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/nba-raptor/historical_RAPTOR_by_player.csv"
+  },
+  {
+   "cols": 8,
+   "license_note": "Open Database License (ODbL) \u2014 openflights.org/data.php",
+   "rows_kept": 150,
+   "sha256": "4c7f8056f3a395cf2a20dcea394b379f98bbe01a59db93b9b207bcb6d3d72388",
+   "slug": "of_airlines",
+   "source": "openflights",
+   "url": "https://raw.githubusercontent.com/jpatokal/openflights/master/data/airlines.dat"
+  },
+  {
+   "cols": 14,
+   "license_note": "Open Database License (ODbL) \u2014 openflights.org/data.php",
+   "rows_kept": 150,
+   "sha256": "558c3d4934b33481198fee9e2a540c6846b8bf998eb23453c8d0a6240ad6756c",
+   "slug": "of_airports",
+   "source": "openflights",
+   "url": "https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat"
+  },
+  {
+   "cols": 3,
+   "license_note": "Open Database License (ODbL) \u2014 openflights.org/data.php",
+   "rows_kept": 150,
+   "sha256": "1888fc308cb9d85a6cfec6e7ff751de6cc07256d66adaeec5f0b8640badd9a2c",
+   "slug": "of_countries",
+   "source": "openflights",
+   "url": "https://raw.githubusercontent.com/jpatokal/openflights/master/data/countries.dat"
+  },
+  {
+   "cols": 3,
+   "license_note": "Open Database License (ODbL) \u2014 openflights.org/data.php",
+   "rows_kept": 150,
+   "sha256": "8e8584134a9d6898135998752a7284c238df797f904e33d85c79dd0123bd7beb",
+   "slug": "of_planes",
+   "source": "openflights",
+   "url": "https://raw.githubusercontent.com/jpatokal/openflights/master/data/planes.dat"
+  },
+  {
+   "cols": 9,
+   "license_note": "Open Database License (ODbL) \u2014 openflights.org/data.php",
+   "rows_kept": 150,
+   "sha256": "4384ed55580572c228a13a6c1963036d20a0c2b8a8add48af049d0daca645ab5",
+   "slug": "of_routes",
+   "source": "openflights",
+   "url": "https://raw.githubusercontent.com/jpatokal/openflights/master/data/routes.dat"
+  },
+  {
+   "cols": 3,
+   "license_note": "public example datasets collected for seaborn docs \u2014 github.com/mwaskom/seaborn-data",
+   "rows_kept": 20,
+   "sha256": "3c2e2dec229264be78368f447a666a488ed44788a8bab7370e8362e2e0aac194",
+   "slug": "sb_anagrams",
+   "source": "seaborn",
+   "url": "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/anagrams.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "public example datasets collected for seaborn docs \u2014 github.com/mwaskom/seaborn-data",
+   "rows_kept": 44,
+   "sha256": "a0c1f636aa0347101de76271e7efe4c86a22ef28cda62886eaff23a1bf1924b1",
+   "slug": "sb_anscombe",
+   "source": "seaborn",
+   "url": "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/anscombe.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "public example datasets collected for seaborn docs \u2014 github.com/mwaskom/seaborn-data",
+   "rows_kept": 60,
+   "sha256": "fbbd4da34f5d0ee9b724073d08c06664d33c3a355c212a337fefcd137683b88f",
+   "slug": "sb_attention",
+   "source": "seaborn",
+   "url": "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/attention.csv"
+  },
+  {
+   "cols": 8,
+   "license_note": "public example datasets collected for seaborn docs \u2014 github.com/mwaskom/seaborn-data",
+   "rows_kept": 51,
+   "sha256": "78ac44c0f6d407bda2d646a65447d119994d34afa11bb9f689833031bc4869c7",
+   "slug": "sb_car_crashes",
+   "source": "seaborn",
+   "url": "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/car_crashes.csv"
+  },
+  {
+   "cols": 10,
+   "license_note": "public example datasets collected for seaborn docs \u2014 github.com/mwaskom/seaborn-data",
+   "rows_kept": 150,
+   "sha256": "dc7b7fe52d131435ca46c4281001881c4a024a2d546b5b9287309f28ea8371a1",
+   "slug": "sb_diamonds",
+   "source": "seaborn",
+   "url": "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/diamonds.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "public example datasets collected for seaborn docs \u2014 github.com/mwaskom/seaborn-data",
+   "rows_kept": 150,
+   "sha256": "1eff268674117feb5dbce259968f2389f4644923b844cb79e6dfaf07d6c5ce1f",
+   "slug": "sb_dots",
+   "source": "seaborn",
+   "url": "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/dots.csv"
+  },
+  {
+   "cols": 6,
+   "license_note": "public example datasets collected for seaborn docs \u2014 github.com/mwaskom/seaborn-data",
+   "rows_kept": 90,
+   "sha256": "d172b02fd777ce529dd07ee72e2cbad539b1667445fd02f3cde1a20579b0d716",
+   "slug": "sb_exercise",
+   "source": "seaborn",
+   "url": "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/exercise.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "public example datasets collected for seaborn docs \u2014 github.com/mwaskom/seaborn-data",
+   "rows_kept": 144,
+   "sha256": "237d834127d9c6355630d8f443a7a2377b5925923010009b59809ba0b67f4fac",
+   "slug": "sb_flights",
+   "source": "seaborn",
+   "url": "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/flights.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "public example datasets collected for seaborn docs \u2014 github.com/mwaskom/seaborn-data",
+   "rows_kept": 150,
+   "sha256": "6ef3d95c72b60619a52d3638dcf9bdc722e52ec879cf58399932e4f392a02b01",
+   "slug": "sb_fmri",
+   "source": "seaborn",
+   "url": "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/fmri.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "public example datasets collected for seaborn docs \u2014 github.com/mwaskom/seaborn-data",
+   "rows_kept": 150,
+   "sha256": "2ea582aac4361d682b4d4644422e37fd2e377594c1110fc1609fd2cb943cbf84",
+   "slug": "sb_geyser",
+   "source": "seaborn",
+   "url": "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/geyser.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "public example datasets collected for seaborn docs \u2014 github.com/mwaskom/seaborn-data",
+   "rows_kept": 64,
+   "sha256": "0c6b840da0a2c7fba3422d3b6867492bc8e61dd99dec7a276f6108774c81744e",
+   "slug": "sb_glue",
+   "source": "seaborn",
+   "url": "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/glue.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "public example datasets collected for seaborn docs \u2014 github.com/mwaskom/seaborn-data",
+   "rows_kept": 150,
+   "sha256": "370735756ad3bc6ecec78938e3ccd516bd967465c4cc1264c87f76a30bf49a23",
+   "slug": "sb_healthexp",
+   "source": "seaborn",
+   "url": "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/healthexp.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "public example datasets collected for seaborn docs \u2014 github.com/mwaskom/seaborn-data",
+   "rows_kept": 150,
+   "sha256": "9cc1c345c71bcc9b486b74cbf6063fa66f4bb5e0f603a4b3c3471ec2e5e8e355",
+   "slug": "sb_iris",
+   "source": "seaborn",
+   "url": "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
+  },
+  {
+   "cols": 9,
+   "license_note": "public example datasets collected for seaborn docs \u2014 github.com/mwaskom/seaborn-data",
+   "rows_kept": 150,
+   "sha256": "6cc2eb803b240290516c52bf683562e9c24adb9d9958632341eed9c1fbee1512",
+   "slug": "sb_mpg",
+   "source": "seaborn",
+   "url": "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/mpg.csv"
+  },
+  {
+   "cols": 7,
+   "license_note": "public example datasets collected for seaborn docs \u2014 github.com/mwaskom/seaborn-data",
+   "rows_kept": 150,
+   "sha256": "41fb4134c0befe75db65aa0017f914707b1e8ee6c9f7b8dfb3e8a0bf57ba6451",
+   "slug": "sb_penguins",
+   "source": "seaborn",
+   "url": "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv"
+  },
+  {
+   "cols": 6,
+   "license_note": "public example datasets collected for seaborn docs \u2014 github.com/mwaskom/seaborn-data",
+   "rows_kept": 150,
+   "sha256": "39e87080efe7ec7da5afefd4d5b70f39a4b1ca186d3e72ccf717f585208c67c4",
+   "slug": "sb_planets",
+   "source": "seaborn",
+   "url": "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/planets.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "public example datasets collected for seaborn docs \u2014 github.com/mwaskom/seaborn-data",
+   "rows_kept": 150,
+   "sha256": "cf44e22b6c822cd53c5c67268a8187dd309bac9322d97e8a23bacef4a18cfd53",
+   "slug": "sb_seaice",
+   "source": "seaborn",
+   "url": "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/seaice.csv"
+  },
+  {
+   "cols": 14,
+   "license_note": "public example datasets collected for seaborn docs \u2014 github.com/mwaskom/seaborn-data",
+   "rows_kept": 150,
+   "sha256": "09043676a2ffc4e5b131b8a9258dede8622a89f281a44ae38d873cc561f556f5",
+   "slug": "sb_taxis",
+   "source": "seaborn",
+   "url": "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/taxis.csv"
+  },
+  {
+   "cols": 7,
+   "license_note": "public example datasets collected for seaborn docs \u2014 github.com/mwaskom/seaborn-data",
+   "rows_kept": 150,
+   "sha256": "821a97309353d68a7be0f00d8b02f67853f404f880ede0c41dd56aac880b8aa2",
+   "slug": "sb_tips",
+   "source": "seaborn",
+   "url": "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
+  },
+  {
+   "cols": 15,
+   "license_note": "public example datasets collected for seaborn docs \u2014 github.com/mwaskom/seaborn-data",
+   "rows_kept": 150,
+   "sha256": "1e950e6d067090a3482980616aa543fbbebfaff607a3a0ddb0a8ffd2b31b5898",
+   "slug": "sb_titanic",
+   "source": "seaborn",
+   "url": "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv"
+  },
+  {
+   "cols": 7,
+   "license_note": "BSD-3-Clause repo; public example data \u2014 github.com/vega/vega-datasets",
+   "rows_kept": 150,
+   "sha256": "c9bffa94ca23b3d2c1abf1c1a3190ecd4b5dd4f2324165322f6ad6c0c4e04106",
+   "slug": "vg_airports",
+   "source": "vega",
+   "url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/airports.csv"
+  },
+  {
+   "cols": 14,
+   "license_note": "BSD-3-Clause repo; public example data \u2014 github.com/vega/vega-datasets",
+   "rows_kept": 150,
+   "sha256": "11147152d0b283a45c3361c5c362998c1015b32af6b116f64cb484abf9e5bda5",
+   "slug": "vg_birdstrikes",
+   "source": "vega",
+   "url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/birdstrikes.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "BSD-3-Clause repo; public example data \u2014 github.com/vega/vega-datasets",
+   "rows_kept": 150,
+   "sha256": "f3abaa9042aadc03cfb12f335c8f599ffc98fe21dcdee8d53d79d46ea57a0e8f",
+   "slug": "vg_co2_concentration",
+   "source": "vega",
+   "url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/co2-concentration.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "BSD-3-Clause repo; public example data \u2014 github.com/vega/vega-datasets",
+   "rows_kept": 150,
+   "sha256": "93a6cbef791e7fca81fce803033b31de9f786a1d312415281dfe5452429a6679",
+   "slug": "vg_disasters",
+   "source": "vega",
+   "url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/disasters.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "BSD-3-Clause repo; public example data \u2014 github.com/vega/vega-datasets",
+   "rows_kept": 150,
+   "sha256": "4cebce1f1ade1310d9bf6b2373d779cf6cfcdc65e5c6b3907c43b923d0f18d4f",
+   "slug": "vg_flights_airport",
+   "source": "vega",
+   "url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/flights-airport.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "BSD-3-Clause repo; public example data \u2014 github.com/vega/vega-datasets",
+   "rows_kept": 150,
+   "sha256": "e132a23f1da7180adc398bd2a603750f09667f2094a801dc43b7f8029df4066b",
+   "slug": "vg_gapminder_health_income",
+   "source": "vega",
+   "url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/gapminder-health-income.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "BSD-3-Clause repo; public example data \u2014 github.com/vega/vega-datasets",
+   "rows_kept": 150,
+   "sha256": "49e94616e603cdd0ff0a167612bc1ff2dfc9a02d73fc5ca98b3f4e9fb723c590",
+   "slug": "vg_github",
+   "source": "vega",
+   "url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/github.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "BSD-3-Clause repo; public example data \u2014 github.com/vega/vega-datasets",
+   "rows_kept": 144,
+   "sha256": "08b5fc5be641342ea82c6e01139e6af0597a1d727124b23b95691daff4c9cb35",
+   "slug": "vg_global_temp",
+   "source": "vega",
+   "url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/global-temp.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "BSD-3-Clause repo; public example data \u2014 github.com/vega/vega-datasets",
+   "rows_kept": 51,
+   "sha256": "6071c2e657d91509885a1f3eec0884b2854d66990b5c556dbead15e263f9506b",
+   "slug": "vg_iowa_electricity",
+   "source": "vega",
+   "url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/iowa-electricity.csv"
+  },
+  {
+   "cols": 11,
+   "license_note": "BSD-3-Clause repo; public example data \u2014 github.com/vega/vega-datasets",
+   "rows_kept": 63,
+   "sha256": "90884a2c333e45c172446211edadcb0201957b6b9a378525fa8fd10f4856734a",
+   "slug": "vg_la_riots",
+   "source": "vega",
+   "url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/la-riots.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "BSD-3-Clause repo; public example data \u2014 github.com/vega/vega-datasets",
+   "rows_kept": 52,
+   "sha256": "62225f22e5fd94327150f0c51d384c780de8a92f1b131b6b8d6c5549b5cc00a8",
+   "slug": "vg_population_engineers_hurricanes",
+   "source": "vega",
+   "url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/population_engineers_hurricanes.csv"
+  },
+  {
+   "cols": 6,
+   "license_note": "BSD-3-Clause repo; public example data \u2014 github.com/vega/vega-datasets",
+   "rows_kept": 150,
+   "sha256": "fd3e6a94205a5a388bd0974b95a5d71d17fcd76ccbbeea6acf2709eaae584314",
+   "slug": "vg_seattle_weather",
+   "source": "vega",
+   "url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/seattle-weather.csv"
+  },
+  {
+   "cols": 4,
+   "license_note": "BSD-3-Clause repo; public example data \u2014 github.com/vega/vega-datasets",
+   "rows_kept": 150,
+   "sha256": "064f6a114adec1924b7f87a038579e9cb487e4309f8f707ecd9a3d6d5b40d175",
+   "slug": "vg_seattle_weather_hourly_normals",
+   "source": "vega",
+   "url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/seattle-weather-hourly-normals.csv"
+  },
+  {
+   "cols": 2,
+   "license_note": "BSD-3-Clause repo; public example data \u2014 github.com/vega/vega-datasets",
+   "rows_kept": 123,
+   "sha256": "8d1a3310b741565fd2aaf7b9d34030c92b1fbedbc9ba839f4a50dab8b2dd5c3d",
+   "slug": "vg_sp500",
+   "source": "vega",
+   "url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/sp500.csv"
+  },
+  {
+   "cols": 7,
+   "license_note": "BSD-3-Clause repo; public example data \u2014 github.com/vega/vega-datasets",
+   "rows_kept": 150,
+   "sha256": "1a5f414eabb1106fe93ce132d68ec5c7d2894475a59de7e82d8f1793d3fdfe92",
+   "slug": "vg_sp500_2000",
+   "source": "vega",
+   "url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/sp500-2000.csv"
+  },
+  {
+   "cols": 6,
+   "license_note": "BSD-3-Clause repo; public example data \u2014 github.com/vega/vega-datasets",
+   "rows_kept": 150,
+   "sha256": "ec6676aafb2be59193182361ffb316800398a9c2310dfad3c841f67d5670c3d1",
+   "slug": "vg_species",
+   "source": "vega",
+   "url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/species.csv"
+  },
+  {
+   "cols": 3,
+   "license_note": "BSD-3-Clause repo; public example data \u2014 github.com/vega/vega-datasets",
+   "rows_kept": 150,
+   "sha256": "ebc97f018452fce11e307bc72ddafc5462dea7121a411e4e5a6beed992a91704",
+   "slug": "vg_stocks",
+   "source": "vega",
+   "url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/stocks.csv"
+  },
+  {
+   "cols": 24,
+   "license_note": "BSD-3-Clause repo; public example data \u2014 github.com/vega/vega-datasets",
+   "rows_kept": 120,
+   "sha256": "0fa5366929bf738ac420509b84ed120155f740b0fa9c265ca309dad4057d1b1b",
+   "slug": "vg_us_employment",
+   "source": "vega",
+   "url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/us-employment.csv"
+  },
+  {
+   "cols": 7,
+   "license_note": "BSD-3-Clause repo; public example data \u2014 github.com/vega/vega-datasets",
+   "rows_kept": 150,
+   "sha256": "db3ba7c3e96771f2f9e291d2bf21a92b92129cf40abd77c5f1a2db76d043a0de",
+   "slug": "vg_weather",
+   "source": "vega",
+   "url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/weather.csv"
+  },
+  {
+   "cols": 5,
+   "license_note": "BSD-3-Clause repo; public example data \u2014 github.com/vega/vega-datasets",
+   "rows_kept": 150,
+   "sha256": "fa281eb0dbc4ce9317ee6ed13318184f5cc6211b7e6540a028a3d44239489e5b",
+   "slug": "vg_windvectors",
+   "source": "vega",
+   "url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/windvectors.csv"
+  },
+  {
+   "cols": 6,
+   "license_note": "BSD-3-Clause repo; public example data \u2014 github.com/vega/vega-datasets",
+   "rows_kept": 150,
+   "sha256": "fc534ba6541d10bcede2d370385cfbc8dd4b49d4f005f7c88393f048129b0150",
+   "slug": "vg_zipcodes",
+   "source": "vega",
+   "url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/zipcodes.csv"
+  }
+ ],
+ "fetched_at": "2026-06-12T22:42:44Z",
+ "gates": {
+  "max_cols": 60,
+  "min_cols": 2,
+  "min_rows": 20
+ },
+ "row_cap": 150,
+ "stats": {
+  "datasets_kept": 282,
+  "fetch_seconds": 247.4,
+  "github_api_calls": 4,
+  "per_source": {
+   "datasets-org": {
+    "attempted": 247,
+    "failed": 46,
+    "kept": 176,
+    "license_screened": 8,
+    "misses": [
+     "https://raw.githubusercontent.com/datasets/ai/main/data/ai.csv",
+     "https://raw.githubusercontent.com/datasets/archive-fivethirtyeight/master/data/archive-fivethirtyeight.csv",
+     "https://raw.githubusercontent.com/datasets/carbondoomsday/main/data/carbondoomsday.csv",
+     "https://raw.githubusercontent.com/datasets/climate-and-environment/main/data/climate-and-environment.csv",
+     "https://raw.githubusercontent.com/datasets/clinical-trials-us/main/data/clinical-trials-us.csv",
+     "https://raw.githubusercontent.com/datasets/collective/main/data/collective.csv",
+     "https://raw.githubusercontent.com/datasets/commons/main/data/commons.csv",
+     "https://raw.githubusercontent.com/datasets/country-list/main/data/country-list.csv",
+     "https://raw.githubusercontent.com/datasets/crunchbase-data/master/data/crunchbase-data.csv",
+     "https://raw.githubusercontent.com/datasets/datacatalogs.org/main/data/datacatalogs.org.csv",
+     "https://raw.githubusercontent.com/datasets/datapressr/main/data/datapressr.csv",
+     "https://raw.githubusercontent.com/datasets/datasets.github.com/master/data/datasets.github.com.csv",
+     "https://raw.githubusercontent.com/datasets/economic-history/main/data/economic-history.csv",
+     "https://raw.githubusercontent.com/datasets/edgar/main/data/edgar.csv",
+     "https://raw.githubusercontent.com/datasets/energy-and-commodities/main/data/energy-and-commodities.csv",
+     "https://raw.githubusercontent.com/datasets/exchange-rates-usd/main/data/exchange-rates-usd.csv",
+     "https://raw.githubusercontent.com/datasets/five-thirty-eight-datasets/main/datasets/airline-safety/data/airline-safety.csv",
+     "https://raw.githubusercontent.com/datasets/football-datasets/main/data/football-datasets.csv",
+     "https://raw.githubusercontent.com/datasets/gcat-artificial-space-objects/main/data/gcat-artificial-space-objects.csv",
+     "https://raw.githubusercontent.com/datasets/geo-admin1-us/main/data/geo-admin1-us.csv",
+     "https://raw.githubusercontent.com/datasets/geo-boundaries-us-110m/main/data/geo-boundaries-us-110m.csv",
+     "https://raw.githubusercontent.com/datasets/geo-boundaries-world-110m/main/data/geo-boundaries-world-110m.csv",
+     "https://raw.githubusercontent.com/datasets/geo-countries/main/data/geo-countries.csv",
+     "https://raw.githubusercontent.com/datasets/geo-ne-admin1/main/data/geo-ne-admin1.csv",
+     "https://raw.githubusercontent.com/datasets/geo-nuts-administrative-boundaries/main/data/geo-nuts-administrative-boundaries.csv",
+     "https://raw.githubusercontent.com/datasets/geodata/main/data/geodata.csv",
+     "https://raw.githubusercontent.com/datasets/giveth/main/data/giveth.csv",
+     "https://raw.githubusercontent.com/datasets/giving-data/main/data/giving-data.csv",
+     "https://raw.githubusercontent.com/datasets/glwd/main/data/glwd.csv",
+     "https://raw.githubusercontent.com/datasets/labs/main/data/labs.csv",
+     "https://raw.githubusercontent.com/datasets/lme-large-marine-ecosystems/main/data/lme-large-marine-ecosystems.csv",
+     "https://raw.githubusercontent.com/datasets/openflights/main/data/openflights.csv",
+     "https://raw.githubusercontent.com/datasets/opented/main/data/opented.csv",
+     "https://raw.githubusercontent.com/datasets/owid-datasets/main/datasets/ Literacy by years of schooling US 1947 \u2013 OECD (2014) / Literacy by years of schooling US 1947 \u2013 OECD (2014) .csv",
+     "https://raw.githubusercontent.com/datasets/owid-datasets/main/datasets/ Literate world population (OurWorldInData based on OECD and UNESCO)/ Literate world population (OurWorldInData based on OECD and UNESCO).csv",
+     "https://raw.githubusercontent.com/datasets/owid-datasets/main/datasets/20th century deaths in US - CDC/20th century deaths in US - CDC.csv",
+     "https://raw.githubusercontent.com/datasets/polls-us-presidential/main/data/polls-us-presidential.csv",
+     "https://raw.githubusercontent.com/datasets/product-data/main/data/product-data.csv",
+     "https://raw.githubusercontent.com/datasets/reference-staging/main/data/reference-staging.csv",
+     "https://raw.githubusercontent.com/datasets/seshat/main/data/seshat.csv"
+    ],
+    "rejected": 17
+   },
+   "fivethirtyeight": {
+    "attempted": 67,
+    "failed": 2,
+    "kept": 60,
+    "license_screened": 0,
+    "misses": [
+     "https://raw.githubusercontent.com/fivethirtyeight/data/master/bachelorette/bachelorette.csv",
+     "https://raw.githubusercontent.com/fivethirtyeight/data/master/classic-rock/classic-rock-raw-data.csv"
+    ],
+    "rejected": 5
+   },
+   "openflights": {
+    "attempted": 5,
+    "failed": 0,
+    "kept": 5,
+    "license_screened": 0,
+    "misses": [],
+    "rejected": 0
+   },
+   "seaborn": {
+    "attempted": 22,
+    "failed": 1,
+    "kept": 20,
+    "license_screened": 0,
+    "misses": [
+     "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/gammas.csv"
+    ],
+    "rejected": 1
+   },
+   "vega": {
+    "attempted": 23,
+    "failed": 0,
+    "kept": 21,
+    "license_screened": 0,
+    "misses": [],
+    "rejected": 2
+   }
+  },
+  "total_bytes": 3188598
+ },
+ "user_agent": "OntoForge-Research/0.1 (glenn.hubbard.career@gmail.com)",
+ "version": 1
+}

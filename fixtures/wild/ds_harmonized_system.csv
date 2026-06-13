@@ -1,0 +1,151 @@
+section,hscode,description,parent,level
+I,01,Animals; live,TOTAL,2
+I,0101,"Horses, asses, mules and hinnies; live",01,4
+I,010121,"Horses; live, pure-bred breeding animals",0101,6
+I,010129,"Horses; live, other than pure-bred breeding animals",0101,6
+I,010130,Asses; live,0101,6
+I,010190,Mules and hinnies; live,0101,6
+I,0102,Bovine animals; live,01,4
+I,010221,"Cattle; live, pure-bred breeding animals",0102,6
+I,010229,"Cattle; live, other than pure-bred breeding animals",0102,6
+I,010231,"Buffalo; live, pure-bred breeding animals",0102,6
+I,010239,"Buffalo; live, other than pure-bred breeding animals",0102,6
+I,010290,"Bovine animals; live, other than cattle and buffalo",0102,6
+I,0103,Swine; live,01,4
+I,010310,"Swine; live, pure-bred breeding animals",0103,6
+I,010391,"Swine; live, other than pure-bred breeding animals, weighing less than 50kg",0103,6
+I,010392,"Swine; live, other than pure-bred breeding animals, weighing 50kg or more",0103,6
+I,0104,Sheep and goats; live,01,4
+I,010410,Sheep; live,0104,6
+I,010420,Goats; live,0104,6
+I,0105,"Poultry; live, fowls of the species Gallus domesticus, ducks, geese, turkeys and guinea fowls",01,4
+I,010511,"Poultry; live, fowls of the species Gallus domesticus, weighing not more than 185g",0105,6
+I,010512,"Poultry; live, turkeys, weighing not more than 185g",0105,6
+I,010513,"Poultry; live, ducks, weighing not more than 185g",0105,6
+I,010514,"Poultry; live, geese, weighing not more than 185g",0105,6
+I,010515,"Poultry; live, guinea fowls, weighing not more than 185g",0105,6
+I,010594,"Poultry; live, fowls of the species Gallus domesticus, weighing more than 185g",0105,6
+I,010599,"Poultry; live, ducks, geese, turkeys and guinea fowls, weighing more than 185g",0105,6
+I,0106,"Animals; live, n.e.c. in chapter 01",01,4
+I,010611,"Mammals; live, primates",0106,6
+I,010612,"Mammals; live, whales, dolphins and porpoises (mammals of the order Cetacea); manatees and dugongs (mammals of the order Sirenia); seals, sea lions and walruses (mammals of the suborder Pinnipedia)",0106,6
+I,010613,"Mammals; live, camels and other camelids (Camelidae)",0106,6
+I,010614,"Mammals; live, rabbits and hares",0106,6
+I,010619,"Mammals; live, other than primates, whales, dolphins, porpoises (mammals of the order Cetacea); manatees, dugongs (mammals of the order Sirenia); seals, sea lions, walruses (mammals of the suborder Pinnipedia), camels, other camelids, rabbits and hares",0106,6
+I,010620,Reptiles; live (including snakes and turtles),0106,6
+I,010631,"Birds; live, birds of prey",0106,6
+I,010632,"Birds; live, Psittaciformes",0106,6
+I,010633,"Birds; live, ostriches; emus (Dromaius novaehollandiae)",0106,6
+I,010639,"Birds; live, other than birds of prey, Psittaciformes, ostriches and emus (Dromaius novaehollandiae)",0106,6
+I,010641,"Insects; live, bees",0106,6
+I,010649,"Insects; live, other than bees",0106,6
+I,010690,"Animals; live, n.e.c. in chapter 01, other than mammals, reptiles, birds and insects",0106,6
+I,02,Meat and edible meat offal,TOTAL,2
+I,0201,Meat of bovine animals; fresh or chilled,02,4
+I,020110,"Meat; of bovine animals, carcasses and half-carcasses, fresh or chilled",0201,6
+I,020120,"Meat; of bovine animals, cuts with bone in (excluding carcasses and half-carcasses), fresh or chilled",0201,6
+I,020130,"Meat; of bovine animals, boneless cuts, fresh or chilled",0201,6
+I,0202,Meat of bovine animals; frozen,02,4
+I,020210,"Meat; of bovine animals, carcasses and half-carcasses, frozen",0202,6
+I,020220,"Meat; of bovine animals, cuts with bone in (excluding carcasses and half-carcasses), frozen",0202,6
+I,020230,"Meat; of bovine animals, boneless cuts, frozen",0202,6
+I,0203,"Meat of swine; fresh, chilled or frozen",02,4
+I,020311,"Meat; of swine, carcasses and half-carcasses, fresh or chilled",0203,6
+I,020312,"Meat; of swine, hams, shoulders and cuts thereof, with bone in, fresh or chilled",0203,6
+I,020319,"Meat; of swine, n.e.c. in item no. 0203.1, fresh or chilled",0203,6
+I,020321,"Meat; of swine, carcasses and half-carcasses, frozen",0203,6
+I,020322,"Meat; of swine, hams, shoulders and cuts thereof, with bone in, frozen",0203,6
+I,020329,"Meat; of swine, n.e.c. in item no. 0203.2, frozen",0203,6
+I,0204,"Meat of sheep or goats; fresh, chilled or frozen",02,4
+I,020410,"Meat; of sheep, lamb carcasses and half-carcasses, fresh or chilled",0204,6
+I,020421,"Meat; of sheep, carcasses and half-carcasses (excluding carcasses and half-carcasses of lamb), fresh or chilled",0204,6
+I,020422,"Meat; of sheep (including lamb), cuts with bone in (excluding carcasses and half-carcasses), fresh or chilled",0204,6
+I,020423,"Meat; of sheep (including lamb), boneless cuts, fresh or chilled",0204,6
+I,020430,"Meat; of sheep, lamb carcasses and half-carcasses, frozen",0204,6
+I,020441,"Meat; of sheep, carcasses and half-carcasses (excluding carcasses and half-carcasses of lamb), frozen",0204,6
+I,020442,"Meat; of sheep (including lamb), cuts with bone in (excluding carcasses and half-carcasses), frozen",0204,6
+I,020443,"Meat; of sheep (including lamb), boneless cuts, frozen",0204,6
+I,020450,"Meat; of goats, fresh, chilled or frozen",0204,6
+I,0205,"Meat; of horses, asses, mules or hinnies, fresh, chilled or frozen",02,4
+I,020500,"Meat; of horses, asses, mules or hinnies, fresh, chilled or frozen",0205,6
+I,0206,"Edible offal of bovine animals, swine, sheep, goats, horses, asses, mules or hinnies; fresh, chilled or frozen",02,4
+I,020610,"Offal, edible; of bovine animals, fresh or chilled",0206,6
+I,020621,"Offal, edible; of bovine animals, tongues, frozen",0206,6
+I,020622,"Offal, edible; of bovine animals, livers, frozen",0206,6
+I,020629,"Offal, edible; of bovine animals, (other than tongues and livers), frozen",0206,6
+I,020630,"Offal, edible; of swine, fresh or chilled",0206,6
+I,020641,"Offal, edible; of swine, livers, frozen",0206,6
+I,020649,"Offal, edible; of swine, (other than livers), frozen",0206,6
+I,020680,"Offal, edible; of sheep, goats, horses, asses, mules or hinnies, fresh or chilled",0206,6
+I,020690,"Offal, edible; of sheep, goats, horses, asses, mules or hinnies, frozen",0206,6
+I,0207,"Meat and edible offal of poultry; of the poultry of heading no. 0105, (i.e. fowls of the species Gallus domesticus), fresh, chilled or frozen",02,4
+I,020711,"Meat and edible offal; of fowls of the species Gallus domesticus, not cut in pieces, fresh or chilled",0207,6
+I,020712,"Meat and edible offal; of fowls of the species Gallus domesticus, not cut in pieces, frozen",0207,6
+I,020713,"Meat and edible offal; of fowls of the species Gallus domesticus, cuts and offal, fresh or chilled",0207,6
+I,020714,"Meat and edible offal; of fowls of the species Gallus domesticus, cuts and offal, frozen",0207,6
+I,020724,"Meat and edible offal; of turkeys, not cut in pieces, fresh or chilled",0207,6
+I,020725,"Meat and edible offal; of turkeys, not cut in pieces, frozen",0207,6
+I,020726,"Meat and edible offal; of turkeys, cuts and offal, fresh or chilled",0207,6
+I,020727,"Meat and edible offal; of turkeys, cuts and offal, frozen",0207,6
+I,020741,"Meat and edible offal; of ducks, not cut in pieces, fresh or chilled",0207,6
+I,020742,"Meat and edible offal; of ducks, not cut in pieces, frozen",0207,6
+I,020743,"Meat and edible offal; of ducks, fatty livers (foie gras), fresh or chilled",0207,6
+I,020744,"Meat and edible offal; of ducks, cuts and offal, excluding fatty livers, fresh or chilled",0207,6
+I,020745,"Meat and edible offal; of ducks, cuts and offal, excluding fatty livers, frozen",0207,6
+I,020751,"Meat and edible offal; of geese, not cut in pieces, fresh or chilled",0207,6
+I,020752,"Meat and edible offal; of geese, not cut in pieces, frozen",0207,6
+I,020753,"Meat and edible offal; of geese, fatty livers (foie gras), fresh or chilled",0207,6
+I,020754,"Meat and edible offal; of geese, cuts and offal, excluding fatty livers, fresh or chilled",0207,6
+I,020755,"Meat and edible offal; of geese, cuts and offal, excluding fatty livers, frozen",0207,6
+I,020760,"Meat and edible offal; of guinea fowls, fresh, chilled or frozen",0207,6
+I,0208,"Meat and edible meat offal, n.e.c. in chapter 2; fresh, chilled or frozen",02,4
+I,020810,"Meat and edible meat offal; of rabbits or hares, fresh, chilled or frozen",0208,6
+I,020830,"Meat and edible meat offal; of primates, fresh, chilled or frozen",0208,6
+I,020840,"Meat and edible meat offal; of whales, dolphins and porpoises (mammals of the order Cetacea); of manatees and dugongs (mammals of the order Sirenia); of seals, sea lions and walruses (mammals of the suborder Pinnipedia), fresh, chilled or frozen",0208,6
+I,020850,"Meat and edible meat offal; of reptiles (including snakes and turtles), fresh, chilled or frozen",0208,6
+I,020860,"Meat and edible meat offal; of camels and other camelids (Camelidae), fresh, chilled or frozen",0208,6
+I,020890,"Meat and edible meat offal; n.e.c. in chapter 2, fresh, chilled or frozen",0208,6
+I,0209,"Pig fat, free of lean meat, and poultry fat, not rendered or otherwise extracted, fresh, chilled, frozen, salted, in brine, dried or smoked",02,4
+I,020910,"Fat; pig fat, free of lean meat, not rendered or otherwise extracted, fresh, chilled, frozen, salted, in brine, dried or smoked",0209,6
+I,020990,"Fat; poultry fat, not rendered or otherwise extracted, fresh, chilled, frozen, salted, in brine, dried or smoked",0209,6
+I,0210,"Meat and edible meat offal; salted, in brine, dried or smoked; edible flours and meals of meat or meat offal",02,4
+I,021011,"Meat; salted, in brine, dried or smoked, of swine, hams, shoulders and cuts thereof, with bone in",0210,6
+I,021012,"Meat; salted, in brine, dried or smoked, of swine, bellies (streaky) and cuts thereof",0210,6
+I,021019,"Meat; salted in brine, dried or smoked, of swine, n.e.c. in item no. 0210.1",0210,6
+I,021020,"Meat; salted, in brine, dried or smoked, of bovine animals",0210,6
+I,021091,"Meat and edible meat offal; salted, in brine, dried or smoked, and edible flours and meals of meat or meat offal, of primates",0210,6
+I,021092,"Meat and edible meat offal; salted, in brine, dried or smoked; edible flours, meals of meat or meat offal, of whales, dolphins, porpoises (of order Cetacea); manatees, dugongs (of order Sirenia); seals, sea lions, and walruses (of suborder Pinnipedia)",0210,6
+I,021093,"Meat and edible meat offal; salted, in brine, dried or smoked, and edible flours and meals of meat or meat offal, of reptiles (including snakes and turtles)",0210,6
+I,021099,"Meat and edible meat offal; salted, in brine, dried or smoked, and edible flours and meals of meat or meat offal, other than of primates, whales, dolphins, porpoises, manatees, dugongs, seals, sea lions, walruses, reptiles (including snakes and turtles)",0210,6
+I,03,"Fish and crustaceans, molluscs and other aquatic invertebrates",TOTAL,2
+I,0301,Fish; live,03,4
+I,030111,"Fish; live, ornamental, freshwater",0301,6
+I,030119,"Fish; live, ornamental, other than freshwater",0301,6
+I,030191,"Fish; live, trout (Salmo trutta, Oncorhynchus mykiss, Oncorhynchus clarki, Oncorhynchus aguabonita, Oncorhynchus gilae, Oncorhynchus apache and Oncorhynchus chrysogaster)",0301,6
+I,030192,"Fish; live, eels (Anguilla spp.)",0301,6
+I,030193,"Fish; live, carp (Cyprinus spp., Carassius spp., Ctenopharyngodon idellus, Hypophthalmichthys spp., Cirrhinus spp., Mylopharyngodon piceus, Catla catla, Labeo spp., Osteochilus hasselti, Leptobarbus hoeveni, Megalobrama spp.)",0301,6
+I,030194,"Fish; live, Atlantic and Pacific bluefin tunas (Thunnus thynnus, Thunnus orientalis)",0301,6
+I,030195,"Fish; live, southern bluefin tunas (Thunnus maccoyii)",0301,6
+I,030199,"Fish; live, n.e.c. in heading 0301",0301,6
+I,0302,"Fish; fresh or chilled, excluding fish fillets and other fish meat of heading 0304",03,4
+I,030211,"Fish; fresh or chilled, trout (Salmo trutta, Oncorhynchus mykiss, Oncorhynchus clarki, Oncorhynchus aguabonita, Oncorhynchus gilae, Oncorhynchus apache and Oncorhynchus chrysogaster), excluding fillets, fish meat of 0304, and edible fish offal of 0302.9",0302,6
+I,030213,"Fish; fresh or chilled, Pacific salmon (Oncorhynchus nerka, Oncorhynchus gorbuscha, Oncorhynchus keta, Oncorhynchus tschawytscha, Oncorhynchus kisutch, Oncorhynchus masou, Oncorhynchus rhodurus), not fillets, meat of 0304, and edible fish offal of 0302.9",0302,6
+I,030214,"Fish; fresh or chilled, Atlantic salmon (Salmo salar) and Danube salmon (Hucho hucho), excluding fillets, fish meat of 0304, and edible fish offal of subheadings 0302.91 to 0302.99",0302,6
+I,030219,"Fish; fresh or chilled, salmonidae, n.e.c. in item no. 0302.1, excluding fillets, fish meat of 0304, and edible fish offal of subheadings 0302.91 to 0302.99",0302,6
+I,030221,"Fish; fresh or chilled, halibut (Reinhardtius hippoglossoides, Hippoglossus hippoglossus, Hippoglossus stenolepis), excluding fillets, fish meat of 0304, and edible fish offal of subheadings 0302.91 to 0302.99",0302,6
+I,030222,"Fish; fresh or chilled, plaice (Pleuronectes platessa), excluding fillets, fish meat of 0304, and edible fish offal of subheadings 0302.91 to 0302.99",0302,6
+I,030223,"Fish; fresh or chilled, sole (Solea spp.), excluding fillets, fish meat of 0304, and edible fish offal of subheadings 0302.91 to 0302.99",0302,6
+I,030224,"Fish; fresh or chilled, turbots (Psetta maxima, Scophthalmidae), excluding fillets, fish meat of 0304, and edible fish offal of subheadings 0302.91 to 0302.99",0302,6
+I,030229,"Fish; fresh or chilled, flat fish, n.e.c. in item no. 0302.2, excluding fillets, fish meat of 0304, and edible fish offal of subheadings 0302.91 to 0302.99",0302,6
+I,030231,"Fish; fresh or chilled, albacore or longfinned tunas (Thunnus alalunga), excluding fillets, fish meat of 0304, and edible fish offal of subheadings 0302.91 to 0302.99",0302,6
+I,030232,"Fish; fresh or chilled, yellowfin tunas (Thunnus albacares), excluding fillets, fish meat of 0304, and edible fish offal of subheadings 0302.91 to 0302.99",0302,6
+I,030233,"Fish; fresh or chilled, skipjack tuna (stripe-bellied bonito) (Katsuwonus pelamis), excluding fillets, fish meat of 0304, and edible fish offal of subheadings 0302.91 to 0302.99",0302,6
+I,030234,"Fish; fresh or chilled, bigeye tunas (Thunnus obesus), excluding fillets, fish meat of 0304, and edible fish offal of subheadings 0302.91 to 0302.99",0302,6
+I,030235,"Fish; fresh or chilled, Atlantic and Pacific bluefin tunas (Thunnus thynnus, Thunnus orientalis), excluding fillets, fish meat of 0304, and edible fish offal of subheadings 0302.91 to 0302.99",0302,6
+I,030236,"Fish; fresh or chilled, southern bluefin tunas (Thunnus maccoyii), excluding fillets, fish meat of 0304, and edible fish offal of subheadings 0302.91 to 0302.99",0302,6
+I,030239,"Fish; fresh or chilled, tuna, n.e.c. in item no. 0302.3, excluding fillets, fish meat of 0304, and edible fish offal of subheadings 0302.91 to 0302.99",0302,6
+I,030241,"Fish; fresh or chilled, herrings (Clupea harengus, Clupea pallasii), excluding fillets, fish meat of 0304, and edible fish offal of subheadings 0302.91 to 0302.99",0302,6
+I,030242,"Fish; fresh or chilled, anchovies (Engraulis spp.), excluding fillets, fish meat of 0304, and edible fish offal of subheadings 0302.91 to 0302.99",0302,6
+I,030243,"Fish; fresh or chilled, sardines (Sardina pilchardus, Sardinops spp.), sardinella (Sardinella spp.), brisling or sprats (Sprattus sprattus), excluding fillets, fish meat of 0304, and edible fish offal of subheadings 0302.91 to 0302.99",0302,6
+I,030244,"Fish; fresh or chilled, mackerel (Scomber scombrus, Scomber australasicus, Scomber japonicus), excluding fillets, fish meat of 0304, and edible fish offal of subheadings 0302.91 to 0302.99",0302,6
+I,030245,"Fish; fresh or chilled, jack and horse mackerel (Trachurus spp.), excluding fillets, fish meat of 0304, and edible fish offal of subheadings 0302.91 to 0302.99",0302,6

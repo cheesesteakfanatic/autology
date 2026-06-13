@@ -1,0 +1,151 @@
+prim_state,area_name,tot_emp,emp_prse,jobs_1000,loc_quotient
+OH,"Springfield, OH",**,**,**,**
+WA,"Mount Vernon-Anacortes, WA",**,**,**,**
+PR,"Aguadilla-Isabela-San Sebastian, PR",160,4.4,3.727,3.62
+PR,"Ponce, PR",180,3.6,3.434,3.34
+PR,"San German-Cabo Rojo, PR",50,0.2,2.679,2.6
+PR,"Mayaguez, PR",80,1.4,2.563,2.49
+KY,"Owensboro, KY",100,34,2.099,2.04
+NY,"Nassau-Suffolk, NY Metropolitan Division",2530,6.6,2.05,1.99
+MD,"Bethesda-Rockville-Frederick, MD Metropolitan Division",1140,19.1,2.036,1.98
+CT,"New Haven, CT",550,9,2.01,1.95
+MA,"Haverhill-North Andover-Amesbury, MA-NH NECTA Division",160,6,1.985,1.93
+FL,"Tallahassee, FL",310,3,1.975,1.92
+NC,"Durham-Chapel Hill, NC",540,1.7,1.962,1.91
+NY,"Ithaca, NY",100,33.7,1.954,1.9
+DE,"Dover, DE",120,42.6,1.952,1.9
+MO,"St. Joseph, MO-KS",100,12.6,1.942,1.89
+FL,"Gainesville, FL",220,9.1,1.805,1.75
+NY,"Poughkeepsie-Newburgh-Middletown, NY",440,10.3,1.802,1.75
+IA,"Iowa City, IA",160,45.5,1.792,1.74
+KS,"Lawrence, KS",80,11.7,1.754,1.7
+MA,"Worcester, MA-CT",420,6.9,1.73,1.68
+ND,"Grand Forks, ND-MN",90,2.8,1.716,1.67
+IN,"Anderson, IN",60,15.4,1.7,1.65
+KS,"Manhattan, KS",80,7.4,1.68,1.63
+MA,"Springfield, MA-CT",480,9.1,1.67,1.62
+FL,"Ocala, FL",150,40.7,1.667,1.62
+AL,"Auburn-Opelika, AL",80,6.7,1.658,1.61
+CA,"Madera-Chowchilla, CA",60,30.1,1.655,1.61
+OH,"Dayton, OH",610,29.7,1.652,1.6
+SC,"Sumter, SC",60,17,1.644,1.6
+WI,"Sheboygan, WI",90,16.8,1.613,1.57
+OK,"Lawton, OK",70,23.4,1.612,1.57
+IL,"Bloomington-Normal, IL",140,9.6,1.608,1.56
+NY,"Kingston, NY",90,8.1,1.607,1.56
+KS,"Topeka, KS",170,10,1.604,1.56
+KY,"Bowling Green, KY",90,6.8,1.58,1.53
+MD,"Salisbury, MD",80,2.1,1.569,1.52
+GA,"Athens-Clarke County, GA",120,5.1,1.556,1.51
+AR,"Jonesboro, AR",80,3.8,1.539,1.49
+NY,"Albany-Schenectady-Troy, NY",660,5.1,1.538,1.49
+IN,"Muncie, IN",70,4.3,1.524,1.48
+VA,"Lynchburg, VA",150,18.2,1.515,1.47
+CT,"Norwich-New London, CT-RI",190,11.2,1.513,1.47
+MI,"Niles-Benton Harbor, MI",90,22.9,1.508,1.46
+TX,"McAllen-Edinburg-Mission, TX",350,3,1.5,1.46
+TN,"Kingsport-Bristol-Bristol, TN-VA",170,16,1.5,1.46
+CT,"Hartford-West Hartford-East Hartford, CT",830,8.1,1.486,1.44
+MS,"Jackson, MS",370,7.7,1.477,1.43
+NY,"Glens Falls, NY",80,6.7,1.466,1.42
+PA,"Johnstown, PA",80,8.9,1.465,1.42
+WI,"Madison, WI",500,5.6,1.463,1.42
+NC,"Fayetteville, NC",180,6.9,1.461,1.42
+PR,"San Juan-Caguas-Guaynabo, PR",1050,1.5,1.459,1.42
+MA,"Pittsfield, MA",50,13.9,1.454,1.41
+MA,"Boston-Cambridge-Quincy, MA NECTA Division",2540,2.3,1.452,1.41
+NC,"Burlington, NC",80,8.3,1.452,1.41
+NY,"Syracuse, NY",440,6.8,1.447,1.41
+WA,"Olympia, WA",140,17.6,1.446,1.4
+MI,"Ann Arbor, MI",290,9,1.437,1.4
+IN,"Bloomington, IN",100,3.6,1.429,1.39
+LA,"Alexandria, LA",90,18.9,1.421,1.38
+IL,"Peoria, IL",260,29,1.413,1.37
+MD,"Cumberland, MD-WV",50,18.4,1.411,1.37
+DC,"Washington-Arlington-Alexandria, DC-VA-MD-WV Metropolitan Division",3340,2.4,1.409,1.37
+NY,"Rochester, NY",700,4.4,1.407,1.37
+SC,"Columbia, SC",480,2.5,1.397,1.36
+NJ,"Edison-New Brunswick, NJ Metropolitan Division",1370,18.2,1.391,1.35
+CT,"Waterbury, CT",90,10.8,1.39,1.35
+IN,"South Bend-Mishawaka, IN-MI",170,5.4,1.385,1.34
+NH,"Rochester-Dover, NH-ME",70,16.6,1.377,1.34
+CO,"Greeley, CO",120,5.3,1.376,1.34
+MS,"Pascagoula, MS",70,18.4,1.375,1.34
+NY,"Utica-Rome, NY",170,13.5,1.372,1.33
+FL,"Palm Bay-Melbourne-Titusville, FL",260,6,1.363,1.32
+MO,"Jefferson City, MO",100,13.6,1.36,1.32
+IL,"Lake County-Kenosha County, IL-WI Metropolitan Division",510,20.5,1.35,1.31
+ND,"Bismarck, ND",90,13.6,1.34,1.3
+MA,"Leominster-Fitchburg-Gardner, MA",60,31.7,1.332,1.29
+OR,"Corvallis, OR",40,6.8,1.327,1.29
+OH,"Canton-Massillon, OH",220,8.7,1.325,1.29
+WI,"Fond du Lac, WI",60,12.2,1.324,1.29
+FL,"Deltona-Daytona Beach-Ormond Beach, FL",200,12.2,1.319,1.28
+ME,"Bangor, ME",80,10.4,1.319,1.28
+RI,"Providence-Fall River-Warwick, RI-MA",710,5,1.315,1.28
+LA,"Monroe, LA",100,4,1.308,1.27
+GA,"Rome, GA",50,25,1.304,1.27
+CT,"Bridgeport-Stamford-Norwalk, CT",540,5.6,1.295,1.26
+NJ,"Trenton-Ewing, NJ",280,15.6,1.29,1.25
+CT,"Danbury, CT",90,20.4,1.284,1.25
+PA,"State College, PA",80,10.6,1.283,1.25
+WV,"Morgantown, WV",80,7.2,1.278,1.24
+PA,"Pittsburgh, PA",1440,9.4,1.275,1.24
+VA,"Virginia Beach-Norfolk-Newport News, VA-NC",920,8.9,1.272,1.24
+ME,"Portland-South Portland-Biddeford, ME",250,6.6,1.272,1.24
+IL,"Kankakee-Bradley, IL",50,37.5,1.271,1.23
+TN,"Morristown, TN",60,9.6,1.269,1.23
+SC,"Anderson, SC",80,12,1.268,1.23
+MA,"Barnstable Town, MA",120,9,1.267,1.23
+SC,"Greenville-Mauldin-Easley, SC",380,8.6,1.266,1.23
+NH,"Nashua, NH-MA NECTA Division",170,5.8,1.266,1.23
+VA,"Richmond, VA",770,3.6,1.265,1.23
+NC,"Raleigh-Cary, NC",670,9.6,1.258,1.22
+TN,"Cleveland, TN",50,8.1,1.243,1.21
+OH,"Cleveland-Elyria-Mentor, OH",1250,13.5,1.241,1.21
+MO,"Springfield, MO",230,18.8,1.241,1.21
+VA,"Harrisonburg, VA",70,0,1.241,1.21
+TX,"El Paso, TX",350,6.1,1.234,1.2
+NC,"Greenville, NC",90,8.4,1.229,1.19
+TX,"Brownsville-Harlingen, TX",160,2.8,1.223,1.19
+ID,"Pocatello, ID",40,8,1.221,1.19
+MD,"Baltimore-Towson, MD",1560,3.9,1.218,1.18
+WV,"Parkersburg-Marietta-Vienna, WV-OH",80,13.1,1.215,1.18
+TN,"Clarksville, TN-KY",100,7.7,1.212,1.18
+TX,"Killeen-Temple-Fort Hood, TX",160,11.6,1.211,1.18
+GA,"Albany, GA",70,13.9,1.202,1.17
+IL,"Decatur, IL",60,15.2,1.198,1.16
+KY,"Lexington-Fayette, KY",300,5.1,1.192,1.16
+OH,"Toledo, OH",350,11.6,1.19,1.16
+UT,"Logan, UT-ID",60,20.1,1.183,1.15
+NJ,"Newark-Union, NJ-PA Metropolitan Division",1130,13.2,1.179,1.15
+MA,"Brockton-Bridgewater-Easton, MA NECTA Division",110,6.9,1.178,1.14
+AL,"Anniston-Oxford, AL",50,13.8,1.175,1.14
+TN,"Jackson, TN",70,10.6,1.174,1.14
+MS,"Hattiesburg, MS",70,8,1.173,1.14
+NC,"Rocky Mount, NC",60,5.4,1.173,1.14
+IN,"Lafayette, IN",100,44.5,1.171,1.14
+WA,"Spokane, WA",230,4.5,1.17,1.14
+IL,"Champaign-Urbana, IL",110,15.6,1.164,1.13
+AR,"Fort Smith, AR-OK",130,7.4,1.161,1.13
+TX,"Abilene, TX",70,12.4,1.155,1.12
+NH,"Manchester, NH",120,7.1,1.145,1.11
+NC,"Greensboro-High Point, NC",390,4.1,1.139,1.11
+VA,"Charlottesville, VA",110,7.2,1.139,1.11
+NY,"Binghamton, NY",120,4,1.138,1.11
+WI,"La Crosse, WI-MN",80,11.5,1.136,1.1
+WA,"Yakima, WA",90,4.2,1.132,1.1
+AR,"Little Rock-North Little Rock-Conway, AR",380,9.3,1.129,1.1
+AL,"Montgomery, AL",180,3.9,1.128,1.1
+IN,"Terre Haute, IN",70,9.1,1.124,1.09
+NJ,"Ocean City, NJ",40,18.8,1.124,1.09
+VA,"Roanoke, VA",170,11.1,1.118,1.09
+VA,"Blacksburg-Christiansburg-Radford, VA",70,9.9,1.117,1.09
+TX,"Wichita Falls, TX",60,4.1,1.116,1.08
+MO,"Columbia, MO",100,16.8,1.112,1.08
+NC,"Winston-Salem, NC",230,13.1,1.111,1.08
+LA,"Baton Rouge, LA",410,3.2,1.105,1.07
+AL,"Tuscaloosa, AL",100,20.3,1.102,1.07
+ME,"Lewiston-Auburn, ME",50,21.3,1.102,1.07
+MA,"New Bedford, MA",70,29.9,1.1,1.07
+AZ,"Prescott, AZ",60,32.8,1.096,1.06

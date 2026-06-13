@@ -1,0 +1,151 @@
+Group,Subgroup,CodePoint,Status,Representation,Name,Section
+Activities,event,1F383,fully-qualified,🎃,jack-o-lantern,E0.6
+Activities,event,1F384,fully-qualified,🎄,Christmas tree,E0.6
+Activities,event,1F386,fully-qualified,🎆,fireworks,E0.6
+Activities,event,1F387,fully-qualified,🎇,sparkler,E0.6
+Activities,event,1F9E8,fully-qualified,🧨,firecracker,E11.0
+Activities,event,2728,fully-qualified,✨,sparkles,E0.6
+Activities,event,1F388,fully-qualified,🎈,balloon,E0.6
+Activities,event,1F389,fully-qualified,🎉,party popper,E0.6
+Activities,event,1F38A,fully-qualified,🎊,confetti ball,E0.6
+Activities,event,1F38B,fully-qualified,🎋,tanabata tree,E0.6
+Activities,event,1F38D,fully-qualified,🎍,pine decoration,E0.6
+Activities,event,1F38E,fully-qualified,🎎,Japanese dolls,E0.6
+Activities,event,1F38F,fully-qualified,🎏,carp streamer,E0.6
+Activities,event,1F390,fully-qualified,🎐,wind chime,E0.6
+Activities,event,1F391,fully-qualified,🎑,moon viewing ceremony,E0.6
+Activities,event,1F9E7,fully-qualified,🧧,red envelope,E11.0
+Activities,event,1F380,fully-qualified,🎀,ribbon,E0.6
+Activities,event,1F381,fully-qualified,🎁,wrapped gift,E0.6
+Activities,event,1F397 FE0F,fully-qualified,🎗️,reminder ribbon,E0.7
+Activities,event,1F397,unqualified,🎗,reminder ribbon,E0.7
+Activities,event,1F39F FE0F,fully-qualified,🎟️,admission tickets,E0.7
+Activities,event,1F39F,unqualified,🎟,admission tickets,E0.7
+Activities,event,1F3AB,fully-qualified,🎫,ticket,E0.6
+Activities,award-medal,1F396 FE0F,fully-qualified,🎖️,military medal,E0.7
+Activities,award-medal,1F396,unqualified,🎖,military medal,E0.7
+Activities,award-medal,1F3C6,fully-qualified,🏆,trophy,E0.6
+Activities,award-medal,1F3C5,fully-qualified,🏅,sports medal,E1.0
+Activities,award-medal,1F947,fully-qualified,🥇,1st place medal,E3.0
+Activities,award-medal,1F948,fully-qualified,🥈,2nd place medal,E3.0
+Activities,award-medal,1F949,fully-qualified,🥉,3rd place medal,E3.0
+Activities,sport,26BD,fully-qualified,⚽,soccer ball,E0.6
+Activities,sport,26BE,fully-qualified,⚾,baseball,E0.6
+Activities,sport,1F94E,fully-qualified,🥎,softball,E11.0
+Activities,sport,1F3C0,fully-qualified,🏀,basketball,E0.6
+Activities,sport,1F3D0,fully-qualified,🏐,volleyball,E1.0
+Activities,sport,1F3C8,fully-qualified,🏈,american football,E0.6
+Activities,sport,1F3C9,fully-qualified,🏉,rugby football,E1.0
+Activities,sport,1F3BE,fully-qualified,🎾,tennis,E0.6
+Activities,sport,1F94F,fully-qualified,🥏,flying disc,E11.0
+Activities,sport,1F3B3,fully-qualified,🎳,bowling,E0.6
+Activities,sport,1F3CF,fully-qualified,🏏,cricket game,E1.0
+Activities,sport,1F3D1,fully-qualified,🏑,field hockey,E1.0
+Activities,sport,1F3D2,fully-qualified,🏒,ice hockey,E1.0
+Activities,sport,1F94D,fully-qualified,🥍,lacrosse,E11.0
+Activities,sport,1F3D3,fully-qualified,🏓,ping pong,E1.0
+Activities,sport,1F3F8,fully-qualified,🏸,badminton,E1.0
+Activities,sport,1F94A,fully-qualified,🥊,boxing glove,E3.0
+Activities,sport,1F94B,fully-qualified,🥋,martial arts uniform,E3.0
+Activities,sport,1F945,fully-qualified,🥅,goal net,E3.0
+Activities,sport,26F3,fully-qualified,⛳,flag in hole,E0.6
+Activities,sport,26F8 FE0F,fully-qualified,⛸️,ice skate,E0.7
+Activities,sport,26F8,unqualified,⛸,ice skate,E0.7
+Activities,sport,1F3A3,fully-qualified,🎣,fishing pole,E0.6
+Activities,sport,1F93F,fully-qualified,🤿,diving mask,E12.0
+Activities,sport,1F3BD,fully-qualified,🎽,running shirt,E0.6
+Activities,sport,1F3BF,fully-qualified,🎿,skis,E0.6
+Activities,sport,1F6F7,fully-qualified,🛷,sled,E5.0
+Activities,sport,1F94C,fully-qualified,🥌,curling stone,E5.0
+Activities,game,1F3AF,fully-qualified,🎯,bullseye,E0.6
+Activities,game,1FA80,fully-qualified,🪀,yo-yo,E12.0
+Activities,game,1FA81,fully-qualified,🪁,kite,E12.0
+Activities,game,1F52B,fully-qualified,🔫,water pistol,E0.6
+Activities,game,1F3B1,fully-qualified,🎱,pool 8 ball,E0.6
+Activities,game,1F52E,fully-qualified,🔮,crystal ball,E0.6
+Activities,game,1FA84,fully-qualified,🪄,magic wand,E13.0
+Activities,game,1F3AE,fully-qualified,🎮,video game,E0.6
+Activities,game,1F579 FE0F,fully-qualified,🕹️,joystick,E0.7
+Activities,game,1F579,unqualified,🕹,joystick,E0.7
+Activities,game,1F3B0,fully-qualified,🎰,slot machine,E0.6
+Activities,game,1F3B2,fully-qualified,🎲,game die,E0.6
+Activities,game,1F9E9,fully-qualified,🧩,puzzle piece,E11.0
+Activities,game,1F9F8,fully-qualified,🧸,teddy bear,E11.0
+Activities,game,1FA85,fully-qualified,🪅,piata,E13.0
+Activities,game,1FAA9,fully-qualified,🪩,mirror ball,E14.0
+Activities,game,1FA86,fully-qualified,🪆,nesting dolls,E13.0
+Activities,game,2660 FE0F,fully-qualified,♠️,spade suit,E0.6
+Activities,game,2660,unqualified,♠,spade suit,E0.6
+Activities,game,2665 FE0F,fully-qualified,♥️,heart suit,E0.6
+Activities,game,2665,unqualified,♥,heart suit,E0.6
+Activities,game,2666 FE0F,fully-qualified,♦️,diamond suit,E0.6
+Activities,game,2666,unqualified,♦,diamond suit,E0.6
+Activities,game,2663 FE0F,fully-qualified,♣️,club suit,E0.6
+Activities,game,2663,unqualified,♣,club suit,E0.6
+Activities,game,265F FE0F,fully-qualified,♟️,chess pawn,E11.0
+Activities,game,265F,unqualified,♟,chess pawn,E11.0
+Activities,game,1F0CF,fully-qualified,🃏,joker,E0.6
+Activities,game,1F004,fully-qualified,🀄,mahjong red dragon,E0.6
+Activities,game,1F3B4,fully-qualified,🎴,flower playing cards,E0.6
+Activities,arts-crafts,1F3AD,fully-qualified,🎭,performing arts,E0.6
+Activities,arts-crafts,1F5BC FE0F,fully-qualified,🖼️,framed picture,E0.7
+Activities,arts-crafts,1F5BC,unqualified,🖼,framed picture,E0.7
+Activities,arts-crafts,1F3A8,fully-qualified,🎨,artist palette,E0.6
+Activities,arts-crafts,1F9F5,fully-qualified,🧵,thread,E11.0
+Activities,arts-crafts,1FAA1,fully-qualified,🪡,sewing needle,E13.0
+Activities,arts-crafts,1F9F6,fully-qualified,🧶,yarn,E11.0
+Activities,arts-crafts,1FAA2,fully-qualified,🪢,knot,E13.0
+Animals-Nature,animal-mammal,1F435,fully-qualified,🐵,monkey face,E0.6
+Animals-Nature,animal-mammal,1F412,fully-qualified,🐒,monkey,E0.6
+Animals-Nature,animal-mammal,1F98D,fully-qualified,🦍,gorilla,E3.0
+Animals-Nature,animal-mammal,1F9A7,fully-qualified,🦧,orangutan,E12.0
+Animals-Nature,animal-mammal,1F436,fully-qualified,🐶,dog face,E0.6
+Animals-Nature,animal-mammal,1F415,fully-qualified,🐕,dog,E0.7
+Animals-Nature,animal-mammal,1F9AE,fully-qualified,🦮,guide dog,E12.0
+Animals-Nature,animal-mammal,1F415 200D 1F9BA,fully-qualified,🐕‍🦺,service dog,E12.0
+Animals-Nature,animal-mammal,1F429,fully-qualified,🐩,poodle,E0.6
+Animals-Nature,animal-mammal,1F43A,fully-qualified,🐺,wolf,E0.6
+Animals-Nature,animal-mammal,1F98A,fully-qualified,🦊,fox,E3.0
+Animals-Nature,animal-mammal,1F99D,fully-qualified,🦝,raccoon,E11.0
+Animals-Nature,animal-mammal,1F431,fully-qualified,🐱,cat face,E0.6
+Animals-Nature,animal-mammal,1F408,fully-qualified,🐈,cat,E0.7
+Animals-Nature,animal-mammal,1F408 200D 2B1B,fully-qualified,🐈‍⬛,black cat,E13.0
+Animals-Nature,animal-mammal,1F981,fully-qualified,🦁,lion,E1.0
+Animals-Nature,animal-mammal,1F42F,fully-qualified,🐯,tiger face,E0.6
+Animals-Nature,animal-mammal,1F405,fully-qualified,🐅,tiger,E1.0
+Animals-Nature,animal-mammal,1F406,fully-qualified,🐆,leopard,E1.0
+Animals-Nature,animal-mammal,1F434,fully-qualified,🐴,horse face,E0.6
+Animals-Nature,animal-mammal,1FACE,fully-qualified,🫎,moose,E15.0
+Animals-Nature,animal-mammal,1FACF,fully-qualified,🫏,donkey,E15.0
+Animals-Nature,animal-mammal,1F40E,fully-qualified,🐎,horse,E0.6
+Animals-Nature,animal-mammal,1F984,fully-qualified,🦄,unicorn,E1.0
+Animals-Nature,animal-mammal,1F993,fully-qualified,🦓,zebra,E5.0
+Animals-Nature,animal-mammal,1F98C,fully-qualified,🦌,deer,E3.0
+Animals-Nature,animal-mammal,1F9AC,fully-qualified,🦬,bison,E13.0
+Animals-Nature,animal-mammal,1F42E,fully-qualified,🐮,cow face,E0.6
+Animals-Nature,animal-mammal,1F402,fully-qualified,🐂,ox,E1.0
+Animals-Nature,animal-mammal,1F403,fully-qualified,🐃,water buffalo,E1.0
+Animals-Nature,animal-mammal,1F404,fully-qualified,🐄,cow,E1.0
+Animals-Nature,animal-mammal,1F437,fully-qualified,🐷,pig face,E0.6
+Animals-Nature,animal-mammal,1F416,fully-qualified,🐖,pig,E1.0
+Animals-Nature,animal-mammal,1F417,fully-qualified,🐗,boar,E0.6
+Animals-Nature,animal-mammal,1F43D,fully-qualified,🐽,pig nose,E0.6
+Animals-Nature,animal-mammal,1F40F,fully-qualified,🐏,ram,E1.0
+Animals-Nature,animal-mammal,1F411,fully-qualified,🐑,ewe,E0.6
+Animals-Nature,animal-mammal,1F410,fully-qualified,🐐,goat,E1.0
+Animals-Nature,animal-mammal,1F42A,fully-qualified,🐪,camel,E1.0
+Animals-Nature,animal-mammal,1F42B,fully-qualified,🐫,two-hump camel,E0.6
+Animals-Nature,animal-mammal,1F999,fully-qualified,🦙,llama,E11.0
+Animals-Nature,animal-mammal,1F992,fully-qualified,🦒,giraffe,E5.0
+Animals-Nature,animal-mammal,1F418,fully-qualified,🐘,elephant,E0.6
+Animals-Nature,animal-mammal,1F9A3,fully-qualified,🦣,mammoth,E13.0
+Animals-Nature,animal-mammal,1F98F,fully-qualified,🦏,rhinoceros,E3.0
+Animals-Nature,animal-mammal,1F99B,fully-qualified,🦛,hippopotamus,E11.0
+Animals-Nature,animal-mammal,1F42D,fully-qualified,🐭,mouse face,E0.6
+Animals-Nature,animal-mammal,1F401,fully-qualified,🐁,mouse,E1.0
+Animals-Nature,animal-mammal,1F400,fully-qualified,🐀,rat,E1.0
+Animals-Nature,animal-mammal,1F439,fully-qualified,🐹,hamster,E0.6
+Animals-Nature,animal-mammal,1F430,fully-qualified,🐰,rabbit face,E0.6
+Animals-Nature,animal-mammal,1F407,fully-qualified,🐇,rabbit,E1.0
+Animals-Nature,animal-mammal,1F43F FE0F,fully-qualified,🐿️,chipmunk,E0.7
+Animals-Nature,animal-mammal,1F43F,unqualified,🐿,chipmunk,E0.7

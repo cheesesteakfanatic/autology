@@ -1009,6 +1009,164 @@ td.cited { position: relative; }
 .node-card .nc-prop { font-family: var(--mono); font-size: var(--fs-1); color: var(--ink-dim); }
 .node-card .nc-prop .dt { color: var(--ink-faint); }
 
+/* ════════════════════ the Atlas — the visual grammar of certainty ═══
+   confirmed joins are solid hairlines; LIKELY joins are dashed amber
+   hypotheses (opacity ∝ score, breathing only on hover); hints are
+   nearly invisible dots, off by default; silos are quieter but
+   dignified — never error-red. Hairlines hold their width at every
+   zoom (non-scaling-stroke); only the stars scale. */
+
+.constellation .island-hull {
+  fill: var(--amber);
+  fill-opacity: 0.022;
+  stroke: var(--hairline);
+  vector-effect: non-scaling-stroke;
+}
+.constellation .island-label {
+  font-family: var(--serif);
+  font-variant: small-caps;
+  letter-spacing: 0.08em;
+  font-size: 13px;
+  fill: var(--ink-dim);
+  cursor: pointer;
+}
+.constellation .island-label:hover { fill: var(--ink); }
+.constellation .island-label .il-count { fill: var(--ink-faint); font-variant: normal; font-size: 0.82em; }
+
+.constellation .atlas-edge { fill: none; stroke-width: 1; pointer-events: none; vector-effect: non-scaling-stroke; }
+.constellation .tier-confirmed { stroke: var(--amber-dim); stroke-opacity: 0.28; }
+.constellation .tier-likely    { stroke: var(--amber); stroke-dasharray: 4 6; }   /* opacity ∝ score, set per arc */
+.constellation .tier-hint      { stroke: var(--ink-faint); stroke-dasharray: 1 5; stroke-opacity: 0.13; }
+
+/* invisible wide hit twins make hairline arcs honestly hoverable */
+.constellation .edge-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 9;
+  stroke-dasharray: none;
+  pointer-events: stroke;
+  cursor: pointer;
+  vector-effect: non-scaling-stroke;
+}
+
+.constellation path.lit.tier-confirmed { stroke-opacity: 0.8; }
+.constellation path.lit.tier-hint { stroke-opacity: 0.45; }
+.constellation path.lit.tier-likely { animation: likely-breathe 1.8s ease-in-out infinite; }
+@keyframes likely-breathe {
+  0%, 100% { stroke-opacity: 0.92; }
+  50%      { stroke-opacity: 0.5; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .constellation path.lit.tier-likely { animation: none; stroke-opacity: 0.92; }
+}
+
+/* legend chips are filter toggles — these classes hide whole tiers */
+.constellation.hide-confirmed .tier-confirmed,
+.constellation.hide-likely    .tier-likely,
+.constellation.hide-hint      .tier-hint,
+.constellation.hide-silos     .archipelago,
+.constellation.hide-silos     .touches-silo { display: none; }
+
+/* class labels yield below the zoom threshold; island labels never do.
+   At the same altitude the hypothesis field calms so the confirmed
+   geography reads first — descending reveals the dashed amber. */
+.constellation.labels-hidden .node-label { display: none; }
+.constellation.labels-hidden path.tier-likely { stroke-opacity: 0.13; }
+.constellation.labels-hidden path.tier-hint { stroke-opacity: 0.05; }
+.constellation.labels-hidden path.lit.tier-likely { stroke-opacity: 0.92; }
+
+/* the archipelago band: silos collect along the bottom, dimmer, dignified */
+.constellation .archipelago { opacity: 0.85; }
+.constellation .archipelago .node-core { stroke: var(--ink-dim); }
+.constellation .archipelago .node-label { fill: var(--ink-faint); }
+.constellation .archipelago-line { stroke: var(--hairline); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.constellation .archipelago-label { cursor: default; fill: var(--ink-faint); }
+
+.tier-toggle {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  background: none;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  padding: 0.1rem 0.65rem;
+  font-family: var(--sans);
+  font-size: var(--fs-0);
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+  cursor: pointer;
+  transition: color var(--ease), border-color var(--ease), background var(--ease);
+}
+.tier-toggle:hover { color: var(--ink-dim); }
+.tier-toggle.on { color: var(--ink-dim); border-color: var(--hairline-strong); background: var(--bg3); }
+.tier-toggle.on:hover { color: var(--ink); }
+.tier-toggle b { font-family: var(--mono); font-weight: 600; color: inherit; }
+.tier-toggle:not(.on) i { opacity: 0.35; }
+.lg-confirmed { width: 16px; height: 1px; background: var(--amber-dim); }
+.lg-likely    { width: 16px; height: 0; border-top: 1px dashed var(--amber); }
+.lg-hintline  { width: 16px; height: 0; border-top: 1px dotted var(--ink-faint); }
+.lg-silo      { width: 9px; height: 9px; border-radius: 50%; background: var(--bg2); border: 1px solid var(--ink-dim); }
+.atlas-absent { color: var(--ink-faint); font-style: italic; letter-spacing: 0.04em; }
+
+/* the evidence card — why the instrument believes a LIKELY join */
+.evidence-card {
+  position: absolute;
+  max-width: 21rem;
+  background: var(--bg2);
+  border: 1px solid var(--hairline-strong);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  pointer-events: none;
+  z-index: 6;
+}
+.evidence-card.pinned { pointer-events: auto; border-color: var(--amber-line); }
+.evidence-card .ev-head { display: flex; align-items: baseline; gap: 0.75em; }
+.evidence-card .ev-tier {
+  font-size: var(--fs-0);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.evidence-card .ev-likely { color: var(--amber); }
+.evidence-card .ev-confirmed { color: var(--amber-dim); }
+.evidence-card .ev-hint { color: var(--ink-faint); }
+.evidence-card .ev-score { font-family: var(--mono); font-size: var(--fs-1); color: var(--ink-dim); }
+.evidence-card .ev-cols {
+  font-family: var(--mono);
+  font-size: var(--fs-1);
+  color: var(--ink);
+  margin: 0.35rem 0 0.2rem;
+  overflow-wrap: anywhere;
+}
+.evidence-card .ev-meta { font-size: var(--fs-0); letter-spacing: 0.06em; color: var(--ink-faint); margin-bottom: 0.45rem; }
+.evidence-card .ev-samples { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.evidence-card .ev-sample {
+  font-family: var(--mono);
+  font-size: var(--fs-0);
+  color: var(--ink-dim);
+  background: var(--bg3);
+  border: 1px solid var(--hairline);
+  border-radius: 3px;
+  padding: 0 0.4em;
+  max-width: 9.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.evidence-card .ev-pin-hint { font-size: var(--fs-0); letter-spacing: 0.06em; color: var(--ink-faint); margin-top: 0.45rem; }
+.evidence-card .ev-unpin {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.4rem;
+  background: none;
+  border: none;
+  padding: 0 0.2em;
+  color: var(--ink-faint);
+  font-size: var(--fs-2);
+  cursor: pointer;
+}
+.evidence-card .ev-unpin:hover { color: var(--ink); }
+
 .class-detail {
   flex: none;
   max-height: 45%;

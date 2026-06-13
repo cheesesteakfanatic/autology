@@ -1,0 +1,84 @@
+city,state,2014_murders,change
+Baltimore,Maryland,211,133
+Chicago,Illinois,411,67
+Houston,Texas,242,61
+Cleveland,Ohio,63,57
+Washington,D.C.,105,57
+Milwaukee,Wisconsin,90,55
+Philadelphia,Pennsylvania,248,32
+Kansas City,Missouri,78,31
+Nashville,Tennessee,41,31
+St. Louis,Missouri,159,29
+Oklahoma City,Oklahoma,45,28
+Louisville,Kentucky,56,25
+Denver,Colorado,31,22
+Los Angeles,California,260,22
+Dallas,Texas,116,20
+New York,New York,333,19
+Orlando,Florida,15,17
+Minneapolis,Minnesota,31,16
+Omaha,Nebraska,32,16
+Sacramento,California,28,15
+Anchorage,Alaska,12,14
+Charlotte-Mecklenburg,North Carolina,47,14
+New Orleans,Louisiana,150,14
+Albuquerque,New Mexico,30,13
+Aurora,Colorado,11,13
+Fort Wayne,Indiana,12,13
+Long Beach,California,23,13
+Durham,North Carolina,21,13
+Indianapolis,Indiana,136,12
+Newark,New Jersey,93,11
+Tulsa,Oklahoma,46,9
+Portland,Oregon,26,8
+San Francisco,California,45,8
+Cincinnati,Ohio,60,6
+Tampa,Florida,28,6
+Bakersfield,California,17,5
+Colorado Springs,Colorado,20,5
+Las Vegas,Nevada,122,5
+Oakland,California,80,5
+San Diego,California,32,5
+St. Paul,Minnesota,11,5
+Anaheim,California,14,4
+Greensboro,North Carolina,23,3
+Jersey City,New Jersey,24,3
+Mesa,Arizona,13,3
+Fort Worth,Texas,54,2
+Virginia Beach,Virginia,17,2
+Irvine,California,0,2
+Atlanta,Georgia,93,1
+Henderson,Nevada,3,1
+Jacksonville,Florida,96,1
+Raleigh,North Carolina,16,1
+Wichita,Kansas,26,1
+Chandler,Arizona,1,0
+Plano,Texas,4,0
+Stockton,California,49,0
+Toledo,Ohio,24,0
+Chula Vista,California,7,-1
+Phoenix,Arizona,114,-2
+Riverside,California,12,-2
+San Jose,California,32,-2
+Detroit,Michigan,298,-3
+Seattle,Washington,26,-3
+El Paso,Texas,21,-4
+Tucson,Arizona,35,-4
+Arlington,Texas,13,-5
+Lexington,Kentucky,20,-5
+Memphis,Tennessee,140,-5
+St. Petersburg,Florida,19,-5
+Columbus,Ohio,83,-6
+Honolulu,Hawaii,21,-6
+Laredo,Texas,14,-6
+Lincoln,Nebraska,7,-6
+Miami,Florida,81,-6
+Santa Ana,California,18,-6
+Mobile,Alabama,31,-7
+Fresno,California,47,-8
+Austin,Texas,32,-9
+San Antonio,Texas,103,-9
+Corpus Christi,Texas,27,-10
+Pittsburgh,Pennsylvania,69,-12
+Boston,Massachusetts,53,-15
+Buffalo,New York,60,-19

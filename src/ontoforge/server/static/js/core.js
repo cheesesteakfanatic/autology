@@ -112,7 +112,7 @@ export const store = {
 
 /* ───────────────────────────── shared world cache (status + ontology) */
 
-const cache = { ontology: null, ontologyPromise: null };
+const cache = { ontology: null, ontologyPromise: null, atlas: null, atlasPromise: null };
 
 export function loadOntology() {
   if (!cache.ontologyPromise) {
@@ -125,7 +125,21 @@ export function loadOntology() {
 
 export function ontologyNow() { return cache.ontology; }
 
+/** The Atlas — GET /api/atlas. The endpoint may not exist yet (a parallel
+    crew owns it): resolve null instead of throwing, so the constellation
+    can fall back to the plain ontology sky with a quiet note. */
+export function loadAtlas() {
+  if (!cache.atlasPromise) {
+    cache.atlasPromise = api("/api/atlas")
+      .then((a) => { cache.atlas = a; return a; })
+      .catch(() => { cache.atlas = null; return null; });
+  }
+  return cache.atlasPromise;
+}
+
 export function dropCaches() {
   cache.ontology = null;
   cache.ontologyPromise = null;
+  cache.atlas = null;
+  cache.atlasPromise = null;
 }

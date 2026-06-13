@@ -23,6 +23,7 @@ must load.
 from __future__ import annotations
 
 import re
+from pathlib import Path
 from typing import Any, Optional
 
 from ontoforge.contracts import Interval, Layer, LinkCell, Ontology, ValueCell, leaf, make_cell_atom
@@ -187,10 +188,18 @@ def materialize_induced(
     ledger: Any,
     *,
     resolutions: Optional[dict[str, ClassResolution]] = None,
+    atlas_dir: Optional[Path] = None,
 ) -> dict[str, Any]:
     """Commit the estate into HEARTH under the INDUCED ontology. Returns stats
     ``{entities, cells, links, classes, er, plans}``; ``induced_ontology`` is
-    enriched IN PLACE (callers persist it as the materialized ontology)."""
+    enriched IN PLACE (callers persist it as the materialized ontology).
+
+    ``atlas_dir`` (optional, new): when given, the connection atlas is built
+    from the just-enriched ontology at the END of materialization and written
+    to ``<atlas_dir>/atlas.json`` (plus a ledger 'atlas' artifact). Existing
+    callers — including the frozen CLI — pass nothing and are byte-identical;
+    CLI projects rebuild the atlas offline via
+    ``python -m ontoforge.pipeline.atlas <project_dir>``."""
     onto = induced_ontology
     artifacts = strata_artifacts
     plans = build_plans(artifacts.strata, onto)
@@ -399,4 +408,10 @@ def materialize_induced(
         {"class": p.class_name, "kind": p.kind, "cid": p.cid, "table": p.table}
         for p in plans
     ]
+    if atlas_dir is not None:
+        from .atlas import build_and_persist_atlas
+
+        build_and_persist_atlas(
+            atlas_dir, estate, artifacts, ontology=onto, ledger=ledger
+        )
     return stats

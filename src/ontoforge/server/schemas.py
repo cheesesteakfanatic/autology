@@ -287,6 +287,66 @@ class ExportsOut(BaseModel):
     exports: list[ExportBundleOut]
 
 
+# ---------------------------------------------------------------------- atlas
+
+
+class AtlasEvidence(BaseModel):
+    """WHY one atlas arc exists — the evidence-card contract."""
+
+    coverage: float
+    overlap_count: int
+    sample_shared_values: list[str] = Field(default_factory=list)
+    name_similarity: float
+    semtype_match: bool
+
+
+class AtlasLink(BaseModel):
+    """One tiered arc between two class URIs."""
+
+    src_class: str
+    dst_class: str
+    src_prop: Optional[str] = None
+    dst_prop: Optional[str] = None
+    tier: Literal["confirmed", "likely", "hint"]
+    score: float
+    evidence: AtlasEvidence
+
+
+class AtlasComponent(BaseModel):
+    """One island (or silo) of confirmed-connected classes."""
+
+    id: str
+    label: str
+    class_uris: list[str]
+    dataset_count: int
+    is_silo: bool
+
+
+class AtlasStats(BaseModel):
+    classes: int
+    components: int
+    silos: int
+    confirmed: int
+    likely: int
+    hint: int
+
+
+class AtlasOut(BaseModel):
+    """GET /api/atlas — the full connection atlas the constellation renders."""
+
+    components: list[AtlasComponent]
+    links: list[AtlasLink]
+    stats: AtlasStats
+
+
+class AtlasLinksOut(BaseModel):
+    """GET /api/atlas/link?src=&dst= — the matching arcs with full evidence."""
+
+    src: str
+    dst: str
+    links: list[AtlasLink]
+
+
 # --------------------------------------------------------------------- reload
 
 

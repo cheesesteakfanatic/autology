@@ -1,0 +1,151 @@
+Status,CommonCode,Name,Description,LevelAndCategory,Symbol,ConversionFactor
+X,05,lift,,3.9,,
+X,06,small spray,,3.9,,
+X,08,heat lot,,3.9,,
+,10,group,A unit of count defining the number of groups (group: set of items classified together).,3.9,,
+,11,outfit,A unit of count defining the number of outfits (outfit: a complete set of equipment / materials / objects used for a specific purpose).,3.9,,
+,13,ration,A unit of count defining the number of rations (ration: a single portion of provisions).,3.9,,
+,14,shot,"A unit of liquid measure, especially related to spirits.",3.9,,
+,15,"stick, military",A unit of count defining the number of military sticks (military stick: bombs or paratroops released in rapid succession from an aircraft).,3.9,,
+X,16,hundred fifteen kg drum,,3.3,,
+X,17,hundred lb drum,,3.3,,
+X,18,fiftyfive gallon (US) drum,,3.3,,
+X,19,tank truck,,3.4,,
+,20,twenty foot container,A unit of count defining the number of shipping containers that measure 20 foot in length.,3.4,,
+,21,forty foot container,A unit of count defining the number of shipping containers that measure 40 foot in length.,3.4,,
+,22,decilitre per gram,,1M,dl/g,10⁻¹ x m³/kg
+,23,gram per cubic centimetre,,1S,g/cm³,10³ kg/m³
+,24,theoretical pound,A unit of mass defining the expected mass of material expressed as the number of pounds.,3.1,,
+,25,gram per square centimetre,,1M,g/cm²,10 kg/m²
+X,26,actual ton,,3.1,,
+,27,theoretical ton,"A unit of mass defining the expected mass of material, expressed as the number of tons.",3.1,,
+,28,kilogram per square metre,,1,kg/m²,kg/m²
+X,29,pound per thousand square foot,,3.8,lb/kft²,
+X,30,horse power day per air dry metric ton,,3.5,,
+X,31,catch weight,,3.9,,
+X,32,kilogram per air dry metric ton,,3.5,,
+,33,kilopascal square metre per gram,,1M,kPa·m²/g,10⁶ m/s²
+,34,kilopascal per millimetre,,1M,kPa/mm,10⁶ kg/(m² x s²)
+,35,millilitre per square centimetre second,,1M,ml/(cm²·s),10⁻² m/s
+X,36,cubic foot per minute per square foot,Conversion factor required,1M,ft³/(min/ft²),
+,37,ounce per square foot,,2,oz/ft²,"0,305 151 7 kg/m²"
+,38,"ounce per square foot per 0,01inch",,3.9,oz/(ft²/cin),
+,40,millilitre per second,,1M,ml/s,10⁻⁶ m³/s
+,41,millilitre per minute,,1M,ml/min,"1,666 67 x 10⁻⁸ m³/s"
+X,43,super bulk bag,"Use UN/ECE Recommendation 21 (refer to Note 2 in the spreadsheet introduction, 1st sheet).",3.3,,
+X,44,fivehundred kg bulk bag,,3.3,,
+X,45,threehundred kg bulk bag,,3.3,,
+X,46,fifty lb bulk bag,,3.3,,
+X,47,fifty lb bag,,3.3,,
+X,48,bulk car load,,3.4,,
+X,53,theoretical kilogram,,3.1,,
+X,54,theoretical tonne,,3.1,,
+,56,sitas,A unit of area for tin plate equal to a surface area of 100 square metres.,3.9,,
+,57,mesh,A unit of count defining the number of strands per inch as a measure of the fineness of a woven product.,3.9,,
+,58,net kilogram,A unit of mass defining the total number of kilograms after deductions.,3.1,,
+,59,part per million,A unit of proportion equal to 10⁻⁶.,3.7,ppm,1 x 10⁻⁶
+,60,percent weight,A unit of proportion equal to 10⁻².,3.7,,1 x 10⁻²
+,61,part per billion (US),A unit of proportion equal to 10⁻⁹.,3.7,ppb,1 x 10⁻⁹
+X,62,percent per 1000 hour,,3.7,,
+X,63,failure rate in time,,3.9,,
+D,64,"pound per square inch, gauge",,3.1,,"7,030 696 x 10² kg/m²"
+D,66,oersted,,3.5,Oe,"7,957 747 x 10 A/m"
+X,69,test specific scale,,3.9,,
+X,71,volt ampere per pound,,3.9,,
+X,72,watt per pound,,3.9,,
+X,73,ampere tum per centimetre,,3.9,,
+,74,millipascal,,1S,mPa,10⁻³ Pa
+D,76,gauss,,3.5,Gs,10⁻⁴ T
+,77,milli-inch,,2,mil,"25,4 x 10⁻⁶ m"
+D,78,kilogauss,,3.5,kGs,10⁻¹ T
+,80,pound per square inch absolute,,2,lb/in²,"7,030 696 x 10² kg/m²"
+,81,henry,,1,H,H
+D,84,kilopound-force per square inch,"A unit of pressure defining the number of kilopounds force per square inch.,Use kip per square inch (common code N20).",2,klbf/in²,"6,894 757 x 10⁶ Pa"
+,85,foot pound-force,,2,ft·lbf,"1,355 818 J"
+,87,pound per cubic foot,,2,lb/ft³,"1,601 846 x 10¹ kg/m³"
+,89,poise,,2,P,"0,1 Pa x s"
+X,90,Saybold universal second,,3.9,,
+,91,stokes,,2,St,10⁻⁴ m²/s
+X,92,calorie per cubic centimetre,,3.9,,
+X,93,calorie per gram,Use International Table (IT) calorie per gram (common code D75).,3.5,cal/g,"4,186 8 x 10³ J/kg"
+X,94,curl unit,,3.9,,
+X,95,twenty thousand gallon (US) tankcar,,3.4,,
+X,96,ten thousand gallon (US) tankcar,,3.4,,
+X,97,ten kg drum,,3.3,,
+X,98,fifteen kg drum,,3.3,,
+X,1A,car mile,,3.5,,
+X,1B,car count,,3.5,,
+X,1C,locomotive count,,3.5,,
+X,1D,caboose count,,3.5,,
+X,1E,empty car,,3.5,,
+X,1F,train mile,,3.5,,
+X,1G,fuel usage gallon (US),,3.5,,
+X,1H,caboose mile,,3.5,,
+,1I,fixed rate,A unit of quantity expressed as a predetermined or set rate for usage of a facility or service.,3.9,,
+X,1J,ton mile,,3.5,,
+X,1K,locomotive mile,,3.5,,
+X,1L,total car count,,3.5,,
+X,1M,total car mile,,3.5,,
+X,1X,quarter mile,,3.8,,
+,2A,radian per second,Refer ISO/TC12 SI Guide,1,rad/s,rad/s
+,2B,radian per second squared,Refer ISO/TC12 SI Guide,1,rad/s²,rad/s²
+,2C,roentgen,,2,R,"2,58 x 10⁻⁴ C/kg"
+,2G,volt AC,A unit of electric potential in relation to alternating current (AC).,3.1,V,V
+,2H,volt DC,A unit of electric potential in relation to direct current (DC).,3.1,V,V
+,2I,British thermal unit (international table) per hour,,2,BtuIT/h,"2,930 711x 10⁻¹ W"
+,2J,cubic centimetre per second,,1S,cm³/s,10⁻⁶ m³/s
+,2K,cubic foot per hour,,2,ft³/h,"7,865 79 x 10⁻⁶ m³/s"
+,2L,cubic foot per minute,,2,ft³/min,"4,719 474 x 10⁻⁴ m³/s"
+,2M,centimetre per second,,1S,cm/s,10⁻² m/s
+,2N,decibel,,1,dB,"0,115 129 3 Np"
+,2P,kilobyte,A unit of information equal to 10³ (1000) bytes.,3.6,kbyte,
+,2Q,kilobecquerel,,1S,kBq,10³ Bq
+,2R,kilocurie,,2S,kCi,"3,7 x 10¹³ Bq"
+,2U,megagram,,1S,Mg,10³ kg
+X,2V,megagram per hour,,3.8,Mg/h,
+X,2W,bin,"Use UN/ECE Recommendation 21 (refer to Note 2 in the spreadsheet introduction, 1st sheet).",3.3,,
+,2X,metre per minute,,1M,m/min,"0,016 666 m/s"
+,2Y,milliroentgen,,2,mR,"2,58 x 10⁻⁷ C/kg"
+,2Z,millivolt,,1S,mV,10⁻³ V
+,3B,megajoule,,1S,MJ,10⁶ J
+,3C,manmonth,A unit of count defining the number of months for a person or persons to perform an undertaking.,3.9,,
+X,3E,pound per pound of product,,3.9,,
+X,3G,pound per piece of product,,3.9,,
+X,3H,kilogram per kilogram of product,,3.9,,
+X,3I,kilogram per piece of product,,3.9,,
+X,4A,bobbin,"Use UN/ECE Recommendation 21 (refer to Note 2 in the spreadsheet introduction, 1st sheet).",3.3,,
+X,4B,cap,,3.9,,
+,4C,centistokes,,2,cSt,10⁻⁶ m²/s
+X,4E,twenty pack,,3.2,,
+,4G,microlitre,,1M,µl,10⁻⁹ m³
+,4H,micrometre (micron),,1S,µm,10⁻⁶ m
+,4K,milliampere,,1S,mA,10⁻³ A
+,4L,megabyte,A unit of information equal to 10⁶ (1000000) bytes.,3.6,Mbyte,
+,4M,milligram per hour,,1M,mg/h,"2,777 78 x 10⁻¹⁰ kg/s"
+,4N,megabecquerel,,1S,MBq,10⁶ Bq
+,4O,microfarad,,1S,µF,10⁻⁶ F
+,4P,newton per metre,,1,N/m,N/m
+,4Q,ounce inch,,2,oz·in,"7,200 778 x 10⁻⁴ kg x m"
+,4R,ounce foot,,2,oz·ft,"8,640 934 x 10⁻³ kg x m"
+,4T,picofarad,,1S,pF,10⁻¹² F
+,4U,pound per hour,,2,lb/h,"1,259 979 x 10⁻⁴ kg/s"
+,4W,ton (US) per hour,,2,ton (US) /h,"2,519 958 x 10⁻¹ kg/s"
+,4X,kilolitre per hour,,1M,kl/h,"2,777 78 x 10⁻⁴ m³/s"
+,5A,barrel (US) per minute,,2,barrel (US)/min,"2,649 79 x 10⁻³ m³/s"
+,5B,batch,A unit of count defining the number of batches (batch: quantity of material produced in one operation or number of animals or persons coming at once).,3.9,,
+X,5C,gallon(US) per thousand,,3.9,,
+,5E,MMSCF/day,A unit of volume equal to one million (1000000) cubic feet of gas per day.,3.9,,
+X,5F,pound per thousand,,3.9,,
+X,5G,pump,,3.9,,
+X,5H,stage,,3.9,,
+X,5I,standard cubic foot,Use standard (common code WSD),2,std,"4,672 m³"
+,5J,hydraulic horse power,A unit of power defining the hydraulic horse power delivered by a fluid pump depending on the viscosity of the fluid.,3.5,,
+X,5K,count per minute,,3.9,,
+X,5P,seismic level,,3.9,,
+X,5Q,seismic line,,3.9,,
+D,A1,15 °C calorie,,2,cal₁₅,"4,188 46  J"
+,A10,ampere square metre per joule second,,1,A·m²/(J·s),(A x s)/kg
+,A11,angstrom,,1,Å,10⁻¹⁰ m
+,A12,astronomical unit,,1,ua,"1,495 978 70 x 10¹¹ m"
+,A13,attojoule,,1S,aJ,10⁻¹⁸ J
+,A14,barn,,1,b,10⁻²⁸ m²

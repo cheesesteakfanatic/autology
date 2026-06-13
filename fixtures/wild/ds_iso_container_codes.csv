@@ -1,0 +1,151 @@
+code,description,length,height,group
+22B0,Bulk,20,8.5,22BU
+22B1,Dry Bulk,20,8.5,22BU
+22B3,Dry Bulk,20,8.5,22BU
+22B4,Dry Bulk,20,8.5,22BU
+22B5,Dry Bulk,20,8.5,22BU
+22B6,Dry Bulk,20,8.5,22BU
+22BK,Dry Bulk,20,8.5,22BU
+2080,Dry Bulk,20,8,22BU
+20B0,Dry Bulk,20,8,22BU
+20B1,Dry Bulk,20,8,22BU
+20B3,Dry Bulk,20,8,22BU
+20B4,Dry Bulk,20,8,22BU
+20B5,Dry Bulk,20,8,22BU
+20B6,Dry Bulk,20,8,22BU
+20BK,Dry Bulk,20,8,22BU
+20BU,Dry Bulk,20,8,22BU
+2280,Dry Bulk,20,8.5,22BU
+2281,Dry Bulk,20,8.5,22BU
+2299,Air/Surface,20,8.5,22BU
+22BU,Dry Bulk,20,8.5,22BU
+22G0,Standard Dry,20,8.5,22GP
+22G1,Standard Dry,20,8.5,22GP
+22G2,Standard Dry,20,8.5,22GP
+22G3,Standard Dry,20,8.5,22GP
+22V3,Standard Dry,20,8.5,22GP
+2300,Standard Dry,20,8.5,22GP
+2301,Standard Dry,20,8.5,22GP
+2302,Standard Dry,20,8.5,22GP
+2303,Standard Dry,20,8.5,22GP
+2304,Standard Dry,20,8.5,22GP
+2410,HIGH CUBE,20,9.5,22GP
+24G0,Standard Dry,20,9,22GP
+24G1,Standard Dry,20,9,22GP
+24G2,Standard Dry,20,9,22GP
+24G3,Standard Dry,20,9,22GP
+24GP,Standard Dry,20,9,22GP
+2500,Standard Dry,20,8.5,22GP
+25G0,Standard Dry High Cube,20,9,22GP
+2600,Standard Dry,20,4.25,22GP
+26G0,Standard Dry,20,9.5,22GP
+26G1,Standard Dry,20,9.5,22GP
+26G2,Standard Dry,20,9.5,22GP
+26G3,Standard Dry,20,9.5,22GP
+26GP,Standard Dry,20,9.5,22GP
+28G0,Standard Dry,20,4.25,22GP
+28GP,Standard Dry,20,4.25,22GP
+28U1,BIN HALF HEIGHT (OPEN TOP),20,4.25,22GP
+28U2,"OPENING(S) AT ONE OR BOTH ENDS, PLUS REMV TOP MEMB",20,8.5,22GP
+28UT,"OPENING(S) AT ONE OR BOTH ENDS, PLUS REMV TOP MEMB",20,8.5,22GP
+2994,Air/Surface,20,4,22GP
+2999,SLIDER CHASSIS,20,0,22GP
+3000,Standard Dry,30,8,22GP
+30G0,DRY CARGO/GENERAL PURPOSE,30,8,22GP
+3200,Standard Dry,30,8.5,22GP
+32G0,DRY CARGO/GENERAL PURPOSE,30,8.5,22GP
+3399,TRIAXLE CHASSIS,23,0,22GP
+7999,SLIDER CHASSIS,20,0,22GP
+B2G1,PASSIVE VENTS AT UPPER PART OF CARGO SPACE,24,8.5,22GP
+1000,Standard Dry,10,8,22GP
+10G0,DRY CARGO/GENERAL PURPOSE,10,8,22GP
+1200,Standard Dry,10,8.5,22GP
+12G0,DRY CARGO/GENERAL PURPOSE,10,8.5,22GP
+2000,Standard Dry,20,8,22GP
+2001,Standard Dry,20,8,22GP
+2002,Standard Dry,20,8,22GP
+2003,Standard Dry,20,8,22GP
+2004,Standard Dry,20,8,22GP
+2025,Livestock Carrier,20,8,22GP
+20G0,Standard Dry,20,8,22GP
+20G1,Standard Dry,20,8,22GP
+20G2,Standard Dry,20,8,22GP
+20G3,Standard Dry,20,8,22GP
+20GP,Standard Dry,20,8,22GP
+2101,Standard Dry,20,8,22GP
+2102,Standard Dry,20,8,22GP
+2103,Standard Dry,20,8,22GP
+2104,Standard Dry,20,8,22GP
+2125,Livestock Carrier,20,8,22GP
+2200,Standard Dry,20,8.5,22GP
+2201,Standard Dry,20,8.5,22GP
+2202,Standard Dry,20,8.5,22GP
+2204,Standard Dry,20,8.5,22GP
+2205,Standard Dry,20,8.5,22GP
+2210,Standard Dry,20,8.5,22GP
+2213,Standard Dry,20,8.5,22GP
+2225,Livestock Carrier,20,8.5,22GP
+22GP,Standard Dry,20,8.5,22GP
+2212,General Purpose (Hanging Garments),20,8.5,22GP
+25GP,High Cube,20,9.5,22GP
+22H0,Insulated (Conair),20,8.5,22HR
+22H1,Thermal Refrigerated/Heated,20,8.5,22HR
+22H2,Thermal Refrigerated/Heated,20,8.5,22HR
+22H5,Thermal Insulated,20,8.5,22HR
+22H6,Thermal Insulated,20,8.5,22HR
+22HI,Thermal Refrigerated/Heated,20,8.5,22HR
+24H5,Thermal Insulated,20,9,22HR
+24H6,Thermal Insulated,20,9,22HR
+2020,Thermal Insulated,20,8,22HR
+20H0,Thermal Refrigerated/Heated,20,8,22HR
+20H1,Thermal Refrigerated/Heated,20,8,22HR
+20H2,Thermal Refrigerated/Heated,20,8,22HR
+20H5,Thermal Insulated,20,8,22HR
+20H6,Thermal Insulated,20,8,22HR
+20HI,Thermal Refrigerated/Heated,20,8,22HR
+20HR,Thermal Refrigerated/Heated,20,8,22HR
+2220,Thermal Insulated,20,8.5,22HR
+2224,Insulated,20,8.5,22HR
+22HR,Thermal Refrigerated/Heated,20,8.5,22HR
+22P1,Flat Rack,20,8.5,22PF
+22P2,Platform,20,8.5,22PF
+22P4,Platform,20,8.5,22PF
+22P5,Platform,20,8.5,22PF
+22P7,PLATFORM FIXED,20,8.5,22PF
+22P8,Platform,20,8.5,22PF
+22P9,Platform,20,8.5,22PF
+22PL,Platform,20,8.5,22PF
+22PS,Platform,20,8.5,22PF
+2361,Platform,20,8.5,22PF
+2362,Platform,20,8.5,22PF
+2363,Platform,20,8.5,22PF
+2364,Platform,20,8.5,22PF
+2365,Platform,20,8.5,22PF
+2366,Platform,20,8.5,22PF
+2367,Platform,20,8.5,22PF
+2651,Open Top,20,4.25,22PF
+2661,Platform,20,4.25,22PF
+2761,Platform,20,4.25,22PF
+2063,Flat,20,8,22PF
+2066,Platform,20,8,22PF
+2067,Platform,20,8,22PF
+20P2,Platform,20,8,22PF
+20P4,Platform,20,8,22PF
+20P5,Platform,20,8,22PF
+20PC,Platform,20,8,22PF
+20PF,Platform,20,8,22PF
+20PL,Platform,20,8,22PF
+20PS,Platform,20,8,22PF
+2160,Flat,20,8,22PF
+2161,Platform,20,8,22PF
+2162,Platform,20,8,22PF
+2163,Platform,20,8,22PF
+2164,Platform,20,8,22PF
+2165,Platform,20,8,22PF
+2166,Platform,20,8,22PF
+2167,Platform,20,8,22PF
+2260,Flat,20,8.5,22PF
+2261,Flat,20,8.5,22PF
+2262,Platform,20,8.5,22PF
+2265,Platform,20,8.5,22PF
+2266,Platform,20,8.5,22PF

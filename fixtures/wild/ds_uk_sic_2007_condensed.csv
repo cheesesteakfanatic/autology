@@ -1,0 +1,151 @@
+sic_code,sic_description,section,section_description,sic_version
+1110,"Growing of cereals (except rice), leguminous crops and oil seeds",A,"Agriculture, Forestry and Fishing",SIC 2007
+1120,Growing of rice,A,"Agriculture, Forestry and Fishing",SIC 2007
+1130,"Growing of vegetables and melons, roots and tubers",A,"Agriculture, Forestry and Fishing",SIC 2007
+1140,Growing of sugar cane,A,"Agriculture, Forestry and Fishing",SIC 2007
+1150,Growing of tobacco,A,"Agriculture, Forestry and Fishing",SIC 2007
+1160,Growing of fibre crops,A,"Agriculture, Forestry and Fishing",SIC 2007
+1190,Growing of other non-perennial crops,A,"Agriculture, Forestry and Fishing",SIC 2007
+1210,Growing of grapes,A,"Agriculture, Forestry and Fishing",SIC 2007
+1220,Growing of tropical and subtropical fruits,A,"Agriculture, Forestry and Fishing",SIC 2007
+1230,Growing of citrus fruits,A,"Agriculture, Forestry and Fishing",SIC 2007
+1240,Growing of pome fruits and stone fruits,A,"Agriculture, Forestry and Fishing",SIC 2007
+1250,Growing of other tree and bush fruits and nuts,A,"Agriculture, Forestry and Fishing",SIC 2007
+1260,Growing of oleaginous fruits,A,"Agriculture, Forestry and Fishing",SIC 2007
+1270,Growing of beverage crops,A,"Agriculture, Forestry and Fishing",SIC 2007
+1280,"Growing of spices, aromatic, drug and pharmaceutical crops",A,"Agriculture, Forestry and Fishing",SIC 2007
+1290,Growing of other perennial crops,A,"Agriculture, Forestry and Fishing",SIC 2007
+1300,Plant propagation,A,"Agriculture, Forestry and Fishing",SIC 2007
+1410,Raising of dairy cattle,A,"Agriculture, Forestry and Fishing",SIC 2007
+1420,Raising of other cattle and buffaloes,A,"Agriculture, Forestry and Fishing",SIC 2007
+1430,Raising of horses and other equines,A,"Agriculture, Forestry and Fishing",SIC 2007
+1440,Raising of camels and camelids,A,"Agriculture, Forestry and Fishing",SIC 2007
+1450,Raising of sheep and goats,A,"Agriculture, Forestry and Fishing",SIC 2007
+1460,Raising of swine/pigs,A,"Agriculture, Forestry and Fishing",SIC 2007
+1470,Raising of poultry,A,"Agriculture, Forestry and Fishing",SIC 2007
+1490,Raising of other animals,A,"Agriculture, Forestry and Fishing",SIC 2007
+1500,Mixed farming,A,"Agriculture, Forestry and Fishing",SIC 2007
+1610,Support activities for crop production,A,"Agriculture, Forestry and Fishing",SIC 2007
+1621,Farm animal boarding and care,A,"Agriculture, Forestry and Fishing",SIC 2007
+1629,Support activities for animal production (other than farm animal boarding and care) n.e.c.,A,"Agriculture, Forestry and Fishing",SIC 2007
+1630,Post-harvest crop activities,A,"Agriculture, Forestry and Fishing",SIC 2007
+1640,Seed processing for propagation,A,"Agriculture, Forestry and Fishing",SIC 2007
+1700,"Hunting, trapping and related service activities",A,"Agriculture, Forestry and Fishing",SIC 2007
+2100,Silviculture and other forestry activities,A,"Agriculture, Forestry and Fishing",SIC 2007
+2200,Logging,A,"Agriculture, Forestry and Fishing",SIC 2007
+2300,Gathering of wild growing non-wood products,A,"Agriculture, Forestry and Fishing",SIC 2007
+2400,Support services to forestry,A,"Agriculture, Forestry and Fishing",SIC 2007
+3110,Marine fishing,A,"Agriculture, Forestry and Fishing",SIC 2007
+3120,Freshwater fishing,A,"Agriculture, Forestry and Fishing",SIC 2007
+3210,Marine aquaculture,A,"Agriculture, Forestry and Fishing",SIC 2007
+3220,Freshwater aquaculture,A,"Agriculture, Forestry and Fishing",SIC 2007
+5101,Deep coal mines,B,Mining and Quarrying,SIC 2007
+5102,Open cast coal working,B,Mining and Quarrying,SIC 2007
+5200,Mining of lignite,B,Mining and Quarrying,SIC 2007
+6100,Extraction of crude petroleum,B,Mining and Quarrying,SIC 2007
+6200,Extraction of natural gas,B,Mining and Quarrying,SIC 2007
+7100,Mining of iron ores,B,Mining and Quarrying,SIC 2007
+7210,Mining of uranium and thorium ores,B,Mining and Quarrying,SIC 2007
+7290,Mining of other non-ferrous metal ores,B,Mining and Quarrying,SIC 2007
+8110,"Quarrying of ornamental and building stone, limestone, gypsum, chalk and slate",B,Mining and Quarrying,SIC 2007
+8120,Operation of gravel and sand pits; mining of clays and kaolin,B,Mining and Quarrying,SIC 2007
+8910,Mining of chemical and fertilizer minerals,B,Mining and Quarrying,SIC 2007
+8920,Extraction of peat,B,Mining and Quarrying,SIC 2007
+8930,Extraction of salt,B,Mining and Quarrying,SIC 2007
+8990,Other mining and quarrying n.e.c.,B,Mining and Quarrying,SIC 2007
+9100,Support activities for petroleum and natural gas mining,B,Mining and Quarrying,SIC 2007
+9900,Support activities for other mining and quarrying,B,Mining and Quarrying,SIC 2007
+10110,Processing and preserving of meat,C,Manufacturing,SIC 2007
+10120,Processing and preserving of poultry meat,C,Manufacturing,SIC 2007
+10130,Production of meat and poultry meat products,C,Manufacturing,SIC 2007
+10200,"Processing and preserving of fish, crustaceans and molluscs",C,Manufacturing,SIC 2007
+10310,Processing and preserving of potatoes,C,Manufacturing,SIC 2007
+10320,Manufacture of fruit and vegetable juice,C,Manufacturing,SIC 2007
+10390,Other processing and preserving of fruit and vegetables,C,Manufacturing,SIC 2007
+10410,Manufacture of oils and fats,C,Manufacturing,SIC 2007
+10420,Manufacture of margarine and similar edible fats,C,Manufacturing,SIC 2007
+10511,Liquid milk and cream production,C,Manufacturing,SIC 2007
+10512,Butter and cheese production,C,Manufacturing,SIC 2007
+10519,Manufacture of other milk products,C,Manufacturing,SIC 2007
+10520,Manufacture of ice cream,C,Manufacturing,SIC 2007
+10611,Grain milling,C,Manufacturing,SIC 2007
+10612,Manufacture of breakfast cereals and cereals-based food,C,Manufacturing,SIC 2007
+10620,Manufacture of starches and starch products,C,Manufacturing,SIC 2007
+10710,Manufacture of bread; manufacture of fresh pastry goods and cakes,C,Manufacturing,SIC 2007
+10720,Manufacture of rusks and biscuits; manufacture of preserved pastry goods and cakes,C,Manufacturing,SIC 2007
+10730,"Manufacture of macaroni, noodles, couscous and similar farinaceous products",C,Manufacturing,SIC 2007
+10810,Manufacture of sugar,C,Manufacturing,SIC 2007
+10821,Manufacture of cocoa and chocolate confectionery,C,Manufacturing,SIC 2007
+10822,Manufacture of sugar confectionery,C,Manufacturing,SIC 2007
+10831,Tea processing,C,Manufacturing,SIC 2007
+10832,Production of coffee and coffee substitutes,C,Manufacturing,SIC 2007
+10840,Manufacture of condiments and seasonings,C,Manufacturing,SIC 2007
+10850,Manufacture of prepared meals and dishes,C,Manufacturing,SIC 2007
+10860,Manufacture of homogenized food preparations and dietetic food,C,Manufacturing,SIC 2007
+10890,Manufacture of other food products n.e.c.,C,Manufacturing,SIC 2007
+10910,Manufacture of prepared feeds for farm animals,C,Manufacturing,SIC 2007
+10920,Manufacture of prepared pet foods,C,Manufacturing,SIC 2007
+11010,"Distilling, rectifying and blending of spirits",C,Manufacturing,SIC 2007
+11020,Manufacture of wine from grape,C,Manufacturing,SIC 2007
+11030,Manufacture of cider and other fruit wines,C,Manufacturing,SIC 2007
+11040,Manufacture of other non-distilled fermented beverages,C,Manufacturing,SIC 2007
+11050,Manufacture of beer,C,Manufacturing,SIC 2007
+11060,Manufacture of malt,C,Manufacturing,SIC 2007
+11070,Manufacture of soft drinks; production of mineral waters and other bottled waters,C,Manufacturing,SIC 2007
+12000,Manufacture of tobacco products,C,Manufacturing,SIC 2007
+13100,Preparation and spinning of textile fibres,C,Manufacturing,SIC 2007
+13200,Weaving of textiles,C,Manufacturing,SIC 2007
+13300,Finishing of textiles,C,Manufacturing,SIC 2007
+13910,Manufacture of knitted and crocheted fabrics,C,Manufacturing,SIC 2007
+13921,Manufacture of soft furnishings,C,Manufacturing,SIC 2007
+13922,"Manufacture of canvas goods, sacks, etc.",C,Manufacturing,SIC 2007
+13923,Manufacture of household textiles,C,Manufacturing,SIC 2007
+13931,Manufacture of woven or tufted carpets and rugs,C,Manufacturing,SIC 2007
+13939,Manufacture of other carpets and rugs,C,Manufacturing,SIC 2007
+13940,"Manufacture of cordage, rope, twine and netting",C,Manufacturing,SIC 2007
+13950,"Manufacture of non-wovens and articles made from non-wovens, except apparel",C,Manufacturing,SIC 2007
+13960,Manufacture of other technical and industrial textiles,C,Manufacturing,SIC 2007
+13990,Manufacture of other textiles n.e.c.,C,Manufacturing,SIC 2007
+14110,Manufacture of leather clothes,C,Manufacturing,SIC 2007
+14120,Manufacture of workwear,C,Manufacturing,SIC 2007
+14131,Manufacture of other men's outerwear,C,Manufacturing,SIC 2007
+14132,Manufacture of other women's outerwear,C,Manufacturing,SIC 2007
+14141,Manufacture of men's underwear,C,Manufacturing,SIC 2007
+14142,Manufacture of women's underwear,C,Manufacturing,SIC 2007
+14190,Manufacture of other wearing apparel and accessories n.e.c.,C,Manufacturing,SIC 2007
+14200,Manufacture of articles of fur,C,Manufacturing,SIC 2007
+14310,Manufacture of knitted and crocheted hosiery,C,Manufacturing,SIC 2007
+14390,Manufacture of other knitted and crocheted apparel,C,Manufacturing,SIC 2007
+15110,Tanning and dressing of leather; dressing and dyeing of fur,C,Manufacturing,SIC 2007
+15120,"Manufacture of luggage, handbags and the like, saddlery and harness",C,Manufacturing,SIC 2007
+15200,Manufacture of footwear,C,Manufacturing,SIC 2007
+16100,Sawmilling and planing of wood,C,Manufacturing,SIC 2007
+16210,Manufacture of veneer sheets and wood-based panels,C,Manufacturing,SIC 2007
+16220,Manufacture of assembled parquet floors,C,Manufacturing,SIC 2007
+16230,Manufacture of other builders' carpentry and joinery,C,Manufacturing,SIC 2007
+16240,Manufacture of wooden containers,C,Manufacturing,SIC 2007
+16290,"Manufacture of other products of wood; manufacture of articles of cork, straw and plaiting materials",C,Manufacturing,SIC 2007
+17110,Manufacture of pulp,C,Manufacturing,SIC 2007
+17120,Manufacture of paper and paperboard,C,Manufacturing,SIC 2007
+17211,"Manufacture of corrugated paper and paperboard, sacks and bags",C,Manufacturing,SIC 2007
+17219,Manufacture of other paper and paperboard containers,C,Manufacturing,SIC 2007
+17220,Manufacture of household and sanitary goods and of toilet requisites,C,Manufacturing,SIC 2007
+17230,Manufacture of paper stationery,C,Manufacturing,SIC 2007
+17240,Manufacture of wallpaper,C,Manufacturing,SIC 2007
+17290,Manufacture of other articles of paper and paperboard n.e.c.,C,Manufacturing,SIC 2007
+18110,Printing of newspapers,C,Manufacturing,SIC 2007
+18121,Manufacture of printed labels,C,Manufacturing,SIC 2007
+18129,Printing n.e.c.,C,Manufacturing,SIC 2007
+18130,Pre-press and pre-media services,C,Manufacturing,SIC 2007
+18140,Binding and related services,C,Manufacturing,SIC 2007
+18201,Reproduction of sound recording,C,Manufacturing,SIC 2007
+18202,Reproduction of video recording,C,Manufacturing,SIC 2007
+18203,Reproduction of computer media,C,Manufacturing,SIC 2007
+19100,Manufacture of coke oven products,C,Manufacturing,SIC 2007
+19201,Mineral oil refining,C,Manufacturing,SIC 2007
+19209,Other treatment of petroleum products (excluding petrochemicals manufacture),C,Manufacturing,SIC 2007
+20110,Manufacture of industrial gases,C,Manufacturing,SIC 2007
+20120,Manufacture of dyes and pigments,C,Manufacturing,SIC 2007
+20130,Manufacture of other inorganic basic chemicals,C,Manufacturing,SIC 2007
+20140,Manufacture of other organic basic chemicals,C,Manufacturing,SIC 2007
+20150,Manufacture of fertilizers and nitrogen compounds,C,Manufacturing,SIC 2007

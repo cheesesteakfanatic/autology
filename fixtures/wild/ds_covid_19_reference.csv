@@ -1,0 +1,151 @@
+UID,iso2,code3,FIPS,Admin2,Province_State,Country_Region,Lat,Long_,Combined_Key,Population
+4,AF,4,,,,Afghanistan,33.93911,67.709953,Afghanistan,38928341
+8,AL,8,,,,Albania,41.1533,20.1683,Albania,2877800
+10,AQ,10,,,,Antarctica,-71.9499,23.347,Antarctica,
+12,DZ,12,,,,Algeria,28.0339,1.6596,Algeria,43851043
+20,AD,20,,,,Andorra,42.5063,1.5218,Andorra,77265
+24,AO,24,,,,Angola,-11.2027,17.8739,Angola,32866268
+28,AG,28,,,,Antigua and Barbuda,17.0608,-61.7964,Antigua and Barbuda,97928
+32,AR,32,,,,Argentina,-38.4161,-63.6167,Argentina,45195777
+51,AM,51,,,,Armenia,40.0691,45.0382,Armenia,2963234
+40,AT,40,,,,Austria,47.5162,14.5501,Austria,9006400
+31,AZ,31,,,,Azerbaijan,40.1431,47.5769,Azerbaijan,10139175
+44,BS,44,,,,Bahamas,25.025885,-78.035889,Bahamas,393248
+48,BH,48,,,,Bahrain,26.0275,50.55,Bahrain,1701583
+50,BD,50,,,,Bangladesh,23.685,90.3563,Bangladesh,164689383
+52,BB,52,,,,Barbados,13.1939,-59.5432,Barbados,287371
+112,BY,112,,,,Belarus,53.7098,27.9534,Belarus,9449321
+56,BE,56,,,,Belgium,50.8333,4.469936,Belgium,11492641
+5601,BE,56,,,Antwerp,Belgium,51.2195,4.4024,"Antwerp, Belgium",1869730
+5602,BE,56,,,Brussels,Belgium,50.8503,4.3517,"Brussels, Belgium",1218255
+5603,BE,56,,,East Flanders,Belgium,51.0362,3.7373,"East Flanders, Belgium",1525255
+5604,BE,56,,,Flemish Brabant,Belgium,50.9167,4.5833,"Flemish Brabant, Belgium",1155843
+5605,BE,56,,,Hainaut,Belgium,50.5257,4.0621,"Hainaut, Belgium",1346840
+5606,BE,56,,,Liege,Belgium,50.4496,5.8492,"Liege, Belgium",1109800
+5607,BE,56,,,Limburg,Belgium,50.9739,5.342,"Limburg, Belgium",877370
+5608,BE,56,,,Luxembourg,Belgium,50.0547,5.4677,"Luxembourg, Belgium",286752
+5609,BE,56,,,Namur,Belgium,50.331,4.8221,"Namur, Belgium",495832
+5610,BE,56,,,Unknown,Belgium,,,"Unknown, Belgium",
+5611,BE,56,,,Walloon Brabant,Belgium,50.4,4.35,"Walloon Brabant, Belgium",406019
+5612,BE,56,,,West Flanders,Belgium,51.0536,3.1458,"West Flanders, Belgium",1200945
+84,BZ,84,,,,Belize,17.1899,-88.4976,Belize,397621
+204,BJ,204,,,,Benin,9.3077,2.3158,Benin,12123198
+64,BT,64,,,,Bhutan,27.5142,90.4336,Bhutan,771612
+68,BO,68,,,,Bolivia,-16.2902,-63.5887,Bolivia,11673029
+70,BA,70,,,,Bosnia and Herzegovina,43.9159,17.6791,Bosnia and Herzegovina,3280815
+72,BW,72,,,,Botswana,-22.3285,24.6849,Botswana,2351625
+76,BR,76,,,,Brazil,-14.235,-51.9253,Brazil,212559409
+7601,BR,76,,,Acre,Brazil,-9.0238,-70.812,"Acre, Brazil",881935
+7602,BR,76,,,Alagoas,Brazil,-9.5713,-36.782,"Alagoas, Brazil",3337357
+7603,BR,76,,,Amapa,Brazil,0.902,-52.003,"Amapa, Brazil",845731
+7604,BR,76,,,Amazonas,Brazil,-3.4168,-65.8561,"Amazonas, Brazil",4144597
+7605,BR,76,,,Bahia,Brazil,-12.5797,-41.7007,"Bahia, Brazil",14873064
+7606,BR,76,,,Ceara,Brazil,-5.4984,-39.3206,"Ceara, Brazil",9132078
+7607,BR,76,,,Distrito Federal,Brazil,-15.7998,-47.8645,"Distrito Federal, Brazil",3015268
+7608,BR,76,,,Espirito Santo,Brazil,-19.1834,-40.3089,"Espirito Santo, Brazil",4018650
+7609,BR,76,,,Goias,Brazil,-15.827,-49.8362,"Goias, Brazil",7018354
+7610,BR,76,,,Maranhao,Brazil,-4.9609,-45.2744,"Maranhao, Brazil",7075181
+7611,BR,76,,,Mato Grosso,Brazil,-12.6819,-56.9211,"Mato Grosso, Brazil",3484466
+7612,BR,76,,,Mato Grosso do Sul,Brazil,-20.7722,-54.7852,"Mato Grosso do Sul, Brazil",2778986
+7613,BR,76,,,Minas Gerais,Brazil,-18.5122,-44.555,"Minas Gerais, Brazil",21168791
+7614,BR,76,,,Para,Brazil,-1.9981,-54.9306,"Para, Brazil",8602865
+7615,BR,76,,,Paraiba,Brazil,-7.24,-36.782,"Paraiba, Brazil",4018127
+7616,BR,76,,,Parana,Brazil,-25.2521,-52.0215,"Parana, Brazil",11433957
+7617,BR,76,,,Pernambuco,Brazil,-8.8137,-36.9541,"Pernambuco, Brazil",9557071
+7618,BR,76,,,Piaui,Brazil,-7.7183,-42.7289,"Piaui, Brazil",3273227
+7619,BR,76,,,Rio de Janeiro,Brazil,-22.9068,-43.1729,"Rio de Janeiro, Brazil",17264943
+7620,BR,76,,,Rio Grande do Norte,Brazil,-5.4026,-36.9541,"Rio Grande do Norte, Brazil",3506853
+7621,BR,76,,,Rio Grande do Sul,Brazil,-30.0346,-51.2177,"Rio Grande do Sul, Brazil",11377239
+7622,BR,76,,,Rondonia,Brazil,-11.5057,-63.5806,"Rondonia, Brazil",1777225
+7623,BR,76,,,Roraima,Brazil,-2.7376,-62.0751,"Roraima, Brazil",605761
+7624,BR,76,,,Santa Catarina,Brazil,-27.2423,-50.2189,"Santa Catarina, Brazil",7164788
+7625,BR,76,,,Sao Paulo,Brazil,-23.5505,-46.6333,"Sao Paulo, Brazil",45919049
+7626,BR,76,,,Sergipe,Brazil,-10.5741,-37.3857,"Sergipe, Brazil",2298696
+7627,BR,76,,,Tocantins,Brazil,-10.1753,-48.2982,"Tocantins, Brazil",1572866
+7628,BR,76,,,Unknown,Brazil,,,"Unknown, Brazil",
+96,BN,96,,,,Brunei,4.5353,114.7277,Brunei,437483
+100,BG,100,,,,Bulgaria,42.7339,25.4858,Bulgaria,6948445
+854,BF,854,,,,Burkina Faso,12.2383,-1.5616,Burkina Faso,20903278
+104,MM,104,,,,Burma,21.9162,95.956,Burma,54409794
+108,BI,108,,,,Burundi,-3.3731,29.9189,Burundi,11890781
+132,CV,132,,,,Cabo Verde,16.5388,-23.0418,Cabo Verde,555988
+116,KH,116,,,,Cambodia,11.55,104.9167,Cambodia,16718971
+120,CM,120,,,,Cameroon,3.848,11.5021,Cameroon,26545864
+140,CF,140,,,,Central African Republic,6.6111,20.9394,Central African Republic,4829764
+148,TD,148,,,,Chad,15.4542,18.7322,Chad,16425859
+152,CL,152,,,,Chile,-35.6751,-71.543,Chile,19116209
+15201,CL,152,,,Antofagasta,Chile,-23.6509,-70.3975,"Antofagasta, Chile",607534
+15202,CL,152,,,Araucania,Chile,-38.9489,-72.3311,"Araucania, Chile",957224
+15203,CL,152,,,Arica y Parinacota,Chile,-18.594,-69.4785,"Arica y Parinacota, Chile",226068
+15204,CL,152,,,Atacama,Chile,-27.5661,-70.0503,"Atacama, Chile",288944
+15205,CL,152,,,Aysen,Chile,-45.9864,-73.7669,"Aysen, Chile",103158
+15206,CL,152,,,Biobio,Chile,-37.4464,-72.1416,"Biobio, Chile",1556805
+15207,CL,152,,,Coquimbo,Chile,-29.959,-71.3389,"Coquimbo, Chile",757586
+15208,CL,152,,,Los Lagos,Chile,-41.9198,-72.1416,"Los Lagos, Chile",828708
+15209,CL,152,,,Los Rios,Chile,-40.231,-72.3311,"Los Rios, Chile",384837
+15210,CL,152,,,Magallanes,Chile,-52.368,-70.9863,"Magallanes, Chile",166533
+15211,CL,152,,,Maule,Chile,-35.5183,-71.6885,"Maule, Chile",1044950
+15212,CL,152,,,Metropolitana,Chile,-33.4376,-70.6505,"Metropolitana, Chile",7112808
+15213,CL,152,,,Nuble,Chile,-36.7226,-71.7622,"Nuble, Chile",480609
+15214,CL,152,,,OHiggins,Chile,-34.5755,-71.0022,"OHiggins, Chile",914555
+15215,CL,152,,,Tarapaca,Chile,-19.9232,-69.5132,"Tarapaca, Chile",330558
+15216,CL,152,,,Valparaiso,Chile,-33.0472,-71.6127,"Valparaiso, Chile",1815902
+15217,CL,152,,,Unknown,Chile,,,"Unknown, Chile",
+170,CO,170,,,,Colombia,4.5709,-74.2973,Colombia,50882884
+17001,CO,170,,,Amazonas,Colombia,-1.4429,-71.5724,"Amazonas, Colombia",76589
+17002,CO,170,,,Antioquia,Colombia,7.1986,-75.3412,"Antioquia, Colombia",6407102
+17003,CO,170,,,Arauca,Colombia,7.0762,-70.7105,"Arauca, Colombia",262174
+17004,CO,170,,,Atlantico,Colombia,10.6966,-74.8741,"Atlantico, Colombia",2535517
+17005,CO,170,,,Bolivar,Colombia,8.6704,-74.03,"Bolivar, Colombia",2070110
+17006,CO,170,,,Boyaca,Colombia,5.4545,-73.362,"Boyaca, Colombia",1217376
+17007,CO,170,,,Caldas,Colombia,5.2983,-75.2479,"Caldas, Colombia",998255
+17008,CO,170,,,Capital District,Colombia,4.711,-74.0721,"Capital District, Colombia",7412566
+17009,CO,170,,,Caqueta,Colombia,0.8699,-73.8419,"Caqueta, Colombia",401489
+17010,CO,170,,,Casanare,Colombia,5.7589,-71.5724,"Casanare, Colombia",420504
+17011,CO,170,,,Cauca,Colombia,2.705,-76.826,"Cauca, Colombia",1464488
+17012,CO,170,,,Cesar,Colombia,9.3373,-73.6536,"Cesar, Colombia",1200574
+17013,CO,170,,,Choco,Colombia,5.2528,-76.826,"Choco, Colombia",534826
+17014,CO,170,,,Cordoba,Colombia,8.0493,-75.574,"Cordoba, Colombia",1784783
+17015,CO,170,,,Cundinamarca,Colombia,5.026,-74.03,"Cundinamarca, Colombia",2919060
+17016,CO,170,,,Guainia,Colombia,2.5854,-68.5247,"Guainia, Colombia",48114
+17017,CO,170,,,Guaviare,Colombia,1.0654,-73.2603,"Guaviare, Colombia",82767
+17018,CO,170,,,Huila,Colombia,2.5359,-75.5277,"Huila, Colombia",1100386
+17019,CO,170,,,La Guajira,Colombia,11.3548,-72.5205,"La Guajira, Colombia",880560
+17020,CO,170,,,Magdalena,Colombia,10.4113,-74.4057,"Magdalena, Colombia",1341746
+17021,CO,170,,,Meta,Colombia,3.272,-73.0877,"Meta, Colombia",1039722
+17022,CO,170,,,Narino,Colombia,1.2892,-77.3579,"Narino, Colombia",1630592
+17023,CO,170,,,Norte de Santander,Colombia,7.9463,-72.8988,"Norte de Santander, Colombia",1491689
+17024,CO,170,,,Putumayo,Colombia,0.436,-75.5277,"Putumayo, Colombia",348182
+17025,CO,170,,,Quindio,Colombia,4.461,-75.6674,"Quindio, Colombia",539904
+17026,CO,170,,,Risaralda,Colombia,5.3158,-75.9928,"Risaralda, Colombia",943401
+17027,CO,170,,,San Andres y Providencia,Colombia,12.5567,-81.7185,"San Andres y Providencia, Colombia",61280
+17028,CO,170,,,Santander,Colombia,6.6437,-73.6536,"Santander, Colombia",2184837
+17029,CO,170,,,Sucre,Colombia,8.814,-74.7233,"Sucre, Colombia",904863
+17030,CO,170,,,Tolima,Colombia,4.0925,-75.1545,"Tolima, Colombia",1330187
+17031,CO,170,,,Valle del Cauca,Colombia,3.8009,-76.6413,"Valle del Cauca, Colombia",4475886
+17032,CO,170,,,Vaupes,Colombia,0.8554,-70.812,"Vaupes, Colombia",40797
+17033,CO,170,,,Vichada,Colombia,4.4234,-69.2878,"Vichada, Colombia",107808
+17034,CO,170,,,Unknown,Colombia,,,"Unknown, Colombia",
+178,CG,178,,,,Congo (Brazzaville),-0.228,15.8277,Congo (Brazzaville),5518092
+180,CD,180,,,,Congo (Kinshasa),-4.0383,21.7587,Congo (Kinshasa),89561404
+174,KM,174,,,,Comoros,-11.6455,43.3333,Comoros,869595
+188,CR,188,,,,Costa Rica,9.7489,-83.7534,Costa Rica,5094114
+384,CI,384,,,,Cote d'Ivoire,7.54,-5.5471,Cote d'Ivoire,26378275
+191,HR,191,,,,Croatia,45.1,15.2,Croatia,4105268
+192,CU,192,,,,Cuba,21.521757,-77.781167,Cuba,11326616
+196,CY,196,,,,Cyprus,35.1264,33.4299,Cyprus,1207361
+203,CZ,203,,,,Czechia,49.8175,15.473,Czechia,10708982
+208,DK,208,,,,Denmark,56.2639,9.5018,Denmark,5837213
+234,FO,234,,,Faroe Islands,Denmark,61.8926,-6.9118,"Faroe Islands, Denmark",48865
+304,GL,304,,,Greenland,Denmark,71.7069,-42.6043,"Greenland, Denmark",56772
+9999,,,,,,Diamond Princess,,,Diamond Princess,
+262,DJ,262,,,,Djibouti,11.8251,42.5903,Djibouti,988002
+212,DM,212,,,,Dominica,15.415,-61.371,Dominica,71991
+214,DO,214,,,,Dominican Republic,18.7357,-70.1627,Dominican Republic,10847904
+218,EC,218,,,,Ecuador,-1.8312,-78.1834,Ecuador,17643060
+818,EG,818,,,,Egypt,26.820553,30.802498,Egypt,102334403
+222,SV,222,,,,El Salvador,13.7942,-88.8965,El Salvador,6486201
+226,GQ,226,,,,Equatorial Guinea,1.6508,10.2679,Equatorial Guinea,1402985
+232,ER,232,,,,Eritrea,15.1794,39.7823,Eritrea,3546427
+233,EE,233,,,,Estonia,58.5953,25.0136,Estonia,1326539
+748,SZ,748,,,,Eswatini,-26.5225,31.4659,Eswatini,1160164

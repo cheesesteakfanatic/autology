@@ -17,6 +17,14 @@ name-flavored ("operator") feature path, and conformance/grounding enrichment
 happen on the pipeline's side of the interface.
 """
 
+from .atlas import (
+    AtlasComponent,
+    AtlasEvidence,
+    AtlasLink,
+    AtlasReport,
+    build_and_persist_atlas,
+    build_atlas,
+)
 from .conform import ColumnConformance, conform_value, decide_column, is_null_value, parse_measure
 from .discover import ESTATE_NAME, KEY_SEP, discover_sources, load_table, slugify, table_row_keys
 from .enrich import ERLink, enrich_ontology
@@ -28,12 +36,18 @@ from .materialize import materialize_induced
 __all__ = [
     "ESTATE_NAME",
     "KEY_SEP",
+    "AtlasComponent",
+    "AtlasEvidence",
+    "AtlasLink",
+    "AtlasReport",
     "ClassPlan",
     "ClassResolution",
     "ColumnConformance",
     "ERLink",
     "IdentityDomain",
     "InducedArtifacts",
+    "build_and_persist_atlas",
+    "build_atlas",
     "build_plans",
     "conform_value",
     "decide_column",

@@ -911,7 +911,9 @@ def status(project: Path = _PROJECT_OPT) -> None:
 
 @app.command()
 def demo(
-    estate: str = typer.Argument(..., help="Demo estate: 'meridian' (generic engine) or 'aviation'."),
+    estate: str = typer.Argument(
+        ..., help="Demo estate: 'meridian' (generic engine), 'aviation', or 'wild' (real internet corpus)."
+    ),
     project_dir: Path = typer.Argument(DEFAULT_PROJECT, help="Project directory to create."),
 ) -> None:
     """One-command demo: init -> ingest -> profile -> induce -> resolve ->
@@ -920,11 +922,15 @@ def demo(
     'meridian' regenerates the bundled 10-table enterprise corpus from code
     (works from an installed wheel; no fixture files needed) and runs the
     GENERIC engine over it — no estate module, no gold ontology. 'aviation'
-    uses the repo's aviation fixtures (source checkout).
+    uses the repo's aviation fixtures (source checkout). 'wild' runs the
+    generic engine over fixtures/wild — hundreds of REAL datasets snapshotted
+    from the public internet (source checkout; see docs/WILD_CORPUS.md).
     """
     estate = estate.strip().lower()
-    if estate not in ("meridian", "aviation"):
-        console.print(f"[red]unknown demo estate {estate!r} (expected 'meridian' or 'aviation')[/]")
+    if estate not in ("meridian", "aviation", "wild"):
+        console.print(
+            f"[red]unknown demo estate {estate!r} (expected 'meridian', 'aviation', or 'wild')[/]"
+        )
         raise typer.Exit(code=1)
 
     global _DEMO_MEMO
@@ -938,13 +944,31 @@ def demo(
 def _run_demo(estate: str, project_dir: Path) -> None:
     stages = 7 if estate == "meridian" else 6
     step = 0
+    ingest_limit: Optional[int] = None
 
     def banner(title: str) -> None:
         nonlocal step
         step += 1
         console.rule(f"[bold cyan]demo {step}/{stages}: {title}")
 
-    if estate == "meridian":
+    if estate == "wild":
+        from ontoforge.estates import wild as wild_mod
+
+        fixtures_dir = wild_mod.default_fixtures_dir()
+        if not (fixtures_dir / wild_mod.MANIFEST_NAME).is_file():
+            console.print(
+                f"[red]wild corpus not found at {fixtures_dir} — the wild demo needs a source "
+                "checkout (the committed fixtures/wild snapshot is not shipped in the wheel). "
+                "Rebuild it with `python scripts/fetch_wild_corpus.py` (network), or use "
+                "`ontoforge demo meridian`: its corpus regenerates from code.[/]"
+            )
+            raise typer.Exit(code=1)
+        manifest = wild_mod.load_manifest(fixtures_dir)
+        n_sets = manifest["stats"]["datasets_kept"]
+        ingest_limit = wild_mod.DEMO_ROW_LIMIT
+        banner(f"init (wild corpus: {n_sets} real internet datasets — ontology will be INDUCED)")
+        init(project_dir, fixtures=None, source=fixtures_dir)
+    elif estate == "meridian":
         from ontoforge.estates.meridian_gen import build_corpus
 
         source_dir = project_dir / "meridian_source"
@@ -972,7 +996,7 @@ def _run_demo(estate: str, project_dir: Path) -> None:
         init(project_dir, fixtures=None, source=None)
 
     banner("ingest (CDC -> ledger + RAW mirror)")
-    ingest(project=project_dir, limit=None)
+    ingest(project=project_dir, limit=ingest_limit)
     banner("profile (keys, FDs, INDs, units)")
     profile(project=project_dir)
     banner("induce (STRATA ontology induction)")
@@ -983,7 +1007,15 @@ def _run_demo(estate: str, project_dir: Path) -> None:
     materialize(project=project_dir, ontology=None)
 
     console.rule("[bold green]demo ready")
-    if estate == "meridian":
+    if estate == "wild":
+        console.print(
+            "OntoForge just induced an ontology over hundreds of real internet datasets "
+            "(OpenFlights, datasets-org world data, FiveThirtyEight, vega, seaborn).\n"
+            "inspect what it built:"
+        )
+        console.print(f"  ontoforge status -p {project_dir}")
+        console.print(f"  {project_dir / 'ontology.json'}  (the induced classes + cross-dataset links)")
+    elif estate == "meridian":
         console.print("try, with citations on every answered cell:")
         console.print(
             f'  ontoforge ask -p {project_dir} "How many support tickets describe battery swelling?"'

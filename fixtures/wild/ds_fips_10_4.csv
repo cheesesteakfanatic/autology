@@ -1,0 +1,151 @@
+region_code,region_division,region_name
+AA00,country,ARUBA
+AC00,country,ANTIGUA AND BARBUDA
+AC01,dependency,Barbuda
+AC03,parish,Saint George
+AC04,parish,Saint John
+AC05,parish,Saint Mary
+AC06,parish,Saint Paul
+AC07,parish,Saint Peter
+AC08,parish,Saint Philip
+AC09,dependency,Redonda
+AE00,country,UNITED ARAB EMIRATES
+AE01,emirate,Abū Z̧aby
+AE02,emirate,ʻAjman
+AE03,emirate,Dubayy
+AE04,emirate,Al Fujayrah
+AE05,emirate,Raʼs al Khaymah
+AE06,emirate,Ash Shāriqah
+AE07,emirate,Umm al Qaywayn
+AF00,country,AFGHANISTAN
+AF01,province velayat,Badakhshan
+AF02,province velayat,Badghis
+AF03,province velayat,Baghlan
+AF05,province velayat,Bamian
+AF06,province velayat,Farah
+AF07,province velayat,Faryab
+AF08,province velayat,Ghazni
+AF09,province velayat,Ghowr  Ghor
+AF10,province velayat,Helmand
+AF11,province velayat,Herat
+AF13,province velayat,Kabol
+AF14,province velayat,Kapisa
+AF17,province velayat,Lowgar  Logar
+AF18,province velayat,Nangarhar
+AF19,province velayat,Nimruz  Chakhansur
+AF23,province velayat,Kandahar  Kandahar
+AF24,province velayat,Kondoz  Kunduz
+AF26,province velayat,Takhar
+AF27,province velayat,Vardak  Warkak
+AF28,province velayat,Zabol  Zabul
+AF29,province velayat,Paktika
+AF30,province velayat,Balkh
+AF31,province velayat,Jowzjan
+AF32,province velayat,Samangan
+AF33,province velayat,Sar-e Pol
+AF34,province velayat,Konar
+AF35,province velayat,Laghmān
+AF36,province velayat,Paktīā
+AF37,province velayat,Khowst
+AF38,province velayat,Nūrestān
+AF39,province velayat,Orūzgān  Uruzgan
+AF40,province velayat,Parvān  Parwan
+AF41,province velayat,Dāykondī
+AF42,province velayat,Panjshīr
+AG00,country,ALGERIA
+AG01,province wilaya,Alger
+AG03,province wilaya,Batna
+AG04,province wilaya,Constantine
+AG06,province wilaya,Medea
+AG07,province wilaya,Mostaganem
+AG09,province wilaya,Oran
+AG10,province wilaya,Saida
+AG12,province wilaya,Setif
+AG13,province wilaya,Tiaret
+AG14,province wilaya,Tizi Ouzou
+AG15,province wilaya,Tlemcen
+AG18,province wilaya,Bejaia
+AG19,province wilaya,Biskra
+AG20,province wilaya,Blida
+AG21,province wilaya,Bouira
+AG22,province wilaya,Djelfa
+AG23,province wilaya,Guelma
+AG24,province wilaya,Jijel
+AG25,province wilaya,Laghouat
+AG26,province wilaya,Mascara
+AG27,province wilaya,M'sila
+AG29,province wilaya,Oum el Bouaghi
+AG30,province wilaya,Sidi Bel Abbes
+AG31,province wilaya,Skikda
+AG33,province wilaya,Tebessa
+AG34,province wilaya,Adrar
+AG35,province wilaya,Ain Defla
+AG36,province wilaya,Ain Temouchent
+AG37,province wilaya,Annaba
+AG38,province wilaya,Bechar
+AG39,province wilaya,Bordj Bou Arreridj
+AG40,province wilaya,Boumerdes
+AG41,province wilaya,Chlef
+AG42,province wilaya,El Bayadh
+AG43,province wilaya,El Oued
+AG44,province wilaya,El Tarf
+AG45,province wilaya,Ghardaia
+AG46,province wilaya,Illizi
+AG47,province wilaya,Khenchela
+AG48,province wilaya,Mila
+AG49,province wilaya,Naama
+AG50,province wilaya,Ouargla
+AG51,province wilaya,Relizane
+AG52,province wilaya,Souk Ahras
+AG53,province wilaya,Tamanghasset
+AG54,province wilaya,Tindouf
+AG55,province wilaya,Tipaza
+AG56,province wilaya,Tissemsilt
+AJ00,country,AZERBAIJAN
+AJ01,rayon rayonu,Abşeron
+AJ02,rayon rayonu,Ağcabədi
+AJ03,rayon rayonu,Ağdam
+AJ04,rayon rayonu,Ağdaş
+AJ05,rayon rayonu,Ağstafa
+AJ06,rayon rayonu,Ağsu
+AJ07,city şəhəri,Əli Bayramlı
+AJ08,rayon rayonu,Astara
+AJ09,city şəhəri,Bakı
+AJ10,rayon rayonu,Balakən
+AJ11,rayon rayonu,Bərdə
+AJ12,rayon rayonu,Beyləqan
+AJ13,rayon rayonu,Biləsuvar
+AJ14,rayon rayonu,Cəbrayıl
+AJ15,rayon rayonu,Cəlilabad
+AJ16,rayon rayonu,Daşkəsən
+AJ17,rayon rayonu,Dəvəçi
+AJ18,rayon rayonu,Füzuli
+AJ19,rayon rayonu,Gədəbəy
+AJ20,city şəhəri,Gəncə
+AJ21,rayon rayonu,Goranboy
+AJ22,rayon rayonu,Göyçay
+AJ23,rayon rayonu,Hacıqabul
+AJ24,rayon rayonu,İmişli
+AJ25,rayon rayonu,İsmayıllı
+AJ26,rayon rayonu,Kəlbəcər
+AJ27,rayon rayonu,Kürdəmir
+AJ28,rayon rayonu,Laçın
+AJ29,rayon rayonu,Lənkəran
+AJ30,city şəhəri,Lənkəran
+AJ31,rayon rayonu,Lerik
+AJ32,rayon rayonu,Masallı
+AJ33,city şəhəri,Mingəcevir
+AJ34,city şəhəri,Naftalan
+AJ35,autonomous republic muxtar respublikasi,Naxçıvan
+AJ36,rayon rayonu,Neftçala
+AJ37,rayon rayonu,Oğuz
+AJ38,rayon rayonu,Qəbələ
+AJ39,rayon rayonu,Qax
+AJ40,rayon rayonu,Qazax
+AJ41,rayon rayonu,Qobustan
+AJ42,rayon rayonu,Quba
+AJ43,rayon rayonu,Qubadlı
+AJ44,rayon rayonu,Qusar
+AJ45,rayon rayonu,Saatlı
+AJ46,rayon rayonu,Sabirabad
+AJ47,rayon rayonu,Şəki

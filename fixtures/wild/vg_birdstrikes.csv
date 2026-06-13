@@ -1,0 +1,151 @@
+Airport Name,Aircraft Make Model,Effect Amount of damage,Flight Date,Aircraft Airline Operator,Origin State,Phase of flight,Wildlife Size,Wildlife Species,Time of day,Cost Other,Cost Repair,Cost Total $,Speed IAS in knots
+BARKSDALE AIR FORCE BASE ARPT,T-38A,None,1990-01-08,MILITARY,Louisiana,Climb,Large,Turkey vulture,Day,0,0,0,300
+BARKSDALE AIR FORCE BASE ARPT,KC-10A,None,1990-01-09,MILITARY,Louisiana,Approach,Medium,Unknown bird or bat,Night,0,0,0,200
+BARKSDALE AIR FORCE BASE ARPT,B-52,None,1990-01-11,MILITARY,Louisiana,Take-off run,Medium,Unknown bird or bat,Day,0,0,0,130
+NEW ORLEANS INTL,B-737-300,Substantial,1990-01-11,SOUTHWEST AIRLINES,Louisiana,Take-off run,Small,Rock pigeon,Day,0,0,0,140
+BARKSDALE AIR FORCE BASE ARPT,KC-10A,None,1990-01-12,MILITARY,Louisiana,Climb,Medium,Unknown bird or bat,Day,0,0,0,160
+BARKSDALE AIR FORCE BASE ARPT,KC-10A,None,1990-02-02,MILITARY,Louisiana,Take-off run,Medium,Unknown bird or bat,Day,0,0,0,180
+BARKSDALE AIR FORCE BASE ARPT,KC-10A,None,1990-02-06,MILITARY,Louisiana,Climb,Medium,Unknown bird or bat,Dusk,0,0,0,140
+WASHINGTON DULLES INTL ARPT,B-727,None,1990-02-22,FEDEX EXPRESS,DC,Approach,Large,Unknown bird - large,Night,0,0,0,190
+BARKSDALE AIR FORCE BASE ARPT,KC-10A,None,1990-03-01,MILITARY,Louisiana,Climb,Medium,Unknown bird or bat,Day,0,0,0,180
+BARKSDALE AIR FORCE BASE ARPT,B-52,None,1990-03-02,MILITARY,Louisiana,Take-off run,Medium,Unknown bird or bat,Dusk,0,0,0,130
+WASHINGTON DULLES INTL ARPT,BA-146,Medium,1990-03-03,AIR WISCONSIN AIRLINES,DC,Climb,Large,Unknown bird - large,Day,0,0,0,180
+BARKSDALE AIR FORCE BASE ARPT,B-52,None,1990-03-08,MILITARY,Louisiana,Approach,Medium,Unknown bird or bat,Night,0,0,0,150
+RONALD REAGAN WASHINGTON NATL,C-141B,None,1990-03-09,MILITARY,DC,Approach,Medium,Unknown bird - medium,Night,0,0,0,200
+CHARLESTON AFB/INTL ARPT,C-141B,None,1990-03-09,MILITARY,South Carolina,Approach,Medium,Unknown bird or bat,Night,0,0,0,190
+BARKSDALE AIR FORCE BASE ARPT,B-52,None,1990-03-09,MILITARY,Louisiana,Take-off run,Medium,Unknown bird or bat,Night,0,0,0,150
+BARKSDALE AIR FORCE BASE ARPT,A-10A,None,1990-03-13,MILITARY,Louisiana,Approach,Medium,Unknown bird or bat,Day,0,4175,4175,250
+BARKSDALE AIR FORCE BASE ARPT,KC-10A,None,1990-03-19,MILITARY,Louisiana,Approach,Medium,Unknown bird or bat,Dusk,0,0,0,150
+LAMBERT-ST LOUIS INTL,SA227 AC METRO III,Minor,1990-03-22,TRANS STATES AIRLINES,Missouri,Climb,Small,European starling,Day,0,0,0,160
+BARKSDALE AIR FORCE BASE ARPT,KC-10A,None,1990-04-04,MILITARY,Louisiana,Approach,Medium,Unknown bird or bat,Night,0,0,0,135
+LAGUARDIA NY,B-737-400,Substantial,1990-04-07,US AIRWAYS*,New York,Take-off run,Large,Canada goose,Day,0,0,0,
+BARKSDALE AIR FORCE BASE ARPT,KC-10A,None,1990-04-07,MILITARY,Louisiana,Take-off run,Medium,Unknown bird or bat,Dusk,0,0,0,120
+BARKSDALE AIR FORCE BASE ARPT,KC-10A,None,1990-04-09,MILITARY,Louisiana,Approach,Medium,Unknown bird or bat,Day,0,0,0,210
+BARKSDALE AIR FORCE BASE ARPT,KC-10A,None,1990-04-15,MILITARY,Louisiana,Climb,Medium,Unknown bird or bat,Day,0,0,0,180
+BARKSDALE AIR FORCE BASE ARPT,KC-10A,None,1990-04-16,MILITARY,Louisiana,Climb,Medium,Unknown bird or bat,Dawn,0,0,0,150
+BARKSDALE AIR FORCE BASE ARPT,KC-10A,None,1990-04-18,MILITARY,Louisiana,Take-off run,Medium,Unknown bird or bat,Day,0,0,0,140
+BARKSDALE AIR FORCE BASE ARPT,KC-10A,None,1990-04-19,MILITARY,Louisiana,Approach,Medium,Unknown bird or bat,Day,0,0,0,180
+BARKSDALE AIR FORCE BASE ARPT,KC-135,None,1990-04-19,MILITARY,Louisiana,Take-off run,Medium,Unknown bird or bat,Night,0,0,0,140
+NEW ORLEANS INTL,B-727,None,1990-04-19,AMERICAN AIRLINES,Louisiana,Approach,Small,Unknown bird - small,Day,0,0,0,235
+CHARLOTTE/DOUGLAS INTL ARPT,BE-58  BARON,None,1990-04-20,UNKNOWN,North Carolina,Approach,Medium,Unknown bird - medium,Day,0,0,0,105
+BARKSDALE AIR FORCE BASE ARPT,KC-10A,None,1990-04-23,MILITARY,Louisiana,Approach,Medium,Unknown bird or bat,Dawn,0,0,0,190
+CHARLESTON AFB/INTL ARPT,C-141B,None,1990-04-23,MILITARY,South Carolina,Take-off run,Medium,Unknown bird or bat,Night,0,0,0,160
+CHARLESTON AFB/INTL ARPT,C-141B,None,1990-04-24,MILITARY,South Carolina,Approach,Medium,Unknown bird or bat,Day,0,0,0,200
+BARKSDALE AIR FORCE BASE ARPT,B-52,None,1990-04-25,MILITARY,Louisiana,Approach,Medium,Unknown bird or bat,Dusk,0,0,0,140
+BARKSDALE AIR FORCE BASE ARPT,KC-10A,None,1990-04-25,MILITARY,Louisiana,Approach,Medium,Unknown bird or bat,Night,0,0,0,170
+BARKSDALE AIR FORCE BASE ARPT,KC-135,None,1990-04-26,MILITARY,Louisiana,Approach,Medium,Unknown bird or bat,Night,0,0,0,180
+LOS ANGELES INTL,B-737-300,None,1990-04-27,US AIRWAYS*,California,Climb,Medium,Unknown bird - medium,Day,0,0,0,230
+CHICAGO O'HARE INTL ARPT,B-727,None,1990-04-27,AMERICAN AIRLINES,Illinois,Approach,Medium,Unknown bird - medium,Night,0,0,0,
+PORTLAND INTL (OR),B-727,None,1990-04-28,AMERICAN AIRLINES,Oregon,Approach,Medium,Unknown bird - medium,Night,0,0,0,127
+WASHINGTON DULLES INTL ARPT,B-727,Medium,1990-04-29,AMERICAN AIRLINES,DC,Approach,Medium,Unknown bird - medium,Night,0,0,0,250
+FORT LAUDERDALE/HOLLYWOOD INTL,B-737-400,Substantial,1990-04-30,US AIRWAYS*,Florida,Take-off run,Small,Unknown bird - small,Day,0,0,0,140
+CHICAGO O'HARE INTL ARPT,B-727,None,1990-05-01,UNITED AIRLINES,Illinois,Climb,Large,White-tailed deer,Night,0,0,0,120
+HOUSTON-HOBBY,B-737-500,None,1990-05-01,SOUTHWEST AIRLINES,Texas,Approach,Small,Unknown bird - small,Day,0,0,0,124
+CHICAGO O'HARE INTL ARPT,B-767-200,None,1990-05-02,AMERICAN AIRLINES,Illinois,Approach,Medium,Unknown bird - medium,Night,0,0,0,130
+SAN ANTONIO INTL,B-737-200,None,1990-05-03,SOUTHWEST AIRLINES,Texas,Descent,Small,Unknown bird - small,Night,0,0,0,320
+SACRAMENTO INTL,MD-80,None,1990-05-05,AMERICAN AIRLINES,California,Approach,Medium,Unknown bird - medium,Night,0,0,0,260
+WILL ROGERS WORLD ARPT,B-727-200,None,1990-05-05,AMERICAN AIRLINES,Oklahoma,Approach,Small,Unknown bird - small,Day,0,0,0,150
+ATLANTA INTL,B-767,None,1990-05-05,DELTA AIR LINES,Georgia,Approach,Small,Unknown bird - small,Night,0,0,0,180
+INDIANAPOLIS INTL,BE-90  KING,Minor,1990-05-07,BUSINESS,Indiana,Descent,Medium,Unknown bird - medium,Day,0,0,0,160
+DALLAS/FORT WORTH INTL ARPT,MD-80,None,1990-05-07,AMERICAN AIRLINES,Texas,Descent,Medium,Unknown bird - medium,Day,0,0,0,240
+KANSAS CITY INTL,E-4B,None,1990-05-08,MILITARY,Missouri,Approach,Medium,Unknown bird - medium,Night,0,0,0,180
+MINETA SAN JOSE INTL,MD-80,None,1990-05-08,AMERICAN AIRLINES,California,Take-off run,Small,American robin,Day,0,0,0,135
+METRO OAKLAND INTL,MD-82,None,1990-05-10,AMERICAN AIRLINES,California,Approach,Medium,Unknown bird - medium,Day,0,0,0,135
+BARKSDALE AIR FORCE BASE ARPT,KC-10A,None,1990-05-10,MILITARY,Louisiana,Approach,Medium,Unknown bird or bat,Night,0,0,0,220
+CHICAGO O'HARE INTL ARPT,MD-82,None,1990-05-11,AMERICAN AIRLINES,Illinois,Climb,Medium,Unknown bird - medium,Night,0,0,0,250
+NASHVILLE INTL,B-727,None,1990-05-13,AMERICAN AIRLINES,Tennessee,Approach,Small,Unknown bird - small,Day,0,0,0,140
+DALLAS/FORT WORTH INTL ARPT,B-727-200,None,1990-05-13,AMERICAN AIRLINES,Texas,Approach,Small,Unknown bird - small,Day,0,0,0,160
+NASHVILLE INTL,MD-80,None,1990-05-13,AMERICAN AIRLINES,Tennessee,Climb,Small,European starling,Day,0,0,0,160
+MINNEAPOLIS-ST PAUL INTL,DC-9,None,1990-05-13,AMERICAN AIRLINES,Minnesota,Landing Roll,Small,American robin,Day,0,0,0,100
+PORTLAND INTL (OR),MD-80,None,1990-05-14,AMERICAN AIRLINES,Oregon,Descent,Medium,Unknown bird - medium,Night,0,0,0,200
+LAMBERT-ST LOUIS INTL,MD-80,None,1990-05-14,AMERICAN AIRLINES,Missouri,Approach,Small,Unknown bird - small,Night,0,0,0,140
+CHICAGO O'HARE INTL ARPT,KC-135E,None,1990-05-15,MILITARY,Illinois,Take-off run,Large,Coyote,Day,0,0,0,150
+CHICAGO O'HARE INTL ARPT,C-130,None,1990-05-15,MILITARY,Illinois,Climb,Medium,Unknown bird - medium,Day,0,0,0,120
+DALLAS/FORT WORTH INTL ARPT,B-727-200,None,1990-05-15,AMERICAN AIRLINES,Texas,Landing Roll,Medium,American crow,Day,0,0,0,135
+SALT LAKE CITY INTL,KC-135E,None,1990-05-15,MILITARY,Utah,Landing Roll,Small,Common nighthawk,Day,0,0,0,150
+HONOLULU INTL ARPT,B-737,None,1990-05-16,ALOHA AIRLINES,Hawaii,Landing Roll,Large,Unknown bird - large,Day,0,0,0,70
+AUSTIN-BERGSTROM INTL,B-737-200,None,1990-05-16,SOUTHWEST AIRLINES,Texas,Approach,Small,Unknown bird - small,Day,0,0,0,140
+DALLAS/FORT WORTH INTL ARPT,B-727,None,1990-05-18,AMERICAN AIRLINES,Texas,Approach,Small,American robin,Night,0,0,0,122
+LAMBERT-ST LOUIS INTL,MD-80,None,1990-05-19,AMERICAN AIRLINES,Missouri,Approach,Small,Unknown bird - small,Night,0,0,0,140
+RONALD REAGAN WASHINGTON NATL,B-757-200,None,1990-05-20,AMERICAN AIRLINES,DC,Approach,Small,Unknown bird - small,Night,0,0,0,120
+SACRAMENTO INTL,B-737-300,None,1990-05-22,UNITED AIRLINES,California,Approach,Small,Unknown bird - small,Night,0,0,0,140
+CHICAGO O'HARE INTL ARPT,B-727-200,None,1990-05-22,AMERICAN AIRLINES,Illinois,Approach,Small,Unknown bird - small,Night,0,0,0,140
+SAN FRANCISCO INTL ARPT,B-767,None,1990-05-23,DELTA AIR LINES,California,Take-off run,Medium,Unknown bird - medium,Day,0,0,0,150
+CHARLESTON AFB/INTL ARPT,C-141B,None,1990-05-24,MILITARY,South Carolina,Approach,Medium,Unknown bird or bat,Day,0,0,0,250
+HOUSTON-HOBBY,B-737-300,None,1990-05-24,SOUTHWEST AIRLINES,Texas,Approach,Small,Unknown bird - small,Night,0,0,0,250
+LAMBERT-ST LOUIS INTL,L-1011,None,1990-05-26,TRANS WORLD AIRLINES,Missouri,Descent,Medium,Unknown bird - medium,Day,0,0,0,160
+HOUSTON-HOBBY,B-737,None,1990-05-26,SOUTHWEST AIRLINES,Texas,Take-off run,Medium,Unknown bird - medium,Day,0,0,0,
+CLEVELAND-HOPKINS INTL ARPT,EMB-120,None,1990-05-26,EXPRESSJET (CONTINENTAL EXPRS),Ohio,Climb,Medium,Unknown bird - medium,Night,0,0,0,180
+NASHVILLE INTL,B-727-200,None,1990-05-26,AMERICAN AIRLINES,Tennessee,Approach,Small,Unknown bird - small,Day,0,0,0,170
+SACRAMENTO INTL,B-737-300,None,1990-05-27,UNITED AIRLINES,California,Approach,Medium,Mallard,Day,0,0,0,140
+CINCINNATI/NORTHERN KENTUCKY INTL ARPT,DC-9-30,None,1990-05-27,US AIRWAYS*,Kentucky,Climb,Medium,Unknown bird - medium,Night,0,0,0,180
+DALLAS/FORT WORTH INTL ARPT,MD-80,None,1990-05-27,AMERICAN AIRLINES,Texas,Approach,Small,American robin,Day,0,0,0,170
+LOUISVILLE INTL ARPT,DC-9-10,None,1990-05-29,TRANS WORLD AIRLINES,Kentucky,Approach,Medium,Unknown bird - medium,Night,0,0,0,130
+BARKSDALE AIR FORCE BASE ARPT,KC-10A,None,1990-05-29,MILITARY,Louisiana,Take-off run,Medium,Unknown bird or bat,Night,0,0,0,130
+BARKSDALE AIR FORCE BASE ARPT,KC-10A,None,1990-05-29,MILITARY,Louisiana,Take-off run,Medium,Unknown bird or bat,Night,0,0,0,135
+CHICAGO O'HARE INTL ARPT,B-727-200,None,1990-05-29,AMERICAN AIRLINES,Illinois,Climb,Small,European starling,Day,0,0,0,160
+NEW ORLEANS INTL,B-737-200,None,1990-05-30,SOUTHWEST AIRLINES,Louisiana,Approach,Small,Unknown bird - small,Day,0,0,0,130
+LAMBERT-ST LOUIS INTL,GULFAERO IV,None,1990-05-30,BUSINESS,Missouri,Landing Roll,Small,European starling,Day,0,0,0,140
+LAMBERT-ST LOUIS INTL,B-737-300,None,1990-05-31,SOUTHWEST AIRLINES,Missouri,Approach,Small,Unknown bird - small,Day,0,0,0,135
+LOUISVILLE INTL ARPT,DC-8,None,1990-05-31,UPS AIRLINES,Kentucky,Take-off run,Small,Unknown bird - small,Day,0,0,0,120
+BARKSDALE AIR FORCE BASE ARPT,B-52,None,1990-06-01,MILITARY,Louisiana,Approach,Medium,Unknown bird or bat,Day,0,0,0,146
+DALLAS/FORT WORTH INTL ARPT,DC-10,None,1990-06-01,AMERICAN AIRLINES,Texas,Landing Roll,Small,European starling,Day,0,0,0,120
+DALLAS/FORT WORTH INTL ARPT,MD-80,None,1990-06-04,AMERICAN AIRLINES,Texas,Descent,Small,Unknown bird - small,Night,0,0,0,210
+WILL ROGERS WORLD ARPT,MD-80,None,1990-06-05,AMERICAN AIRLINES,Oklahoma,Climb,Small,Rock pigeon,Day,0,0,0,180
+LAMBERT-ST LOUIS INTL,B-737-200,None,1990-06-06,SOUTHWEST AIRLINES,Missouri,Approach,Small,Unknown bird - small,Night,0,0,0,210
+GREATER PITTSBURGH,A-7,None,1990-06-07,MILITARY,Pennsylvania,Landing Roll,Medium,Unknown bird or bat,Day,0,0,0,120
+BARKSDALE AIR FORCE BASE ARPT,KC-10A,None,1990-06-07,MILITARY,Louisiana,Take-off run,Medium,Unknown bird or bat,Day,0,0,0,200
+CHICAGO O'HARE INTL ARPT,MD-80,None,1990-06-07,AMERICAN AIRLINES,Illinois,Approach,Small,Unknown bird - small,Day,0,0,0,210
+METRO OAKLAND INTL,B-737-200,None,1990-06-08,SOUTHWEST AIRLINES,California,Approach,Small,Unknown bird - small,Day,0,0,0,135
+NASHVILLE INTL,B-727-200,None,1990-06-09,AMERICAN AIRLINES,Tennessee,Approach,Small,Unknown bird - small,Day,0,0,0,136
+BALTIMORE WASH INTL,BA-31 JETSTR,None,1990-06-09,PSA AIRLINES,Maryland,Take-off run,Small,Unknown bird - small,Day,0,0,0,130
+GREATER PITTSBURGH,B-727,None,1990-06-11,UNITED AIRLINES,Pennsylvania,Landing Roll,Small,Unknown bird - small,Day,0,0,0,
+BARKSDALE AIR FORCE BASE ARPT,KC-10A,None,1990-06-12,MILITARY,Louisiana,Take-off run,Medium,Unknown bird or bat,Day,0,0,0,150
+WILL ROGERS WORLD ARPT,B-737-300,None,1990-06-12,SOUTHWEST AIRLINES,Oklahoma,Approach,Small,Mourning dove,Day,0,0,0,135
+SAN ANTONIO INTL,DC-10-10,None,1990-06-14,AMERICAN AIRLINES,Texas,Approach,Medium,Unknown bird - medium,Night,0,0,0,250
+CINCINNATI/NORTHERN KENTUCKY INTL ARPT,DC-9-30,None,1990-06-14,US AIRWAYS*,Kentucky,Landing Roll,Small,American robin,Day,0,0,0,120
+NASHVILLE INTL,B-727-100,None,1990-06-14,AMERICAN AIRLINES,Tennessee,Landing Roll,Small,American robin,Dusk,0,0,0,85
+WILL ROGERS WORLD ARPT,B-737-200,Medium,1990-06-17,SOUTHWEST AIRLINES,Oklahoma,Climb,Medium,Unknown bird - medium,Night,0,0,0,180
+LOGAN INTL,B-757-200,None,1990-06-18,AMERICA WEST AIRLINES,Massachusetts,Approach,Medium,Herring gull,Dawn,48704,0,48704,130
+BARKSDALE AIR FORCE BASE ARPT,KC-10A,None,1990-06-19,MILITARY,Louisiana,Take-off run,Medium,Unknown bird or bat,Night,0,0,0,130
+GREATER PITTSBURGH,MD-80,None,1990-06-19,AMERICAN AIRLINES,Pennsylvania,Approach,Small,Unknown bird - small,Day,0,0,0,130
+SAN FRANCISCO INTL ARPT,DC-8-70,None,1990-06-20,UNITED AIRLINES,California,Take-off run,Medium,Unknown bird - medium,Day,0,0,0,140
+ORLANDO INTL,MD-80,None,1990-06-21,AMERICAN AIRLINES,Florida,Approach,Medium,Unknown bird - medium,Day,0,0,0,140
+BARKSDALE AIR FORCE BASE ARPT,KC-10A,None,1990-06-22,MILITARY,Louisiana,Approach,Medium,Unknown bird or bat,Day,0,0,0,150
+HOUSTON-HOBBY,B-737-300,None,1990-06-23,SOUTHWEST AIRLINES,Texas,Approach,Medium,Unknown bird - medium,Day,0,0,0,250
+CLEVELAND-HOPKINS INTL ARPT,B-737,None,1990-06-23,CONTINENTAL AIRLINES,Ohio,Landing Roll,Medium,American crow,Day,0,0,0,110
+CLEVELAND-HOPKINS INTL ARPT,BA-31 JETSTR,None,1990-06-23,PSA AIRLINES,Ohio,Landing Roll,Medium,American crow,Day,0,0,0,100
+MINETA SAN JOSE INTL,MD-80,None,1990-06-23,AMERICAN AIRLINES,California,Take-off run,Medium,Unknown bird - medium,Dusk,0,0,0,110
+PORT COLUMBUS INTL,B-727,None,1990-06-23,UNKNOWN,Ohio,Climb,Small,Unknown bird - small,Day,0,0,0,
+BARKSDALE AIR FORCE BASE ARPT,KC-135,None,1990-06-26,MILITARY,Louisiana,Climb,Medium,Unknown bird or bat,Night,0,0,0,160
+EPPLEY AIRFIELD,MD-87,None,1990-06-26,UPS AIRLINES,Nebraska,Approach,Small,Unknown bird - small,Day,0,0,0,140
+ATLANTIC CITY INTL,CV-580,None,1990-06-27,GOVERNMENT,New Jersey,Landing Roll,Medium,Unknown bird - medium,Day,0,0,0,40
+CHICAGO O'HARE INTL ARPT,B-727-200,None,1990-06-28,AMERICAN AIRLINES,Illinois,Approach,Small,Unknown bird - small,Day,0,0,0,130
+DALLAS/FORT WORTH INTL ARPT,B-727-100,None,1990-06-28,AMERICAN AIRLINES,Texas,Approach,Small,Unknown bird - small,Night,0,0,0,250
+CHICAGO O'HARE INTL ARPT,MD-80,None,1990-06-30,AMERICAN AIRLINES,Illinois,Landing Roll,Small,Unknown bird - small,Day,0,0,0,145
+DALLAS/FORT WORTH INTL ARPT,MD-80,None,1990-07-01,AMERICAN AIRLINES,Texas,Approach,Small,Unknown bird - small,Day,0,0,0,140
+HONOLULU INTL ARPT,DC-10-10,None,1990-07-03,AMERICAN AIRLINES,Hawaii,Approach,Medium,Unknown bird - medium,Night,0,0,0,137
+GEORGE BUSH INTERCONTINENTAL,B-727-200,None,1990-07-03,AMERICAN AIRLINES,Texas,Approach,Small,Unknown bird - small,Day,0,0,0,140
+CHARLOTTE/DOUGLAS INTL ARPT,MD-80,None,1990-07-05,US AIRWAYS*,North Carolina,Approach,Small,Unknown bird - small,Day,0,0,0,125
+CHARLESTON AFB/INTL ARPT,MD-80,None,1990-07-06,AMERICAN AIRLINES,South Carolina,Take-off run,Medium,Unknown bird - medium,Day,0,0,0,100
+SACRAMENTO INTL,B-737-200,None,1990-07-06,UNITED AIRLINES,California,Approach,Small,Unknown bird - small,Day,0,0,0,125
+LOUISVILLE INTL ARPT,B-737,None,1990-07-07,UNITED AIRLINES,Kentucky,Take-off run,Small,Unknown bird - small,Day,0,0,0,140
+MINETA SAN JOSE INTL,B-767,Minor,1990-07-08,AMERICAN AIRLINES,California,Take-off run,Medium,Unknown bird - medium,Day,0,0,0,140
+SALT LAKE CITY INTL,MD-80,None,1990-07-08,AMERICAN AIRLINES,Utah,Approach,Medium,Unknown bird - medium,Day,0,0,0,
+CHARLOTTE/DOUGLAS INTL ARPT,FOKKER F100,None,1990-07-08,US AIRWAYS*,North Carolina,Approach,Small,Unknown bird - small,Day,0,0,0,134
+CHICAGO O'HARE INTL ARPT,B-727,None,1990-07-08,AMERICAN AIRLINES,Illinois,Climb,Small,Unknown bird - small,Day,0,0,0,210
+SEATTLE-TACOMA INTL,DC-10,None,1990-07-09,NORTHWEST AIRLINES,Washington,Climb,Medium,Unknown bird - medium,Day,0,0,0,200
+ATLANTA INTL,B-737,None,1990-07-10,UNITED AIRLINES,Georgia,Approach,Medium,Unknown bird - medium,Day,0,0,0,
+MEMPHIS INTL,MD-80,None,1990-07-10,AMERICAN AIRLINES,Tennessee,Approach,Small,Unknown bird - small,Night,0,0,0,130
+SALT LAKE CITY INTL,B-727,Minor,1990-07-11,DELTA AIR LINES,Utah,Descent,Large,Unknown bird - large,Day,0,0,0,350
+ATLANTA INTL,B-767,None,1990-07-11,DELTA AIR LINES,Georgia,Landing Roll,Small,European starling,Dawn,0,0,0,130
+SAN FRANCISCO INTL ARPT,L-1011,None,1990-07-11,TRANS WORLD AIRLINES,California,Approach,Small,Unknown bird - small,Day,0,0,0,
+CLEVELAND-HOPKINS INTL ARPT,EMB-120,None,1990-07-12,BUSINESS,Ohio,Approach,Small,American robin,Day,0,0,0,130
+LIHUE ARPT,B-737-300,Substantial,1990-07-13,ALOHA AIRLINES,Hawaii,Take-off run,Small,Short-eared owl,Dawn,0,0,0,85
+LOS ANGELES INTL,MD-80,None,1990-07-13,ALASKA AIRLINES,California,Landing Roll,Small,American kestrel,Day,0,0,0,125
+GREATER PITTSBURGH,MD-80,None,1990-07-15,AMERICAN AIRLINES,Pennsylvania,Approach,Medium,Unknown bird - medium,Night,0,0,0,160
+NASHVILLE INTL,MD-80,None,1990-07-15,AMERICAN AIRLINES,Tennessee,Landing Roll,Small,Unknown bird - small,Dusk,0,0,0,120
+METRO OAKLAND INTL,BA-146-200,Minor,1990-07-16,US AIRWAYS*,California,Climb,Large,Canada goose,Dusk,0,0,0,130
+KANSAS CITY INTL,MD-80,None,1990-07-16,AMERICAN AIRLINES,Missouri,Approach,Small,Unknown bird - small,Day,0,0,0,140
+ATLANTIC CITY INTL,B-727,None,1990-07-16,BUSINESS,New Jersey,Climb,Small,Laughing gull,Day,0,0,0,120
+ATLANTIC CITY INTL,FOKKER F100,None,1990-07-16,US AIRWAYS*,New Jersey,Climb,Small,Laughing gull,Day,0,0,0,120

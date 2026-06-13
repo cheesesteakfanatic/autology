@@ -80,3 +80,26 @@ affected modules, justification referencing acceptance tests, and migration note
 - **Migration note:** Iceberg re-enters with the Rust core (AMD-0001 migration); the cell schema and
   survivorship ordering are substrate-independent, so the swap is a storage-layer replacement behind
   the same `Hearth` API.
+
+## AMD-0009 — ADD connection atlas (pipeline/atlas.py + /api/atlas): tier caps and build hooks
+
+- **GIVEN** the Atlas UI contract (constellation.js; scale-proven at 250 nodes / 600 arcs against
+  `tests/server/fixtures/atlas_synthetic_250.json`) tiers cross-dataset joins as
+  confirmed / likely / hint, **WHEN** building the atlas engine over the wild corpus (282 real
+  datasets), **THEN** three documented disciplines apply beyond the tier rules themselves:
+  (1) **LIKELY_CAP = 600 by score** — the raw likely band admits ~32k weak numeric/date co-coverage
+  pairs at wild scale; the cap mirrors the contract's own hint cap (400) and the UI's proven arc
+  budget; one arc per (src class, src prop, dst class, dst prop), strongest evidence first.
+  (2) **'atlas' ledger artifact provenance is ONE Leaf over a synthetic `atom://atlas/build` atom**
+  (constraint H satisfied cheaply; per-arc evidence remains inspectable in the payload itself).
+  (3) **the frozen CLI does not auto-build the atlas**: `materialize_induced` gained an OPTIONAL
+  `atlas_dir` keyword (existing callers unchanged); CLI/demo projects build offline via
+  `python -m ontoforge.pipeline.atlas <project_dir>`, which is exactly what `GET /api/atlas`'s
+  404 message instructs.
+- **Affected:** pipeline (atlas.py; materialize_induced optional kwarg), server
+  (/api/atlas, /api/atlas/link, ProjectWorld.read_atlas + reload cache drop).
+- **Justification:** tests/pipeline/test_atlas*.py (exact tiers/components/stats on a crafted
+  corpus; scaled-IND equivalence property) and tests/server/test_atlas_api.py (the UI fixture
+  parses through the API schema — the compatibility gate).
+- **Migration note:** none — caps are constants; lifting them is a one-line change when the UI
+  renderer's arc budget grows.

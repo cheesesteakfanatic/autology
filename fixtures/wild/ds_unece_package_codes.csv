@@ -1,0 +1,151 @@
+Status,Code,Name,Description,Numeric code
+,1A,"Drum, steel",,34
+,1B,"Drum, aluminium",,34
+,1D,"Drum, plywood",,34
+,1F,"Container, flexible",A packaging container of flexible construction.,93
+,1G,"Drum, fibre",,34
+,1W,"Drum, wooden",,34 or 35
+,2C,"Barrel, wooden",,44 or 45
+,3A,"Jerrican, steel",,23 or 33
+,3H,"Jerrican, plastic",,23 or 33
+,43,"Bag, super bulk",A cloth plastic or paper based bag having the dimensions of the pallet on which it is constructed.,64
+,44,"Bag, polybag","A type of plastic bag, typically used to wrap promotional pieces, publications, product samples, and/or catalogues. ",62 or 63
+,4A,"Box, steel",,21 to 25
+,4B,"Box, aluminium",,21 to 25
+,4C,"Box, natural wood",,21 to 25
+,4D,"Box, plywood",,21 to 25
+,4F,"Box, reconstituted wood",,21 to 25
+,4G,"Box, fibreboard",,21 to 25
+,4H,"Box, plastic",,21 to 25
+,5H,"Bag, woven plastic",,62 to 64
+,5L,"Bag, textile ",,62 to 64
+,5M,"Bag, paper ",,62 to 64
+,6H,"Composite packaging, plastic receptacle",,24 or 25 or 33 or 34
+,6P,"Composite packaging, glass receptacle",,23 or 24 or 25 or 33 or 34 or 62 or 63
+,7A,"Case, car",A type of portable container designed to store equipment for carriage in an automobile.,22 or 23
+,7B,"Case, wooden",A case made of wood for retaining substances or articles.,24 or 25
+,8A,"Pallet, wooden","A platform or open-ended box, made of wood, on which goods are retained for ease of mechanical handling during transport and storage.",24 or 25
+,8B,"Crate, wooden","A receptacle, made of wood, on which goods are retained for ease of mechanical handling during transport and storage.",23 to 27
+,8C,"Bundle, wooden",Loose or unpacked pieces of wood tied or wrapped together. ,16
+,AA,"Intermediate bulk container, rigid plastic",,23 to 26
+,AB,"Receptacle, fibre ",Containment vessel made of fibre used for retaining substances or articles.,21 to 23 or 31 to 33 or 41 to 43
+,AC,"Receptacle, paper ",Containment vessel made of paper for retaining substances or articles.,21 to 23 or 31 to 33 or 41 to 43
+,AD,"Receptacle, wooden ",Containment vessel made of wood for retaining substances or articles.,21 to 23 or 31 to 33 or 41 to 43
+,AE,Aerosol,,42 or 43
+,AF,"Pallet, modular, collars 80cms * 60cms ",Standard sized pallet of dimensions 80 centimeters by 60 centimeters (cms).,92
+,AG,"Pallet, shrinkwrapped ",Pallet load secured with transparent plastic film that has been wrapped around and then shrunk tightly.,92
+,AH,"Pallet, 100cms * 110cms ",Standard sized pallet of dimensions 100centimeters by 110 centimeters (cms).,92
+,AI,Clamshell,,21 to 23
+,AJ,Cone,Container used in the transport of linear material such as yarn.,51
+,AL,Ball,A spherical containment vessel for retaining substances or articles.,46
+,AM,"Ampoule, non-protected ",,31
+,AP,"Ampoule, protected ",,31
+,AT,Atomizer ,,42 or 43
+,AV,Capsule,,92
+,B4,Belt,A band use to retain multiple articles together.,93
+,BA,Barrel ,,44 or 45
+,BB,Bobbin ,,91
+,BC,Bottlecrate / bottlerack ,,29
+,BD,Board,,16
+,BE,Bundle ,,61 to 65
+,BF,"Balloon, non-protected ",,42 or 43
+,BG,Bag,A receptacle made of flexible material with an open or closed top.,62 to 64
+,BH,Bunch,,61 to 65
+,BI,Bin,,21 or 25
+,BJ,Bucket ,,51
+,BK,Basket ,,27
+,BL,"Bale, compressed ",,65
+,BM,Basin,,51
+,BN,"Bale, non-compressed ",,65
+,BO,"Bottle, non-protected, cylindrical ",A narrow-necked cylindrical shaped vessel without external protective packing material.,32 or 33
+,BP,"Balloon, protected ",,42 or 43
+,BQ,"Bottle, protected cylindrical",A narrow-necked cylindrical shaped vessel with external protective packing material.,32 or 33
+,BR,Bar,,16
+,BS,"Bottle, non-protected, bulbous ",A narrow-necked bulb shaped vessel without external protective packing material.,42 or 43
+,BT,Bolt ,,13
+,BU,Butt ,,44 or 45
+,BV,"Bottle, protected bulbous",A narrow-necked bulb shaped vessel with external protective packing material.,42 or 43
+,BW,"Box, for liquids",,21 to 25
+,BX,Box,,21 to 25
+,BY,"Board, in bundle/bunch/truss ",,16
+,BZ,"Bars, in bundle/bunch/truss",,16
+,CA,"Can, rectangular ",,22
+,CB,"Crate, beer",,23 to 27
+,CC,Churn,,32 or 33
+,CD,"Can, with handle and spout ",,22
+,CE,Creel,,27
+,CF,Coffer ,,24
+,CG,Cage ,,26
+,CH,Chest,,25
+,CI,Canister ,,21 or 22
+,CJ,Coffin ,,54
+,CK,Cask ,,44 or 45
+,CL,Coil ,,14
+,CM,Card,A flat package usually made of fibreboard from/to which product is often hung or attached.,67
+,CN,"Container, not otherwise specified as transport equipment",,25
+,CO,"Carboy, non-protected",,43
+,CP,"Carboy, protected",,43
+,CQ,Cartridge,Package containing a charge such as propelling explosive for firearms or ink toner for a printer.,92
+,CR,Crate,,24 to 25
+,CS,Case ,,21 to 25
+,CT,Carton ,,22 to 24
+,CU,Cup,,51
+,CV,Cover,,67
+,CW,"Cage, roll ",,26
+,CX,"Can, cylindrical ",,32
+,CY,Cylinder ,,12
+,CZ,Canvas ,,67
+,DA,"Crate, multiple layer, plastic ",,23 to 25 or 27
+,DB,"Crate, multiple layer, wooden",,23 to 25 or 27
+,DC,"Crate, multiple layer, cardboard ",,23 to 25 or 27
+,DG,"Cage, Commonwealth Handling Equipment Pool  (CHEP)",,26
+,DH,"Box, Commonwealth Handling Equipment Pool (CHEP), Eurobox",A box mounted on a pallet base under the control of CHEP.,27
+,DI,"Drum, iron ",,34
+,DJ,"Demijohn, non-protected",,43
+,DK,"Crate, bulk, cardboard ",,23 to 25 or 27
+,DL,"Crate, bulk, plastic ",,23 to 25 or 27
+,DM,"Crate, bulk, wooden",,23 to 25 or 27
+,DN,Dispenser,,93
+,DP,"Demijohn, protected",,43
+,DR,Drum ,,34
+,DS,"Tray, one layer no cover, plastic",,27
+,DT,"Tray, one layer no cover, wooden ",,27
+,DU,"Tray, one layer no cover, polystyrene",,27
+,DV,"Tray, one layer no cover, cardboard",,27
+,DW,"Tray, two layers no cover, plastic tray",,27 or 29
+,DX,"Tray, two layers no cover, wooden",,27 or 29
+,DY,"Tray, two layers no cover, cardboard ",,27 or 29
+,EC,"Bag, plastic ",,62 to 64
+,ED,"Case, with pallet base ",,23 to 25
+,EE,"Case, with pallet base, wooden ",,23 to 25
+,EF,"Case, with pallet base, cardboard",,23 to 25
+,EG,"Case, with pallet base, plastic",,23 to 25
+,EH,"Case, with pallet base, metal",,23 to 25
+,EI,"Case, isothermic ",,22 to 25
+,EN,Envelope ,,67
+,FB,Flexibag,"A flexible containment bag made of plastic, typically for the transportation bulk non-hazardous cargoes using standard size shipping containers.",65
+,FC,"Crate, fruit ",,23 to 27
+,FD,"Crate, framed",,26
+,FE,Flexitank,"A flexible containment tank made of plastic, typically for the transportation bulk non-hazardous cargoes using standard size shipping containers.",65
+,FI,Firkin ,,44 or 45
+,FL,Flask,,42 or 43
+,FO,Footlocker ,,23
+,FP,Filmpack ,,67
+,FR,Frame,,26
+,FT,Foodtainer,,21 to 23
+,FW,"Cart, flatbed",Wheeled flat bedded device on which trays or other regular shaped items are packed for transportation purposes.,94
+,FX,"Bag, flexible container",,61 to 66
+,GB,"Bottle, gas",A narrow-necked metal cylinder for retention of liquefied or compressed gas.,31 or 35
+,GI,Girder ,,16
+,GL,"Container, gallon",A container with a capacity of one gallon.,32
+,GR,"Receptacle, glass ",Containment vessel made of glass for retaining substances or articles.,21 to 23 or 31 to 33 or 41 to 43
+,GU,"Tray, containing horizontally stacked flat items",Tray containing flat items stacked on top of one another.,27
+,GY,"Bag, gunny","A sack made of gunny or burlap, used for transporting coarse commodities, such as grains, potatoes, and other agricultural products. ",63 to 64
+,GZ,"Girders, in bundle/bunch/truss ",,16
+,HA,"Basket, with handle, plastic ",,27
+,HB,"Basket, with handle, wooden",,27
+,HC,"Basket, with handle, cardboard ",,27
+,HG,Hogshead ,,44 or 45
+,HN,Hanger,A purpose shaped device with a hook at the top for hanging items from a rail.,93
+,HR,Hamper ,,23
+,IA,"Package, display, wooden ",,21 to 23

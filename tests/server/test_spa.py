@@ -6,12 +6,14 @@ dignified voice; and the whole non-vendor payload stays under budget."""
 
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 
 STATIC_DIR = Path(__file__).resolve().parents[2] / "src" / "ontoforge" / "server" / "static"
 JS_DIR = STATIC_DIR / "js"
 APPS_DIR = JS_DIR / "apps"
+ATLAS_FIXTURE = Path(__file__).parent / "fixtures" / "atlas_synthetic_250.json"
 
 #: every micro-app the OS ships, in registry order
 APPS = ("ask", "constellation", "inspector", "evidence", "review", "dashboards", "pulse", "exporter")
@@ -199,3 +201,172 @@ def test_total_non_vendor_payload_under_budget():
         if p.is_file() and "vendor" not in p.parts
     )
     assert total < 250 * 1024, f"non-vendor static payload is {total} bytes (budget 250 KB)"
+
+
+# ═══════════════════════════════════ THE ATLAS (constellation, evolved)
+
+
+def _engine_src() -> str:
+    return (JS_DIR / "constellation.js").read_text(encoding="utf-8")
+
+
+def _app_src() -> str:
+    return (APPS_DIR / "constellation.js").read_text(encoding="utf-8")
+
+
+def test_atlas_fetch_is_wired_and_defensive(client):
+    """The app rides GET /api/atlas through the shared cache, and falls
+    back to the plain ontology sky with a quiet note while the endpoint's
+    crew lands (it may 404 — that must never throw into the DOM)."""
+    core = (JS_DIR / "core.js").read_text(encoding="utf-8")
+    assert "/api/atlas" in core, "the atlas endpoint is fetched through the kernel cache"
+    assert "loadAtlas" in core
+    assert "cache.atlasPromise = null" in core or "atlasPromise: null" in core
+    app = _app_src()
+    assert "loadAtlas" in app, "the constellation app asks for the atlas"
+    assert "renderAtlas" in app, "and renders it through the engine"
+    assert "atlas not built" in app, "the 404 fallback keeps a quiet, honest voice"
+    assert "engine.render(onto)" in app, "the original ontology sky still renders"
+    # a reload drops the atlas cache with the rest of the world
+    assert "dropCaches" in app
+
+
+def test_atlas_tier_legend_chips_are_filter_toggles():
+    """confirmed / likely / hint / silos render as toggle chips carrying
+    counts from the served stats block."""
+    app = _app_src()
+    for tier in ("confirmed", "likely", "hint", "silos"):
+        assert f'"{tier}"' in app, f"the {tier} tier has a legend toggle"
+    assert "tier-toggle" in app, "legend chips are buttons, not decorations"
+    assert "data-tier" in app
+    assert "aria-pressed" in app, "toggles speak their state"
+    assert "stats.confirmed" in app and "stats.likely" in app, "counts come from stats"
+    assert re.search(r'tierToggle\("hint",[^)]*off: true', app), "hint arcs ship OFF by default"
+    css = (STATIC_DIR / "style.css").read_text(encoding="utf-8")
+    assert ".tier-toggle" in css
+    for tier in ("confirmed", "likely", "hint", "silos"):
+        assert f".constellation.hide-{tier}" in css, f"toggling {tier} hides that tier in CSS"
+
+
+def test_likely_joins_are_dashed_amber_with_score_opacity():
+    """A LIKELY join must read as a hypothesis: dashed amber, weighted by
+    its own score, breathing only on hover."""
+    css = (STATIC_DIR / "style.css").read_text(encoding="utf-8")
+    likely_rule = re.search(r"\.tier-likely\s*\{([^}]*)\}", css)
+    assert likely_rule, "the dashed-likely CSS class exists"
+    assert "stroke-dasharray" in likely_rule.group(1), "likely arcs are dashed"
+    assert "--amber" in likely_rule.group(1), "likely arcs are amber"
+    assert "likely-breathe" in css, "likely arcs breathe on hover"
+    assert "prefers-reduced-motion" in css
+    engine = _engine_src()
+    assert "tier-${tier}" in engine, "every arc carries its tier class"
+    assert 'setAttribute("stroke-opacity"' in engine, "opacity is set per arc, proportional to score"
+
+
+def test_atlas_evidence_card_speaks_the_contract():
+    """Hovering a likely arc shows WHY: score, coverage, overlap, the two
+    column names, sample shared values in mono; click pins the card."""
+    engine = _engine_src()
+    for key in ("coverage", "overlap_count", "sample_shared_values",
+                "name_similarity", "semtype_match", "src_prop", "dst_prop"):
+        assert key in engine, f"the evidence card surfaces {key}"
+    assert "pinEvidence" in engine and "unpinEvidence" in engine, "click pins, click-away releases"
+    assert "slice(0, 5)" in engine, "at most five sample shared values"
+    app = _app_src()
+    assert "evidence-card" in app or "evidence-card" in engine, "the evidence-card container exists"
+    css = (STATIC_DIR / "style.css").read_text(encoding="utf-8")
+    assert ".evidence-card" in css
+    assert ".evidence-card.pinned" in css
+    assert "--mono" in css  # samples and column names are mono (design tokens present)
+
+
+def test_silos_collect_in_a_dignified_archipelago():
+    """Singleton components band along the bottom — dimmer, labeled, and
+    never styled like an error."""
+    engine = _engine_src()
+    assert "archipelago" in engine, "the archipelago band is real markup"
+    assert "island-hull" in engine and "island-label" in engine, "islands carry hulls and labels"
+    assert "dataset_count" in engine, "island labels carry their dataset counts"
+    css = (STATIC_DIR / "style.css").read_text(encoding="utf-8")
+    assert ".constellation .archipelago" in css
+    assert ".constellation .island-hull" in css
+    assert ".constellation .island-label" in css
+    arch_rules = "".join(m.group(0) for m in re.finditer(r"\.archipelago[^{]*\{[^}]*\}", css))
+    assert "--verdict-red" not in arch_rules, "silos are quiet, never error-red"
+    assert "small-caps" in css, "island labels are small-caps serif"
+
+
+def test_atlas_scale_discipline_is_documented_and_held():
+    """250 nodes / 600 arcs: settle once, render static SVG, pan/zoom by
+    viewBox only, hover by delegation, labels yield below the zoom
+    threshold. The guard comment marks the contract in the source."""
+    engine = _engine_src()
+    assert "ATLAS SCALE GUARD" in engine, "the node-count guard comment survives"
+    assert "250 nodes / 600 arcs" in engine
+    # pan/zoom touch only the viewBox
+    assert 'setAttribute("viewBox"' in engine
+    # hover/click ride one delegated listener set — never per-node handlers
+    assert 'svg.addEventListener("pointerover"' in engine
+    assert 'svg.addEventListener("click"' in engine
+    assert "onpointerenter:" not in engine, "no per-node inline hover handlers"
+    assert "onpointermove:" not in engine
+    # iterations shrink as islands grow — one big island cannot stall render
+    assert "layoutIterations" in engine
+    # class labels hide when zoomed out; island labels stay readable
+    assert "labels-hidden" in engine
+    css = (STATIC_DIR / "style.css").read_text(encoding="utf-8")
+    assert ".constellation.labels-hidden .node-label" in css
+
+
+def test_atlas_titlebar_and_spotlight_focus():
+    """When the atlas is present the window announces itself —
+    'Atlas — N islands · M silos' — and a class search flies to its island."""
+    app = _app_src()
+    assert "setTitle" in app and "Atlas — " in app
+    assert "islands" in app and "silos" in app
+    engine = _engine_src()
+    assert "zoomToIsland" in engine, "island labels zoom to fit their island"
+    assert "focusClass" in engine, "spotlight focus lands on the engine"
+    assert "engine.focusClass" in app, "the app routes class:focus through the island zoom"
+
+
+def test_synthetic_250_node_atlas_fixture_matches_the_contract():
+    """The committed wild-atlas fixture exercises the full contract at the
+    scale the engine guards: 250 classes, 600+ links, every tier, real
+    silos — and the JS consumes exactly these keys."""
+    atlas = json.loads(ATLAS_FIXTURE.read_text(encoding="utf-8"))
+    comps, links, stats = atlas["components"], atlas["links"], atlas["stats"]
+
+    n_classes = sum(len(c["class_uris"]) for c in comps)
+    assert n_classes == 250, "the fixture is the 250-node scale test"
+    assert stats["classes"] == n_classes
+    unique = {u for c in comps for u in c["class_uris"]}
+    assert len(unique) == n_classes, "class URIs are globally unique across components"
+    assert len(links) >= 600, "the fixture is the 600-arc scale test"
+    assert {l["tier"] for l in links} == {"confirmed", "likely", "hint"}
+    assert stats["confirmed"] == sum(1 for l in links if l["tier"] == "confirmed")
+    assert stats["likely"] == sum(1 for l in links if l["tier"] == "likely")
+    assert stats["hint"] == sum(1 for l in links if l["tier"] == "hint")
+
+    silos = [c for c in comps if c["is_silo"]]
+    assert silos, "the fixture has honest silos"
+    assert stats["silos"] == len(silos)
+    assert stats["components"] == len(comps)
+    assert all(len(c["class_uris"]) == 1 for c in silos), "silos are singletons"
+
+    for c in comps:
+        assert {"id", "label", "class_uris", "dataset_count", "is_silo"} <= set(c)
+    every_uri = {u for c in comps for u in c["class_uris"]}
+    for l in links:
+        assert {"src_class", "dst_class", "src_prop", "dst_prop",
+                "tier", "score", "evidence"} <= set(l)
+        assert l["src_class"] in every_uri and l["dst_class"] in every_uri
+        assert {"coverage", "overlap_count", "sample_shared_values",
+                "name_similarity", "semtype_match"} <= set(l["evidence"])
+
+    # the render path consumes this exact contract — every key it needs
+    # appears in the engine/app source (static proof the code paths exist)
+    src = _engine_src() + _app_src()
+    for key in ("components", "links", "stats", "class_uris", "dataset_count",
+                "is_silo", "src_class", "dst_class", "tier", "score", "evidence"):
+        assert key in src, f"the JS never reads contract key {key}"
