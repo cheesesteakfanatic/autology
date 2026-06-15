@@ -58,17 +58,35 @@ export function createInspectorApp() {
       const ms = (iso) => (iso ? Date.parse(iso) : null);
       const dayISO = (t) => new Date(t).toISOString().slice(0, 10);
 
+      // Many materialized cells carry an epoch-floor valid_from (1970-01-01)
+      // for "always-known" facts. Anchoring the slider at 1970 squashes every
+      // real change into the far right and makes the scrubber spatially
+      // useless. So we clamp the LOW bound to the data's real activity window:
+      // the earliest NON-epoch timestamp (a robust 5th-percentile lower edge),
+      // never the raw minimum. The full history bars still draw open to −∞.
+      const EPOCH_FLOOR = Date.parse("1971-01-01T00:00:00Z"); // anything older = "always"
       function computeDomain(hist) {
-        let lo = Infinity, hi = -Infinity;
+        const reals = [];
+        let hi = -Infinity;
         for (const cells of Object.values(hist)) {
           for (const c of cells) {
-            const a = ms(c.valid_from); if (a !== null) { lo = Math.min(lo, a); hi = Math.max(hi, a); }
-            const b = ms(c.valid_to);   if (b !== null) { lo = Math.min(lo, b); hi = Math.max(hi, b); }
+            const a = ms(c.valid_from);
+            if (a !== null) { if (a > EPOCH_FLOOR) reals.push(a); hi = Math.max(hi, a); }
+            const b = ms(c.valid_to);
+            if (b !== null) { if (b > EPOCH_FLOOR) reals.push(b); hi = Math.max(hi, b); }
           }
         }
         const now = Date.now();
-        if (!isFinite(lo)) { lo = now - 365 * 864e5; }
-        hi = Math.max(isFinite(hi) ? hi : now, now);
+        reals.sort((x, y) => x - y);
+        let lo;
+        if (reals.length) {
+          // 5th-percentile lower edge — trims a lone early outlier, keeps the
+          // window where the real changes actually happened
+          lo = reals[Math.floor(reals.length * 0.05)];
+        } else {
+          lo = now - 365 * 864e5; // no real timestamps — last year is plenty
+        }
+        hi = Math.max(isFinite(hi) && hi > EPOCH_FLOOR ? hi : now, now);
         if (hi - lo < 864e5) { lo -= 30 * 864e5; hi += 30 * 864e5; }
         const pad = (hi - lo) * 0.04;
         return [lo - pad, hi + pad];

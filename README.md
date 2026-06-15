@@ -14,7 +14,7 @@ typed amendments in [docs/DEVIATIONS.md](docs/DEVIATIONS.md).
 
 ```bash
 uv sync --all-extras
-uv run pytest tests/ -q          # full suite (1030+ tests)
+uv run pytest tests/ -q          # full suite (1109 tests)
 
 # One line, zero setup — the Meridian enterprise estate (10 tables, ~9,000 rows
 # of supply-chain/retail/quality data, regenerated from code, full pipeline):
@@ -47,16 +47,24 @@ questions ("altitude in dollars") are rejected statically by the OQIR type check
 
 **OntoForge OS** (`ontoforge serve`) is the web surface: not pages, an operating system for an
 induced ontology. A window manager (drag, 8-handle resize, edge snap with preview ghost,
-minimize-to-dock) hosts eight micro-apps — **Ask** (cited answers whose amber cite-dots spawn an
-Evidence child window of source atoms), **Evidence** (atoms + derivation tree), **Constellation**
-(the ontology star chart), **Inspector** (bitemporal time scrubber + neighbors, where clicking a
-neighbor opens a second Inspector beside it), **Review** (j/k/a/r verdict queue feeding spine
-recalibration), **Dashboards**, **Pulse** (live ledger counters), and **Exporter** (AMBER bundles).
-**Spotlight** (⌘K, `/`, or just start typing) is the front door: one search box over classes,
-entities, properties, saved questions, and apps, backed by `GET /api/search` with ranked,
-interleaved results — and an "Ask the estate" fallback so no query dead-ends. Layouts persist via
-`/api/workspace`. Vanilla ES modules, no build chain, <250 KB payload (test-enforced). Design
-system in [docs/UI_DESIGN.md](docs/UI_DESIGN.md); shell internals in
+minimize-to-dock) hosts eight micro-apps — **Ask** (cited answers whose source-hue cite-dots land
+with a staggered pop and spawn an Evidence child window of source atoms), **Evidence** (atoms +
+derivation tree), **Constellation** (the ontology star chart, each Atlas island in its own
+categorical hue), **Inspector** (bitemporal time scrubber clamped to the data's real activity
+window + neighbors, where clicking a neighbor opens a second Inspector beside it), **Review**
+(j/k/a/r verdict queue feeding spine recalibration), **Dashboards** (warm Vega charts), **Pulse**
+(live ledger counters), and **Exporter** (AMBER bundles). **Spotlight** (⌘K, `/`, or just start
+typing) is the front door: one search box over classes, entities, properties, saved questions, and
+apps, backed by `GET /api/search` with ranked, interleaved results — and an "Ask the estate"
+fallback so no query dead-ends. Layouts persist via `/api/workspace`.
+
+The look is a **warm midcentury-modern system**: oatmeal/cream paper grounds, espresso ink, a
+locked atomic-age 8-hue atlas wheel (each app, island, and chart series owns a deterministic hue),
+marigold accents, warm-amber shadows (never black), a 270° arc confidence gauge, and a quiet
+calm-dark night theme as an opt-in. Vanilla ES modules, no build chain, ships fully offline
+(vendored Vega only); the non-vendor payload is **217,742 bytes — under the 250 KB budget**
+(test-enforced), with API data reaching the DOM only through `createTextNode` (no `innerHTML`).
+Design system in [docs/UI_DESIGN.md](docs/UI_DESIGN.md); shell internals in
 [src/ontoforge/server/static/README.md](src/ontoforge/server/static/README.md); competitive
 positioning in [docs/MARKET_EDGE.md](docs/MARKET_EDGE.md).
 

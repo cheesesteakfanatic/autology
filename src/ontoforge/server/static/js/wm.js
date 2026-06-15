@@ -11,7 +11,7 @@
    - interaction shield (body.wm-gesture) during every gesture
    - layout persisted: PUT /api/workspace (debounced) + localStorage always */
 
-import { el, api, debounce, store } from "./core.js";
+import { el, api, debounce, store, appHue } from "./core.js";
 
 const WORKSPACE_KEY = "ontoforge.workspace";
 const MIN_W = 300;
@@ -411,6 +411,9 @@ export function createWM({ desktop, bus, registry, onWindows, dockTarget }) {
     const root = el("section", {
       class: "window", tabindex: "-1", role: "dialog",
       "aria-label": spec.title,
+      // the window's owner-app atlas hue — drives the title strip, dock
+      // tile, and any cite-dots the app renders inside it
+      style: `--accent:${appHue(spec.id)}`,
       dataset: { app: spec.id, winId: id },
     }, titlebar, body,
       HANDLES.map((d) => el("span", { class: `rs rs-${d}`, dataset: { rs: d }, "aria-hidden": "true" })));

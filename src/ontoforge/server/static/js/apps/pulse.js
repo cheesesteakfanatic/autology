@@ -3,7 +3,7 @@
    open (the interval is disposed with the window). Project reload lives
    here and announces itself on the bus. */
 
-import { el, clear, api, errorNote, fmt, skeletonCard, dropCaches } from "../core.js";
+import { el, clear, api, errorNote, fmt, skeletonCard, dropCaches, toast } from "../core.js";
 
 const PIPELINE = ["ingest", "profile", "induce", "resolve", "materialize"];
 const POLL_MS = 10_000;
@@ -27,6 +27,7 @@ export function createPulseApp() {
             dropCaches();
             ctx.emit("world:reload", {});
             await load();
+            toast("project reloaded", { kind: "ok" });
           } catch (e) {
             clear(body).append(errorNote(e));
           } finally {

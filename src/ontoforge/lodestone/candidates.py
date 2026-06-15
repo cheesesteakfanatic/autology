@@ -323,6 +323,7 @@ def _enumerate(question: str, bindings: list[Binding], coverage: float, onto: On
 
     # numeric comparisons: attach to the bound numeric property whose unit
     # dimension matches the literal's unit (else the nearest bound numeric prop)
+    classes_for_cond = set(classes)
     for b in by_kind.get("number_cond", []):
         op, val = b.value  # type: ignore[misc]
         unit_sym = b.target or None
@@ -337,6 +338,34 @@ def _enumerate(question: str, bindings: list[Binding], coverage: float, onto: On
                     continue
             dist = abs((pb.pos if pb.pos >= 0 else 0) - (b.pos if b.pos >= 0 else 0))
             cands.append((dist, cls, prop))
+        # FALLBACK: a paraphrase may state the threshold WITHOUT naming the
+        # measure ('reports ... under 10000 ft' has no 'altitude' prop binding).
+        # Search numeric properties on the bound classes; require unit-dimension
+        # AGREEMENT when the literal carries a unit (dimension-guarded — a
+        # dimension-incompatible literal stays unhosted and the type checker
+        # still rejects a coerced reading, so no trick-unit can sneak through).
+        if not cands and classes_for_cond:
+            host_cands: list[tuple[str, str, bool]] = []
+            for cls in sorted(classes_for_cond):
+                for prop, p in sorted(all_props(onto, cls).items()):
+                    if p.is_link or p.datatype not in NUMERIC \
+                            or (cls, prop) in used_cond_props:
+                        continue
+                    dim_ok = True
+                    if unit_sym and p.unit and unit_sym in UNITS and p.unit in UNITS:
+                        dim_ok = UNITS[unit_sym].dimension == UNITS[p.unit].dimension
+                    if unit_sym and not p.unit:
+                        dim_ok = False  # literal carries a unit; host must too
+                    host_cands.append((cls, prop, dim_ok))
+            # prefer a dimension-matching host; among those, the one whose unit
+            # equals the literal's unit, then deterministic name order
+            matching = [(c, p) for c, p, ok in host_cands if ok]
+            if matching:
+                def _unit_eq(cp: tuple[str, str]) -> int:
+                    pu = resolve_prop(onto, cp[0], cp[1])
+                    return 0 if (unit_sym and pu and pu.unit == unit_sym) else 1
+                cls, prop = sorted(matching, key=lambda cp: (_unit_eq(cp), cp[0], cp[1]))[0]
+                cands = [(0, cls, prop)]
         if cands:
             _d, cls, prop = sorted(cands)[0]
             add_shared(cls, prop, op, val, unit_sym)
@@ -509,15 +538,33 @@ def _enumerate(question: str, bindings: list[Binding], coverage: float, onto: On
             in_clause.append((pb, cls, prop, p.is_link))
         if not in_clause:
             continue
+        wh_pos = start
+        for i in range(start, min(end, len(toks))):
+            if toks[i] in WH:
+                wh_pos = i
+                break
         datatype = [x for x in in_clause if not x[3]]
-        if datatype:
+        links = [x for x in in_clause if x[3]]
+        # wh-adjacency: when a LINK property sits right after the wh-word (the
+        # asked-for entity, 'which MANUFACTURER made the model ...') and every
+        # datatype prop in the clause appears strictly LATER (those are path
+        # waypoints — 'the MODEL of the aircraft'), the link is the answer, not
+        # the waypoint's datatype. Otherwise the general datatype-beats-link rule
+        # applies ('registration NUMBER' over 'aircraft').
+        nearest_link = sorted(
+            links,
+            key=lambda x: ((x[0].pos - wh_pos) if x[0].pos >= wh_pos else 10_000,
+                           -x[0].score, x[1]),
+        )[0] if links else None
+        if (
+            nearest_link is not None
+            and 0 <= nearest_link[0].pos - wh_pos <= 2
+            and (not datatype or all(d[0].pos > nearest_link[0].pos for d in datatype))
+        ):
+            best = nearest_link
+        elif datatype:
             best = sorted(datatype, key=lambda x: (x[0].pos, -x[0].score, x[1]))[0]
         else:
-            wh_pos = start
-            for i in range(start, min(end, len(toks))):
-                if toks[i] in WH:
-                    wh_pos = i
-                    break
             best = sorted(
                 in_clause,
                 key=lambda x: ((x[0].pos - wh_pos) if x[0].pos >= wh_pos else 10_000,

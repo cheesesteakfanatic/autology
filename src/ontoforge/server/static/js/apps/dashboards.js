@@ -5,25 +5,32 @@
 
 import { el, clear, api, errorNote } from "../core.js";
 
+/* Warm mid-century chart theme: espresso ink, walnut axes, the locked
+   atomic-age categorical wheel for multi-series, marigold for the single
+   default mark. Transparent ground sits on the cream chart cell. */
+const ATLAS_RANGE = ["#1F6F6B", "#E0A126", "#C75B39", "#7C8A3B", "#2D6E8E", "#B8532A", "#6E4A63", "#9A6B2F"];
+const INK = "#2A1F14", WALNUT = "#6B5A45";
 const VEGA_CONFIG = {
   background: "transparent",
   view: { stroke: "transparent" },
+  font: "Futura, 'Avenir Next', 'Century Gothic', system-ui, sans-serif",
   axis: {
-    labelColor: "#9b978e", titleColor: "#9b978e",
-    gridColor: "rgba(232,230,225,0.07)", domainColor: "rgba(232,230,225,0.22)",
-    tickColor: "rgba(232,230,225,0.22)",
-    labelFont: "monospace", titleFont: "monospace", labelFontSize: 10, titleFontSize: 10,
+    labelColor: WALNUT, titleColor: WALNUT,
+    gridColor: "rgba(42,31,20,0.08)", domainColor: "rgba(42,31,20,0.26)",
+    tickColor: "rgba(42,31,20,0.26)",
+    labelFont: "ui-monospace, Menlo, monospace", titleFont: "Futura, 'Avenir Next', system-ui, sans-serif",
+    labelFontSize: 10, titleFontSize: 10, gridDash: [1, 3],
   },
-  legend: { labelColor: "#9b978e", titleColor: "#9b978e" },
-  title: { color: "#e8e6e1", font: "Georgia, serif" },
-  range: { category: ["#e8a33d", "#b97c26", "#8a5c1d", "#5c3e16", "#f0c47e"] },
-  mark: { color: "#e8a33d" },
-  bar: { fill: "#e8a33d" },
-  line: { stroke: "#e8a33d" },
-  point: { fill: "#e8a33d" },
-  area: { fill: "#b97c26" },
-  arc: { fill: "#e8a33d" },
-  text: { fill: "#e8e6e1", font: "monospace" },
+  legend: { labelColor: WALNUT, titleColor: WALNUT },
+  title: { color: INK, font: "Futura, 'Avenir Next', system-ui, sans-serif", fontWeight: 600 },
+  range: { category: ATLAS_RANGE },
+  mark: { color: "#E0A126" },
+  bar: { fill: "#E0A126" },
+  line: { stroke: "#1F6F6B", strokeWidth: 2 },
+  point: { fill: "#1F6F6B" },
+  area: { fill: "#E0A126", fillOpacity: 0.65 },
+  arc: { fill: "#E0A126" },
+  text: { fill: INK, font: "ui-monospace, Menlo, monospace" },
 };
 
 function renderChart(cell, spec) {

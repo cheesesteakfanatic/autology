@@ -3,7 +3,7 @@
    arc per decision kind, ER pairs side-by-side, and verdicts that feed
    the spine's recalibration flywheel. */
 
-import { el, svgEl, clear, api, errorNote, confGauge } from "../core.js";
+import { el, svgEl, clear, api, errorNote, confGauge, toast } from "../core.js";
 
 const ER_PAIR_RE = /^er:([^:]+):(.+)\|\|(.+)$/;
 
@@ -100,6 +100,9 @@ export function createReviewApp() {
             clear(actions).append(el("span", {
               class: `verdict-result${out.recalibrated ? " recalibrated" : ""}`,
             }, msg, out.recalibrated ? ` · ⚒ ${out.kind} recalibrated` : ""));
+            toast(
+              out.recalibrated ? `${out.kind} recalibrated — the spine refit` : msg,
+              { kind: out.recalibrated ? "ok" : "info" });
             clearTimeout(reloadTimer);
             reloadTimer = setTimeout(load, 750);
           } catch (e) {

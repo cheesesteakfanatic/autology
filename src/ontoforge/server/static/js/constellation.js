@@ -27,6 +27,15 @@
 
 const BASE_W = 960, BASE_H = 600;
 
+/* the locked atomic-age categorical wheel — each ISLAND draws a distinct
+   warm hue from here so the map reads as mid-century cartography (kept in
+   sync with core.js ATLAS_HUES; the engine stays import-free for the
+   scale-guard discipline). */
+const ISLAND_HUES = [
+  "#1F6F6B", "#E0A126", "#C75B39", "#7C8A3B",
+  "#2D6E8E", "#B8532A", "#6E4A63", "#9A6B2F",
+];
+
 /* seeded PRNG (mulberry32) over a string hash — same input, same sky */
 function hash32(s) {
   let h = 2166136261 >>> 0;
@@ -340,7 +349,7 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
 
   /* ────────────────────────────────────────────── shared node painter */
 
-  function appendNode(layer, uri, x, y, c, { halo = true } = {}) {
+  function appendNode(layer, uri, x, y, c, { halo = true, hue = null } = {}) {
     const r = nodeRadius(c);
     const lum = Math.max(0.15, c.confidence);
     const g = svgEl("g", {
@@ -348,15 +357,16 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
       "data-uri": uri,
     });
     if (halo) {
-      // luminance halo: amber glow scaled by confidence — the star's heat
+      // luminance halo: marigold glow scaled by confidence — the star's heat
       g.append(svgEl("circle", {
         class: "node-halo", cx: x.toFixed(1), cy: y.toFixed(1),
-        r: (r * 2.1).toFixed(1), opacity: (0.10 * lum).toFixed(3),
+        r: (r * 2.1).toFixed(1), opacity: (0.12 * lum).toFixed(3),
       }));
     }
     g.append(svgEl("circle", {
       class: "node-core", cx: x.toFixed(1), cy: y.toFixed(1), r: r.toFixed(1),
       "stroke-opacity": lum.toFixed(3),
+      style: hue ? `stroke:${hue}` : null,   // island stars wear their hue
     }));
     if (c.is_event) {
       g.append(svgEl("circle", {
@@ -472,6 +482,7 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
       || String(a.id).localeCompare(String(b.id)));
 
     // 1 · each island settles its own seeded sim in local coordinates
+    islands.forEach((comp, ii) => { comp._hue = ISLAND_HUES[ii % ISLAND_HUES.length]; });
     for (const comp of islands) {
       const uris = comp.class_uris;
       const inIsland = new Set(uris);
@@ -578,10 +589,11 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
       const pad = 30;
       const bb = { x: x0 - pad, y: y0 - pad, w: (x1 - x0) + 2 * pad, h: (y1 - y0) + 2 * pad };
       islandGeo.set(String(comp.id), bb);
-      // the hull — a barely-visible rounded boundary, never a border
+      // the hull — a flat categorical-hue blob with a faint contour halo
       hullLayer.append(svgEl("rect", {
         class: "island-hull", x: bb.x.toFixed(1), y: bb.y.toFixed(1),
         width: bb.w.toFixed(1), height: bb.h.toFixed(1), rx: 26,
+        style: `fill:${comp._hue}`,
       }));
       const label = svgEl("text", {
         class: "island-label", "data-island": String(comp.id),
@@ -641,7 +653,7 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
     for (const comp of islands) {
       for (const p of comp._local) {
         const q = positions.get(p.id);
-        appendNode(nodeLayer, p.id, q.x, q.y, nodeInfo.get(p.id));
+        appendNode(nodeLayer, p.id, q.x, q.y, nodeInfo.get(p.id), { hue: comp._hue });
       }
     }
 

@@ -17,6 +17,16 @@ const KIND_GLYPHS = {
 };
 const RECENT_QUESTIONS_KEY = "ontoforge.recent.questions";
 
+/* The server's static app registry uses legacy ids that diverge from the
+   JS micro-app ids (server: entities/status/export; JS: inspector/pulse/
+   exporter). Map them so a server app result routes correctly; ids that
+   match the JS registry pass through unchanged. */
+const SERVER_APP_ALIAS = {
+  entities: "inspector",
+  status: "pulse",
+  export: "exporter",
+};
+
 /* ─────────────────────────── ranking: exact-prefix > word-prefix >
    substring > fuzzy subsequence with boundary/consecutive-run bonuses */
 
@@ -109,10 +119,20 @@ export function createSpotlight({ root, input, listEl, countEl, registry, wm, bu
       const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&limit=20`, { signal: abortCtl.signal });
       if (!res.ok) return; // endpoint optional — local results stand alone
       const out = await res.json();
-      serverResults = (out.results || []).map((r) => ({
-        kind: r.kind, title: r.title, subtitle: r.subtitle || "", ref: r.ref,
-        score: Math.round((r.score || 0) * 900),
-      }));
+      serverResults = [];
+      for (const r of out.results || []) {
+        let ref = r.ref;
+        if (r.kind === "app") {
+          // route legacy server app ids to the real JS micro-apps; drop any
+          // that still don't resolve so no Spotlight row dead-ends on click
+          ref = SERVER_APP_ALIAS[ref] || ref;
+          if (!registry.get(ref)) continue;
+        }
+        serverResults.push({
+          kind: r.kind, title: r.title, subtitle: r.subtitle || "", ref,
+          score: Math.round((r.score || 0) * 900),
+        });
+      }
       serverFor = q;
       if (openState && input.value.trim() === q) rebuild(false);
     } catch { /* aborted or offline — keep local results */ }
@@ -147,9 +167,28 @@ export function createSpotlight({ root, input, listEl, countEl, registry, wm, bu
     if (q) queryServer(q);
   }
 
+  /** A short, stable tail of an entity ref/uri — the last id segment —
+      used to disambiguate rows that share a non-unique display label. */
+  function refTail(ref) {
+    const seg = String(ref).split(/[/#]/).filter(Boolean).pop() || String(ref);
+    return seg.length > 14 ? `…${seg.slice(-12)}` : seg;
+  }
+
   function render() {
     clear(listEl);
+    // labels are often non-unique (a port-of-loading name shared across many
+    // contracts). Find which titles repeat so we can append a disambiguating
+    // ref tail — otherwise identical rows crowd out distinct hits.
+    const titleCounts = new Map();
+    for (const it of items) {
+      if (it.kind === "entity") titleCounts.set(it.title, (titleCounts.get(it.title) || 0) + 1);
+    }
     items.forEach((item, i) => {
+      const ambiguous = item.kind === "entity" && titleCounts.get(item.title) > 1;
+      const title = el("span", {
+        class: `si-title${item.kind === "question" || item.kind === "ask" ? " serif" : ""}${item.kind === "entity" ? " mono" : ""}`,
+      }, item.title);
+      if (ambiguous) title.append(el("span", { class: "si-disamb" }, ` · ${refTail(item.ref)}`));
       listEl.append(el("div", {
         class: `spot-item${i === sel ? " active" : ""}${item.fallback ? " fallback" : ""}`,
         id: `spot-opt-${i}`, role: "option",
@@ -159,7 +198,7 @@ export function createSpotlight({ root, input, listEl, countEl, registry, wm, bu
       },
         el("span", { class: "si-glyph", "aria-hidden": "true" }, KIND_GLYPHS[item.kind] || "·"),
         el("span", { class: "si-main" },
-          el("span", { class: `si-title${item.kind === "question" || item.kind === "ask" ? " serif" : ""}${item.kind === "entity" ? " mono" : ""}` }, item.title),
+          title,
           item.subtitle ? el("span", { class: "si-sub" }, item.subtitle) : null),
         el("span", { class: "si-kind" }, item.kind)));
     });

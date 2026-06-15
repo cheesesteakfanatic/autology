@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>OntoForge</title>
 <link rel="stylesheet" href="/static/style.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230b0d10'/%3E%3Ccircle cx='8' cy='8' r='3' fill='%23e8a33d'/%3E%3Ccircle cx='3' cy='4' r='1.2' fill='%23b97c26'/%3E%3Ccircle cx='13' cy='12' r='1.2' fill='%23b97c26'/%3E%3Cpath d='M4 4.8 6.5 6.9M9.5 9.1 12 11.2' stroke='%23b97c26' stroke-width='.6'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%23ECE1CB'/%3E%3Cpath d='M8 3.4 8.7 7.3 12.6 8 8.7 8.7 8 12.6 7.3 8.7 3.4 8 7.3 7.3z' fill='%23E0A126'/%3E%3Ccircle cx='8' cy='8' r='1.5' fill='%232A1F14'/%3E%3C/svg%3E">
 <link rel="modulepreload" href="/static/app.js">
 <link rel="modulepreload" href="/static/js/core.js">
 <link rel="modulepreload" href="/static/js/bus.js">
@@ -23,7 +23,7 @@
 <!-- ══════════════════════════════════════════════════════ menu bar -->
 <header id="menubar" class="menubar">
   <span class="wordmark" title="OntoForge — the ontology operating system">
-    <span class="wm-onto">Onto</span><span class="wm-spark" aria-hidden="true">&#9679;</span><span class="wm-forge">Forge</span>
+    <span class="wm-onto">Onto</span><span class="wm-spark" aria-hidden="true">&#10038;</span><span class="wm-forge">Forge</span>
   </span>
   <span class="mb-sub">the ontology operating system</span>
   <div class="mb-meta">
@@ -31,8 +31,10 @@
     <span class="meta-cell">atoms <b id="meta-atoms">&mdash;</b></span>
     <span class="meta-cell">cost <b id="meta-cost">&mdash;</b><i>&thinsp;tok</i></span>
     <button class="spotlight-hint" id="spotlight-hint" type="button" title="spotlight — search everything">
-      <span class="sh-glass" aria-hidden="true">&#8981;</span><kbd>&#8984;K</kbd>
+      <span class="sh-glass" aria-hidden="true">&#10038;</span><kbd>&#8984;K</kbd>
     </button>
+    <button class="theme-toggle" id="theme-toggle" type="button" title="toggle warm / night theme"
+            aria-label="toggle warm or night theme">&#9789;</button>
   </div>
 </header>
 
@@ -40,7 +42,7 @@
 <main id="desktop" class="desktop" aria-label="workspace">
   <div id="epigraph" class="epigraph" aria-hidden="true">
     <p class="epi-line">struck from source atoms &mdash;<br>nothing asserted without a derivation</p>
-    <p class="epi-hint">press <kbd>/</kbd> or just type</p>
+    <p class="epi-hint">press <kbd>/</kbd> or just type to begin</p>
   </div>
   <!-- windows are born here; the snap preview ghost is WM-owned -->
 </main>

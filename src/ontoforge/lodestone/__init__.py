@@ -45,6 +45,9 @@ __all__ = [
 ]
 
 MIN_COVERAGE = 0.6          # strong-grounding floor below which we abstain
+MIN_COVERAGE_SOFT = 0.45    # soft-clarify band floor: [SOFT, MIN) asks instead
+                            # of abstaining when a strong anchor + a well-typed
+                            # candidate exist (whitepaper §6.2 recoverable turn)
 CONFORMAL_MARGIN = 0.90     # Γ = candidates within this score ratio of the top
 SHARPEN = 4                 # score -> pseudo-probability exponent (uncalibrated)
 ABSTAIN_ID = "__abstain__"
@@ -90,12 +93,42 @@ class Lodestone:
         self._pending = None
         g = ground(question, self.onto, self.value_index)
 
-        if g.coverage < MIN_COVERAGE:
+        # below the SOFT floor: genuinely ungroundable -> hard abstain (the
+        # abstention contract; CQ-16/CQ-17 land here)
+        if g.coverage < MIN_COVERAGE_SOFT:
             missing = ", ".join(g.unconsumed[:8])
             return _abstain(
                 f"insufficient grounding (coverage {g.coverage:.2f} < {MIN_COVERAGE}): "
                 f"could not ground: {missing}"
             )
+
+        # a STRONG anchor (a class or property the question really named, not a
+        # lone value probe) is required to answer OR soft-clarify — keeps an
+        # out-of-scope question from clearing the floor on a coincidental probe.
+        # The soft-clarify band additionally needs the question's MEASURE to be
+        # grounded (a strong prop/agg/textjoin), not merely the entity class:
+        # 'warranty period of product P0042' grounds only the class+id and the
+        # asked-for property is absent, so it stays on the hard-abstain path.
+        has_strong_anchor = any(
+            b.strong and b.kind in ("class", "prop") for b in g.bindings
+        )
+        # the soft-clarify MEASURE anchor must be a property/aggregation the
+        # question genuinely named BEYOND the entity class — a prop binding whose
+        # span merely echoes a class mention ('product' -> product_id) does not
+        # count, so 'warranty period of product P0042' (only class+id grounded,
+        # the asked-for property absent) stays on the hard-abstain path.
+        class_spans = {
+            tok for b in g.bindings
+            if b.strong and b.kind == "class" for tok in b.span
+        }
+        has_measure_anchor = any(
+            b.strong and (
+                b.kind in ("agg", "textjoin", "number_cond", "date_cond",
+                           "having_gt1")
+                or (b.kind == "prop" and not set(b.span) <= class_spans)
+            )
+            for b in g.bindings
+        )
 
         cs: CandidateSet = generate_candidates(question, g, self.onto, self.client)
         if not cs.candidates:
@@ -103,6 +136,49 @@ class Lodestone:
                 msgs = "; ".join(sorted({e.message for e in cs.type_errors}))
                 return _abstain(f"rejected by the OQIR type checker: {msgs}")
             return _abstain("no well-typed interpretation could be constructed")
+
+        # SOFT band [SOFT, MIN): one or two tokens short of the floor with a
+        # strong anchor and a well-typed candidate that ACTUALLY HOLDS DATA — ask
+        # a single disambiguating question naming the unconsumed tokens instead
+        # of abstaining silently. A clarification is never a wrong answer, so
+        # 0-confidently-wrong holds. The non-empty-execution requirement keeps a
+        # genuinely unanswerable question (CQ-16: airframe hours exist in NO
+        # source) on the hard-abstain path: its candidate executes empty.
+        if g.coverage < MIN_COVERAGE:
+            viable_top = None
+            if has_strong_anchor and has_measure_anchor:
+                for c in cs.candidates[:4]:
+                    out = execute_candidate(c, self.onto, self.hearth)
+                    if isinstance(out, ExecOutcome) and out.rows:
+                        viable_top = c
+                        break
+            if viable_top is not None:
+                unconsumed = ", ".join(g.unconsumed[:6])
+                bound = sorted({
+                    (self.onto.get(b.target.split("::")[0]).name
+                     if self.onto.get(b.target.split("::")[0]) else b.target)
+                    for b in g.bindings
+                    if b.strong and b.kind == "class"
+                })
+                anchor_txt = ", ".join(bound[:3]) or "the named fields"
+                clar = Clarification(
+                    question=(
+                        f"I can answer about {anchor_txt}; what did you mean by "
+                        f"'{unconsumed}'?"
+                    ),
+                    options=("the entities I identified", "rephrase"),
+                    candidates=(viable_top, viable_top),
+                )
+                self._pending = (question, clar, g.coverage)
+                a = Answer(confidence=round(0.5 * g.coverage, 4))
+                a.clarification = clar.question
+                a.clarification_options = clar.options
+                return a
+            missing = ", ".join(g.unconsumed[:8])
+            return _abstain(
+                f"insufficient grounding (coverage {g.coverage:.2f} < {MIN_COVERAGE}): "
+                f"could not ground: {missing}"
+            )
 
         # ---- DecisionKind.QI through the spine
         decision = self.spine.decide(_qi_request(question, cs.candidates, g.coverage))

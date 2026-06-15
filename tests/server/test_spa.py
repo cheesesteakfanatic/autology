@@ -67,7 +67,9 @@ def test_index_references_only_existing_static_files(client):
 
 def test_static_assets_have_sane_content(client):
     css = client.get("/static/style.css").text
-    assert "--amber" in css and "--hairline" in css, "the design system tokens"
+    # the WARM design-system tokens are present…
+    for token in ("--marigold", "--ink", "--canvas", "--cream", "--teal", "--hairline", "--mono"):
+        assert token in css, f"the warm design token {token} is defined"
     js = client.get("/static/js/core.js").text
     assert "createTextNode" in js, "data is interpolated as text nodes, never innerHTML"
     # the apps still speak to the real API
@@ -75,6 +77,123 @@ def test_static_assets_have_sane_content(client):
     assert "/api/ask" in ask
     review = (APPS_DIR / "review.js").read_text(encoding="utf-8")
     assert "/api/review" in review
+
+
+def test_warm_theme_replaced_the_dark_void(client):
+    """The default is warm light: the espresso/cream tokens carry the
+    palette, the old near-black grounds are gone, every neutral is warm,
+    and shadows are amber-tinted — never black."""
+    css = client.get("/static/style.css").text
+    root = css.split("}", 1)[0]  # the first :root block defines the warm defaults
+    # warm grounds & ink
+    assert "#ECE1CB" in root, "Canvas Oatmeal is the desktop ground"
+    assert "#FBF4E6" in root, "Card Cream is the resting surface"
+    assert "#2A1F14" in root, "Espresso Ink is the primary text — never #000"
+    assert "#E0A126" in root, "Marigold is the primary-action fill"
+    # the abstention taupe + atlas hues are part of the system
+    assert "#D8CDB8" in css, "Abstention-Taupe — the dignified 'no reading' ground"
+    for hue in ("#1F6F6B", "#C75B39", "#7C8A3B", "#2D6E8E", "#6E4A63"):
+        assert hue in css, f"the atlas categorical hue {hue} is in the wheel"
+    # the old dark void must be gone from the live default theme
+    default_block = css.split('html[data-theme="dark"]')[0]
+    for dead in ("#0b0d10", "#0e1116", "#11141a", "#161a22"):
+        assert dead not in default_block, f"the old dark ground {dead} is gone from the warm default"
+    # shadows are warm amber, never black, in the default theme
+    assert "rgba(90, 55, 20" in default_block or "rgba(90,55,20" in default_block, \
+        "elevation shadows are warm-amber tinted"
+    assert "rgba(0, 0, 0" not in default_block and "rgba(0,0,0" not in default_block, \
+        "no black shadows in the warm default theme"
+
+
+def test_marigold_is_fill_not_text_on_buttons():
+    """The contrast rule: the primary button is marigold-FILLED with
+    ESPRESSO ink (7.1:1), never white-on-marigold (which fails)."""
+    css = (STATIC_DIR / "style.css").read_text(encoding="utf-8")
+    forge = re.search(r"\.btn-forge\s*\{([^}]*)\}", css)
+    assert forge, "the primary marigold button class exists"
+    body = forge.group(1)
+    assert "--marigold" in body or "#E0A126" in body, "the primary button is marigold-filled"
+    assert "--ink" in body, "its label is espresso ink, not white"
+
+
+def test_confidence_gauge_is_an_arc_not_a_bar():
+    """The signature confidence instrument is a 270° arc gauge with a
+    band-colored fill and a mono value — never a plain progress bar."""
+    core = (JS_DIR / "core.js").read_text(encoding="utf-8")
+    assert "gauge-arc" in core and "gauge-fill-arc" in core, "the gauge renders as an SVG arc"
+    assert "confGauge" in core and "svgEl" in core, "the gauge is built from SVG nodes"
+    css = (STATIC_DIR / "style.css").read_text(encoding="utf-8")
+    assert ".gauge-fill-arc" in css and ".gauge-track-arc" in css, "arc track + fill have treatments"
+    # banded by confidence: teal confirmed / marigold likely / walnut weak
+    for band in ("--teal", "--marigold", "--walnut"):
+        assert band in core, f"the gauge bands on {band}"
+
+
+def test_toast_notification_system_exists():
+    """A global toast/notification host is part of the kernel and is used
+    by the apps for action feedback."""
+    core = (JS_DIR / "core.js").read_text(encoding="utf-8")
+    assert "export function toast" in core, "toast() is a kernel export"
+    assert "toast-host" in core
+    css = (STATIC_DIR / "style.css").read_text(encoding="utf-8")
+    assert ".toast-host" in css and ".toast" in css, "toasts have a designed treatment"
+    # at least the exporter and review use toasts for feedback
+    exporter = (APPS_DIR / "exporter.js").read_text(encoding="utf-8")
+    assert "toast(" in exporter, "the exporter announces snapshot results"
+
+
+def test_windows_carry_a_per_app_accent_strip():
+    """Each window gets a colored title-bar strip in its owner-app's atlas
+    hue, written as a --accent custom property by the WM."""
+    wm = (JS_DIR / "wm.js").read_text(encoding="utf-8")
+    assert "appHue" in wm and "--accent" in wm, "the WM writes the app accent onto each window"
+    core = (JS_DIR / "core.js").read_text(encoding="utf-8")
+    assert "export function appHue" in core, "appHue maps each app id to an atlas hue"
+    assert "APP_HUE" in core
+    css = (STATIC_DIR / "style.css").read_text(encoding="utf-8")
+    titlebar = re.search(r"\.titlebar\s*\{([^}]*)\}", css)
+    assert titlebar and "var(--accent)" in titlebar.group(1), "the title strip is filled with the accent"
+
+
+def test_exporter_handles_a_500_gracefully():
+    """The Exporter never shows a raw stack-trace: a 500 (server fault) OR a
+    404/405 (endpoint absent) both degrade to honest CLI guidance."""
+    exporter = (APPS_DIR / "exporter.js").read_text(encoding="utf-8")
+    assert "export-guidance" in exporter, "a guidance card replaces the raw error"
+    assert "ontoforge export" in exporter, "it points at the CLI fallback"
+    # the catch must not special-case only 404/405 anymore — guidance covers all
+    assert "exportGuidance" in exporter
+    css = (STATIC_DIR / "style.css").read_text(encoding="utf-8")
+    assert ".export-guidance" in css
+
+
+def test_spotlight_routes_server_app_ids_and_disambiguates():
+    """Server app ids are remapped to the real JS micro-apps so no row
+    dead-ends on click, and non-unique entity labels get a disambiguating
+    ref tail so distinct hits never read as identical duplicates."""
+    spot = (JS_DIR / "spotlight.js").read_text(encoding="utf-8")
+    assert "SERVER_APP_ALIAS" in spot, "legacy server app ids are aliased to JS app ids"
+    for legacy, real in (("entities", "inspector"), ("status", "pulse"), ("export", "exporter")):
+        assert legacy in spot and real in spot, f"{legacy} routes to {real}"
+    assert "registry.get(ref)" in spot, "app results that still don't resolve are dropped"
+    assert "si-disamb" in spot, "ambiguous entity rows append a disambiguating ref tail"
+
+
+def test_inspector_scrubber_domain_is_clamped_off_epoch():
+    """The as-of scrubber clamps its low bound to the data's real activity
+    window instead of letting epoch-dated (1970) cells stretch it useless."""
+    inspector = (APPS_DIR / "inspector.js").read_text(encoding="utf-8")
+    assert "EPOCH_FLOOR" in inspector, "epoch-floor timestamps are excluded from the domain low bound"
+    assert "1971" in inspector, "anything older than ~1971 reads as 'always-known'"
+
+
+def test_dashboards_use_the_warm_chart_palette():
+    """VISTA charts render on the warm chart theme: the atlas categorical
+    wheel for series, espresso ink, walnut axes — not the old dark palette."""
+    dash = (APPS_DIR / "dashboards.js").read_text(encoding="utf-8")
+    assert "ATLAS_RANGE" in dash, "multi-series charts use the atlas wheel"
+    assert "#1F6F6B" in dash and "#E0A126" in dash, "teal + marigold anchor the chart palette"
+    assert "#9b978e" not in dash and "#e8e6e1" not in dash, "the old dark chart inks are gone"
 
 
 # ─────────────────────────────────────────────────── the OS layers
@@ -248,19 +367,29 @@ def test_atlas_tier_legend_chips_are_filter_toggles():
         assert f".constellation.hide-{tier}" in css, f"toggling {tier} hides that tier in CSS"
 
 
-def test_likely_joins_are_dashed_amber_with_score_opacity():
-    """A LIKELY join must read as a hypothesis: dashed amber, weighted by
+def test_likely_joins_are_dashed_marigold_with_score_opacity():
+    """A LIKELY join must read as a hypothesis: dashed marigold, weighted by
     its own score, breathing only on hover."""
     css = (STATIC_DIR / "style.css").read_text(encoding="utf-8")
     likely_rule = re.search(r"\.tier-likely\s*\{([^}]*)\}", css)
     assert likely_rule, "the dashed-likely CSS class exists"
     assert "stroke-dasharray" in likely_rule.group(1), "likely arcs are dashed"
-    assert "--amber" in likely_rule.group(1), "likely arcs are amber"
+    assert "--marigold" in likely_rule.group(1), "likely arcs are marigold (the 'likely' accent)"
     assert "likely-breathe" in css, "likely arcs breathe on hover"
     assert "prefers-reduced-motion" in css
     engine = _engine_src()
     assert "tier-${tier}" in engine, "every arc carries its tier class"
     assert 'setAttribute("stroke-opacity"' in engine, "opacity is set per arc, proportional to score"
+
+
+def test_atlas_islands_wear_distinct_categorical_hues():
+    """Mid-century cartography: each island draws a distinct warm hue from
+    the locked atlas wheel — confirmed roads solid teal, likely dashed
+    marigold — so the map reads as land masses, not a monochrome blob."""
+    engine = _engine_src()
+    assert "ISLAND_HUES" in engine, "the engine carries the categorical wheel"
+    assert "comp._hue" in engine, "each island is assigned a hue and fills its hull with it"
+    assert "fill:${comp._hue}" in engine, "the hull fill is the island hue"
 
 
 def test_atlas_evidence_card_speaks_the_contract():

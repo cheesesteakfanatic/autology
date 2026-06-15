@@ -1,7 +1,7 @@
 # M12 — LODESTONE: Ontology-Grounded Query Planning over OQIR
 
 Implements whitepaper §6.1–6.2 and §11.2 M12. Owner files:
-`src/ontoforge/lodestone/`, tests in `tests/m12/` (64 tests).
+`src/ontoforge/lodestone/`, tests in `tests/m12/`.
 
 Public entry point (§11.2 interface):
 
@@ -119,6 +119,83 @@ if a.clarification:                       # exactly one multiple-choice question
   abstains with the failed leaf.
 * **Determinism**: identical answers, confidences, and citation sets across
   repeated asks and fresh engines.
+* **Free-text robustness** (`test_freetext_robustness.py`, the keyless-NL
+  gate): 25 deliberate PARAPHRASES of the aviation gold CQs (LODESTONE never
+  sees the canonical strings) — 22 answerable, 2 unanswerable, 1 trick-unit.
+  **22/22 = 100% answered-correct WITH atom-level citations** (≥ 70% gate),
+  0 confidently-wrong (no wrong answer at confidence ≥ `tau_high`), both
+  unanswerables abstain, and the trick-unit ("total altitude in dollars") is
+  rejected by the OQIR type checker — the abstention/rejection contract
+  survives paraphrasing.
+
+## Deterministic NL hardening (keyless free-text path, §6.2)
+
+The KEYLESS (no-LLM) grounding path is a true core, not a fallback: it answers
+real **paraphrased** free text — reworded verbs, abbreviations, cue synonyms,
+clause reorder, magnitude/written number forms — without ever emitting a
+confidently-wrong answer. The techniques below are all deterministic and
+network-free (AMD-0002); they only ever add *evidence tiers* and *re-ranking
+nudges* — none can fabricate a binding or override the type checker.
+
+* **Index-time schema-link expansion** (`grounding.py` `Lexicon`). Each class /
+  property registers, beyond its verbatim name + camel/snake split + head
+  token + authored synonyms: a closed-table **abbreviation** map applied BOTH
+  directions (`qty↔quantity`, `amt↔amount`, `mfr/maker↔manufacturer`,
+  `dt↔date`, `#/no↔number`, `wt↔weight`…) as STRONG keys (curated, high
+  precision); plural↔singular variants; and open morphological **stems**
+  (drop `ing/ed/es/s`) as WEAK keys. Forward abbreviation expansion fires only
+  on a whole single-word name — a fragment (`mfr` inside `mfr_mdl_code`) gets
+  reverse/stem variants only, so it can't falsely equate a compound column with
+  an expansion. Stopwords and 1-char tokens are never expanded (no `in`=inch,
+  `no`=number, `id`=word leakage). The greedy longest-first matcher still hits
+  the exact canonical key first, so canonical phrasings are untouched.
+* **Trigram-blocked Jaro-Winkler fuzzy linking** (`Lexicon.lookup` /
+  `_fuzzy_lookup`). A pure-python prefix-weighted Jaro-Winkler (no new
+  dependency) runs only over keys sharing ≥1 char-trigram with the query token
+  (BRIDGE/IRNet-style blocking inverted index), never when the token already
+  exact-matches a schema key. Calibrated thresholds are the single most
+  important confidently-wrong guard: `JW ≥ 0.92` is STRONG-eligible,
+  `0.88 ≤ JW < 0.92` is an evidence-only band that is forced `strong=False`, so
+  a fuzzy near-miss can **rank/clarify but never alone clear the coverage
+  floor**.
+* **Expanded cue lexicons** (`AGG_CUES`, `CMP_CUES`, `TEXTJOIN_CUES`). Richer
+  ordered phrase tuples (longest-match preserved) route synonymous surface
+  forms to the same intent: count←{tally, total number, how many, no. of},
+  sum←{combined, aggregate, sum total, add up}, avg←{mean, on average,
+  typical}, min/max←{lowest/least/bottom, highest/greatest/peak/biggest},
+  GT/LT/GE/LE←{in excess of, north/south of, no more than (LE), at least (GE),
+  exceeding, beyond}. Cue words stay in `CUE_WORDS` so they count toward
+  coverage without being mistaken for content.
+* **Numeric phrase parsing** (`MONEY_MAG`, `WRITTEN_NUMBERS`, `MAGNITUDE`,
+  `CURRENCY_PREFIX`). Currency prefixes (`$/£/€`), magnitude suffixes
+  (`10k`, `$1M`, `£1.5bn`), grouped/decimal digits, and a small written-number
+  table all resolve to the same `number_cond` literal — but **only when a
+  comparison cue is adjacent**, and every unit-bearing literal is still routed
+  through the unit-dimension check in `candidates.py` + the type checker, so
+  `$1M` against a length property stays a `TypeError_`, never a coercion (the
+  CQ-18 trick-unit gate is unweakened).
+* **Honest coverage accounting** (`STOPWORDS`, coverage block). Conversational /
+  politeness / imperative filler (`could`, `would`, `please`, `tell`, `know`,
+  `wondering`, `show`, `list`, `find`, `want`…) is in `STOPWORDS`, so paraphrase
+  chrome does not inflate the coverage denominator. The strong-only numerator is
+  unchanged, so the abstention contract is preserved — the denominator is just
+  honest.
+* **Soft-clarify band** (`__init__.py`, `MIN_COVERAGE_SOFT = 0.45`). In
+  `[0.45, 0.6)` with ≥1 strong class/prop anchor, a strong MEASURE anchor
+  (a prop/agg the question named *beyond* the entity class), AND a well-typed
+  candidate that actually executes non-empty, LODESTONE asks one disambiguating
+  question naming the unconsumed tokens instead of abstaining silently. Below
+  0.45 the hard-abstain path is kept (CQ-16/CQ-17 land there: their candidates
+  execute empty, so they never reach the soft band). A clarification is never a
+  wrong answer, so 0-confidently-wrong holds.
+
+These are guarded against the named pitfalls: fuzzy hits below 0.92 can't clear
+the floor; abbreviation expansion is context-gated and stopword-excluded;
+magnitude/currency literals route through the existing dimension check; relative
+temporal windows resolve against the corpus as-of anchor (never wall-clock); the
+coverage numerator stays strong-only; value probes stay `value_contains`
+alternatives that execution-guided Γ re-ranking settles. The regression guard
+for every change is the **aviation 15/15 + meridian gold gates run green**.
 
 ## Design decisions & trade-offs
 

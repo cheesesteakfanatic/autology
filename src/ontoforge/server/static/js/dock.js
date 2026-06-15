@@ -3,7 +3,7 @@
    shelf where minimized windows collect. The WM asks targetFor(win) for the
    FLIP minimize target rect. */
 
-import { el, clear } from "./core.js";
+import { el, clear, appHue } from "./core.js";
 
 export function createDock({ root, registry, wm }) {
   const appsBox = el("div", { class: "dock-apps", role: "group", "aria-label": "applications" });
@@ -17,6 +17,7 @@ export function createDock({ root, registry, wm }) {
   for (const spec of registry.all()) {
     const icon = el("button", {
       class: "dock-icon", type: "button", dataset: { app: spec.id },
+      style: `--accent:${appHue(spec.id)}`,   // the tile wears its app hue
       "aria-label": `${spec.title} — launch or focus`,
       onclick: () => activate(spec.id),
     },
@@ -37,7 +38,16 @@ export function createDock({ root, registry, wm }) {
 
   function update(wins) {
     const running = new Set(wins.map((w) => w.app.id));
-    for (const [appId, icon] of iconEls) icon.classList.toggle("running", running.has(appId));
+    for (const [appId, icon] of iconEls) {
+      const was = icon.classList.contains("running");
+      const now = running.has(appId);
+      icon.classList.toggle("running", now);
+      // a single marigold starburst pulse confirms a fresh launch
+      if (now && !was) {
+        icon.classList.add("pulse-once");
+        setTimeout(() => icon.classList.remove("pulse-once"), 200);
+      }
+    }
 
     const minimized = wins.filter((w) => w.minimized);
     clear(minBox);

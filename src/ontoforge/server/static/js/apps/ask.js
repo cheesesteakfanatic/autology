@@ -5,7 +5,7 @@
 
 import {
   el, clear, api, errorNote, confGauge, skeletonCard, store,
-  loadOntology, ontologyNow,
+  loadOntology, ontologyNow, hueFor,
 } from "../core.js";
 
 const RECENT_KEY = "ontoforge.recent.questions";
@@ -75,20 +75,31 @@ export function createAskApp() {
         ];
       }
 
-      function citeDot(ids, label, holder) {
-        return el("button", {
+      // cite-dots carry a sequence number and the source's atlas hue, and
+      // "land" with a staggered pop as the answer renders — so a citation
+      // feels like it arrives as the sentence completes.
+      let citeSeq = 0;
+      function citeDot(ids, label, holder, hueKey) {
+        const n = ++citeSeq;
+        const dot = el("button", {
           class: "cite-dot", type: "button",
+          style: hueKey ? `background:${hueFor(hueKey)}` : null,
           title: `${ids.length} source atom${ids.length === 1 ? "" : "s"} — click for evidence`,
           "aria-label": `evidence for ${label}`,
           onclick: () => {
             ctx.emit("evidence:atoms", { atomIds: ids, label, anchor: holder });
           },
-        });
+        }, ids.length ? String(n) : null);
+        // staggered landing — 40ms apart, after the card paints
+        requestAnimationFrame(() => requestAnimationFrame(() =>
+          setTimeout(() => dot.classList.add("landed"), n * 40)));
+        return dot;
       }
 
       function renderAnswer(out) {
         const target = clear(result);
         activeClarify = null;
+        citeSeq = 0;
 
         if (out.clarification) {
           activeClarify = { question: out.question, options: out.clarification_options };
@@ -105,11 +116,11 @@ export function createAskApp() {
         // abstention: never an error style — OntoForge declines to guess
         if (out.abstained) {
           target.append(el("div", { class: "answer-card state-abstained" },
-            el("span", { class: "abstain-mark" }, "abstained"),
+            el("span", { class: "abstain-mark" }, "no grounded answer"),
             el("p", { class: "abstain-line" }, "OntoForge declines to guess."),
             el("p", { class: "abstain-reason" }, out.abstain_reason || "no derivation reached the answer floor"),
             abstainHelp(),
-            confGauge(out.confidence, "confidence · below the floor")));
+            confGauge(out.confidence, "below the floor")));
           return;
         }
 
@@ -126,7 +137,7 @@ export function createAskApp() {
           const headline = el("div", { class: "answer-headline" },
             el("span", {}, v === null ? "∅" : String(v)),
             el("span", { class: "headline-col" }, out.columns[0]));
-          if (ids && ids.length) headline.append(citeDot(ids, `${out.columns[0]} = ${v}`, headline));
+          if (ids && ids.length) headline.append(citeDot(ids, `${out.columns[0]} = ${v}`, headline, out.columns[0]));
           card.append(headline);
         } else {
           const thead = el("tr", {}, out.columns.map((c) => el("th", {}, c)));
@@ -137,7 +148,7 @@ export function createAskApp() {
               const td = el("td", {}, v === null ? "∅" : String(v));
               if (ids && ids.length) {
                 td.classList.add("cited");
-                td.append(citeDot(ids, `row ${ri + 1} · ${col} = ${v}`, td));
+                td.append(citeDot(ids, `row ${ri + 1} · ${col} = ${v}`, td, col));
               }
               return td;
             })));

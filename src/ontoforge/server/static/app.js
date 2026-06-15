@@ -11,7 +11,7 @@
      js/spotlight.js  the front door (⌘K / just type; /api/search)
      js/apps/*        the micro-apps, registered in js/apps/registry.js   */
 
-import { $, api, fmt, loadOntology } from "./js/core.js";
+import { $, api, fmt, loadOntology, store } from "./js/core.js";
 import { createBus } from "./js/bus.js";
 import { createWM } from "./js/wm.js";
 import { createDock } from "./js/dock.js";
@@ -113,6 +113,22 @@ const spotlight = createSpotlight({
 });
 
 $("#spotlight-hint").addEventListener("click", () => spotlight.toggle());
+
+// ───────────────────────────────────────────────── theme (warm default)
+// Warm is the first impression; a night theme is opt-in and persisted.
+const THEME_KEY = "ontoforge.theme";
+function applyTheme(theme) {
+  if (theme === "dark") document.documentElement.setAttribute("data-theme", "dark");
+  else document.documentElement.removeAttribute("data-theme");
+  const t = $("#theme-toggle");
+  if (t) t.textContent = theme === "dark" ? "☼" : "☽"; // sun / moon
+}
+applyTheme(store.get(THEME_KEY, "warm"));
+$("#theme-toggle").addEventListener("click", () => {
+  const next = document.documentElement.getAttribute("data-theme") === "dark" ? "warm" : "dark";
+  store.set(THEME_KEY, next);
+  applyTheme(next);
+});
 
 // ───────────────────────────────────────────────────────────── menubar
 

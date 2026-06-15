@@ -3,7 +3,26 @@
    the project holds. Renders the server's response defensively and
    degrades to honest CLI guidance when the endpoint isn't in this build. */
 
-import { el, clear, api, errorNote, fmt } from "../core.js";
+import { el, clear, api, fmt, toast } from "../core.js";
+
+/* Honest guidance when a snapshot can't be struck through the server —
+   whether the endpoint is absent (404/405) or the snapshot itself failed
+   on the server (500). The CLI always works; the bundle format is the same. */
+function exportGuidance(err) {
+  const absent = err && (err.status === 404 || err.status === 405);
+  return el("div", { class: "export-guidance" },
+    el("span", { class: "section-label", style: "margin:0 0 0.5rem" },
+      absent ? "export not exposed by this build" : "snapshot could not be struck"),
+    absent
+      ? el("p", { style: "margin:0" },
+          "this server build does not expose ", el("code", {}, "POST /api/export"),
+          " — run ", el("code", {}, "ontoforge export"),
+          " from the CLI; the AMBER bundle format is identical.")
+      : el("p", { style: "margin:0" },
+          "the server reported a fault while sealing the bundle. Run ",
+          el("code", {}, "ontoforge export"),
+          " from the CLI for the detailed error — portability is unaffected once the snapshot succeeds."));
+}
 
 function kvRows(obj) {
   const rows = [];
@@ -71,13 +90,17 @@ export function createExporterApp() {
             el("span", { class: "section-label", style: "margin:0 0 0.5rem" }, "snapshot struck"),
             el("table", { class: "data" }, el("tbody", {},
               kvRows(typeof out === "object" && out !== null ? out : { result: String(out) })))));
+          toast("AMBER snapshot struck", { kind: "ok" });
           refreshList();
         } catch (e) {
-          clear(result).append(
+          // any non-success — 404/405 (endpoint absent) OR 500 (server fault)
+          // — degrades to honest guidance, never a raw stack-trace string
+          clear(result).append(exportGuidance(e));
+          toast(
             e.status === 404 || e.status === 405
-              ? el("div", { class: "empty-note", style: "text-align:left;padding:0.75rem 0" },
-                  "export endpoint not exposed by this server build — run `ontoforge export` from the CLI; the bundle format is the same")
-              : errorNote(e));
+              ? "export not exposed — use the CLI"
+              : "snapshot failed — see CLI for details",
+            { kind: "warn" });
         } finally {
           button.disabled = false;
         }
