@@ -205,6 +205,7 @@ function showPanel(panelId) {
 }
 
 bus.on("studio:show-map", () => { ensureStudio(); showPanel("constellation"); });
+bus.on("studio:show-catalog", () => { ensureStudio(); showPanel("catalog"); });
 bus.on("studio:build-started", () => { ensureStudio(); showPanel("constellation"); });
 // mirror the review count into the studio rail badge too
 bus.on("review:count", ({ count }) => {

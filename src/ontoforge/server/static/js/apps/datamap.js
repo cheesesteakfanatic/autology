@@ -1,16 +1,12 @@
-/* Data Map — the live join graph (de-jargoned Constellation/Atlas). Types
-   are nodes; joins tier as confirmed join (solid teal) / likely join
-   (dashed marigold) / separate (no link found). Tap a node to Explore
-   record; tap an arc for Where this came from.
-   THE SIGNATURE STUDIO MOMENT — watch it build: on studio:build-started it
-   polls GET /api/workspace/build/{job_id} and animates from REAL events —
-   a node pops the moment a type is induced, an arc draws the moment a join
-   is classified. Never a timed fake; batched on rAF so a burst won't strobe.
-   When the build finishes it renders the final map via engine.renderAtlas.
-   The engine + atlas contract are unchanged — only labels are de-jargoned. */
+/* Data Map (de-jargoned Constellation/Atlas) — joins tier as confirmed join /
+   likely join / separate (no link found). Every entry renders the PERSISTED
+   atlas (GET /api/atlas) at once; the map never waits on a build. The live
+   watch-it-build is ADDITIVE: on studio:build-started it polls the build job
+   and, only while a real job streams, animates from REAL events before
+   resolving to the final map via engine.renderAtlas. */
 
 import {
-  el, svgEl, clear, errorNote, loadOntology, loadAtlas, dropCaches, fmt,
+  el, svgEl, clear, loadOntology, loadAtlas, dropCaches,
 } from "../core.js";
 import { createConstellation } from "../constellation.js";
 
@@ -51,8 +47,7 @@ export function createDataMapApp() {
       const evCard = el("div", { class: "evidence-card", hidden: "hidden" });
       const legend = el("div", { class: "constellation-legend" });
       const wrap = el("div", { class: "constellation-wrap" }, buildStrip, liveSvg, svg, card, evCard, legend);
-      const detail = el("div", { class: "class-detail" },
-        el("div", { class: "empty-note" }, "tap a type to explore its record · tap a line for where it came from"));
+      const detail = el("div", { class: "class-detail" });  // load() fills it
       ctx.root.append(wrap, narrative, detail);
 
       let onto = null;
@@ -67,7 +62,7 @@ export function createDataMapApp() {
         onSelect: (c) => renderClassDetail(c),
       });
 
-      /* ───────────────────────────── legend / tier toggles (de-jargoned) */
+      /* legend / tier toggles (de-jargoned) */
       function starLegend(note) {
         clear(legend).append(
           el("span", {}, el("i", { class: "lg-node" }), " type · sized by structure"),
@@ -103,7 +98,7 @@ export function createDataMapApp() {
             "hover a dashed line for where it came from · click to pin · click a group name to fly there"));
       }
 
-      /* ───────────────────────────── type-detail drawer (de-jargoned) */
+      /* type-detail drawer (de-jargoned) */
       function renderClassDetail(c, highlightProp) {
         lastUri = c.uri;
         const byUri = new Map((onto ? onto.classes : []).map((k) => [k.uri, k]));
@@ -154,9 +149,9 @@ export function createDataMapApp() {
         if (c) renderClassDetail(c, prop);
       }
 
-      /* ════════════════════════ LIVE BUILD — watch it build ════════════ */
+      /* LIVE BUILD — additive watch-it-build animation */
       // deterministic seeded layout so arriving nodes don't reflow
-      function seedPos(key, i, total) {
+      function seedPos(key) {
         let h = 2166136261 >>> 0;
         const s = String(key);
         for (let k = 0; k < s.length; k++) { h ^= s.charCodeAt(k); h = Math.imul(h, 16777619); }
@@ -177,7 +172,7 @@ export function createDataMapApp() {
 
       function popNode(label) {
         if (livePos.has(label)) return;
-        const p = seedPos(label, liveTypes, 0);
+        const p = seedPos(label);
         livePos.set(label, p);
         liveTypes++;
         const g = svgEl("g", { class: "live-node", transform: `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})` });
@@ -261,7 +256,10 @@ export function createDataMapApp() {
         return raw || "Working…";
       }
 
+      // ADDITIVE live layer: covers the map only while a job streams
+      let liveActive = false;
       function showLive() {
+        liveActive = true;
         buildStrip.hidden = false;
         liveSvg.hidden = false;
         narrative.hidden = false;
@@ -269,6 +267,7 @@ export function createDataMapApp() {
         legend.style.display = "none";
       }
       function hideLive() {
+        liveActive = false;
         buildStrip.hidden = true;
         liveSvg.hidden = true;
         narrative.hidden = true;
@@ -277,11 +276,23 @@ export function createDataMapApp() {
       }
 
       let lastSeq = -1;
+      let buildWatchdog = null;
+      ctx.addDisposer(() => clearTimeout(buildWatchdog));
+
+      // a stalled/gone job must not strand the map — fall back to the atlas
+      function armWatchdog() {
+        clearTimeout(buildWatchdog);
+        buildWatchdog = setTimeout(() => { if (liveActive) finishBuild(); }, 8000);
+      }
+
       async function pollBuild(jobId) {
         try {
           const res = await fetch(`/api/workspace/build/${encodeURIComponent(jobId)}`);
+          // non-OK (404 / expired) → no live stream; render the persisted atlas
           const out = res.ok ? await res.json() : null;
           if (!out) { finishBuild(); return; }
+          if (!liveActive) showLive();   // first proof of a real job → reveal
+          armWatchdog();
           const fresh = (out.events || []).filter((e) => e.seq === undefined || e.seq > lastSeq);
           for (const e of fresh) lastSeq = Math.max(lastSeq, e.seq ?? lastSeq);
           if (fresh.length) queueEvents(fresh);
@@ -301,8 +312,10 @@ export function createDataMapApp() {
 
       async function finishBuild() {
         clearTimeout(pollTimer);
+        clearTimeout(buildWatchdog);
         if (revealRaf) cancelAnimationFrame(revealRaf);
         pendingEvents = [];
+        if (!liveActive) { dropCaches(); load(); return; }  // never showed → just render
         const stage = buildStrip.querySelector(".build-stage");
         if (stage) {
           stage.textContent = `Model built — ${liveTypes} type${liveTypes === 1 ? "" : "s"}, ${liveConfirmed} confirmed, ${liveLikely} likely`;
@@ -312,42 +325,73 @@ export function createDataMapApp() {
       }
 
       function startBuild(jobId) {
-        // reset the live layer
+        // reset, but reveal the live layer only once a poll proves a real job
+        // — an already-built world keeps its map, never a stuck "Reading the…"
+        clearTimeout(pollTimer);
         clear(liveSvg);
         livePos.clear();
         liveTypes = 0; liveConfirmed = 0; liveLikely = 0; lastSeq = -1;
         clear(narrative);
         liveTally();
-        showLive();
+        buildStrip.querySelector(".build-stage").textContent = "Reading the data…";
+        buildStrip.querySelector(".build-bar-fill").style.width = "0%";
+        armWatchdog();
         pollBuild(jobId);
       }
 
-      /* ──────────────────────────────────────── final-map world load */
+      /* ─────── world load: render the PERSISTED atlas (GET /api/atlas) on
+         every entry — never gated on a live build (showLive only ADDS atop) */
       const countTier = (atlas, tier) => (atlas.links || []).filter((l) => l.tier === tier).length;
+      const TAP_HINT = "tap a type to explore its record · tap a line for where it came from";
+      const drained = () => {   // shared tail: detail hint + any pending focus
+        clear(detail).append(el("div", { class: "empty-note" }, TAP_HINT));
+        if (pendingFocus) { focusClass(pendingFocus, pendingProp); pendingFocus = null; pendingProp = null; }
+      };
 
       async function load() {
-        try { onto = await loadOntology(); }
-        catch (e) { clear(detail).append(errorNote(e)); return; }
+        if (liveActive) hideLive();   // an entry never leaves the map covered
         for (const t of TIERS) svg.classList.remove(`hide-${t}`);
-        const atlas = await loadAtlas();
+
+        const atlas = await loadAtlas();   // 404 → null, never throws
         if (atlas && Array.isArray(atlas.components) && atlas.components.length) {
+          try { onto = await loadOntology(); }
+          catch { onto = onto || { classes: [], edges: [] }; }  // render from atlas stubs
           const stats = atlas.stats || {};
           engine.renderAtlas(atlas, onto);
+          const silos = stats.silos ?? atlas.components.filter((c) => c.is_silo).length;
           atlasLegend({
             confirmed: stats.confirmed ?? countTier(atlas, "confirmed"),
             likely: stats.likely ?? countTier(atlas, "likely"),
             hint: stats.hint ?? countTier(atlas, "hint"),
-            silos: stats.silos ?? atlas.components.filter((c) => c.is_silo).length,
+            silos,
           });
-          const silos = stats.silos ?? atlas.components.filter((c) => c.is_silo).length;
           const islands = Math.max(0, (stats.components ?? atlas.components.length) - silos);
           ctx.setTitle(`Data Map — ${islands} group${islands === 1 ? "" : "s"} · ${silos} standalone`);
-        } else {
+          drained();
+          return;
+        }
+
+        // no atlas: induced-types sky if a model exists, else a calm invite —
+        // never a permanent "Reading the data…".
+        let ontoErr = null;
+        try { onto = await loadOntology(); }
+        catch (e) { ontoErr = e; }
+        ctx.setTitle("Data Map");
+        if (onto && Array.isArray(onto.classes) && onto.classes.length) {
           engine.render(onto);
           starLegend("model not built yet — induced types shown");
-          ctx.setTitle("Data Map");
+          drained();
+        } else {
+          clear(svg); clear(legend);
+          clear(detail).append(el("div", { class: "empty-note" },
+            el("p", {}, ontoErr
+              ? "Couldn't read the model. Pick datasets in Catalog and build to draw the map."
+              : "No data map yet — pick datasets in Catalog and build; the map draws itself as joins are found."),
+            el("button", {
+              class: "btn", type: "button", style: "margin-top:0.75em",
+              onclick: () => ctx.emit("studio:show-catalog", {}),
+            }, "Open Catalog →")));
         }
-        if (pendingFocus) { focusClass(pendingFocus, pendingProp); pendingFocus = null; pendingProp = null; }
       }
 
       ctx.on("world:reload", () => { onto = null; dropCaches(); clear(detail).append(el("div", { class: "empty-note" }, "redrawing the map…")); load(); });

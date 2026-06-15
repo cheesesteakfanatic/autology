@@ -53,6 +53,23 @@ from .world import REVIEW_RECALIBRATION_THRESHOLD, ProjectError, ProjectWorld, j
 
 STATIC_DIR = Path(__file__).parent / "static"
 
+
+class _NoCacheStatic(StaticFiles):
+    """StaticFiles that forbids browser caching of the SPA assets.
+
+    The UI is a vanilla ES-module graph: the browser caches each module by
+    URL. When a build renames or removes a module (e.g. apps/ask.js →
+    surfaces/ask.js), a cached entry-point that still imports the old path
+    fails to link and the whole app boots to a blank screen — with every file
+    individually returning 200. Revalidating every request makes updates
+    always take effect; the assets are tiny and served locally."""
+
+    def file_response(self, *args: Any, **kwargs: Any):  # type: ignore[override]
+        resp = super().file_response(*args, **kwargs)
+        resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        return resp
+
+
 #: decision kinds the review queue surfaces (per spec: ER + QI judgments).
 REVIEW_KINDS = ("er", "qi")
 #: a deferred decision or one auto-resolved below this confidence is queued.
@@ -874,11 +891,17 @@ def create_app(project: Path | str) -> FastAPI:
 
     # ----------------------------------------------------------- the SPA
 
-    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+    app.mount("/static", _NoCacheStatic(directory=STATIC_DIR), name="static")
 
     @app.get("/", include_in_schema=False)
     async def index() -> FileResponse:
-        return FileResponse(STATIC_DIR / "index.html")
+        # never let a browser serve a stale shell against a fresh build — an
+        # ES-module graph that imports a renamed/removed module fails silently
+        # (blank app). Revalidate every load; the assets are tiny and local.
+        return FileResponse(
+            STATIC_DIR / "index.html",
+            headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
+        )
 
     return app
 

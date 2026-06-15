@@ -1,4 +1,4 @@
-/* ════════════════════════════════════════════════════════════════════
+/* ══════
    OntoForge OS — THE WARM REDESIGN.
    A mid-century-modern operating surface: the whole OS sits on warm
    oatmeal paper with a 3% grain tooth; windows float as molded-fiberglass
@@ -10,7 +10,7 @@
    arc; abstention is dignified taupe, never red.
    Refs: Charley Harper, Saul Bass, Eames/Herman Miller, Dieter Rams,
    mid-century cartography. WCAG: espresso/cream 14.7:1, walnut/cream 6:1.
-   ════════════════════════════════════════════════════════════════════ */
+   ══════ */
 
 :root {
   /* ── warm neutral grounds (the paper the OS sits on) ── */
@@ -173,7 +173,7 @@ body.wm-gesture iframe, body.wm-gesture embed, body.wm-gesture object,
 body.wm-gesture canvas { pointer-events: none !important; }
 body.wm-gesture { cursor: inherit; }
 
-/* ═══════════════════════════════════════════════════════ menu bar */
+/* ══════ menu bar */
 
 .menubar {
   position: fixed;
@@ -253,7 +253,7 @@ body.wm-gesture { cursor: inherit; }
 }
 .theme-toggle:hover { color: var(--ink); border-color: var(--hairline-strong); }
 
-/* ═══════════════════════════════════════ the workspace ground */
+/* ══════ the workspace ground */
 
 .desktop {
   position: fixed;
@@ -283,7 +283,7 @@ body.wm-gesture { cursor: inherit; }
 }
 .snap-preview.visible { opacity: 1; }
 
-/* ════════════════════════════════════════════════ window chrome
+/* ══════ window chrome
    Each window is a molded shell: elevation-2 warm-white body + a 28px
    COLORED title strip in its app accent, square-bottomed so it reads as a
    TV bezel cap over the screen. */
@@ -408,7 +408,7 @@ body.wm-gesture { cursor: inherit; }
 .rs-se { bottom: -6px; right: -6px; width: 16px; height: 16px; cursor: se-resize; }
 .rs-sw { bottom: -6px; left: -6px; width: 16px; height: 16px; cursor: sw-resize; }
 
-/* ══════════════════════════════════════════════════════ the dock
+/* ══════ the dock
    One cream pill floating above the canvas; app icons are rounded-square
    tiles each in their atlas hue with a flat espresso glyph; a marigold
    starburst dot beneath running apps. */
@@ -530,7 +530,7 @@ body.wm-gesture { cursor: inherit; }
 .dock-tile .di-label { font-variant: normal; text-transform: none; }
 .dock-tile span:not(.di-label) { font-variant: small-caps; letter-spacing: 0.04em; }
 
-/* ═══════════════════════════════════════════════════ spotlight
+/* ══════ spotlight
    Elevation-3 modal on a 32% espresso scrim with blur. A single warm-white
    card; the selected row carries a marigold left-edge bar + bisque fill. */
 
@@ -656,7 +656,7 @@ body.wm-gesture { cursor: inherit; }
 }
 .spot-keys { display: flex; gap: 1.25rem; }
 
-/* ════════════════════════════════════════════ shared components */
+/* ══════ shared components */
 
 /* secondary button (cream fill, walnut border) is the .btn default */
 .btn {
@@ -874,7 +874,7 @@ table.data tbody tr:hover td { background: rgba(227, 214, 187, 0.4); }
   text-align: center;
 }
 
-/* ───────────────────────────────────────── toasts / notifications */
+/* ────── toasts / notifications */
 .toast-host {
   position: fixed;
   bottom: calc(var(--dock-h) + 24px);
@@ -912,7 +912,7 @@ table.data tbody tr:hover td { background: rgba(227, 214, 187, 0.4); }
 .toast-warn { border-left-color: var(--marigold); }.toast-warn .toast-dot { background: var(--marigold); }
 .toast-error { border-left-color: var(--terracotta); }.toast-error .toast-dot { background: var(--terracotta); }
 
-/* ═══════════════════════════════════════════════════════ app: ask */
+/* ══════ app: ask */
 
 .ask-form { margin: 0 0 0.75rem; }
 .ask-field { display: flex; gap: 0.625rem; }
@@ -1081,7 +1081,7 @@ td.cited { position: relative; }
 .clarify-option:hover { border-color: var(--marigold-line); background: var(--marigold-wash); }
 .clarify-option kbd { color: var(--ink); background: var(--marigold-wash); border-color: var(--marigold-line); }
 
-/* ═══════════════════════════════════════════════ app: evidence
+/* ══════ app: evidence
    Index-card tray: bisque troughs, mono source-id chip in source hue. */
 
 .evidence-context {
@@ -1135,7 +1135,7 @@ td.cited { position: relative; }
 .prov-op .twist { color: var(--teal); font-size: var(--fs-1); }
 .prov-op .arity { color: var(--ink-faint); letter-spacing: 0; font-variant: normal; }
 
-/* ══════════════════════════════════════════ app: constellation */
+/* ══════ app: constellation */
 
 .win-body.app-constellation {
   display: flex;
@@ -1218,7 +1218,7 @@ td.cited { position: relative; }
 .node-card .nc-prop { font-family: var(--mono); font-size: var(--fs-1); color: var(--ink); }
 .node-card .nc-prop .dt { color: var(--walnut); }
 
-/* ════════════════════ the Atlas — the grammar of certainty ═══════
+/* ══════ the Atlas — the grammar of certainty ═══════
    Islands are flat categorical-hue kidney/blob shapes on the oatmeal
    ground with a contour halo. Link tiers are map roads: confirmed = solid
    teal; likely = dashed marigold (opacity ∝ score, breathing on hover);
@@ -1401,7 +1401,7 @@ td.cited { position: relative; }
 .class-detail .empty-note { padding: 1.25rem 0; }
 tr.prop-highlight td { background: var(--marigold-wash); }
 
-/* ══════════════════════════════════════════════ app: inspector */
+/* ══════ app: inspector */
 
 .entity-form { display: flex; gap: 0.625rem; margin-bottom: 0.625rem; }
 .entity-input { flex: 1; min-width: 0; font-size: var(--fs-2); padding: 0.625rem 1rem; font-family: var(--mono); }
@@ -1598,7 +1598,7 @@ tr.prop-highlight td { background: var(--marigold-wash); }
   padding: 0.375rem 0;
 }
 
-/* ═════════════════════════════════════════════════ app: review */
+/* ══════ app: review */
 
 .review-keys {
   display: flex;
@@ -1726,7 +1726,7 @@ tr.prop-highlight td { background: var(--marigold-wash); }
 .verdict-result { font-size: var(--fs-1); color: var(--walnut); }
 .verdict-result.recalibrated { color: var(--teal); font-weight: 600; }
 
-/* ═════════════════════════════════════════════ dashboard proposals (BUILD) */
+/* ══════ dashboard proposals (BUILD) */
 
 .dash-proposal {
   background: var(--warm-white);
@@ -1773,7 +1773,7 @@ tr.prop-highlight td { background: var(--marigold-wash); }
 }
 .offline-note { font-size: var(--fs-0); color: var(--ink-faint); margin-bottom: 0.5rem; }
 
-/* ══════════════════════════════════════════════════ app: pulse */
+/* ══════ app: pulse */
 
 .status-project { font-family: var(--mono); font-size: var(--fs-1); color: var(--walnut); margin-bottom: 1.25rem; overflow-wrap: anywhere; }
 
@@ -1825,7 +1825,7 @@ tr.prop-highlight td { background: var(--marigold-wash); }
   margin-bottom: 1.5rem;
 }
 
-/* ══════════════════════════════════════ export (BUILD output) */
+/* ══════ export (BUILD output) */
 
 .export-blurb {
   font-style: italic;
@@ -1842,14 +1842,14 @@ tr.prop-highlight td { background: var(--marigold-wash); }
   overflow-wrap: anywhere;
 }
 
-/* ══════════════════════════════════════════════════════ motion */
+/* ══════ motion */
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
   .gauge-fill-arc.sweep { transition: none; }
 }
 
-/* ════════════════════════════════════════════════ dark mode (opt-in)
+/* ══════ dark mode (opt-in)
    A quiet warm-dark for night use — NOT the default, never the first
    impression. Espresso-deep grounds keep the warm cast; the atlas hues
    and marigold carry through. Activated by data-theme="dark" on <html>. */
@@ -1876,11 +1876,11 @@ html[data-theme="dark"] body::before { opacity: 0.05; }
 html[data-theme="dark"] .btn-forge { color: #1A140C; }
 html[data-theme="dark"] .cite-dot { color: #1A140C; }
 
-/* ════════════════════════════════════════════════════════════════════
+/* ══════
    THE THREE-MODE SHELL — ASK | BUILD | STUDIO.
    One always-visible segmented switcher in the top bar; each mode shows
    only its own surfaces. Reuses the warm tokens — no repaint.
-   ════════════════════════════════════════════════════════════════════ */
+   ══════ */
 
 /* ── the mode switcher: the clearest thing on screen ── */
 .mode-switcher {
@@ -1953,7 +1953,7 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
   radial-gradient(1100px 720px at 50% 30%, rgba(224,161,38,0.05), transparent 70%), var(--canvas); }
 .pane-studio { overflow: hidden; }
 
-/* ════════════════════════════════ ASK — the centered question surface */
+/* ══════ ASK — the centered question surface */
 .surface-ask .ask-layout {
   min-height: 100%;
   display: grid;
@@ -2029,7 +2029,7 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
 .notready-title { font-size: var(--fs-4); margin: 0 0 0.5rem; }
 .notready-line { color: var(--walnut); margin: 0 0 1.25rem; }
 
-/* ════════════════════════════════ BUILD — the two-pane data builder */
+/* ══════ BUILD — the two-pane data builder */
 .surface-build .build-layout {
   display: grid;
   grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
@@ -2072,7 +2072,7 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
 .extract-actions { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin: 0.5rem 0; flex-wrap: wrap; }
 .extract-target { font-size: var(--fs-1); color: var(--walnut); }
 
-/* ════════════════════════════════ STUDIO — the workspace + left rail */
+/* ══════ STUDIO — the workspace + left rail */
 .pane-studio { display: flex; }
 .studio-rail {
   width: 178px; flex: 0 0 178px;
@@ -2197,7 +2197,7 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
 /* ── the standalone (no link found) tier swatch + group rename ── */
 .lg-hintline { display: inline-block; width: 14px; border-top: 2px dotted var(--ink-faint); }
 
-/* ════════════════════════════════ first-run orientation coach */
+/* ══════ first-run orientation coach */
 .coach { position: fixed; inset: 0; z-index: 2200; display: grid; place-items: center; }
 .coach[hidden] { display: none; }
 .coach-card {
