@@ -2174,6 +2174,10 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
 
 /* ── the live build (watch it build) ── */
 .build-strip { display: flex; align-items: center; gap: 0.75rem; padding: 0.4rem 0.75rem; background: var(--cream); border-bottom: 1px solid var(--hairline); font-size: var(--fs-1); }
+/* the live-build layer hides via the `hidden` attribute; an explicit display
+   rule beats HTML's [hidden]{display:none}, so honor it — otherwise the
+   "Reading the data…" strip paints over a fully-rendered Data Map. */
+.build-strip[hidden], .build-narrative[hidden], .live-map[hidden] { display: none !important; }
 .build-stage { font-weight: 600; color: var(--ink); white-space: nowrap; }
 .build-bar { flex: 1; height: 5px; background: var(--bisque); border-radius: 3px; overflow: hidden; }
 .build-bar-fill { display: block; height: 100%; width: 0; background: var(--marigold); transition: width 0.4s ease; }
