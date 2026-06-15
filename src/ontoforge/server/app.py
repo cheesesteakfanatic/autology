@@ -849,6 +849,7 @@ def create_app(project: Path | str) -> FastAPI:
             new_stats=out.get("new_stats", {}),
             atlas_delta=S.AtlasDelta(**out.get("atlas_delta", {})),
             undo_token=out.get("undo_token"),
+            gate=out.get("gate"),
         )
 
     @app.post("/api/engineer/undo", response_model=S.UndoOut)

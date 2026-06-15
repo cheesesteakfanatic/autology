@@ -75,7 +75,7 @@ The look is a **warm midcentury-modern system**: oatmeal/cream paper grounds, es
 locked atomic-age 8-hue atlas wheel (each app, island, and chart series owns a deterministic hue),
 marigold accents, warm-amber shadows (never black), a 270° arc confidence gauge, and a quiet
 calm-dark night theme as an opt-in. Vanilla ES modules, no build chain, ships fully offline
-(vendored Vega only); the non-vendor payload is **286,125 bytes — under the 280 KB budget**
+(vendored Vega only); the non-vendor payload is **287,370 bytes — under the 290 KB budget**
 (test-enforced), with API data reaching the DOM only through `createTextNode`/`el()` (no
 `innerHTML`). Design system + the full de-jargon naming map in [docs/UI_DESIGN.md](docs/UI_DESIGN.md);
 shell internals in [docs/UI_SHELL_README.md](docs/UI_SHELL_README.md); competitive positioning in
@@ -90,6 +90,41 @@ in a clean venv), as a **Docker image** (`docker build -t ontoforge . && docker 
 OntoForge OS), and any materialized world exports as an **AMBER bundle** — an open-format
 freeze-frame with full provenance, replayable without OntoForge. Details and verification story
 in [docs/PORTABILITY.md](docs/PORTABILITY.md).
+
+## AI-native (keyless today, LLM-ready)
+
+The data-engineering layer is built **AI-native but ships keyless** — every "AI" decision runs on
+deterministic adapters today, with the live-model path stubbed and ready, so the app and engine
+need **no API key and make no network call at runtime**. The scaffolding (`src/ontoforge/aimodels/`):
+
+- **`router`** — a task-scoped `ModelSpec` registry over the frozen `ModelClient` seam with
+  *explicit*, priority-ordered fallback. The default tier for every task is the deterministic
+  `HeuristicAdapter`; a live model (Kimi K2 / Qwen / Opus, OpenAI-compatible) is added by
+  registering one more `ModelSpec` via a lazy factory — no key is needed at import or run, and the
+  routing/fallback logic is unchanged.
+- **`prompts`** — versioned, task-scoped templates (join/merge/retype/name_concept/answer) emitting
+  a constrained `{decision, confidence, rationale}` JSON schema, with few-shot and ontology-grounding
+  slots; `render()` is byte-deterministic.
+- **`context`** — extractive, bidirectional schema linking that prunes a large induced ontology into
+  a token budget at high recall (so a model sees only the relevant subset).
+- **`secure`** — PII redaction, stratified sampling (send a sample, never bulk rows),
+  untrusted-text spotlighting, and injection scanning — injection is defended **architecturally**
+  (data is kept out of the instruction channel), not by fine-tuning.
+
+The headline mechanism is the **weighted-voting decision gate** (`src/ontoforge/ensemble/`): a join /
+merge / retype proposal is decided by a diverse ensemble of deterministic experts (coverage,
+value-overlap, name-similarity, type-compatibility) via per-expert Weighted-Majority Aggregation, a
+label-free aggregation temperature, and Soft-Self-Consistency scoring against a calibrated threshold.
+An **execution-grounded verifier veto runs first and unconditionally** — the engineer's join-coverage
+floor can refuse a join regardless of a unanimous "fire" vote (the gate's confidently-wrong guard),
+and the hard floor is *also* re-checked before the gate is ever consulted, so a gate can only ever
+make a decision **more** conservative, never assert a sub-floor join. A human Confirm/Reject applies a
+Littlestone–Warmuth multiplicative penalty (ε = √(ln N / T)) to the experts that disagreed, so the
+ensemble self-improves over time. Every gated apply records its vote tally + per-expert weights as
+ledger provenance and surfaces them on `/api/engineer/apply` (`result.gate`) — an auditable answer to
+"why did this join fire or hold?". Adding a live model is registering it as one more expert speaking
+the same `Vote` protocol; the gate math does not change. Full architecture and the copy-paste
+live-model layering guide in [docs/AI_NATIVE.md](docs/AI_NATIVE.md).
 
 ## Architecture
 

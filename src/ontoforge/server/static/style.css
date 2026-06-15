@@ -25,11 +25,30 @@
   --bg2:          #FBF4E6;
   --bg3:          #F1E7D3;
 
-  /* ── ink: espresso, never black ── */
-  --ink:          #2A1F14;   /* primary text — 14.7:1 on cream            */
-  --walnut:       #6B5A45;   /* secondary text, captions — 6.0:1          */
-  --ink-dim:      #6B5A45;   /* alias                                     */
-  --ink-faint:    #8A7860;   /* tertiary / placeholders                   */
+  /* ── ink: espresso, never black ──
+     PALETTE GOVERNANCE — the ink ramp is HCL-disciplined so contrast can't
+     drift. All inks share hue ≈ 34° / chroma ≈ 18–24 (one warm espresso
+     family); only LIGHTNESS steps down the ramp. Measured on Card Cream
+     (#FBF4E6): ink 14.7:1, walnut 6.0:1, ink-faint 4.6:1 — all ≥ AA. Never
+     add an ink darker-or-lighter than these without re-measuring contrast. */
+  --ink:          #2A1F14;   /* L≈14  primary text — 14.7:1 on cream       */
+  --walnut:       #6B5A45;   /* L≈39  secondary text, captions — 6.0:1     */
+  --ink-dim:      #6B5A45;   /* alias                                      */
+  --ink-faint:    #8A7860;   /* L≈51  tertiary / placeholders — 4.6:1      */
+
+  /* ── ATTENTION-HIERARCHY chrome tier ──
+     "Don't compete for attention you haven't earned." Orientation/navigation
+     chrome (menubar wordmark + meta, mode subtitles, dock, Studio rail,
+     window title bars) RECEDES so the ACTIVE work surface — which keeps full
+     --ink — visually dominates. Same espresso hue family (≈34°); only
+     lightness lifts. Both tiers stay AA on the CREAM grounds they touch:
+       --chrome-ink  on cream 9.84:1  — recessed PRIMARY chrome (wordmark, meta value)
+       --chrome-dim  on cream 4.53:1  — recessed SECONDARY chrome (meta caption)
+     Primary NAV LABELS on the bisque switcher/rail never recede below
+     --walnut (AA 4.60 on bisque) — their recede is carried by the active
+     segment's elevation + background + inset ring, never by failing AA. */
+  --chrome-ink:   #4A3B29;   /* L≈25  recessed chrome label/value — quieter than --ink */
+  --chrome-dim:   #806D56;   /* L≈47  recessed chrome subtitle/meta — AA on cream        */
 
   /* ── marigold: PRIMARY ACTION + 'likely' accent (fill/stroke only) ── */
   --marigold:     #E0A126;
@@ -199,7 +218,7 @@ body.wm-gesture { cursor: inherit; }
   font-weight: 600;
   font-variant: small-caps;
   letter-spacing: 0.06em;
-  color: var(--ink);
+  color: var(--chrome-ink);     /* orientation chrome recedes; the spark keeps the meaning */
   white-space: nowrap;
 }
 .wm-spark {
@@ -216,10 +235,10 @@ body.wm-gesture { cursor: inherit; }
   align-items: center;
   gap: 1.125rem;
   font-size: var(--fs-1);
-  color: var(--walnut);
+  color: var(--chrome-dim);     /* meta header recedes — it's orientation, not the work */
   white-space: nowrap;
 }
-.meta-cell b { color: var(--ink); font-weight: 500; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.meta-cell b { color: var(--chrome-ink); font-weight: 500; font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .meta-cell i { font-style: normal; color: var(--ink-faint); }
 
 .spotlight-hint {
@@ -339,14 +358,17 @@ body.wm-gesture { cursor: inherit; }
   flex: none;
   border-radius: calc(var(--radius-win) - 1px) calc(var(--radius-win) - 1px) 0 0;
 }
-/* inactive windows: the strip desaturates */
-.window:not(.focused) .titlebar { filter: saturate(0.4) brightness(1.04); }
+/* inactive windows recede further: the strip desaturates AND quiets, so the
+   one focused window's work surface is unambiguously primary */
+.window:not(.focused) .titlebar { filter: saturate(0.32) brightness(1.05) opacity(0.92); }
 
 /* the traffic-light disks: flat solid Charley-Harper coins, glyph on hover.
    They live at the LEFT of the strip (we re-order via flex). */
+/* the per-app glyph is identity, not navigation — it sits quieter than the
+   title so the strip reads as a calm cap, not a competing label (noise cut) */
 .win-glyph {
-  color: rgba(255, 253, 247, 0.92);
-  font-size: var(--fs-1);
+  color: rgba(255, 253, 247, 0.7);
+  font-size: var(--fs-0);
   line-height: 1;
   order: 2;
 }
@@ -356,7 +378,7 @@ body.wm-gesture { cursor: inherit; }
   font-weight: 600;
   font-variant: small-caps;
   letter-spacing: 0.06em;
-  color: var(--warm-white);
+  color: rgba(255, 253, 247, 0.94);   /* the title-bar cap recedes; the work surface dominates */
   margin: 0;
   order: 3;
   overflow: hidden;
@@ -1864,6 +1886,9 @@ html[data-theme="dark"] {
   --walnut:     #C2B295;
   --ink-dim:    #C2B295;
   --ink-faint:  #8E7E66;
+  /* the chrome tier inverts for night: recessed chrome dims DOWN from --ink */
+  --chrome-ink: #D8CBAF;
+  --chrome-dim: #9E8F75;
   --hairline:        rgba(242, 233, 214, 0.12);
   --hairline-strong: rgba(242, 233, 214, 0.24);
   --abstain:    #2C2519;
@@ -1904,7 +1929,7 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
   min-width: 78px;
   padding: 0.25rem 0.85rem;
   background: none; border: none; border-radius: 8px;
-  color: var(--walnut); cursor: pointer;
+  color: var(--walnut); cursor: pointer;   /* inactive segments recede; the active one earns elevation */
   transition: background var(--ease), color var(--ease);
 }
 .mode-seg:hover { color: var(--ink); }
@@ -1916,6 +1941,7 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
   font-size: 0.625rem; letter-spacing: 0.04em; color: var(--ink-faint);
   white-space: nowrap;
 }
+/* the ACTIVE segment is clearly primary — full ink, full elevation */
 .mode-seg.active {
   background: var(--warm-white);
   color: var(--ink);
@@ -2084,11 +2110,12 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
 .rail-item {
   position: relative; text-align: left;
   padding: 0.5rem 0.7rem; border: none; border-radius: 8px;
-  background: none; color: var(--walnut); cursor: pointer;
+  background: none; color: var(--walnut); cursor: pointer;  /* the rail is navigation — it recedes; the active section earns elevation */
   font-family: var(--sans); font-size: var(--fs-2); font-weight: 500;
   transition: background var(--ease), color var(--ease);
 }
 .rail-item:hover { background: var(--warm-white); color: var(--ink); }
+/* the active section is where the work is — it comes forward to full ink */
 .rail-item.active { background: var(--warm-white); color: var(--ink); box-shadow: 0 0 0 1px var(--marigold-line) inset; }
 .rail-badge {
   position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%);

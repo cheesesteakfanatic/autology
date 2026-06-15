@@ -504,6 +504,10 @@ class ApplyOut(BaseModel):
     new_stats: dict[str, Any] = Field(default_factory=dict)
     atlas_delta: AtlasDelta = Field(default_factory=AtlasDelta)
     undo_token: Optional[dict[str, Any]] = None
+    #: ensemble DE-gate provenance for a link op (vote tally + per-expert weights
+    #: + every expert's vote) — auditable "why did this join fire/hold?". Present
+    #: only for gated link ops; None otherwise.
+    gate: Optional[dict[str, Any]] = None
 
 
 class UndoIn(BaseModel):

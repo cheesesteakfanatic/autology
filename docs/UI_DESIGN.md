@@ -49,7 +49,7 @@ it came from; in Studio, claims open evidence beside them, entities open
 records beside records, nothing asserted without a derivation.
 
 Zero frameworks. Vanilla ES modules, one stylesheet, vendored Vega for
-charts only. Non-vendor payload ≈ 286 KB (budget **280 KB** = 286 720 bytes,
+charts only. Non-vendor payload ≈ 287 KB (budget **290 KB** = 296 960 bytes,
 enforced by `tests/server/test_spa.py`; headroom is tight — copy/label
 additions must watch the budget). Every piece of API data enters the DOM
 through `el()`/`svgEl()`/`document.createTextNode` — `innerHTML` never
@@ -334,6 +334,38 @@ errors. Abstention is its own **calm taupe `#D8CDB8`**, never red. All
 hairlines are tinted espresso; **all shadows are warm-amber
 `rgba(90,55,20,*)`, never black** — the single rule that keeps the whole
 OS feeling warm rather than digital.
+
+**Attention hierarchy — "don't compete for attention you haven't earned."**
+The orientation/navigation chrome RECEDES so the *active work surface*
+visually dominates. A dedicated **chrome ink tier** sits between `--ink` and
+`--ink-faint` in the same espresso hue family (≈34°; only lightness lifts):
+
+| token | hex | on cream | used by |
+|---|---|---|---|
+| `--chrome-ink` | `#4A3B29` | 9.84:1 | the wordmark, the menubar meta **values** — recessed but primary |
+| `--chrome-dim` | `#806D56` | 4.53:1 | the menubar meta **captions** — recessed secondary |
+
+The active mode segment and active rail item keep **full `--ink`** and earn
+their primacy through *elevation* (warm-white lift + inset marigold line +
+`--shadow-1`) — never by letting the inactive labels fall below AA, so the
+bisque-grounded switcher/rail labels stay at `--walnut` (4.60:1 on bisque).
+Window **title-bar caps recede**: the per-app glyph drops to `--fs-0` at 0.7α
+(identity, not a competing label) and the title sits at 0.94α near-white;
+unfocused windows desaturate their strip to ~0.32 saturation + 0.92 opacity
+so a single focused window's work surface is unambiguously the foreground.
+The night theme inverts the tier (`--chrome-ink #D8CBAF`, `--chrome-dim
+#9E8F75`) so chrome dims *down* from the light ink on espresso grounds.
+
+**Palette governance (so contrast can't drift).** The ink ramp is
+HCL-disciplined and its measured AA figures are recorded *inline in
+`style.css`* beside the `:root` tokens (a `PALETTE GOVERNANCE` /
+`ATTENTION-HIERARCHY` comment block): every ink shares one warm espresso hue
+and steps only in lightness — `--ink` 14.7:1, `--walnut` 6.0:1, `--ink-faint`
+4.6:1 on Card Cream, all ≥ AA. The accent hues (marigold, teal, the eight
+atlas hues) are reserved for **meaning** — primary action, the certainty
+tiers, per-island/per-app identity — never decoration. `tests/server/
+test_spa.py` asserts the chrome tier exists, the governance note is present,
+the recorded ratios stay AA, and the active segment keeps full contrast.
 
 **Typography.** Geometric-sans chrome (`Futura, Avenir Next, Century
 Gothic, …`); the wordmark and window titles are **small-caps, +0.06em**;

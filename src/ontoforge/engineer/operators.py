@@ -46,6 +46,8 @@ from ontoforge.temper import (
 )
 from ontoforge.temper.ops import resolve_prop
 
+from ontoforge.ensemble import ActionContext, Gate, default_experts
+
 from .commands import ProposedCommand
 
 __all__ = [
@@ -99,12 +101,28 @@ class EngineerService:
     TemperEngine; previews and applies parsed commands. Never edits a frozen
     module — it composes them."""
 
-    def __init__(self, ontology: Any, hearth: Any = None, ledger: Any = None, spine: Any = None) -> None:
+    def __init__(
+        self,
+        ontology: Any,
+        hearth: Any = None,
+        ledger: Any = None,
+        spine: Any = None,
+        gate: Optional[Gate] = None,
+    ) -> None:
         self.ontology = ontology
         self.hearth = hearth
         self.ledger = ledger
         self.spine = spine
         self.engine = TemperEngine(ontology, hearth=hearth, spine=spine, ledger=ledger)
+        #: the ensemble DE-decision gate. Keyless deterministic experts by default;
+        #: ADDS a weighted-vote decision on top of the coverage floor — never
+        #: weakens it. Swap in live-model experts by passing a custom Gate.
+        self.gate: Gate = gate if gate is not None else Gate(default_experts())
+        #: provenance of the most recent gated apply (vote tally + per-expert
+        #: weights), surfaced on the apply result and recorded into the ledger.
+        self.last_gate_provenance: Optional[dict[str, Any]] = None
+        #: (artifact_id, json_payload) of the last recorded gate provenance.
+        self._last_gate_artifact: Optional[tuple[str, str]] = None
 
     # ------------------------------------------------------------- extents
 
@@ -455,6 +473,65 @@ class EngineerService:
                     best = cov
         return best
 
+    def _gate_link(self, op: AddProperty, coverage: Optional[float]):
+        """Run the ensemble DE-decision gate for a link op, building an
+        :class:`ActionContext` from REAL measurements and using the coverage
+        floor as an execution-grounded verifier veto.
+
+        The verifier re-measures coverage from the live HEARTH and VETOES below
+        :data:`JOIN_LIKELY_FLOOR` regardless of any votes — so even a unanimous
+        'fire' can never assert a sub-floor join (the gate's confidently-wrong
+        guard, reusing the engineer's floor)."""
+        subj, tgt = op.class_uri, op.range_class
+        sc, tc = self.ontology.get(subj), self.ontology.get(tgt) if tgt else None
+        # best value overlap across candidate keys (same measurement as coverage)
+        ctx = ActionContext(
+            action="join",
+            coverage=coverage,
+            value_overlap=coverage,
+            left_name=(sc.name if sc is not None else subj),
+            right_name=(tc.name if tc is not None else (tgt or "")),
+            left_type="string",
+            right_type="string",
+        )
+
+        def _verifier(_ctx: ActionContext) -> tuple[bool, str]:
+            cov = self._link_coverage(op)
+            if cov is not None and cov < JOIN_LIKELY_FLOOR:
+                return False, (
+                    f"coverage {cov*100:.0f}% below the {JOIN_LIKELY_FLOOR*100:.0f}% floor "
+                    "(execution-grounded veto)"
+                )
+            return True, ""
+
+        return self.gate.decide(ctx, verifier=_verifier)
+
+    def _record_gate_provenance(self, op: Operator, gate_dec: Any, fired: bool) -> None:
+        """Append the gate's vote tally + per-expert weights to the ledger as an
+        artifact ('why did this action fire/hold?'). Best-effort: provenance must
+        never break an apply, and the ledger's constraint-H (non-ZERO prov_ref)
+        means a synthetic op without atom provenance is recorded via record_cost
+        + an in-memory payload rather than a hard artifact insert."""
+        if self.ledger is None:
+            return
+        prov = self.last_gate_provenance or (gate_dec.to_provenance() if gate_dec is not None else None)
+        if prov is None:
+            return
+        payload = {"op": op_to_dict(op), "fired": fired, "gate": prov}
+        try:
+            import json as _json
+
+            artifact_id = f"gate:{op.op_type}:{self.engine.ontology.version}:{int(fired)}"
+            # record_cost is the always-safe provenance channel (no constraint-H);
+            # it durably logs that a gate decision was taken for this op.
+            self.ledger.record_cost(f"engineer.gate.{op.op_type}", 0)
+            # stash the full payload so the API / ledger reader can surface it;
+            # kept on the service for the same-request response either way.
+            self._last_gate_artifact = (artifact_id, _json.dumps(payload, sort_keys=True))
+        except Exception:
+            # provenance is auditing, not correctness — never fail an apply on it
+            self._last_gate_artifact = None
+
     def apply(self, op_dict: dict[str, Any]) -> dict[str, Any]:
         """Apply a previously-previewed operator via the real TEMPER engine.
 
@@ -468,6 +545,7 @@ class EngineerService:
         below :data:`JOIN_LIKELY_FLOOR` here too — so a hand-crafted op that
         skipped ``interpret`` cannot assert a sub-floor join."""
         op = op_from_dict(op_dict)
+        self.last_gate_provenance = None
         if isinstance(op, AddProperty) and op.range_class:
             cov = self._link_coverage(op)
             if cov is not None and cov < JOIN_LIKELY_FLOOR:
@@ -477,6 +555,29 @@ class EngineerService:
                         f"refused: this join matches only {cov*100:.0f}% of rows, below the "
                         f"{JOIN_LIKELY_FLOOR*100:.0f}% floor — a confidently-wrong join is never applied"
                     ),
+                    "atlas_delta": {"added_links": [], "removed": [], "renamed": []},
+                    "undo_token": None, "new_stats": self.stats(),
+                }
+            # The coverage floor passed. Now the ENSEMBLE GATE: weighted-vote of
+            # deterministic experts, with the coverage floor as an execution-
+            # grounded VETO (it can never let a sub-floor join through, and a
+            # held vote reports rather than applies). This ADDS a decision on top
+            # of the floor — it never weakens it.
+            gate_dec = self._gate_link(op, cov)
+            self.last_gate_provenance = gate_dec.to_provenance()
+            if not gate_dec.fire:
+                self._record_gate_provenance(op, gate_dec, fired=False)
+                summary = (
+                    f"held for review: the decision gate did not fire this join "
+                    f"(confidence {gate_dec.confidence:.2f}, "
+                    f"fire {gate_dec.tally.get('fire', 0):.2f} vs hold {gate_dec.tally.get('hold', 0):.2f})"
+                    if not gate_dec.vetoed
+                    else f"held: {gate_dec.veto_reason}"
+                )
+                return {
+                    "ok": False, "deferred": True, "blocked": gate_dec.vetoed,
+                    "human_summary": summary,
+                    "gate": gate_dec.to_provenance(),
                     "atlas_delta": {"added_links": [], "removed": [], "renamed": []},
                     "undo_token": None, "new_stats": self.stats(),
                 }
@@ -500,13 +601,17 @@ class EngineerService:
         self.ontology = self.engine.ontology
         undo_token = op_to_dict(report.inverse) if report.inverse is not None else None
         atlas_delta = self._atlas_delta(op, report)
-        return {
+        result: dict[str, Any] = {
             "ok": True, "deferred": False,
             "human_summary": _apply_summary(op, report),
             "atlas_delta": atlas_delta,
             "undo_token": undo_token,
             "new_stats": self.stats(),
         }
+        if self.last_gate_provenance is not None:
+            result["gate"] = self.last_gate_provenance
+            self._record_gate_provenance(op, None, fired=True)
+        return result
 
     def undo(self, undo_token: dict[str, Any]) -> dict[str, Any]:
         """Re-apply the stored inverse operator (exact TEMPER undo)."""
