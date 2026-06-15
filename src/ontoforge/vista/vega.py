@@ -24,14 +24,25 @@ VEGA_LITE_SCHEMA = "https://vega.github.io/schema/vega-lite/v5.json"
 
 
 def value_field(metric: MetricDef) -> str:
-    """Column name the aggregate's result lands in (shared with OQIR TopK.by)."""
-    if metric.agg is Agg.COUNT:
-        return "count"
-    return f"{metric.agg.value}_{metric.measure_prop.name}"  # type: ignore[union-attr]
+    """Column name the aggregate's result lands in (shared with OQIR TopK.by).
+
+    Must match the column the LODESTONE executor/typechecker emit for the same
+    Aggregate — ``f"{agg}_{measure_prop or 'rows'}"`` (lodestone.execute._aggregate
+    and lodestone.typecheck). For COUNT (no measure_prop) that is ``count_rows``;
+    naming it ``count`` here desynced the Vega field from the executed rows, so the
+    KPI text mark and every COUNT breakdown read a missing field (rendered NaN) and
+    the COUNT-by-<dim> ``TopK(by=...)`` failed the type check / raised KeyError
+    (swallowed into zero-row breakdowns)."""
+    measure = metric.measure_prop.name if metric.measure_prop is not None else "rows"
+    return f"{metric.agg.value}_{measure}"
 
 
 def _axis_title(metric: MetricDef) -> str:
-    title = value_field(metric).replace("_", " ")
+    # human label for the axis; the binding field stays value_field(metric).
+    if metric.agg is Agg.COUNT:
+        title = "count"
+    else:
+        title = value_field(metric).replace("_", " ")
     return f"{title} ({metric.unit})" if metric.unit else title
 
 
