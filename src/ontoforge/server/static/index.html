@@ -9,6 +9,7 @@
 <link rel="modulepreload" href="/static/app.js">
 <link rel="modulepreload" href="/static/js/core.js">
 <link rel="modulepreload" href="/static/js/bus.js">
+<link rel="modulepreload" href="/static/js/modes.js">
 <link rel="modulepreload" href="/static/js/wm.js">
 <link rel="modulepreload" href="/static/js/dock.js">
 <link rel="modulepreload" href="/static/js/spotlight.js">
@@ -20,43 +21,91 @@
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════════════════ menu bar -->
+<!-- ══════════════════════════════════════════════════════ top bar -->
 <header id="menubar" class="menubar">
-  <span class="wordmark" title="OntoForge — the ontology operating system">
+  <span class="wordmark" title="OntoForge">
     <span class="wm-onto">Onto</span><span class="wm-spark" aria-hidden="true">&#10038;</span><span class="wm-forge">Forge</span>
   </span>
-  <span class="mb-sub">the ontology operating system</span>
+
+  <!-- THE MODE SWITCHER — the clearest thing on screen; always-visible
+       active label so the user always knows which mode they're in. -->
+  <div id="mode-switcher" class="mode-switcher" role="tablist" aria-label="work mode">
+    <button id="mode-ask" class="mode-seg" type="button" role="tab" data-mode="ask"
+            aria-selected="true" aria-controls="mode-pane">
+      <span class="seg-name">Ask</span>
+      <span class="seg-sub">get answers</span>
+    </button>
+    <button id="mode-build" class="mode-seg" type="button" role="tab" data-mode="build"
+            aria-selected="false" aria-controls="mode-pane">
+      <span class="seg-name">Build</span>
+      <span class="seg-sub">measure &amp; pull data</span>
+    </button>
+    <button id="mode-studio" class="mode-seg" type="button" role="tab" data-mode="studio"
+            aria-selected="false" aria-controls="mode-pane">
+      <span class="seg-name">Studio</span>
+      <span class="seg-sub">add &amp; wire up data</span>
+      <span id="studio-badge" class="seg-badge" hidden aria-label="pending suggestions"></span>
+    </button>
+  </div>
+
   <div class="mb-meta">
-    <span class="meta-cell">estate <b id="meta-estate">&mdash;</b></span>
-    <span class="meta-cell">atoms <b id="meta-atoms">&mdash;</b></span>
-    <span class="meta-cell">cost <b id="meta-cost">&mdash;</b><i>&thinsp;tok</i></span>
-    <button class="spotlight-hint" id="spotlight-hint" type="button" title="spotlight — search everything">
+    <span class="meta-cell">your data <b id="meta-estate">&mdash;</b></span>
+    <span class="meta-cell">source records <b id="meta-atoms">&mdash;</b></span>
+    <button class="spotlight-hint" id="spotlight-hint" type="button" title="Search — find anything, or just ask">
       <span class="sh-glass" aria-hidden="true">&#10038;</span><kbd>&#8984;K</kbd>
     </button>
+    <button class="help-toggle" id="help-toggle" type="button" title="three ways to work"
+            aria-label="what are the three modes">?</button>
     <button class="theme-toggle" id="theme-toggle" type="button" title="toggle warm / night theme"
             aria-label="toggle warm or night theme">&#9789;</button>
   </div>
 </header>
 
-<!-- ═══════════════════════════════════════════ the workspace void -->
-<main id="desktop" class="desktop" aria-label="workspace">
-  <div id="epigraph" class="epigraph" aria-hidden="true">
-    <p class="epi-line">struck from source atoms &mdash;<br>nothing asserted without a derivation</p>
-    <p class="epi-hint">press <kbd>/</kbd> or just type to begin</p>
-  </div>
-  <!-- windows are born here; the snap preview ghost is WM-owned -->
+<!-- ═══════════════════════════════════════ the mode pane (one at a time) -->
+<main id="mode-pane" class="mode-pane" aria-label="workspace">
+
+  <!-- ASK — a single centered surface, no window chrome -->
+  <section id="pane-ask" class="pane pane-ask" data-mode="ask" role="tabpanel"
+           aria-label="Ask — cited answers"></section>
+
+  <!-- BUILD — the two-pane dashboard / data builder -->
+  <section id="pane-build" class="pane pane-build" data-mode="build" role="tabpanel"
+           aria-label="Build — measure something, pull data out" hidden></section>
+
+  <!-- STUDIO — the data-engineering workspace; WM windows are born here -->
+  <section id="pane-studio" class="pane pane-studio" data-mode="studio" role="tabpanel"
+           aria-label="Studio — add and wire up data" hidden>
+    <div id="desktop" class="desktop" aria-label="studio workspace">
+      <!-- the studio rail + panels mount here; WM windows float over the canvas -->
+    </div>
+  </section>
+
 </main>
 
-<!-- ═══════════════════════════════════════════════════════ the dock -->
-<nav id="dock" class="dock" aria-label="dock"></nav>
+<!-- ═══════════════════════════════════════════════════ studio dock -->
+<nav id="dock" class="dock" aria-label="studio tools" hidden></nav>
+
+<!-- ══════════════════════════════════════════ first-run orientation -->
+<div id="coach" class="coach" hidden role="dialog" aria-label="three ways to work">
+  <div class="coach-card">
+    <button class="coach-x" id="coach-x" type="button" aria-label="dismiss">&times;</button>
+    <h2 class="coach-title">three ways to work</h2>
+    <ul class="coach-lines">
+      <li><b>Ask</b> — ask anything, see where every answer came from.</li>
+      <li><b>Build</b> — pick what to measure, get charts and downloads.</li>
+      <li><b>Studio</b> — add data and watch the model build.</li>
+    </ul>
+    <button class="btn btn-forge" id="coach-go" type="button">Got it</button>
+  </div>
+</div>
 
 <!-- ══════════════════════════════════════════════════════ spotlight -->
-<div id="spotlight" class="spotlight" hidden role="dialog" aria-label="spotlight search">
+<div id="spotlight" class="spotlight" hidden role="dialog" aria-label="search">
   <div class="spot-box">
     <input id="spotlight-input" class="spot-input" type="text" spellcheck="false"
            role="combobox" aria-expanded="false" aria-autocomplete="list"
            aria-controls="spotlight-results"
-           placeholder="search the estate &mdash; or ask it anything&hellip;">
+           placeholder="find anything, or just ask&hellip;">
     <div id="spotlight-results" class="spot-results" role="listbox" aria-label="results"></div>
     <div class="spot-foot">
       <span id="spotlight-count" aria-live="polite"></span>

@@ -18,6 +18,8 @@ recorded whose provenance sums the verdict atoms.
 
 from __future__ import annotations
 
+import csv
+import io
 import json
 import re
 from collections import Counter
@@ -27,7 +29,7 @@ from typing import Any, Optional
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from ontoforge.amber import AmberError
@@ -156,6 +158,21 @@ def _term_tree(term: ProvTerm, ledger: Any) -> dict[str, Any]:
     if isinstance(term, Prod):
         return {"kind": "product", "terms": [_term_tree(t, ledger) for t in term.terms]}
     raise TypeError(f"not a ProvTerm: {term!r}")  # pragma: no cover
+
+
+def _extract_csv_response(payload: dict[str, Any]) -> StreamingResponse:
+    """Stream an /api/extract result as a CSV download (header + rows)."""
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(payload["columns"])
+    for row in payload["rows"]:
+        writer.writerow(["" if v is None else v for v in row])
+    buf.seek(0)
+    return StreamingResponse(
+        iter([buf.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="extract.csv"'},
+    )
 
 
 def create_app(project: Path | str) -> FastAPI:
@@ -728,6 +745,132 @@ def create_app(project: Path | str) -> FastAPI:
                     )
                 )
         return S.SavedDashboardsOut(dashboards=out)
+
+    # ----------------------------------------------------------- catalog
+
+    @app.get("/api/catalog", response_model=S.CatalogOut)
+    async def api_catalog() -> S.CatalogOut:
+        """Every downloaded dataset (wild corpus + meridian + aviation) with
+        deterministic domain + description, plus the domain histogram."""
+        entries, domains = world.catalog()
+        return S.CatalogOut(
+            datasets=[S.CatalogDataset(**e.to_public()) for e in entries],
+            domains=[S.CatalogDomain(**d) for d in domains],
+        )
+
+    # -------------------------------------------------- workspace / playground
+
+    @app.get("/api/workspace/state", response_model=S.WorkspaceStateOut)
+    async def api_workspace_state() -> S.WorkspaceStateOut:
+        st = world.workspace_state()
+        return S.WorkspaceStateOut(
+            datasets=st["datasets"],
+            built=st["built"],
+            active_world=st["active_world"],
+            stats=S.WorkspaceStats(**st["stats"]),
+        )
+
+    @app.post("/api/workspace/build", response_model=S.WorkspaceBuildOut)
+    async def api_workspace_build(body: S.WorkspaceBuildIn) -> S.WorkspaceBuildOut:
+        """Build a PLAYGROUND world from the selected datasets (cap 25) and make
+        it the active world for reads once done. Returns a pollable job_id."""
+        try:
+            job_id = world.start_build(body.dataset_ids, body.mode)
+        except ProjectError as exc:
+            # a clear, actionable message (over-cap, unknown ids, empty selection)
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        return S.WorkspaceBuildOut(job_id=job_id)
+
+    @app.get("/api/workspace/build/{job_id}", response_model=S.BuildStatusOut)
+    async def api_workspace_build_status(job_id: str, since: int = 0) -> S.BuildStatusOut:
+        """Poll a build: status + new events since `since` (the discovery
+        narrative the constellation animates)."""
+        snap = world.build_status(job_id, since=since)
+        if snap is None:
+            raise HTTPException(status_code=404, detail=f"unknown job_id: {job_id}")
+        return S.BuildStatusOut(**snap)
+
+    # ----------------------------------------------------------- engineer
+
+    @app.post("/api/engineer/interpret", response_model=S.InterpretOut)
+    async def api_engineer_interpret(body: S.InterpretIn) -> S.InterpretOut:
+        """Deterministically parse a plain-English data-engineering imperative
+        into op+preview | clarification | unsupported. PREVIEW ONLY — never
+        mutates. A low-coverage join is flagged/refused, not asserted."""
+        try:
+            out = world.interpret(body.command)
+        except ProjectError as exc:
+            raise fail(exc) from exc
+        if out.get("unsupported"):
+            return S.InterpretOut(
+                unsupported=True, reason=out["reason"],
+                supported_examples=out.get("supported_examples", []),
+            )
+        if out.get("clarification") is not None:
+            return S.InterpretOut(
+                clarification=out["clarification"], options=out.get("options", [])
+            )
+        return S.InterpretOut(
+            op=S.InterpretOp(**out["op"]),
+            preview=S.InterpretPreview(**out["preview"]),
+        )
+
+    @app.post("/api/engineer/apply", response_model=S.ApplyOut)
+    async def api_engineer_apply(body: S.ApplyIn) -> S.ApplyOut:
+        """Apply a previewed op via the real TEMPER/ANVIL/ER machinery; returns
+        atlas_delta + an exact undo_token. Spine-gated ops may DEFER (ok=False,
+        deferred=True) — sent to review, never force-applied."""
+        try:
+            out = world.engineer_apply(body.op)
+        except ProjectError as exc:
+            raise fail(exc) from exc
+        return S.ApplyOut(
+            ok=out["ok"],
+            deferred=out.get("deferred", False),
+            blocked=out.get("blocked", False),
+            human_summary=out.get("human_summary", ""),
+            new_stats=out.get("new_stats", {}),
+            atlas_delta=S.AtlasDelta(**out.get("atlas_delta", {})),
+            undo_token=out.get("undo_token"),
+        )
+
+    @app.post("/api/engineer/undo", response_model=S.UndoOut)
+    async def api_engineer_undo(body: S.UndoIn) -> S.UndoOut:
+        """Undo a prior apply via the TEMPER inverse (exact)."""
+        try:
+            out = world.engineer_undo(body.undo_token)
+        except ProjectError as exc:
+            raise fail(exc) from exc
+        return S.UndoOut(
+            ok=out["ok"], human_summary=out.get("human_summary", ""),
+            new_stats=out.get("new_stats", {}),
+        )
+
+    # ------------------------------------------------------------- extract
+
+    def _run_extract(body: S.ExtractIn) -> dict[str, Any]:
+        try:
+            return world.extract(
+                body.type_uri,
+                [f.model_dump() for f in body.filters],
+                list(body.columns),
+                int(body.limit),
+            )
+        except ProjectError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @app.post("/api/extract", response_model=S.ExtractOut)
+    async def api_extract(body: S.ExtractIn, format: str = "") -> Any:
+        """Filtered entity rows + per-cell citations for a class. ``?format=csv``
+        streams a CSV download instead of JSON."""
+        payload = _run_extract(body)
+        if format.lower() == "csv":
+            return _extract_csv_response(payload)
+        return S.ExtractOut(
+            columns=payload["columns"],
+            rows=payload["rows"],
+            citations=[S.ExtractCitation(**c) for c in payload["citations"]],
+        )
 
     # ----------------------------------------------------------- the SPA
 

@@ -1,0 +1,151 @@
+question_id,start_date,end_date,pollster_id,pollster,sponsors,sample_size,population,methodology,url,politician,favorable,unfavorable,very_favorable,somewhat_favorable,somewhat_unfavorable,very_unfavorable
+114577,2019-12-07,2019-12-10,568,YouGov,Economist,1195,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/4yqcix83qw/econTabReport.pdf,Michael F. Bennet,14,29,4,10,12,17
+114585,2019-12-07,2019-12-10,568,YouGov,Economist,1198,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/4yqcix83qw/econTabReport.pdf,Michael Bloomberg,24,58,7,17,20,38
+114589,2019-12-07,2019-12-10,568,YouGov,Economist,1198,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/4yqcix83qw/econTabReport.pdf,Cory A. Booker,35,45,11,24,12,33
+114593,2019-12-07,2019-12-10,568,YouGov,Economist,1198,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/4yqcix83qw/econTabReport.pdf,Steve Bullock,14,27,3,11,11,16
+114597,2019-12-07,2019-12-10,568,YouGov,Economist,1202,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/4yqcix83qw/econTabReport.pdf,Pete Buttigieg,35,44,14,21,13,31
+114601,2019-12-07,2019-12-10,568,YouGov,Economist,1197,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/4yqcix83qw/econTabReport.pdf,Julián Castro,28,45,6,22,15,30
+114605,2019-12-07,2019-12-10,568,YouGov,Economist,1198,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/4yqcix83qw/econTabReport.pdf,John K. Delaney,11,31,3,8,13,18
+114609,2019-12-07,2019-12-10,568,YouGov,Economist,1202,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/4yqcix83qw/econTabReport.pdf,Tulsi Gabbard,25,45,6,19,21,24
+114613,2019-12-07,2019-12-10,568,YouGov,Economist,1202,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/4yqcix83qw/econTabReport.pdf,Amy Klobuchar,29,40,8,21,14,26
+114617,2019-12-07,2019-12-10,568,YouGov,Economist,1197,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/4yqcix83qw/econTabReport.pdf,Deval Patrick,14,31,4,10,11,20
+114625,2019-12-07,2019-12-10,568,YouGov,Economist,1196,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/4yqcix83qw/econTabReport.pdf,Tom Steyer,19,41,5,14,14,27
+114633,2019-12-07,2019-12-10,568,YouGov,Economist,1195,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/4yqcix83qw/econTabReport.pdf,Marianne Williamson,14,42,3,11,19,23
+114637,2019-12-07,2019-12-10,568,YouGov,Economist,1198,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/4yqcix83qw/econTabReport.pdf,Andrew Yang,32,41,8,24,17,24
+114621,2019-12-07,2019-12-10,568,YouGov,Economist,1201,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/4yqcix83qw/econTabReport.pdf,Bernard Sanders,42,51,20,22,12,39
+114629,2019-12-07,2019-12-10,568,YouGov,Economist,1204,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/4yqcix83qw/econTabReport.pdf,Elizabeth Warren,41,49,22,19,10,39
+114581,2019-12-07,2019-12-10,568,YouGov,Economist,1204,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/4yqcix83qw/econTabReport.pdf,Joseph R. Biden Jr.,42,52,20,22,14,38
+114836,2019-12-07,2019-12-10,568,YouGov,Economist,1203,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/4yqcix83qw/econTabReport.pdf,Donald Trump,45,54,12,6,48,
+114530,2019-12-04,2019-12-09,396,Quinnipiac University,,1553,rv,Live Phone,https://poll.qu.edu/national/release-detail?ReleaseID=3651,Pete Buttigieg,31,29,,,,
+114532,2019-12-04,2019-12-09,396,Quinnipiac University,,1553,rv,Live Phone,https://poll.qu.edu/national/release-detail?ReleaseID=3651,Amy Klobuchar,24,23,,,,
+114534,2019-12-04,2019-12-09,396,Quinnipiac University,,1553,rv,Live Phone,https://poll.qu.edu/national/release-detail?ReleaseID=3651,Michael Bloomberg,21,40,,,,
+114526,2019-12-04,2019-12-09,396,Quinnipiac University,,1553,rv,Live Phone,https://poll.qu.edu/national/release-detail?ReleaseID=3651,Bernard Sanders,44,48,,,,
+114524,2019-12-04,2019-12-09,396,Quinnipiac University,,1553,rv,Live Phone,https://poll.qu.edu/national/release-detail?ReleaseID=3651,Joseph R. Biden Jr.,44,47,,,,
+114528,2019-12-04,2019-12-09,396,Quinnipiac University,,1553,rv,Live Phone,https://poll.qu.edu/national/release-detail?ReleaseID=3651,Elizabeth Warren,38,45,,,,
+114733,2019-12-04,2019-12-09,396,Quinnipiac University,,1553,rv,Live Phone,https://poll.qu.edu/national/release-detail?ReleaseID=3651,Donald Trump,40,57,,,,
+114385,2019-12-04,2019-12-08,320,Monmouth University,,838,rv,Live Phone,https://www.monmouth.edu/polling-institute/documents/monmouthpoll_us_121019.pdf/,Pete Buttigieg,34,35,13,21,13,22
+114386,2019-12-04,2019-12-08,320,Monmouth University,,838,rv,Live Phone,https://www.monmouth.edu/polling-institute/documents/monmouthpoll_us_121019.pdf/,Michael Bloomberg,26,54,7,19,21,33
+114387,2019-12-04,2019-12-08,320,Monmouth University,,838,rv,Live Phone,https://www.monmouth.edu/polling-institute/documents/monmouthpoll_us_121019.pdf/,Andrew Yang,25,28,4,21,11,17
+114382,2019-12-04,2019-12-08,320,Monmouth University,,838,rv,Live Phone,https://www.monmouth.edu/polling-institute/documents/monmouthpoll_us_121019.pdf/,Joseph R. Biden Jr.,43,50,18,25,16,34
+114384,2019-12-04,2019-12-08,320,Monmouth University,,838,rv,Live Phone,https://www.monmouth.edu/polling-institute/documents/monmouthpoll_us_121019.pdf/,Elizabeth Warren,40,50,18,22,11,39
+114383,2019-12-04,2019-12-08,320,Monmouth University,,838,rv,Live Phone,https://www.monmouth.edu/polling-institute/documents/monmouthpoll_us_121019.pdf/,Bernard Sanders,41,54,20,21,15,39
+114673,2019-12-04,2019-12-08,320,Monmouth University,,838,rv,Live Phone,https://www.monmouth.edu/polling-institute/documents/monmouthpoll_us_121019.pdf/,Donald Trump,46,52,33,13,5,47
+114192,2019-12-01,2019-12-03,568,YouGov,Economist,1196,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/799kgtotz3/econTabReport.pdf,Michael Bloomberg,26,57,6,20,20,37
+114196,2019-12-01,2019-12-03,568,YouGov,Economist,1195,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/799kgtotz3/econTabReport.pdf,Cory A. Booker,36,46,12,24,12,34
+114200,2019-12-01,2019-12-03,568,YouGov,Economist,1196,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/799kgtotz3/econTabReport.pdf,Steve Bullock,15,26,4,11,10,16
+114204,2019-12-01,2019-12-03,568,YouGov,Economist,1194,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/799kgtotz3/econTabReport.pdf,Pete Buttigieg,36,43,17,19,15,28
+114208,2019-12-01,2019-12-03,568,YouGov,Economist,1195,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/799kgtotz3/econTabReport.pdf,Julián Castro,32,40,9,23,12,28
+114212,2019-12-01,2019-12-03,568,YouGov,Economist,1191,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/799kgtotz3/econTabReport.pdf,John K. Delaney,14,31,3,11,13,18
+114216,2019-12-01,2019-12-03,568,YouGov,Economist,1194,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/799kgtotz3/econTabReport.pdf,Tulsi Gabbard,26,44,5,21,21,23
+114220,2019-12-01,2019-12-03,568,YouGov,Economist,1194,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/799kgtotz3/econTabReport.pdf,Kamala D. Harris,36,50,12,24,12,38
+114224,2019-12-01,2019-12-03,568,YouGov,Economist,1195,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/799kgtotz3/econTabReport.pdf,Amy Klobuchar,28,41,9,19,18,23
+114228,2019-12-01,2019-12-03,568,YouGov,Economist,1193,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/799kgtotz3/econTabReport.pdf,Deval Patrick,16,30,3,13,12,18
+114236,2019-12-01,2019-12-03,568,YouGov,Economist,1196,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/799kgtotz3/econTabReport.pdf,Joe Sestak,10,25,2,8,10,15
+114240,2019-12-01,2019-12-03,568,YouGov,Economist,1197,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/799kgtotz3/econTabReport.pdf,Tom Steyer,22,39,5,17,13,26
+114248,2019-12-01,2019-12-03,568,YouGov,Economist,1196,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/799kgtotz3/econTabReport.pdf,Marianne Williamson,16,41,3,13,18,23
+114252,2019-12-01,2019-12-03,568,YouGov,Economist,1195,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/799kgtotz3/econTabReport.pdf,Andrew Yang,33,38,9,24,16,22
+114188,2019-12-01,2019-12-03,568,YouGov,Economist,1198,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/799kgtotz3/econTabReport.pdf,Joseph R. Biden Jr.,42,51,20,22,14,37
+114232,2019-12-01,2019-12-03,568,YouGov,Economist,1194,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/799kgtotz3/econTabReport.pdf,Bernard Sanders,42,52,20,22,12,40
+114244,2019-12-01,2019-12-03,568,YouGov,Economist,1197,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/799kgtotz3/econTabReport.pdf,Elizabeth Warren,41,49,22,19,10,39
+114750,2019-12-01,2019-12-03,568,YouGov,Economist,1198,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/799kgtotz3/econTabReport.pdf,Donald Trump,47,52,34,13,5,47
+114338,2019-11-27,2019-11-29,1508,Harris Poll,Harvard,1859,rv,Online,https://harvardharrispoll.com/wp-content/uploads/2019/12/HHP_November2019_Crosstabs_RegisteredVoters.pdf,Pete Buttigieg,32,32,11,21,14,18
+114340,2019-11-27,2019-11-29,1508,Harris Poll,Harvard,1859,rv,Online,https://harvardharrispoll.com/wp-content/uploads/2019/12/HHP_November2019_Crosstabs_RegisteredVoters.pdf,Kamala D. Harris,31,43,8,23,15,28
+114342,2019-11-27,2019-11-29,1508,Harris Poll,Harvard,1859,rv,Online,https://harvardharrispoll.com/wp-content/uploads/2019/12/HHP_November2019_Crosstabs_RegisteredVoters.pdf,Michael Bloomberg,32,38,8,23,19,19
+114332,2019-11-27,2019-11-29,1508,Harris Poll,Harvard,1859,rv,Online,https://harvardharrispoll.com/wp-content/uploads/2019/12/HHP_November2019_Crosstabs_RegisteredVoters.pdf,Bernard Sanders,45,44,17,28,16,28
+114336,2019-11-27,2019-11-29,1508,Harris Poll,Harvard,1859,rv,Online,https://harvardharrispoll.com/wp-content/uploads/2019/12/HHP_November2019_Crosstabs_RegisteredVoters.pdf,Joseph R. Biden Jr.,44,44,15,29,19,25
+114655,2019-11-27,2019-11-29,1508,Harris Poll,Harvard,1859,rv,Online,https://harvardharrispoll.com/wp-content/uploads/2019/12/HHP_November2019_Crosstabs_RegisteredVoters.pdf,Donald Trump,42,54,24,18,11,43
+114334,2019-11-27,2019-11-29,1508,Harris Poll,Harvard,1859,rv,Online,https://harvardharrispoll.com/wp-content/uploads/2019/12/HHP_November2019_Crosstabs_RegisteredVoters.pdf,Elizabeth Warren,35,46,13,21,15,31
+114030,2019-11-24,2019-11-26,568,YouGov,Economist,1186,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/a10nw9wbas/econTabReport.pdf,Michael F. Bennet,18,24,5,13,10,14
+114038,2019-11-24,2019-11-26,568,YouGov,Economist,1187,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/a10nw9wbas/econTabReport.pdf,Michael Bloomberg,23,55,6,17,20,35
+114042,2019-11-24,2019-11-26,568,YouGov,Economist,1184,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/a10nw9wbas/econTabReport.pdf,Cory A. Booker,38,45,14,24,13,32
+114046,2019-11-24,2019-11-26,568,YouGov,Economist,1182,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/a10nw9wbas/econTabReport.pdf,Steve Bullock,17,25,4,13,11,14
+114050,2019-11-24,2019-11-26,568,YouGov,Economist,1187,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/a10nw9wbas/econTabReport.pdf,Pete Buttigieg,35,42,16,19,13,29
+114054,2019-11-24,2019-11-26,568,YouGov,Economist,1184,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/a10nw9wbas/econTabReport.pdf,Julián Castro,30,42,8,22,14,28
+114058,2019-11-24,2019-11-26,568,YouGov,Economist,1182,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/a10nw9wbas/econTabReport.pdf,John K. Delaney,18,28,4,14,12,16
+114062,2019-11-24,2019-11-26,568,YouGov,Economist,1186,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/a10nw9wbas/econTabReport.pdf,Tulsi Gabbard,26,41,7,19,19,22
+114066,2019-11-24,2019-11-26,568,YouGov,Economist,1185,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/a10nw9wbas/econTabReport.pdf,Kamala D. Harris,36,50,14,22,13,37
+114070,2019-11-24,2019-11-26,568,YouGov,Economist,1186,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/a10nw9wbas/econTabReport.pdf,Amy Klobuchar,31,39,10,21,16,23
+114074,2019-11-24,2019-11-26,568,YouGov,Economist,1186,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/a10nw9wbas/econTabReport.pdf,Deval Patrick,16,31,5,11,13,18
+114082,2019-11-24,2019-11-26,568,YouGov,Economist,1189,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/a10nw9wbas/econTabReport.pdf,Joe Sestak,12,24,3,9,11,13
+114086,2019-11-24,2019-11-26,568,YouGov,Economist,1186,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/a10nw9wbas/econTabReport.pdf,Tom Steyer,23,37,5,18,14,23
+114094,2019-11-24,2019-11-26,568,YouGov,Economist,1184,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/a10nw9wbas/econTabReport.pdf,Marianne Williamson,17,41,3,14,17,24
+114098,2019-11-24,2019-11-26,568,YouGov,Economist,1187,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/a10nw9wbas/econTabReport.pdf,Andrew Yang,34,37,9,25,18,19
+114078,2019-11-24,2019-11-26,568,YouGov,Economist,1186,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/a10nw9wbas/econTabReport.pdf,Bernard Sanders,43,52,22,21,13,39
+114034,2019-11-24,2019-11-26,568,YouGov,Economist,1187,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/a10nw9wbas/econTabReport.pdf,Joseph R. Biden Jr.,43,51,20,23,16,35
+114090,2019-11-24,2019-11-26,568,YouGov,Economist,1186,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/a10nw9wbas/econTabReport.pdf,Elizabeth Warren,42,50,22,20,11,39
+114751,2019-11-24,2019-11-26,568,YouGov,Economist,1187,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/a10nw9wbas/econTabReport.pdf,Donald Trump,45,54,35,10,4,50
+114676,2019-11-22,2019-11-24,1189,Morning Consult,Politico,1988,rv,Online,https://www.politico.com/f/?id=0000016e-a474-d17e-a37e-fc7ff3b30000,Donald Trump,40,55,,,,
+113263,2019-11-17,2019-11-19,568,YouGov,Economist,1219,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/u9tu99dui5/econTabReport.pdf,Michael F. Bennet,19,23,5,14,11,12
+113271,2019-11-17,2019-11-19,568,YouGov,Economist,1217,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/u9tu99dui5/econTabReport.pdf,Cory A. Booker,35,43,10,25,12,31
+113275,2019-11-17,2019-11-19,568,YouGov,Economist,1217,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/u9tu99dui5/econTabReport.pdf,Steve Bullock,17,23,6,11,11,12
+113279,2019-11-17,2019-11-19,568,YouGov,Economist,1218,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/u9tu99dui5/econTabReport.pdf,Pete Buttigieg,40,38,18,22,12,26
+113283,2019-11-17,2019-11-19,568,YouGov,Economist,1219,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/u9tu99dui5/econTabReport.pdf,Julián Castro,30,40,8,22,14,26
+113287,2019-11-17,2019-11-19,568,YouGov,Economist,1217,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/u9tu99dui5/econTabReport.pdf,John K. Delaney,17,26,3,14,13,13
+113291,2019-11-17,2019-11-19,568,YouGov,Economist,1214,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/u9tu99dui5/econTabReport.pdf,Tulsi Gabbard,25,41,5,20,20,21
+113295,2019-11-17,2019-11-19,568,YouGov,Economist,1222,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/u9tu99dui5/econTabReport.pdf,Kamala D. Harris,36,48,13,23,12,36
+113299,2019-11-17,2019-11-19,568,YouGov,Economist,1218,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/u9tu99dui5/econTabReport.pdf,Amy Klobuchar,29,36,9,20,16,20
+113303,2019-11-17,2019-11-19,568,YouGov,Economist,1215,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/u9tu99dui5/econTabReport.pdf,Wayne Messam,8,17,2,6,7,10
+113307,2019-11-17,2019-11-19,568,YouGov,Economist,1211,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/u9tu99dui5/econTabReport.pdf,Deval Patrick,16,28,3,13,12,16
+113315,2019-11-17,2019-11-19,568,YouGov,Economist,1217,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/u9tu99dui5/econTabReport.pdf,Joe Sestak,11,22,2,9,10,12
+113319,2019-11-17,2019-11-19,568,YouGov,Economist,1216,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/u9tu99dui5/econTabReport.pdf,Tom Steyer,22,33,6,16,12,21
+113327,2019-11-17,2019-11-19,568,YouGov,Economist,1217,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/u9tu99dui5/econTabReport.pdf,Marianne Williamson,15,37,3,12,16,21
+113331,2019-11-17,2019-11-19,568,YouGov,Economist,1215,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/u9tu99dui5/econTabReport.pdf,Andrew Yang,32,37,8,24,18,19
+113335,2019-11-17,2019-11-19,568,YouGov,Economist,1223,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/u9tu99dui5/econTabReport.pdf,Michael Bloomberg,24,45,5,19,17,28
+113323,2019-11-17,2019-11-19,568,YouGov,Economist,1218,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/u9tu99dui5/econTabReport.pdf,Elizabeth Warren,44,46,25,19,10,36
+113267,2019-11-17,2019-11-19,568,YouGov,Economist,1218,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/u9tu99dui5/econTabReport.pdf,Joseph R. Biden Jr.,44,49,20,24,15,34
+113311,2019-11-17,2019-11-19,568,YouGov,Economist,1217,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/u9tu99dui5/econTabReport.pdf,Bernard Sanders,42,52,21,21,14,38
+114752,2019-11-17,2019-11-19,568,YouGov,Economist,1218,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/u9tu99dui5/econTabReport.pdf,Donald Trump,44,55,32,12,7,48
+113205,2019-11-15,2019-11-17,1189,Morning Consult,Politico,1994,rv,Online,https://morningconsult.com/wp-content/uploads/2019/11/191151_crosstabs_POLITICO_RVs_v1_JB.pdf,Deval Patrick,9,19,,,,
+114677,2019-11-15,2019-11-17,1189,Morning Consult,Politico,1994,rv,Online,https://morningconsult.com/wp-content/uploads/2019/11/191151_crosstabs_POLITICO_RVs_v1_JB.pdf,Donald Trump,41,55,,,,
+112942,2019-11-10,2019-11-12,568,YouGov,Economist,1196,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/7umtlf80ov/econTabReport.pdf,Michael F. Bennet,18,24,5,13,10,14
+112950,2019-11-10,2019-11-12,568,YouGov,Economist,1194,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/7umtlf80ov/econTabReport.pdf,Cory A. Booker,38,42,13,25,10,32
+112954,2019-11-10,2019-11-12,568,YouGov,Economist,1191,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/7umtlf80ov/econTabReport.pdf,Steve Bullock,14,22,4,10,9,13
+112958,2019-11-10,2019-11-12,568,YouGov,Economist,1196,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/7umtlf80ov/econTabReport.pdf,Pete Buttigieg,38,39,17,21,12,27
+112962,2019-11-10,2019-11-12,568,YouGov,Economist,1194,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/7umtlf80ov/econTabReport.pdf,Julián Castro,30,42,8,22,13,29
+112966,2019-11-10,2019-11-12,568,YouGov,Economist,1191,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/7umtlf80ov/econTabReport.pdf,John K. Delaney,14,27,3,11,12,15
+112970,2019-11-10,2019-11-12,568,YouGov,Economist,1193,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/7umtlf80ov/econTabReport.pdf,Tulsi Gabbard,25,43,6,19,21,22
+112974,2019-11-10,2019-11-12,568,YouGov,Economist,1196,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/7umtlf80ov/econTabReport.pdf,Kamala D. Harris,38,47,14,24,10,37
+112978,2019-11-10,2019-11-12,568,YouGov,Economist,1197,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/7umtlf80ov/econTabReport.pdf,Amy Klobuchar,31,38,9,22,15,23
+112982,2019-11-10,2019-11-12,568,YouGov,Economist,1191,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/7umtlf80ov/econTabReport.pdf,Wayne Messam,7,19,3,4,8,11
+112990,2019-11-10,2019-11-12,568,YouGov,Economist,1192,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/7umtlf80ov/econTabReport.pdf,Joe Sestak,9,22,2,7,9,13
+112994,2019-11-10,2019-11-12,568,YouGov,Economist,1194,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/7umtlf80ov/econTabReport.pdf,Tom Steyer,21,34,5,16,11,23
+113002,2019-11-10,2019-11-12,568,YouGov,Economist,1193,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/7umtlf80ov/econTabReport.pdf,Marianne Williamson,15,41,4,11,20,21
+113006,2019-11-10,2019-11-12,568,YouGov,Economist,1193,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/7umtlf80ov/econTabReport.pdf,Andrew Yang,33,35,9,24,16,19
+113013,2019-11-10,2019-11-12,568,YouGov,Economist,1196,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/7umtlf80ov/econTabReport.pdf,Michael Bloomberg,24,49,6,18,21,28
+112998,2019-11-10,2019-11-12,568,YouGov,Economist,1195,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/7umtlf80ov/econTabReport.pdf,Elizabeth Warren,44,47,26,18,9,38
+112986,2019-11-10,2019-11-12,568,YouGov,Economist,1196,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/7umtlf80ov/econTabReport.pdf,Bernard Sanders,44,49,22,22,11,38
+114753,2019-11-10,2019-11-12,568,YouGov,Economist,1196,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/7umtlf80ov/econTabReport.pdf,Donald Trump,43,55,34,9,6,49
+112946,2019-11-10,2019-11-12,568,YouGov,Economist,1196,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/7umtlf80ov/econTabReport.pdf,Joseph R. Biden Jr.,41,51,18,23,14,37
+114678,2019-11-08,2019-11-10,1189,Morning Consult,Politico,1993,rv,Online,https://morningconsult.com/wp-content/uploads/2019/11/191121_crosstabs_POLITICO_RVs_v2_JB.pdf,Donald Trump,39,56,,,,
+112755,2019-11-03,2019-11-05,568,YouGov,Economist,1191,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/cseozthmrp/econTabReport.pdf,Michael F. Bennet,19,24,5,14,11,13
+112763,2019-11-03,2019-11-05,568,YouGov,Economist,1191,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/cseozthmrp/econTabReport.pdf,Cory A. Booker,35,42,12,23,12,30
+112767,2019-11-03,2019-11-05,568,YouGov,Economist,1195,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/cseozthmrp/econTabReport.pdf,Steve Bullock,16,24,4,12,10,14
+112771,2019-11-03,2019-11-05,568,YouGov,Economist,1196,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/cseozthmrp/econTabReport.pdf,Pete Buttigieg,36,38,17,19,12,26
+112775,2019-11-03,2019-11-05,568,YouGov,Economist,1196,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/cseozthmrp/econTabReport.pdf,Julián Castro,32,39,10,22,13,26
+112779,2019-11-03,2019-11-05,568,YouGov,Economist,1192,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/cseozthmrp/econTabReport.pdf,John K. Delaney,17,29,3,14,13,16
+112783,2019-11-03,2019-11-05,568,YouGov,Economist,1191,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/cseozthmrp/econTabReport.pdf,Tulsi Gabbard,25,42,7,18,22,20
+112787,2019-11-03,2019-11-05,568,YouGov,Economist,1194,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/cseozthmrp/econTabReport.pdf,Kamala D. Harris,37,48,16,21,13,35
+112791,2019-11-03,2019-11-05,568,YouGov,Economist,1190,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/cseozthmrp/econTabReport.pdf,Amy Klobuchar,30,37,11,19,15,22
+112795,2019-11-03,2019-11-05,568,YouGov,Economist,1189,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/cseozthmrp/econTabReport.pdf,Wayne Messam,10,18,3,7,8,10
+112803,2019-11-03,2019-11-05,568,YouGov,Economist,1190,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/cseozthmrp/econTabReport.pdf,Joe Sestak,13,22,3,10,9,13
+112807,2019-11-03,2019-11-05,568,YouGov,Economist,1192,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/cseozthmrp/econTabReport.pdf,Tom Steyer,24,31,7,17,11,20
+112815,2019-11-03,2019-11-05,568,YouGov,Economist,1193,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/cseozthmrp/econTabReport.pdf,Marianne Williamson,19,36,5,14,18,18
+112819,2019-11-03,2019-11-05,568,YouGov,Economist,1196,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/cseozthmrp/econTabReport.pdf,Andrew Yang,34,35,9,25,16,19
+112811,2019-11-03,2019-11-05,568,YouGov,Economist,1192,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/cseozthmrp/econTabReport.pdf,Elizabeth Warren,46,45,27,19,9,36
+112799,2019-11-03,2019-11-05,568,YouGov,Economist,1196,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/cseozthmrp/econTabReport.pdf,Bernard Sanders,45,49,23,22,13,36
+112759,2019-11-03,2019-11-05,568,YouGov,Economist,1190,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/cseozthmrp/econTabReport.pdf,Joseph R. Biden Jr.,44,50,21,23,15,35
+114754,2019-11-03,2019-11-05,568,YouGov,Economist,1190,rv,Online,https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/cseozthmrp/econTabReport.pdf,Donald Trump,44,55,35,9,7,48
+112829,2019-10-30,2019-11-03,320,Monmouth University,,835,rv,Live Phone,https://www.monmouth.edu/polling-institute/documents/monmouthpoll_us_110619.pdf/,Kamala D. Harris,27,46,8,19,13,33
+112830,2019-10-30,2019-11-03,320,Monmouth University,,835,rv,Live Phone,https://www.monmouth.edu/polling-institute/documents/monmouthpoll_us_110619.pdf/,Pete Buttigieg,27,34,9,18,13,21
+112828,2019-10-30,2019-11-03,320,Monmouth University,,835,rv,Live Phone,https://www.monmouth.edu/polling-institute/documents/monmouthpoll_us_110619.pdf/,Elizabeth Warren,42,44,20,22,9,35
+112826,2019-10-30,2019-11-03,320,Monmouth University,,835,rv,Live Phone,https://www.monmouth.edu/polling-institute/documents/monmouthpoll_us_110619.pdf/,Joseph R. Biden Jr.,43,50,18,25,17,33
+114674,2019-10-30,2019-11-03,320,Monmouth University,,835,rv,Live Phone,https://www.monmouth.edu/polling-institute/documents/monmouthpoll_us_110619.pdf/,Donald Trump,44,54,34,10,4,50
+114679,2019-11-01,2019-11-03,1189,Morning Consult,,1983,rv,Online,https://morningconsult.com/wp-content/uploads/2019/11/191104_crosstabs_POLITICO_RVs_v2_JB.pdf,Donald Trump,40,55,,,,
+112827,2019-10-30,2019-11-03,320,Monmouth University,,835,rv,Live Phone,https://www.monmouth.edu/polling-institute/documents/monmouthpoll_us_110619.pdf/,Bernard Sanders,41,54,20,21,14,40
+112559,2019-10-29,2019-10-31,1508,Harris Poll,Harvard,1810,rv,Online,https://harvardharrispoll.com/wp-content/uploads/2019/11/HHP_October19_Topline_RegisteredVoters.pdf,Bernard Sanders,48,41,19,29,16,25
+112562,2019-10-29,2019-10-31,1508,Harris Poll,Harvard,1810,rv,Online,https://harvardharrispoll.com/wp-content/uploads/2019/11/HHP_October19_Topline_RegisteredVoters.pdf,Beto O'Rourke,29,38,7,22,15,23
+112563,2019-10-29,2019-10-31,1508,Harris Poll,Harvard,1810,rv,Online,https://harvardharrispoll.com/wp-content/uploads/2019/11/HHP_October19_Topline_RegisteredVoters.pdf,Pete Buttigieg,31,30,8,23,14,16
+112564,2019-10-29,2019-10-31,1508,Harris Poll,Harvard,1810,rv,Online,https://harvardharrispoll.com/wp-content/uploads/2019/11/HHP_October19_Topline_RegisteredVoters.pdf,Kamala D. Harris,33,42,10,23,17,26
+112561,2019-10-29,2019-10-31,1508,Harris Poll,Harvard,1810,rv,Online,https://harvardharrispoll.com/wp-content/uploads/2019/11/HHP_October19_Topline_RegisteredVoters.pdf,Joseph R. Biden Jr.,48,42,16,32,17,25
+112560,2019-10-29,2019-10-31,1508,Harris Poll,Harvard,1810,rv,Online,https://harvardharrispoll.com/wp-content/uploads/2019/11/HHP_October19_Topline_RegisteredVoters.pdf,Elizabeth Warren,39,43,14,25,14,29
+114656,2019-10-29,2019-10-31,1508,Harris Poll,Harvard,1810,rv,Online,https://harvardharrispoll.com/wp-content/uploads/2019/11/HHP_October19_Topline_RegisteredVoters.pdf,Donald Trump,41,54,24,17,11,43

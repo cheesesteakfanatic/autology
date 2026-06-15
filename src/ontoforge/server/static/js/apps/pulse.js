@@ -6,20 +6,28 @@
 import { el, clear, api, errorNote, fmt, skeletonCard, dropCaches, toast } from "../core.js";
 
 const PIPELINE = ["ingest", "profile", "induce", "resolve", "materialize"];
+// plain-English Activity step labels (internal stage name → what it means)
+const STAGE_LABEL = {
+  ingest: "Reading the data",
+  profile: "Finding the shape",
+  induce: "Building the model",
+  resolve: "Matching records",
+  materialize: "Filling in values",
+};
 const POLL_MS = 10_000;
 
 export function createPulseApp() {
   return {
     id: "pulse",
-    title: "Pulse",
-    tagline: "status — the instrument cluster",
+    title: "Activity",
+    tagline: "what the engine did",
     glyph: "◉",
     w: 600, h: 520, multi: false,
 
     mount(ctx) {
       const body = el("div", { class: "status-body" }, skeletonCard([30, 60, 45]));
       const reload = el("button", {
-        class: "btn", type: "button", title: "re-open the project after CLI changes",
+        class: "btn", type: "button", title: "re-open your data after changes",
         onclick: async () => {
           reload.disabled = true;
           try {
@@ -27,14 +35,14 @@ export function createPulseApp() {
             dropCaches();
             ctx.emit("world:reload", {});
             await load();
-            toast("project reloaded", { kind: "ok" });
+            toast("your data reloaded", { kind: "ok" });
           } catch (e) {
             clear(body).append(errorNote(e));
           } finally {
             reload.disabled = false;
           }
         },
-      }, "↻ reload project");
+      }, "↻ re-open project");
       ctx.root.append(body, reload);
       ctx.root.classList.add("app-pulse");
 
@@ -64,28 +72,28 @@ export function createPulseApp() {
             el("div", { class: "counter-label" }, label),
             el("div", { class: `counter-value${accent ? " accent" : ""}` }, value));
           target.append(el("div", { class: "counter-grid" },
-            counter("atoms", s.ledger_exists ? fmt(s.atoms) : "—", true),
-            counter("entities", m.entities !== undefined ? fmt(m.entities) : "—"),
+            counter("source records", s.ledger_exists ? fmt(s.atoms) : "—", true),
+            counter("things", m.entities !== undefined ? fmt(m.entities) : "—"),
             counter("value cells", m.cells !== undefined ? fmt(m.cells) : "—"),
-            counter("links", m.links !== undefined ? fmt(m.links) : "—"),
+            counter("joins", m.links !== undefined ? fmt(m.links) : "—"),
             counter("decisions", fmt(totalDecisions)),
             counter("artifacts", fmt(totalArtifacts)),
             el("div", { class: "counter-cell" },
-              el("div", { class: "counter-label" }, "model cost"),
-              el("div", { class: "counter-value" }, fmt(s.cost_tokens), el("small", {}, " tok")))));
+              el("div", { class: "counter-label" }, "model effort"),
+              el("div", { class: "counter-value" }, fmt(s.cost_tokens)))));
 
           const known = new Set(s.stages);
           const stages = el("div", { class: "stage-list" });
           for (const st of PIPELINE) {
             stages.append(el("span", { class: `stage-item${known.has(st) ? " done" : ""}` },
-              el("span", { class: "tick" }, known.has(st) ? "◆" : "◇"), st));
+              el("span", { class: "tick" }, known.has(st) ? "◆" : "◇"), STAGE_LABEL[st] || st));
           }
           for (const st of s.stages) {
             if (!PIPELINE.includes(st)) {
-              stages.append(el("span", { class: "stage-item done" }, el("span", { class: "tick" }, "◆"), st));
+              stages.append(el("span", { class: "stage-item done" }, el("span", { class: "tick" }, "◆"), STAGE_LABEL[st] || st));
             }
           }
-          target.append(el("span", { class: "section-label" }, "pipeline stages"), stages);
+          target.append(el("span", { class: "section-label" }, "what the engine did"), stages);
 
           target.append(el("div", { class: "status-tables" },
             kvTable("decisions by kind", Object.entries(s.decisions_by_kind)),
@@ -93,7 +101,7 @@ export function createPulseApp() {
               (t) => `${fmt(t.count)} · ${fmt(t.deferred)} deferred · ${fmt(t.quarantined)} quarantined`),
             kvTable("artifacts", Object.entries(s.artifacts))));
 
-          ctx.setTitle(`Pulse — ${s.estate}`);
+          ctx.setTitle(`Activity — ${s.estate}`);
         } catch (e) {
           if (firstLoad) clear(body).append(errorNote(e));
           // a failed poll keeps the last good cluster on screen

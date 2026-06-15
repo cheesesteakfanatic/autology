@@ -14,12 +14,14 @@ typed amendments in [docs/DEVIATIONS.md](docs/DEVIATIONS.md).
 
 ```bash
 uv sync --all-extras
-uv run pytest tests/ -q          # full suite (1109 tests)
+uv run pytest tests/ -q          # full suite (1186 tests)
 
 # One line, zero setup — the Meridian enterprise estate (10 tables, ~9,000 rows
 # of supply-chain/retail/quality data, regenerated from code, full pipeline):
 uv run ontoforge demo meridian /tmp/meridian
 uv run ontoforge serve -p /tmp/meridian      # → http://localhost:8765 — OntoForge OS
+# Three modes in the top bar: Ask (cited answers) · Build (measure + extract/export) ·
+# Studio (the live data playground — add datasets, watch joins form, edit in plain English)
 
 # Point it at YOUR data — any directory of CSV/Parquet files:
 uv run ontoforge init myproject --source /path/to/your/data
@@ -45,28 +47,39 @@ Every `ask` answer carries per-cell citations resolving to content-addressed sou
 the provenance semiring; unanswerable questions are abstained, not guessed; unit-incoherent
 questions ("altitude in dollars") are rejected statically by the OQIR type checker.
 
-**OntoForge OS** (`ontoforge serve`) is the web surface: not pages, an operating system for an
-induced ontology. A window manager (drag, 8-handle resize, edge snap with preview ghost,
-minimize-to-dock) hosts eight micro-apps — **Ask** (cited answers whose source-hue cite-dots land
-with a staggered pop and spawn an Evidence child window of source atoms), **Evidence** (atoms +
-derivation tree), **Constellation** (the ontology star chart, each Atlas island in its own
-categorical hue), **Inspector** (bitemporal time scrubber clamped to the data's real activity
-window + neighbors, where clicking a neighbor opens a second Inspector beside it), **Review**
-(j/k/a/r verdict queue feeding spine recalibration), **Dashboards** (warm Vega charts), **Pulse**
-(live ledger counters), and **Exporter** (AMBER bundles). **Spotlight** (⌘K, `/`, or just start
-typing) is the front door: one search box over classes, entities, properties, saved questions, and
-apps, backed by `GET /api/search` with ranked, interleaved results — and an "Ask the estate"
-fallback so no query dead-ends. Layouts persist via `/api/workspace`.
+**OntoForge OS** (`ontoforge serve`) is the web surface, organized as **three modes** in a top-bar
+switcher (no reload between them):
+
+- **Ask** — the default landing. A centered question box with suggested/recent questions; answers
+  come back as a cited card whose source-hue "Where this came from" dots resolve to per-cell source
+  atoms, and ungroundable questions return a dignified abstention card (never a guess), with a
+  not-ready CTA into Studio. Backed by `GET /api/ask`.
+- **Build** — plain-language analytics: pick a *measure* and *break it down by* dimension, or type
+  free text; get warm-Vega dashboard proposals (`/api/dashboards`) plus two cleanly separated
+  outputs — **Extract** (`/api/extract` → a filtered CSV slice with per-cell citations) and
+  **Export** (`/api/export` → the whole portable AMBER bundle).
+- **Studio** — the live **data playground** over a window-managed desktop: a **Data Catalog**
+  (every downloadable dataset, grouped by domain, add up to 25), a **Data Map** that animates the
+  build in real time from `/api/workspace/build/{job_id}` events (types appear, joins arc into place
+  as `join_found` fires — "found a join: airports ↔ routes on iata_code"), and a plain-English
+  **Console** that turns data-engineering imperatives into preview → apply with exact undo. The
+  Console clarifies one question when ambiguous, falls to worked examples when unsupported, and
+  **refuses a confidently-wrong join** (sub-floor coverage) rather than asserting it. Studio's
+  Confirm / Activity / Record / Where-this-came-from apps round out the workbench.
+
+**Spotlight** (⌘K, `/`, or just start typing) is the front door: one search box over classes,
+entities, properties, saved questions, and apps, backed by `GET /api/search` — with an "Ask the
+estate" fallback so no query dead-ends.
 
 The look is a **warm midcentury-modern system**: oatmeal/cream paper grounds, espresso ink, a
 locked atomic-age 8-hue atlas wheel (each app, island, and chart series owns a deterministic hue),
 marigold accents, warm-amber shadows (never black), a 270° arc confidence gauge, and a quiet
 calm-dark night theme as an opt-in. Vanilla ES modules, no build chain, ships fully offline
-(vendored Vega only); the non-vendor payload is **217,742 bytes — under the 250 KB budget**
-(test-enforced), with API data reaching the DOM only through `createTextNode` (no `innerHTML`).
-Design system in [docs/UI_DESIGN.md](docs/UI_DESIGN.md); shell internals in
-[src/ontoforge/server/static/README.md](src/ontoforge/server/static/README.md); competitive
-positioning in [docs/MARKET_EDGE.md](docs/MARKET_EDGE.md).
+(vendored Vega only); the non-vendor payload is **286,125 bytes — under the 280 KB budget**
+(test-enforced), with API data reaching the DOM only through `createTextNode`/`el()` (no
+`innerHTML`). Design system + the full de-jargon naming map in [docs/UI_DESIGN.md](docs/UI_DESIGN.md);
+shell internals in [docs/UI_SHELL_README.md](docs/UI_SHELL_README.md); competitive positioning in
+[docs/MARKET_EDGE.md](docs/MARKET_EDGE.md).
 
 ## Portability
 
@@ -108,6 +121,14 @@ full wart program — unit mixes, date locales, name variants, stripped vendor i
 re-keyed double entries — and a 12-question gold suite under `fixtures/meridian/gold/` (9
 answerable, 2 abstention traps, 1 trick-unit) that the generic engine answers fully cited with
 zero estate-specific code.
+
+The **Wild corpus** under `fixtures/wild/` is **450 real internet datasets** (4.8 MB, gates: ≥380
+datasets, 20–150 rows, 2–60 columns each) pulled deterministically from seven open sources —
+datasets-org, Our World in Data, FiveThirtyEight, Plotly, Vega, seaborn, OpenFlights — with full
+SHA-256 pinning and per-dataset license attribution (see [docs/WILD_CORPUS.md](docs/WILD_CORPUS.md)).
+Together with Meridian and the aviation corpus this is what the Studio Data Catalog surfaces (`GET
+/api/catalog` enumerates **465** datasets with deterministic domain + description), so a playground
+build can union real cross-source tables and watch genuine joins form.
 
 ## Measured results (fixture scale, deterministic, zero network)
 

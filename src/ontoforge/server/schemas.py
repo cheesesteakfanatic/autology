@@ -358,3 +358,188 @@ class AtlasLinksOut(BaseModel):
 
 class ReloadOut(BaseModel):
     reloaded: bool
+
+
+# -------------------------------------------------------------------- catalog
+
+
+class CatalogDataset(BaseModel):
+    """One downloaded dataset available to add to a playground build."""
+
+    id: str
+    name: str
+    source: str
+    domain: str
+    rows: int
+    cols: int
+    columns: list[str] = Field(default_factory=list)
+    description: str = ""
+
+
+class CatalogDomain(BaseModel):
+    name: str
+    count: int
+
+
+class CatalogOut(BaseModel):
+    datasets: list[CatalogDataset]
+    domains: list[CatalogDomain]
+
+
+# ------------------------------------------------------------------ workspace
+# (the playground build workspace — distinct from the window-layout blob above)
+
+
+class WorkspaceStats(BaseModel):
+    types: int = 0
+    confirmed: int = 0
+    likely: int = 0
+    silos: int = 0
+
+
+class WorkspaceStateOut(BaseModel):
+    datasets: list[str] = Field(default_factory=list)
+    built: bool = False
+    active_world: str = "demo"
+    stats: WorkspaceStats = Field(default_factory=WorkspaceStats)
+
+
+class WorkspaceBuildIn(BaseModel):
+    dataset_ids: list[str] = Field(min_length=1)
+    mode: Literal["replace", "add"] = "replace"
+
+
+class WorkspaceBuildOut(BaseModel):
+    job_id: str
+
+
+class BuildEvent(BaseModel):
+    seq: int
+    kind: str
+    msg: str = ""
+    # the event carries a free-form typed payload (table/join/type fields); we
+    # surface it permissively so the UI animator gets everything the worker emits
+    model_config = {"extra": "allow"}
+
+
+class BuildResult(BaseModel):
+    stats: dict[str, Any] = Field(default_factory=dict)
+    atlas: Optional[dict[str, Any]] = None
+
+
+class BuildStatusOut(BaseModel):
+    job_id: str
+    status: Literal["running", "done", "error"]
+    progress: float = 0.0
+    stage: str = ""
+    events: list[BuildEvent] = Field(default_factory=list)
+    last_seq: int = 0
+    result: Optional[BuildResult] = None
+    error: str = ""
+
+
+# ------------------------------------------------------------------- engineer
+
+
+class InterpretIn(BaseModel):
+    command: str = Field(min_length=1)
+
+
+class InterpretOp(BaseModel):
+    kind: str
+    params: dict[str, Any] = Field(default_factory=dict)
+    human_summary: str = ""
+    confidence: float = 1.0
+
+
+class InterpretPreview(BaseModel):
+    description: str = ""
+    affected_count: int = 0
+    sample: list[Any] = Field(default_factory=list)
+    coverage: Optional[float] = None
+    tier: str = ""
+    spine_gated: bool = False
+    blocked: bool = False
+    block_reason: str = ""
+    valid: bool = True
+    reason: str = ""
+    #: the opaque, server-minted operator handle the apply step echoes back
+    op_token: Optional[dict[str, Any]] = None
+
+
+class InterpretOut(BaseModel):
+    """One of: a proposed op+preview | a clarification | an unsupported reason.
+
+    Exactly one branch is populated (the others are None/empty), matching the
+    API contract's discriminated union."""
+
+    op: Optional[InterpretOp] = None
+    preview: Optional[InterpretPreview] = None
+    clarification: Optional[str] = None
+    options: list[str] = Field(default_factory=list)
+    unsupported: bool = False
+    reason: str = ""
+    supported_examples: list[str] = Field(default_factory=list)
+
+
+class ApplyIn(BaseModel):
+    #: the op_token returned by /interpret (a serialized operator) — applied
+    #: verbatim through the real TEMPER engine; never re-parsed from text
+    op: dict[str, Any]
+
+
+class AtlasDelta(BaseModel):
+    added_links: list[dict[str, Any]] = Field(default_factory=list)
+    removed: list[Any] = Field(default_factory=list)
+    renamed: list[dict[str, Any]] = Field(default_factory=list)
+
+
+class ApplyOut(BaseModel):
+    ok: bool
+    deferred: bool = False
+    #: True when apply refused a sub-floor confidently-wrong join (distinct from
+    #: an ordinary precondition rejection) — the UI shows it as a refused join.
+    blocked: bool = False
+    human_summary: str = ""
+    new_stats: dict[str, Any] = Field(default_factory=dict)
+    atlas_delta: AtlasDelta = Field(default_factory=AtlasDelta)
+    undo_token: Optional[dict[str, Any]] = None
+
+
+class UndoIn(BaseModel):
+    undo_token: dict[str, Any]
+
+
+class UndoOut(BaseModel):
+    ok: bool
+    human_summary: str = ""
+    new_stats: dict[str, Any] = Field(default_factory=dict)
+
+
+# -------------------------------------------------------------------- extract
+
+
+class ExtractFilter(BaseModel):
+    prop: str
+    op: Literal["==", "!=", "<", "<=", ">", ">=", "contains"] = "=="
+    value: Any = None
+
+
+class ExtractIn(BaseModel):
+    type_uri: str
+    filters: list[ExtractFilter] = Field(default_factory=list)
+    columns: list[str] = Field(default_factory=list)
+    limit: int = 200
+
+
+class ExtractCitation(BaseModel):
+    row: int
+    column: str
+    value: Any = None
+    atom_ids: list[str] = Field(default_factory=list)
+
+
+class ExtractOut(BaseModel):
+    columns: list[str] = Field(default_factory=list)
+    rows: list[list[Any]] = Field(default_factory=list)
+    citations: list[ExtractCitation] = Field(default_factory=list)

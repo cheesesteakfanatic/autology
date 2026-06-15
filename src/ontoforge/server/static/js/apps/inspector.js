@@ -12,22 +12,22 @@ const RECENT_KEY = "ontoforge.recent.entities";
 export function createInspectorApp() {
   return {
     id: "inspector",
-    title: "Inspector",
-    tagline: "one entity, every value it ever held",
+    title: "Record",
+    tagline: "one thing, every value it ever held",
     glyph: "◈",
     w: 680, h: 560, multi: true,
 
     mount(ctx, params) {
       const input = el("input", {
         class: "entity-input mono", type: "text", spellcheck: "false",
-        placeholder: "ent://…  (paste a URI, or arrive here from Spotlight)",
+        placeholder: "ent://…  (paste a record id, or arrive here from search)",
       });
       const form = el("form", { class: "entity-form", autocomplete: "off" },
-        input, el("button", { class: "btn btn-forge", type: "submit" }, "Inspect"));
+        input, el("button", { class: "btn btn-forge", type: "submit" }, "Explore record"));
       const recentBox = el("div", { class: "entity-recent" });
       const scrubBox = el("div", { class: "time-scrubber", hidden: "hidden" });
       const body = el("div", { class: "entity-body" },
-        el("div", { class: "empty-note" }, "no entity loaded — the as-of scrubber appears when one is"));
+        el("div", { class: "empty-note" }, "no record loaded — the time slider appears when one is"));
       ctx.root.append(form, recentBox, scrubBox, body);
       ctx.root.classList.add("app-inspector");
 
@@ -102,9 +102,9 @@ export function createInspectorApp() {
         scrubBox.hidden = false;
 
         const stanceLabel = el("span", { class: "scrub-stance" },
-          scrubT === null ? "stance: current" : `stance: as-of ${dayISO(scrubT)}`);
+          scrubT === null ? "showing: today" : `showing: as of ${dayISO(scrubT)}`);
 
-        const track = el("div", { class: "scrub-track", title: "drag — the as-of instant" });
+        const track = el("div", { class: "scrub-track", title: "drag — the date you're viewing" });
         const ticks = new Set();
         for (const cells of Object.values(history)) {
           for (const c of cells) {
@@ -124,7 +124,7 @@ export function createInspectorApp() {
           const f = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
           scrubT = domain[0] + f * (domain[1] - domain[0]);
           handle.style.left = pct(scrubT);
-          stanceLabel.textContent = `stance: as-of ${dayISO(scrubT)}`;
+          stanceLabel.textContent = `showing: as of ${dayISO(scrubT)}`;
           for (const cur of historyCursors) { cur.style.left = pct(scrubT); cur.hidden = false; }
           scheduleFetch();
         }
@@ -147,16 +147,16 @@ export function createInspectorApp() {
 
         scrubBox.append(
           el("div", { class: "scrub-head" },
-            el("span", { class: "section-label", style: "margin:0" }, "as-of time scrubber"),
+            el("span", { class: "section-label", style: "margin:0" }, "rewind to a date"),
             stanceLabel,
             el("button", {
               class: "btn scrub-now-btn", type: "button",
               onclick: () => { scrubT = null; load(currentUri); },
-            }, "↩ current")),
+            }, "↩ today")),
           track,
           el("div", { class: "scrub-axis" },
             el("span", {}, dayISO(domain[0])),
-            el("span", {}, "valid time →"),
+            el("span", {}, "over time →"),
             el("span", {}, dayISO(domain[1]))));
       }
 
@@ -181,10 +181,10 @@ export function createInspectorApp() {
         const keys = Object.keys(props).sort();
         const card = el("div", { class: "stance-card" },
           el("span", { class: "section-label" },
-            scrubT === null ? "property card — current" : `property card — ${stanceLabel || "as-of"}`));
+            scrubT === null ? "details — today" : `details — ${stanceLabel || "as of this date"}`));
         if (!keys.length) {
           card.append(el("div", { class: "stance-empty" },
-            "nothing was valid at this instant — the record is silent here"));
+            "nothing was recorded at this date — the record is silent here"));
         } else {
           card.append(el("table", { class: "data" }, el("tbody", {},
             keys.map((k) => {
@@ -200,7 +200,7 @@ export function createInspectorApp() {
       function renderHistory(target) {
         clear(target);
         target.append(el("span", { class: "section-label" },
-          "bitemporal history — every value ever held, on the valid-time axis"));
+          "history — every value it ever held"));
         const rows = el("div", { class: "history-rows" });
         historyCursors = [];
         for (const prop of Object.keys(history).sort()) {
@@ -226,13 +226,13 @@ export function createInspectorApp() {
             el("span", { class: "history-prop", title: prop }, prop), track));
         }
         target.append(rows, el("div", { class: "history-legend" },
-          "amber bar — current belief · grey bar — superseded or windowed · fade — open-ended · every bar resolves to its derivation"));
+          "amber bar — what's believed now · grey bar — an older value · fade — still open · click any bar for where it came from"));
       }
 
       // ───────────────────────────────── neighbors — the OS moment
 
       async function renderNeighbors(target, uri) {
-        target.append(el("span", { class: "section-label" }, "neighbors"));
+        target.append(el("span", { class: "section-label" }, "related records"));
         const list = el("div", { class: "neighbor-list" },
           el("div", { class: "skeleton", style: "width:60%" }));
         target.append(list);
@@ -241,7 +241,7 @@ export function createInspectorApp() {
           const links = out.links || [];
           clear(list);
           if (!links.length) {
-            list.append(el("div", { class: "neighbor-none" }, "no linked entities"));
+            list.append(el("div", { class: "neighbor-none" }, "no related records"));
             return;
           }
           for (const n of links) {
@@ -274,7 +274,7 @@ export function createInspectorApp() {
         input.value = uri;
         scrubT = null;
         lastProps = {};
-        ctx.setTitle(`Inspector — ${uri.split("/").pop()}`);
+        ctx.setTitle(`Record — ${uri.split("/").pop()}`);
         const target = clear(body);
         scrubBox.hidden = true;
         target.append(el("div", { class: "skeleton-card" }));
@@ -291,7 +291,7 @@ export function createInspectorApp() {
               el("div", { class: "entity-uri" }, e.uri),
               el("div", { class: "entity-classes" },
                 e.classes.map((c) => el("button", {
-                  class: "badge badge-amber badge-btn", type: "button", title: `${c} — open in the constellation`,
+                  class: "badge badge-amber badge-btn", type: "button", title: `${c} — show on the data map`,
                   onclick: () => ctx.emit("class:focus", { uri: c }),
                 }, c.split("/").pop())))),
             el("div", { class: "entity-grid" },

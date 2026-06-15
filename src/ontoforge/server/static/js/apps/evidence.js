@@ -51,8 +51,8 @@ function provNodeView(node) {
 export function createEvidenceApp() {
   return {
     id: "evidence",
-    title: "Evidence",
-    tagline: "source atoms & derivations",
+    title: "Where this came from",
+    tagline: "the source records behind a value",
     glyph: "⌗",
     w: 420, h: 460, multi: true, transient: true,
 
@@ -64,10 +64,10 @@ export function createEvidenceApp() {
 
       function showAtoms(atomIds, label) {
         contextLine.textContent = label || "";
-        ctx.setTitle("Evidence — source atoms");
+        ctx.setTitle("Where this came from");
         clear(body);
         body.append(el("div", { class: "section-label" },
-          `${atomIds.length} source atom${atomIds.length === 1 ? "" : "s"}`));
+          `${atomIds.length} source record${atomIds.length === 1 ? "" : "s"}`));
         for (const id of atomIds) {
           const slot = el("div", { class: "atom-chip" },
             el("div", { class: "atom-id" }, `⌗ ${id}`),
@@ -82,13 +82,13 @@ export function createEvidenceApp() {
 
       async function showProvenance(provRef, label) {
         contextLine.textContent = label || "";
-        ctx.setTitle("Evidence — derivation");
+        ctx.setTitle("Where this came from");
         clear(body).append(el("div", { class: "skeleton", style: "width:55%" }));
         try {
           const out = await api(`/api/provenance/${encodeURIComponent(provRef)}`);
           clear(body).append(
             el("div", { class: "section-label" },
-              `derivation — ${out.n_atoms} atom${out.n_atoms === 1 ? "" : "s"} · ref ${out.prov_ref}`),
+              `how this was worked out — ${out.n_atoms} source record${out.n_atoms === 1 ? "" : "s"}`),
             provNodeView(out.tree));
         } catch (e) {
           clear(body).append(errorNote(e));

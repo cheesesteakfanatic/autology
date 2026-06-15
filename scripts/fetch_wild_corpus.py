@@ -40,11 +40,13 @@ def main(argv: list[str] | None = None) -> int:
     kept = manifest["stats"]["datasets_kept"]
     mb = manifest["stats"]["total_bytes"] / 1e6
     print(f"kept {kept} datasets ({mb:.1f} MB) -> {args.dest or wild.default_fixtures_dir()}")
-    if kept < 150:
-        print("GATE FAILED: fewer than 150 datasets landed", file=sys.stderr)
+    # Landing gates, kept in lockstep with tests/wild/test_manifest.py
+    # (MIN_DATASETS / SIZE_BUDGET_BYTES) and docs/WILD_CORPUS.md.
+    if kept < 380:
+        print("GATE FAILED: fewer than 380 datasets landed", file=sys.stderr)
         return 1
-    if manifest["stats"]["total_bytes"] > 20 * 1024 * 1024:
-        print("GATE FAILED: corpus exceeds 20 MB", file=sys.stderr)
+    if manifest["stats"]["total_bytes"] > 40 * 1024 * 1024:
+        print("GATE FAILED: corpus exceeds 40 MB", file=sys.stderr)
         return 1
     return 0
 

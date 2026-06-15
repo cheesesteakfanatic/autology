@@ -97,7 +97,7 @@ export function createSpotlight({ root, input, listEl, countEl, registry, wm, bu
       for (const c of onto.classes) {
         const s = matchScore(q, c.name);
         if (s !== null) {
-          out.push({ kind: "class", title: c.name, subtitle: "induced class", ref: c.uri, score: s + 20 });
+          out.push({ kind: "class", title: c.name, subtitle: "a type in the model", ref: c.uri, score: s + 20 });
         }
         for (const p of c.properties) {
           const ps = matchScore(q, p.name);
@@ -157,7 +157,7 @@ export function createSpotlight({ root, input, listEl, countEl, registry, wm, bu
 
     // the guaranteed fallback: free text is always askable
     if (q) {
-      const ask = { kind: "ask", title: `Ask the estate — “${q}”`, subtitle: "cited answer or an honest abstention", ref: q, score: -1, fallback: true };
+      const ask = { kind: "ask", title: `Ask — “${q}”`, subtitle: "a cited answer, or an honest 'won't guess'", ref: q, score: -1, fallback: true };
       if (q.endsWith("?") || !items.length) items.unshift(ask);
       else items.push(ask);
     }
@@ -203,7 +203,7 @@ export function createSpotlight({ root, input, listEl, countEl, registry, wm, bu
         el("span", { class: "si-kind" }, item.kind)));
     });
     if (!items.length) {
-      listEl.append(el("div", { class: "spot-empty" }, "type to search the estate — classes, entities, questions, apps"));
+      listEl.append(el("div", { class: "spot-empty" }, "find anything — types, records, questions, tools — or just ask"));
     }
     input.setAttribute("aria-activedescendant", items.length ? `spot-opt-${sel}` : "");
     if (countEl) countEl.textContent = items.length ? `${items.length} result${items.length === 1 ? "" : "s"}` : "no results";

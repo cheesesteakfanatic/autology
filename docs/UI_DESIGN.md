@@ -1,13 +1,39 @@
-# OntoForge OS — the ontology operating system (warm mid-century redesign)
+# OntoForge — three plain-language modes (warm mid-century redesign)
 
-The web UI (`src/ontoforge/server/static/`) is no longer a page with tabs.
-It is an **operating surface**: warm oatmeal paper on which every capability
-is a windowed micro-app, the dock launches and collects them, and Spotlight
-— summoned by `⌘K`, `/`, or just typing on the empty workspace — is the
-front door to everything the estate knows.
+The web UI (`src/ontoforge/server/static/`) is organized around **three
+modes**, switched by one always-visible segmented control in the top bar —
+**Ask · Build · Studio** — and the user always knows which one they're in.
+Each mode shows ONLY its own surfaces; switching is instant (a JS pane flip,
+never a navigation) and obviously changes the whole workspace.
 
-The shell wears a **mid-century-modern** skin: the whole OS sits on Canvas
-Oatmeal `#ECE1CB` with a 3% paper-grain tooth; windows float as molded
+- **ASK** — *the questioner.* The default landing for every session: a single
+  large, centered question box, suggested questions generated from the model,
+  recent questions, and — after you ask — a cited answer card with inline
+  **"Where this came from"** dots. No window chrome, no dock, no graph.
+- **BUILD** — *measure something / pull data out.* A two-pane builder: pick a
+  **measure** and **break-it-down-by** dimensions in plain terms (or describe
+  it free-text), get ranked **dashboard proposals** as warm Vega charts, then
+  two clearly-separated outputs — **Extract** (the filtered table → Download
+  CSV, a slice) and **Export** (Download the whole dataset, portable — the
+  bundle).
+- **STUDIO** — *the data-engineering playground.* A workspace of labeled,
+  persistent sections named by a left rail — **Data Catalog**, **Data Map**,
+  **Console**, **Confirm suggestions**, **Activity** — powered underneath by
+  the window manager and dock. The signature moment: type a plain-English
+  instruction in the Console and watch the Data Map react, or add data and
+  **watch the model build live** as nodes pop and join-arcs draw from real
+  engine events.
+
+The WM + dock (§2, §4) are **Studio's substrate only** — ASK and BUILD are
+calm single surfaces that never spawn windows.
+
+**De-jargon is presentation-only** (§0.1). Internal engine codenames
+(STRATA/HEARTH/LODESTONE/ANVIL/TEMPER/WARDEN/VISTA/AMBER/OQIR) never appear in
+any user-facing label; only the *labels* change — code, URIs, API routes and
+bus intents keep their internal names so routing/persistence still work.
+
+The shell wears a **mid-century-modern** skin: the whole UI sits on Canvas
+Oatmeal `#ECE1CB` with a 3% paper-grain tooth; Studio windows float as molded
 fiberglass shells (cream / warm-white, generous radii) each capped by a
 **colored title-bar strip in its app's atlas hue**; ink is Espresso `#2A1F14`
 (never black) and every shadow is warm-amber (never black). The references —
@@ -17,46 +43,100 @@ the default and the first impression; a night theme is opt-in and persisted.
 
 docs/MARKET_EDGE.md found that what nobody else ships are **trust
 artifacts**: per-value citations, calibrated abstention, bitemporal
-per-value provenance, a testable exit guarantee. The OS shell treats *trust
-as the aesthetic* and *investigation as the workflow*: claims open evidence
-windows beside them; entities open inspectors beside inspectors; nothing
-asserted without a derivation.
+per-value provenance, a testable exit guarantee. The UI treats *trust as the
+aesthetic* and *investigation as the workflow*: every Ask answer shows where
+it came from; in Studio, claims open evidence beside them, entities open
+records beside records, nothing asserted without a derivation.
 
 Zero frameworks. Vanilla ES modules, one stylesheet, vendored Vega for
-charts only. Non-vendor payload ≈ 213 KB (budget 250 KB, enforced by
-`tests/server/test_spa.py`). Every piece of API data enters the DOM through
-`el()`/`document.createTextNode` — `innerHTML` never carries data (also
-test-enforced). The app ships **offline**: no external fonts or CDNs at
-runtime; the grain is an inline data-URI; only Vega is vendored.
+charts only. Non-vendor payload ≈ 286 KB (budget **280 KB** = 286 720 bytes,
+enforced by `tests/server/test_spa.py`; headroom is tight — copy/label
+additions must watch the budget). Every piece of API data enters the DOM
+through `el()`/`svgEl()`/`document.createTextNode` — `innerHTML` never
+carries data (also test-enforced). The app ships **offline**: no external
+fonts or CDNs at runtime; the grain is an inline data-URI; only Vega is
+vendored.
+
+---
+
+## 0. The three-mode shell (js/modes.js)
+
+The shell (`createModeShell`) owns three segments (`#mode-ask`,
+`#mode-build`, `#mode-studio`) and three panes (`#pane-ask`, `#pane-build`,
+`#pane-studio`). `switchTo(mode, opts)` flips `aria-selected` + the `.active`
+class on the lit segment, toggles `hidden` on the panes, hides the dock
+outside Studio, lazily mounts each mode's surface on first entry, and emits
+`mode:changed`. `⌘1/⌘2/⌘3` jump straight to a mode (the shell claims these
+before any window). ASK is the default landing (`modes.boot("ask", …)`).
+
+- **First-run orientation.** A dismissible coach card ("three ways to work")
+  names all three modes in one glance; its primary action adapts to the data
+  state — *"Add your first dataset →"* (→ Studio › Catalog) when empty,
+  *"Try a question →"* (→ Ask, pre-filled) when a model exists. Dismissal and
+  per-mode first-visit nudges persist in `localStorage` (`COACH_KEY`,
+  `FIRSTVISIT_KEY`); a top-bar `?` re-opens it on demand.
+- **The Studio segment carries a count badge** for pending *Confirm
+  suggestions* (`review:count` on the bus → `setBadge`), mirrored on the rail.
+
+### 0.1 The de-jargon naming map (labels only)
+
+| internal (code / URIs / intents — unchanged) | user-facing label |
+|---|---|
+| atoms / `atom://…` | **source records** |
+| Atlas / Constellation (`id:"constellation"`, `/api/atlas`) | **Data Map** |
+| Pulse | **Activity** |
+| Evidence / cite-dots | **Where this came from** / Sources |
+| Inspector | **Explore record** (action) / **Record** (title) |
+| Exporter / AMBER snapshot | **Export** / Download the whole dataset, portable |
+| Review / adjudication (`/api/review`, `verdict("accept")`) | **Confirm suggestions** / Confirm · Not the same |
+| classes / ontology | **types** ("things") / **the model it built** |
+| VISTA dashboards | **Dashboard proposals** / Build a view |
+| atlas tiers confirmed / likely / hint / silo | **confirmed join** / **likely join** / possible / **standalone** |
+| ingest→profile→induce→resolve→materialize | Reading the data → Finding the shape → Building the model → Matching records → Filling in values |
+| abstained | **No grounded answer — won't guess** |
 
 ---
 
 ## 1. Architecture
 
 ```
-app.js                 boot + intent routing policy (the WM owns routing)
-js/core.js             kernel: el/svgEl/clear/api/store + ontology cache
+app.js                 boot + the three-mode shell wiring + Studio routing
+js/core.js             kernel: el/svgEl/clear/api/store + ontology/atlas cache
 js/bus.js              inter-app bus: namespaced intents, disposable subs
-js/wm.js               the window manager
-js/dock.js             the dock
-js/spotlight.js        the search
-js/constellation.js    deterministic star-chart layout engine
-js/apps/registry.js    the app registry (dock order)
-js/apps/{ask,constellation,inspector,evidence,
-         review,dashboards,pulse,exporter}.js
+js/modes.js            the three-mode shell controller (ASK | BUILD | STUDIO)
+js/surfaces/ask.js     ASK — the centered questioner (single surface)
+js/surfaces/build.js   BUILD — the measure/breakdown builder + Extract/Export
+js/wm.js               the window manager (Studio substrate)
+js/dock.js             the dock (Studio substrate)
+js/spotlight.js        the search (⌘K front door, all modes)
+js/constellation.js    deterministic Data-Map layout engine
+js/apps/registry.js    the Studio app registry
+js/apps/{catalog,datamap,console,review,pulse,inspector,evidence}.js
 ```
+
+**ASK and BUILD are single surfaces** mounted directly into their pane —
+no windows. **STUDIO** is the windowed power-tool workspace: a left rail
+(`STUDIO_PANELS`) names the five sections and clicking one focuses-or-opens
+the matching window; on entry the signature pairing is tiled —
+`tileStudioSignature()` puts the **Data Map** across the top with the
+**Console** docked along the bottom. The Catalog leads instead when the
+project is empty.
 
 **Apps never import each other.** An app emits intents over the bus —
 `entity:open`, `class:focus`, `evidence:atoms`, `evidence:prov`, `ask:run`,
-`app:launch` — with `sourceWinId` stamped on every payload, and `app.js`
-decides which window answers: focus the existing singleton, re-point an
-existing child, or spawn adjacent to the source. The WM collects every bus
+`app:launch`, plus the playground intents `studio:build-started`,
+`studio:atlas-delta`, `studio:show-map`, `workspace:built`, `world:reload`,
+`mode:goto` — with `sourceWinId` stamped where relevant, and `app.js` decides
+which window answers: focus the existing singleton, re-point an existing
+child, or spawn adjacent to the source. The WM collects every bus
 subscription and disposer a window makes and tears them down on close.
 
-## 2. The window manager (js/wm.js)
+## 2. The window manager (js/wm.js) — Studio's substrate
 
-Mechanics borrowed from real WMs; chrome native to the web (no traffic
-lights, no aero glass — the uncanny valley is avoided by not entering it):
+The WM lives inside the **Studio** pane only; Ask and Build never spawn
+windows. Mechanics borrowed from real WMs; chrome native to the web (no
+traffic lights, no aero glass — the uncanny valley is avoided by not
+entering it):
 
 - **Pointer-capture gestures.** `setPointerCapture` on the titlebar/handle;
   no document-level mousemove; `pointercancel` runs the same cleanup path.
@@ -132,9 +212,12 @@ palette is pre-mounted: open is instant.
   `aria-live: polite`; `↑↓⏎esc`, `⌘1–9` jumps; focus returns to the
   invoker on close.
 
-## 4. The dock
+## 4. The dock — Studio only
 
-A single Card-Cream pill floating 12px above the canvas (elevation 1, warm
+The dock is hidden outside Studio (`dock.hidden = mode !== "studio"`). In
+Studio the named **left rail** is the plain-language way into the five
+sections; the dock is the substrate that powers and collects the windows
+underneath. A single Card-Cream pill floating 12px above the canvas (elevation 1, warm
 top-highlight, 18px radius). One **rounded-square tile per app, each in its
 own atlas hue** with a flat espresso glyph; the hovered tile lifts 6px and
 shows a small-caps label chip above; running apps get a small **marigold
@@ -149,18 +232,29 @@ into one host above the dock — warm-white cards with a hue-keyed left edge
 fade. Used for export results, project reload, and the recalibration moment;
 never a frantic stack.
 
-## 5. The micro-apps
+## 5. The Studio micro-apps
 
-| app | glyph | what it is |
+The Studio apps keep their internal registry ids (`constellation`,
+`pulse`, …) but wear de-jargoned **labels**. The five rail sections plus two
+shared utilities (Record, Where this came from) opened on demand:
+
+| app (id) | label / glyph | what it is |
 |---|---|---|
-| **Ask** | ❯ | the console reborn in a window (marigold title strip): question field, history chips, answers as a **warm-white card of record with a teal left-edge** (a cited answer), values in mono with **numbered cite-dots colored by their source island** that *land* with a staggered pop; a dot opens an **Evidence child window beside the answer** (re-pointed, never duplicated); clarifications are `1–9` keystroke chips; abstention renders as the dignified Abstention-Taupe `state-abstained` card with a dash-in-circle mark — *"OntoForge declines to guess."* The confidence **arc gauge** sits inline (see §6). |
-| **Evidence** | ⌗ | an index-card tray (mustard strip): source-atom chips fetched live from `/api/atoms` (bisque troughs, source-hue id chips), or the full derivation tree from `/api/provenance` (sums = "any of", products = "all of"). A child of its citing window: closing the parent closes it; `esc` dismisses it. Transient — never persisted. |
-| **Constellation / Atlas** | ✶ | the star chart in a resizable window (teal strip): deterministic seeded force layout, stars sized by structure, marigold luminance = confidence, subsumption hairlines, bowed teal link arcs; pan/zoom/reset; class detail drawer beneath; `focusClass(uri, prop)` API the WM routes `class:focus` to. When `GET /api/atlas` is built it becomes **THE ATLAS** (see §5a) and retitles itself *"Atlas — N islands · M silos"*. Singleton. |
-| **Inspector** | ◈ | one entity (ocean strip): property card under a temporal stance, the **as-of time scrubber** (drag → debounced refetch, changed values flash) whose domain is **clamped to the data's real activity window** (epoch-floor `1970` cells no longer stretch it useless — see §7), per-property **bitemporal history bars** (click → derivation in Evidence), and the **neighbors list** — clicking a neighbor opens *another Inspector beside this one*: the OS moment. Multiple instances are the point; the same URI refocuses instead of duplicating. |
-| **Review** | ⚖ | the adjudication queue (plum strip): kind/tier badges, ER pairs side-by-side under *"same?"* (sides deep-link to Inspectors), conformal chips, confidence arc gauge, `j/k/a/r` routed to this window only, and the recalibration arc (`n/20`) per kind; a verdict toasts, a recalibration toasts loudly. Singleton. |
-| **Dashboards** | ▤ | utterance → VISTA's top-3 proposals (avocado strip) with **warm-themed Vega-Lite previews** (the atlas categorical wheel for series, marigold default mark, espresso/walnut axes); every chart has a `⤢` that expands it into its own window (a single-chart viewer instance). Saved proposals below. |
-| **Pulse** | ◉ | the instrument cluster, live-ish (terracotta strip): counters in mono tabular-nums, pipeline stages, by-kind/by-tier tables, polled every 10s while open (interval disposed with the window); project reload lives here, toasts on success, and announces `world:reload` on the bus. Singleton. |
-| **Exporter** | ⇲ | portability as a visible feature (persimmon strip): one marigold button strikes an AMBER snapshot (`POST /api/export`), the shelf lists bundles (`GET /api/exports`). **Any non-success — a 404/405 (endpoint absent) OR a 500 (server fault) — degrades to one honest Abstention-Taupe guidance card** (*"snapshot could not be struck … run `ontoforge export` from the CLI"*) plus a toast; a raw stack-trace string is never shown. Singleton. |
+| **Data Catalog** (`catalog`) | ▦ | browse downloaded datasets grouped by **domain** (table-of-contents first, collapsed), search across name/columns, per-row **build-status pill** (Modeled / Building… / Not yet modeled / Needs attention), an **Add data** sheet (folder/file path or drop, optional domain), guarded **Remove** ("your source files are not deleted"). Select up to **25** datasets → **Build map** → `POST /api/workspace/build` → emits `studio:build-started`. |
+| **Data Map** (`constellation`) | ✶ | the live join graph (teal strip): types as nodes, joins tiered **confirmed join** (solid teal) / **likely join** (dashed marigold) / **standalone** (no link found). **The signature live build:** on `studio:build-started` it polls `GET /api/workspace/build/{job_id}` and animates from REAL events — a node pops the moment a type is induced (`type_found`), an arc draws the moment a join is classified (`join_found`), batched **≤4 per frame on rAF** so a burst never strobes; an honest progress strip names the stage in plain words with a determinate bar + live tally. When the build finishes it renders the final interactive **Atlas** (§5a). Tap a node → Explore record; tap an arc → Where this came from. Singleton. |
+| **Console** (`console`) | ❯ | the plain-English Data-Engineering console: one instruction at a time → `POST /api/engineer/interpret` → **always a Preview card first** ("nothing has changed yet"), then **Apply** (`/api/engineer/apply`, animates the map delta) with **Undo** (`/api/engineer/undo`). Destructive ops (merge/split/remove) carry a consequence and need an explicit Apply tap — **nothing destructive on Enter alone**. Clarification asks **ONE** question; unsupported never dead-ends — it falls to worked-example chips. |
+| **Confirm suggestions** (`review`) | ⚖ | the adjudication queue (plum strip): candidate cards side-by-side under *"same?"*, **Confirm / Not the same** (internally `verdict("accept"/"reject")` on `/api/review`), `j/k` keys, the recalibration arc per kind; a count badge feeds the Studio segment. Singleton. |
+| **Activity** (`pulse`) | ◉ | the timeline (terracotta strip): plain pipeline-stage labels — **Reading the data / Finding the shape / Building the model / Matching records / Filling in values** — counters of source records / things / joins, polled every 10s while open; "re-open project" lives here and announces `world:reload`. Singleton. |
+| **Explore record** (`inspector`) | ◈ | one record (ocean strip), a shared utility opened from the map/catalog: values under a temporal stance, the **"rewind to a date" time slider** (drag → debounced refetch; domain clamped off the 1970 epoch — see §7), per-field history bars, and the **related-records** list — clicking one opens *another Record beside this one*. Same URI refocuses instead of duplicating. |
+| **Where this came from** (`evidence`) | ⌗ | the source-record tray (mustard strip), a shared utility: **source-record** chips fetched from `/api/atoms`, or the derivation tree from `/api/provenance` ("any of" / "all of"). A transient child of its citing window — never persisted. |
+
+ASK and BUILD are **not** in this table — they are single surfaces
+(`js/surfaces/ask.js`, `js/surfaces/build.js`), not windowed apps. ASK renders
+the cited answer card with inline "Where this came from" dots and the
+dignified `state-abstained` card; BUILD renders the measure/breakdown
+pickers, the warm-Vega **Dashboard proposals** (`/api/dashboards`), and the
+two separated outputs **Extract** (`/api/extract` → Download CSV) and
+**Export** (`/api/export` → "Download the whole dataset, portable").
 
 ## 5a. The Atlas — the visual grammar of certainty
 
@@ -327,14 +421,20 @@ deep grounds keep the warm cast, the atlas hues and marigold carry through.
 
 ## 8. Why this is twenty years ahead
 
-Every BI surface on the market renders *answers in a page*. This one gives
-the analyst an *operating system for belief*: questions, evidence,
-entities, time, and governance are spatial objects you arrange, not routes
-you visit. The investigation workflow that defines the product — claim →
-evidence → entity → neighbor → its evidence — is a chain of windows opening
-beside each other, each one a provenance contract. The dock shows
-governance running (Review, Pulse); the Exporter makes leaving a visible
-feature, which is exactly what makes staying credible. No competitor in
-MARKET_EDGE.md can draw any of these windows, because their platforms don't
-store the artifacts. The shell is thin — it merely refuses to hide what the
-engine knows, and now it gives you a desk to spread it out on.
+Every BI surface on the market renders *answers in a page* and asks the
+analyst to learn its jargon. This one offers **three plain-language modes**
+that meet a person where they are: **Ask** a question and see where every
+answer came from; **Build** a view by naming what to measure and pull the
+data out; open the **Studio** to add data and *watch the model build itself*
+— nodes popping, join-arcs drawing from real engine events — then steer it in
+plain English with a console that previews before it touches anything and
+always offers Undo. The de-jargon layer is presentation-only, so the trust
+artifacts the engine actually stores — per-value citations, calibrated
+abstention, bitemporal provenance, a portable exit bundle — are exactly what
+the surfaces show, under names a newcomer can read. Ask shows where; Build
+measures and extracts; Studio is the autonomous-data-engineering playground
+no competitor in MARKET_EDGE.md can draw, because their platforms don't
+induce the model or store the artifacts in the first place. The shell is
+thin — it merely refuses to hide what the engine knows, and now it hands that
+knowledge to three different kinds of user without making any of them learn
+the engine's vocabulary.

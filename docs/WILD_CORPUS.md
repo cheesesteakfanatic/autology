@@ -1,10 +1,11 @@
 # The WILD corpus — real internet datasets, autonomously ontologized
 
-`fixtures/wild/` is a committed snapshot of **~280 REAL datasets downloaded
+`fixtures/wild/` is a committed snapshot of **450 REAL datasets downloaded
 from the public internet**, mixed domains, deliberately uncurated semantics:
-some genuinely joinable (an aviation cluster, an ISO-coded world-data
-cluster), many random silos. It is the autonomy showcase — point OntoForge at
-the wild internet, watch it build the ontology:
+some genuinely joinable (an aviation cluster, an ISO-coded world-data cluster,
+an Our-World-in-Data country/year cluster), many random silos. It is the
+autonomy showcase — point OntoForge at the wild internet, watch it build the
+ontology:
 
 ```bash
 ontoforge demo wild wild_project        # init -> ingest -> profile -> induce
@@ -19,7 +20,7 @@ fetcher smoke).
 
 ## Sources and attribution
 
-All five sources are public, open datasets fetched with the research UA
+All seven sources are public, open datasets fetched with the research UA
 `OntoForge-Research/0.1 (glenn.hubbard.career@gmail.com)`, 3 retries per URL,
 and a hard ≤15 GitHub API call budget per fetch (actual usage is recorded in
 the manifest; raw.githubusercontent.com content fetches are rate-unlimited).
@@ -28,18 +29,26 @@ the manifest; raw.githubusercontent.com content fetches are rate-unlimited).
 |---|---|---|---|
 | `of_` | [OpenFlights](https://openflights.org/data.php) (`jpatokal/openflights`) | airports, airlines, routes, planes, countries — the genuinely joinable aviation cluster | Open Database License (ODbL) + Database Contents License |
 | `ds_` | the [`datasets` GitHub org](https://github.com/datasets) (Frictionless core data) | world data: GDP, population, ISO country/currency/language codes, prices, emissions, … — ISO codes thread through dozens of tables | per-repo `datapackage.json` licenses, predominantly ODC-PDDL-1.0; recorded per dataset in the manifest |
+| `owid_` | [Our World in Data](https://github.com/owid/owid-datasets) (`owid/owid-datasets`) | hundreds of country/year indicator tables — health, climate, economics, demographics — every table keyed on `Entity` (country/region name) + `Year`, one dense join thread into the country-name & year columns | CC BY 4.0 (OWID standing policy; upstream primary source named per dataset in the `url`) |
 | `fte_` | [FiveThirtyEight](https://github.com/fivethirtyeight/data) | the wonderful randoms: bad drivers, Avengers, Bechdel, polls, … | CC BY 4.0 |
 | `vg_` | [vega-datasets](https://github.com/vega/vega-datasets) | example corpora (cars, gapminder, stocks, zipcodes, …) | BSD-3-Clause repo; public example data |
 | `sb_` | [seaborn-data](https://github.com/mwaskom/seaborn-data) | iris, titanic, penguins, taxis, … | public example datasets collected for the seaborn docs |
+| `pl_` | [plotly/datasets](https://github.com/plotly/datasets) | a curated join-key tail: gapminder (country+year), world GDP with ISO-3 codes, US-state ag exports / solar / cities, county FIPS unemployment, … | MIT (public example data) |
 
 Per-dataset attribution lives in `fixtures/wild/manifest.lock.json`: every
-entry records `{slug, url, source, license_note, rows_kept, cols, sha256}`,
-where `url` is the exact raw file fetched and `license_note` is taken from the
-repo's `datapackage.json` when one exists. **License screen:** datasets whose
-declared license is non-commercial / no-derivatives / restrictive vendor terms
-(CC-BY-NC, CC-BY-ND, John Snow Labs, BIS terms) are rejected at admission and
-never written — this repo is Apache-2.0 and redistributes 150-row excerpts,
-so only open-redistributable data is committed.
+entry records `{slug, url, source, license_note, rows_kept, cols, domain,
+description, sha256}`, where `url` is the exact raw file fetched and
+`license_note` is taken from the repo's `datapackage.json` when one exists.
+The `domain` tag (one of `aviation, health, economics, demographics, climate,
+sports, food, politics, technology, biology, geography, misc`) and the one-line
+`description` are derived **deterministically** at admission time — a keyword
+vote of the slug + column names for the domain, a schema-shaped caption for the
+description (no LLM, no network) — so the catalog endpoint can surface a domain
+facet and a "what is this" blurb without re-reading every CSV. **License
+screen:** datasets whose declared license is non-commercial / no-derivatives /
+restrictive vendor terms (CC-BY-NC, CC-BY-ND, John Snow Labs, BIS terms) are
+rejected at admission and never written — this repo is Apache-2.0 and
+redistributes 150-row excerpts, so only open-redistributable data is committed.
 
 ## Normalization contract
 
@@ -57,7 +66,9 @@ Every admitted dataset is:
    distinct normalized column names: bare numeric tokens are dropped by its
    normalizer, so the repeats would alias);
 4. written as UTF-8 comma CSV named `<source prefix>_<slug>.csv`;
-5. recorded in `manifest.lock.json` with the sha256 of the written file.
+5. recorded in `manifest.lock.json` with the sha256 of the written file plus a
+   deterministic `domain` tag and one-line `description` (keyword vote over the
+   slug + columns; schema-shaped caption — no LLM, no network).
 
 Downloads are capped at 6 MB per file (cut at the last full line — only the
 first 150 rows survive anyway); GitHub API misses and per-URL failures are
@@ -87,11 +98,15 @@ pins the guarantee. All other sources use the plain head.
 
 ## What the engine finds (full breadth)
 
-Numbers from a full run on the committed snapshot (282 datasets; Python 3.12,
-8-core x86-64 macOS laptop; see "Capacity" below for stage timings):
+The structure below was measured on the **prior 282-dataset snapshot** (Python
+3.12, 8-core x86-64 macOS laptop; see "Capacity" below for stage timings):
 **364 induced classes, 14,846 INDs, 169 link properties, 18 cross-table
 identity-domain resolutions; 34,497 entities / 137,154 cells / 25,597 links
-materialized into HEARTH.** Highlights:
+materialized into HEARTH.** The current 450-dataset snapshot adds the OWID
+country/year cluster (`Entity`/`Year` on every table) and the plotly join-key
+tail, so the IND count and link-property count scale *up* — the qualitative
+highlights below hold and intensify (Year and country-name/ISO threads now link
+across far more tables; the silos still stay silos). Highlights:
 
 - the `airports↔routes` join surface is discovered in the M3 IND layer via
   IATA codes (`of_routes."Source airport" → of_airports.IATA`, coverage 0.97)
@@ -111,12 +126,17 @@ materialized into HEARTH.** Highlights:
 
 ## Capacity (measured)
 
-Stage-by-stage timings of the generic pipeline at full breadth (~280 tables ×
-≤150 rows), measured on the committed snapshot in one run (Python 3.12,
-8-core x86-64 macOS laptop; the subset column is the fixed 12-dataset smoke
-mix pinned in `tests/wild/test_pipeline_smoke.py`):
+Stage-by-stage timings of the generic pipeline at full breadth, measured on the
+**prior 282-table** snapshot in one run (Python 3.12, 8-core x86-64 macOS
+laptop; the subset column is the fixed 12-dataset smoke mix pinned in
+`tests/wild/test_pipeline_smoke.py`). The current 450-table snapshot is ~1.6×
+wider, so the full-corpus column scales up proportionally — discover and
+materialize roughly linearly in table count, induce/profile super-linearly in
+the few widest tables (the cost still concentrates there, see below); the OWID
+tables are narrow (≤60 cols, mostly Entity/Year + a handful of measures) so they
+add breadth cheaply. The fetch itself ran in 402 s / 5 GitHub API calls:
 
-| stage | 12-dataset smoke subset | full corpus (282) |
+| stage | 12-dataset smoke subset | prior full corpus (282) |
 |---|---|---|
 | discover (load + per-table profile) | 23.6 s | 98.4 s |
 | profile_estate (cross-table INDs) | 0.8 s | 14.6 s |
@@ -164,8 +184,20 @@ uv run pytest tests/wild -q                                    # offline gates
 ```
 
 Landing gates (enforced by the script's exit code and pinned by
-`tests/wild/test_manifest.py`): **≥ 150 datasets** (aim 200+; the committed
-snapshot has 282: 176 datasets-org + 60 FiveThirtyEight + 21 vega + 20
-seaborn + 5 OpenFlights) and **≤ 20 MB total** (currently 3.2 MB). The fetch
-itself: 4 GitHub API calls, ~4–9 minutes depending on CDN warmth, 8 datasets
-license-screened out.
+`tests/wild/test_manifest.py`): **≥ 380 datasets** and **≤ 40 MB total**. The
+committed snapshot has **450** (176 datasets-org + 110 Our-World-in-Data + 95
+FiveThirtyEight + 23 plotly + 21 vega + 20 seaborn + 5 OpenFlights) at **4.8
+MB**. The fetch itself: 5 GitHub API calls, ~6–9 minutes depending on CDN
+warmth.
+
+The OWID and plotly clusters are the joinability multiplier: every OWID table
+is keyed on `Entity` (country/region name) + `Year`, and the curated plotly
+tail carries country names, ISO-3 codes, US-state names/postal codes and county
+FIPS — so the expansion does not just add tables, it adds *edges*.
+`tests/wild/test_joinability.py` pins the showcase claim by re-deriving the join
+surface from the committed bytes: **≥ 30** of the newly-added datasets share a
+real join key (≥ 5 shared distinct values, ≥ 30 % of the smaller value-set) with
+a dataset from a *different* source. In the committed snapshot **110 of the 133
+owid/plotly datasets** clear that bar — Year and country-name/ISO threads light
+up the live-join map while the silos (iris, taxis, BTC mining…) stay honest
+silos.

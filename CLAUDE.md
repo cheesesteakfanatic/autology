@@ -15,7 +15,7 @@ Always run from the repo root with `uv` on PATH:
 export PATH="$HOME/.local/bin:$PATH"   # uv lives here; system python is 3.9 (too old)
 
 uv sync --all-extras                    # set up the 3.12 venv
-uv run pytest tests/ -q                 # full suite — 1109 tests, must stay green
+uv run pytest tests/ -q                 # full suite — 1186 tests, must stay green
 uv run pytest tests/m12 -q              # LODESTONE / free-text robustness gate (70)
 uv run pytest tests/m12/test_competency.py tests/meridian -q   # competency + gold gate
 uv run ruff check src/                  # lint (pre-existing debt isolated to temper/)
@@ -60,14 +60,48 @@ Modules under `src/ontoforge/` (whitepaper module → package):
 | M14 | AMBER | `amber` | freeze-frame snapshot bundle |
 
 `estates/` holds the swappable estate engines (aviation fixtures + the generic
-any-data builder + Meridian generator). `pipeline/` orchestrates stages end-to-end.
+any-data builder + Meridian generator + the 450-dataset Wild corpus fetcher in
+`estates/wild.py`). `pipeline/` orchestrates stages end-to-end; `pipeline/playground.py`
++ `pipeline/playground_events.py` run a **threaded live build** from a catalog
+selection into `<project>/playground` and stream a discovery narrative.
+`engineer/` is the common-language data-engineering layer: `commands.py`
+(deterministic keyless cue-word + slot parser against the live ontology/estate —
+clarify-don't-guess) and `operators.py` (`EngineerService` wrapping the real
+TEMPER/ANVIL/ER; previews link coverage and **refuses sub-floor joins**, applies
+invertible ops with exact undo).
 
 **Server** (`server/`): FastAPI REST API + the web UI. `serve` mounts `server/static/`.
-The SPA is vanilla ES modules (no build chain): `core.js` is the shared kernel
-(`el`/`svgEl`/`createTextNode` DOM helpers, `confGauge`, `toast`, the locked
-`ATLAS_HUES`/`hueFor`/`APP_HUE`), `wm.js` the window manager, `dock.js`, `spotlight.js`,
-`constellation.js`, and `js/apps/*` the eight micro-apps. Static-UI tests live in
-`tests/server/test_spa.py`.
+`server/catalog.py` enumerates every downloadable dataset; `server/world.py` routes
+all reads through an **active world** (the demo world by default, the playground
+after a build). The SPA is vanilla ES modules (no build chain) in a **three-mode
+shell** — `js/modes.js` flips between **Ask** / **Build** / **Studio** with no
+reload. `js/core.js` is the shared kernel (`el`/`svgEl`/`createTextNode` DOM helpers,
+`confGauge`, `toast`, the locked `ATLAS_HUES`/`hueFor`/`APP_HUE`); `js/surfaces/ask.js`
++ `js/surfaces/build.js` are the single-surface modes; Studio is the window-managed
+desktop (`wm.js`, `dock.js`, `spotlight.js`, `constellation.js`) hosting `js/apps/*`
+(catalog, datamap, console, review, pulse, inspector, evidence). User-facing strings
+are **de-jargoned** (atoms→source records, Atlas→Data Map, Pulse→Activity,
+Review→Confirm, Inspector→Record, Evidence→Where this came from); internal
+ids/URIs/verdicts keep their names. Static-UI tests live in `tests/server/test_spa.py`.
+
+**API contract** (all existing read endpoints — `/api/ask`, `/api/ontology`, `/api/atlas`,
+`/api/entities`, `/api/dashboards`, `/api/review`, `/api/status`, `/api/search`,
+`/api/export` — operate on the *active world*). The playground/engineer additions:
+
+- `GET /api/catalog` → `{datasets:[{id,name,source,domain,rows,cols,columns,description}], domains}`
+  — every downloadable dataset (wild + meridian + aviation), id = `<corpus>:<slug>`.
+- `GET /api/workspace/state` → `{datasets,built,active_world,stats}`.
+- `POST /api/workspace/build {dataset_ids, mode:"replace"|"add"}` → `{job_id}` (cap 25);
+  builds a playground world and flips the active world to it on done.
+- `GET /api/workspace/build/{job_id}?since=<seq>` → pollable `{status,progress,stage,events,result?}`;
+  `events[].kind ∈ {stage,type_found,join_found,silo}` — `join_found` arcs fire EARLY (raw INDs,
+  before profiling) so the UI animates joins forming.
+- `POST /api/engineer/interpret {command}` → discriminated union: `{op,preview}` |
+  `{clarification,options}` | `{unsupported,reason,supported_examples}`. PREVIEW ONLY; the
+  preview carries `op_token` that `apply` echoes back verbatim.
+- `POST /api/engineer/apply {op}` → `{ok,deferred,blocked,human_summary,new_stats,atlas_delta,undo_token}`.
+- `POST /api/engineer/undo {undo_token}` → `{ok,new_stats}` (exact TEMPER inverse).
+- `POST /api/extract {type_uri,filters,columns,limit}` → `{columns,rows,citations}` (+ `?format=csv`).
 
 ## Key gotchas
 
@@ -86,8 +120,18 @@ The SPA is vanilla ES modules (no build chain): `core.js` is the shared kernel
   `rgba(0,0,0,…)` shadows are legitimate. Don't reintroduce dark grounds to `:root`.
 - **Security invariant (test-enforced):** API data enters the DOM only via
   `el()`/`svgEl()`/`createTextNode`. Never assign data to `innerHTML`/`outerHTML`
-  (`tests/server/test_spa.py` greps for it). Non-vendor payload must stay **< 250 KB**
-  (currently 217,742 bytes).
+  (`tests/server/test_spa.py` greps for it). Non-vendor payload must stay **< 280 KB**
+  (currently 286,125 bytes — only ~600 bytes of headroom; minify/trim before adding copy).
+- **Engineer apply re-checks the join floor server-side.** `/api/engineer/apply` never
+  trusts the client to have honored the confidently-wrong guard: for any link op
+  (`AddProperty` with a `range_class`) `EngineerService.apply` re-measures coverage from
+  the live HEARTH and refuses below `JOIN_LIKELY_FLOOR` (returns `ok=False, blocked=True`),
+  so a hand-crafted op that skipped `/interpret` cannot assert a sub-floor join. Spine-gated
+  merge/split DEFER (`ok=False, deferred=True`) — sent to review, never force-applied.
+- **Threaded playground build owns its own sqlite.** The worker opens its OWN
+  `SqliteLedger` and never shares the server's thread-affine handle. `world._drop_handles`
+  only `.close()`s the server ledger from the thread that opened it (tracked in
+  `_ledger_owner`); the worker thread flipping the active world just drops the reference.
 - **Never weaken a gate.** The confidently-wrong guard (no wrong answer at
   confidence ≥ `tau_high`), the free-text robustness gate (≥70% answered-with-citations,
   0 confidently-wrong), the aviation competency suite, the OQIR type checker

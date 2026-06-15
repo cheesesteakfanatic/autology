@@ -10,3 +10,5 @@ dist/
 fixtures/**/*.zip
 data/
 .DS_Store
+.claude/
+.tmp_test/

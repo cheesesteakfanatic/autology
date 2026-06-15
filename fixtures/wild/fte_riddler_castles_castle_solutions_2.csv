@@ -1,0 +1,288 @@
+Castle 1,Why did you choose your troop deployment?
+0,Good against the last round; great against everyone who optimized against the last round.
+0,"I figure most people will use strategies that are either close to the winning submission, would outperform that submission head-to-head, follow your advice from the column after the last time this challenge was submitted, or follow a pretty similar strategy as they did last time. Goal is to get to 28 points, though in general you also want to keep in mind that you want to win the castles you win by just a little, and lose the ones you lose big time. This deployment looks to probably get to that 28 point margin by winning 4,5,9, and 10 most often. But the scout size of 3-5 is designed to try to be a couple steps ahead of the adjusters who are presenting 2-3 scouts after the previous run. I also wanted to watch out for people loading on 8,9,10, and 1, which was a reasonable strategy last time, which is why I loaded pretty heavily into 9 (which I still expect to be less contested than 10).
+
+As a final note, I also think it would be interesting to look at which strategies do best in terms of total differential to opponents, and how that differs from the actual winners of the contest as published."
+0,"Previous winner won 84%. Took the 90%ile of the previous distribution and subtracted the optimal even distribution of 100 soldiers/28 points. Found best values of 4/5/9/10, and matched those number. Added a couple to the lower numbers.  Used the rest to spread between the others with 1 soldier
+"
+3,"10+9+5+4=28 for the win.  Plus, if you put 0 in any castle, you have a 0% chance of winning.  So many put 0's that even 3 or 4 troops can win you several castles."
+0,Near optimal integer program vs previous round: beats 1068 of them.
+1,"10,9,5,4 gives a win, so almost all in on those"
+0,"28 to win. Looked like castles 4,5,9,10 got less troops allocated to them per value than other spots last go around. Didn't bother putting troops anywhere else. Also wanted to be one greater than round numbers like 15 or 30."
+0,"My approach: let `S` be all the strategies available, initialized to the strategies posted on github. Use simulated annealing to find the strategy that ~maximises `P(winning | S)`, and then add that strategy to `S` and repeat. Eventually we will find a strategy that is ""good"" against the empirical strategies and other optimal strategies."
+1,"28 victory points is the minimum threshold to win any war since there are 55 total victory points available. Therefore, it's unnecessary to win every castle. The top three castles alone aren't enough to get 28 victory points, as it falls short by just one point. So lower valued castles could be surprisingly competitive. Based on this, there's an inherent tradeoff between allocating troops in lower valued castles and allocating lots of troops in just a few of the high valued castles. So this set up focuses on the top two castles, the six point castle and the three point castle, which if captured would yield a majority of the victory points. In the event that someone neglects any of the castles, one troop is deployed to the remainder to ensure a victory in case certain strategies solely focus on a few castles."
+6,"Against most opponents, I am trying to win the 10/9/8/1 castles. But there are some strategies that try to do the same, and I attack them on a different front. I don't compete against them for the 10, but trump their assumed zeros on the 7 and 6 (also trumping the guy with my idea with a 2 on the 7). Even if I lose the 9 vs such a strategy I get 28 points if I win the 876 and 1 (tying the rest with 0)."
+1,"Primarily trying to win 10-9-5-4, while leaving some troops to capture other castles if needed. I'm hoping that even with a shifting metagame, this won't be an approach that people will expect."
+0,"Found a strategy that beat the previous 5 winners, assuming that most people would copy the winning strategies, then I tweaked it a bit to maximize the wins"
+2,"I'm hoping people will mimic the winning strategy of focusing on castles 8 and 7, so I'm going for 10, 9, 5, and 4, which would give the 28 required to win. I'm also keeping a few soldiers everywhere else in the hopes I'll pick up a few cheap wins from others completely abandoning castles."
+0,"Focus on 4/5/9/10 to reach 28 points and avoiding the likely heavy competition at 6-8. 31 creeps above the round 30s, 16 creeps above the round 15s and beats out those who are evenly spreading troops out amongst 1-7 and ignoring 8-10. 2 in 6-8 for possible ties or wins over 0s and 1s."
+1,"I only need 28 points to win. All I need to do is divide my resources so that I am able to try to get that many points. So I focus most of my forces on the castles that have the most value to me and then get two other mid-range castles to supplement the points. I devote 1 to each of the castles that are not main targets because I figure that if someone is going to beat me on 9 or 10 that they may not have any covering 8, 7 etc. Instead of dividing the points, I think I can win them in these situations."
+1,"Most of prior winners focused on 7 & 8. So I focused on 5, 6, and 10"
+1,"I tried to accomplish some middle ground between concentrating and even distribution.  Since 4 would be sufficient last time to win on the low castles most of the time, I jumped it to 6.  Enough people put 1, so I dropped 1 troop on each of those because why not?"
+0,"Variation on the heavily commit to undervalued top castles, try to steal two smaller ones, and ignore everywhere else.  Went for 4 and 5 rather than 6 and 3 or 7 and 2, because people during last battle really committed to 6, 7, and 8"
+0,"Gambit strategy that preys on anyone who uses balanced troop distribution. This would have failed in the first iteration of the game, but I predict the metagame shifts towards more normal-looking strategies which will get beaten by this one."
+6,"Out of 55 total points, you only need 28 to win, so let's go all in and see what happens! The way to do this with the fewest number of castles is by winning castles 10, 9, 8,and 1. We'll start by doubling the mean allocation from the previous battle, giving 22 soldiers to castle #10, 32 to #9, 38 to #8, and 6 to #1. This leaves 2 soldiers left, which I'll additionally allocate to castle #10 (because I randomly feel people will be more aggressive on that number based on past results)."
+0,This setup beat 1071 of the 1387 past strategies (found by integer programming)
+1,Concentrate deployment to attain 28 points needing the fewest castles without conceding any.
+4,We battle hard for 9 and 10 and 1-4. Leaving 4 at every other location
+9,10+9+8+1=28
+3,"Put at least some troops to all castles, go for weaker targets according to previous round results."
+9,"Ideally, this will beat out many more balanced strategies, as it captures exactly 28 points if all 1,8,9, and 10 (with more than one troop) are captured. The values are all well above the mean and winning strategy for these castles, so people trying to mimic that will lose to me as well. The other castles have one each to pick up any open points in case I lose a main castle."
+0,Focus soldiers on  castles that allow me to meet the minimum requirement to win
+0,https://pastebin.com/LSXrjJJV
+0,Mostly random
+3,"Low prior deployments for the top couple castles indicates that one should be easily available. If I can get either the 10 or 9, the emphasis on the lower ranked castle's should push me over the edge."
+1,"Previous data suggests 2 and 3 were good choices for your ""throw-off"" castles, as you beat the large swath of 0s and 1s.  I believe that 4 is the ""new 2"" as people will respond to this, being more likely to throw a 2 or 3 on a castle than a 0 or 1. There will be an arms race to grab the 10 and 9 on the cheap (the winner did so because he won something like 40% of the time on those castles for only 2 troop investment). Now people will be responding by putting 4 troops there, and then there will be people trying to next-level those people. I want to be near the top of the next-levelers, because these are key castles, but I still want to lose by a lot to the people that go huge on these to maintain an overwhelming advantage elsewhere.   On castle 8, I think people will respond in two ways, after seeing that people really fought over this castle last time. They will either not enter the fight, or they will enter the fray hard. I chose to throw off, but selected 4 to beat the other people who threw off with 2s and 3s."
+3,"Try to get 10 and 9 and two of 4,5,6. Or get a few cheap ones."
+0,Genetic Algorithm trained on the previous answers yielded this solution after running overnight - had a 78.73% win rate
+1,"Starting with a geometric weighting of castles (SUM(castle#^2)), I then willingly all but abandoned castles #7 and #8 in favor of castles #5, #6, #9 and #10. (Over-weighted in the current data set, I expect a lingering approach to emphasizing these and ignoring castles #9 and #10) Next, I adjusted the castle values incrementally, depending on how many victories I gained or lost between adjustments when battling the initial data set. Min-max adjustments along similar-valued castles got me to this."
+2,ryanmdraper@gmail.com
+1,This is maddening! I want to know the answer! Ahhhhhhh!
+2,Just guessing where the majority of players will land after reviewing the data from previous game.  Trying to figure out where I can get the most vps's (victory points per solider)
+0,"Relies on information from first game: 7 and 8 were popular, 9 and 10 ignored, abandoned castles got 0 or 1."
+0,I specified my deployment based on previous strategy but more concentrated.
+2,"Sacrifice some higher castles (7-9) in the hopes of getting some of the more ignored lower castles (3-6).  Although when ""sacrificing"", still offering some chance and not completely giving them away for free."
+0,not sure.
+3,"I tried not to overreact to the winner from last time (and hopefully predict some of others overreactions) I decided to never completely give up free points so put no fewer than 3 troops at any location. However I concentrated my armies in such a way as to get over half the points with only 4 wins (5,6,9,10). I hoped that this 2 pronged strategy of picking up ""cheap"" points and a few strategic placements (along with some luck) might be enough to win."
+5,https://pastebin.com/LSXrjJJV
+0,Focus on smallest number of castles that can win. Also people seem to understaffed castle 10 so include this in lineup
+0,"Scarborough, ME"
+1,"Slight alteration of my other strategy, mostly reversing 9/10 and  6/7"
+4,https://pastebin.com/LSXrjJJV
+3,A variation on another strategy.
+4,I estimated how many people I would beat at every number and multiplied that percentage by my points. My goal was more than 27.5 expected points.
+2,"I don't really have a great answer, but this was fun to do."
+6,"I took the average of the top 5 winners from round 1, and figured most people would do a version of that, and this answer beats them."
+1,"Nothing flashy.  Tried to assemble 28 from the castles that didn't get enough love last time around (2+3+4+9+10).  Left a lone straggler at the others to punish the fools that leave castles naked.  This strategy is incapable of winning big, but it wins by a small margin an impressive amount of the time."
+4,First valid set of 10 numbers a d20 gave me.
+0,"Try to pick up 9 or 10, because I can probably get at least one of them. and then must win 5 through 2. Three in each of the rest except 1."
+1,"The last group of winners focused on castle attacking castles 7&8; this is designed specifically to counter that strategy by dropping castle 8. Anticipating that a significant number of people are likely to pursue that strategy as well, we go somewhat hard at castles 9 and 10 as well, which allows us to beat equally distributed strategies."
+0,I made an algorithm that weighted the placement 75% based on what would beat all submissions from last competition and 25% based on what would beat those placements.
+2,"Looked at how troop placement was divided up in the previous run-through and tried to place an amount of troops in each castle which would win each one the majority of the time, while largely ignoring castle 7 and 8.  Also tried to stay above multiples of 5."
+0,"Targeting 28 by way of castles 9, 7, 5, 4, and 3. Wanted each of those castles to get at least 10 troops (to beat anyone who submits a strategy of 10s across the board, which I imagine will be at least somewhat popular)."
+3,"I focused exclusively on the top five performers of the previous competition.  I noted that among those competitors, the ordering was Brett>Jim>Ken>Lukas>Cyrus (ironically, Cyrus placed last among that group).  I then assumed that this round's strategies would include the following: Brett clones, anti-Brett strategies, Cyrus clones, anti-Cyrus strategies, ""7 and 8 avoiders"", and old, ineffective strategies.  Most of what followed was guesswork and I only spent about ten minutes actually dividing up my troops.  I quickly decided to devote five more troops than Brett's strategy to each of castles 8, 9, and 10 in the hopes of outmaneuvering all of the Brett, anti-Brett, Cyrus, and anti-Cyrus strategies.  I anticipated a flight from castle 7, which has a disproportionate number of troops but left a decent contingent there to mop up those who avoided the castle entirely.  Castles 1 through 6 remain mostly unchanged from the first battle."
+0,"Just a variant of the strategy I did last time. This time I am fighting for castles 6 and 8 and hope to pick up others that are not well defended. I expect people to put fewer 0,1, & 2, for castles on 9 and 10 and more 3, 4 and 5."
+6,"heavy investment in most valuable positions, with some investment in least competitive battlefields"
+6,I assumed that the distribution would change a little from the previous round but not a whole lot. For the top castles I chose values a few more than what would have done well earlier. For 7 and 8 I went much lower than the winners of the previous round but still a reasonable amount. Then I went down from 6-1.
+4,"My first strategy was similar to the winner, but not quite as good. Seeing the distributions this time, I went for a more uniform distribution. I started with 4 at each castle, which is enough to win a lot of battles since some castles will have few soldiers so others could be loaded up on. Then, I shifted my remaining 60 troops to ensure that A) I could beat a equally distributed soldier allotment, B) I could beat someone who loaded up on the top 3 or 4 by most likely winning castle 9, and C) I could beat the previous winner."
+1,"Last round, many people who did not commit many troops to an attack sent fewer than four or five. My five each on castles ten and eight, and four on castle six could gain a large number of points against such players for a small price. The last winner committed most of his troops to castles totaling 30 points. I decided to try a similar number.  I tried to avoid overinvesting in large castles because the last winner's arrangement suggested that people did so last time."
+2,"I used the approximate percentage distribution from the prior results. I chose to give up the tail end of each distribution, and always capturing the minimally defended towers. Ballpark for the distribution, my average score is about 31 against the prior game players."
+3,"I assumed that most people would submit deployments that perform as well or better than the winner from round 1 (against round 1 submissions). So, I wrote an algorithm that generates a large number of winning deployments against round 1 submissions and then made those compete. The result is a deployment that beats the winner from round 1 and also performs well against other winning deployments."
+3,"Beating bias towards multiples of 5 by adding 1 to each castle. People are afraid of 10 and 9 so they stack 8 and 7, so those are the ones I give up on. Always have >2 men per castle (usually beats 50% of lineups right there). Players that put ~20 on castles 9 and 10 will see they were basically better off putting 5 or 6 down, so I'm expecting a lot of high single digits there. This also beats straight 10's and the old champion, which could be popular lineups"
+1,started filling out numbers and they happened to add to 100.  Similar to last winning submission.
+1,Gut feeling
+1,I tried to build a strategy that would beat strategies designed to beat the prior curves.  Truthfully it was just a guess.
+0,I built a spreadsheet to test different strategies against last year's entries plus an equal number of randomly generated strategies.  Then lots of trial and error.  This was the best performing deployment I could find.
+4,"This is an over-thought plan that is designed to defeat an optimization of the data from the first group of data.  It assumes that people will not try and win 7 or 6 because lots of people tried to win 7 or 6, but it doesn't just give up the space.  In most cases it adds 1 to 2 soldiers over what is optimal in the first contest and (mostly) does not over-commit.  The assumption is that people will mostly choose a plan that was optimal in the first contest, or optimal +1.  This plan will defeat most of the best plans from the first contest, but would be weaker against ""lesser"" plans then the leaders."
+4,I chose my troop deployment with the hope that proper diversification could counter an opponent that put too much emphasis on any one castle.
+4,Mostly wanted to ensure I sent at least 4 troops as looking at the data from last time it seemed many players sent 0-3 troops to many castles. After that I just kind of randomly chose some of the middle castles to make a serious stab at. I fully expect to lose given I suspect others will put a lot more analysis into their plans.
+0,"Randomly generated troop deployment that both does great against the originally submitted answers (it would have won round 1 overall by a comfortable margin), and also does great against *other* randomly generated troop deployments that would have won overall in round 1. Slightly adjusted manually to get even better numbers."
+0,"Focusing on the higher value of each paired number (1,2;3,4;5,6...)"
+0,variant of first strat. Looking for 5 wins instead of 4 by focusing on 3 and 6 instead of the pricier 9. Gave a couple more to 10 as well. avoided 8.
+1,"I chose it based on an intuition that a certain number of people would pick the winning strategy from last time, a certain number of people would pick a strategy which beats that one, a certain number would pick a strategy which beats THAT one, and so on and so forth.  Like with a Keynesian beauty contest game, you want to be exactly one step ahead of most other people; no more, no less.  And, in my experience, people usually go around 2-3 levels deep on these things.  So, I generated a data set which took the original strategy and added a lot of the winning strategy, and one which beats the winning strategy, and one which beats that, etc.  Then, I calculated the expected number of net points you can get, based on this dataset, for each number of people in each castle.  After that, it's a simple evolving function to find a strategy where taking away from any one castle would cause more harm than the good of adding someone to another castle.  The remainder of my answer is a copy of the R code which I made to find this answer:
+
+library(foreign)
+
+setwd(""~/Voting data"")
+
+previousanswers <- read.csv(""castle-solutions.csv"")
+previousanswers <- previousanswers[,-11]
+#I'm not using the text comments, and they just make things harder to read.
+
+#Need 28+ points to win.
+
+previouswinner <- c(3,5,8,10,13,1,26,30,2,2)
+
+#I'm going to make a ""predicted"" dataset, baesd on the previous answers, the previous winner, and winning strategies against the previous winner and so on
+
+#The idea is that some people will copy the winner, some people will anticipate that and make a strategy which beats the winner
+#some people will anticipate that and make a strategy which beats the winner beater, etc., etc.
+#I'm going 4 layers deep on winner beating.  I'm guessing a peek around 2-3.
+
+#Winning strategies should be able to soundly beat the strategy they are set against, while retaining
+#2+ in each castle.
+#There is some subjectivity going into these
+
+winnerb1 <- c(4,6,9,11,14,5,5,31,6,9)
+#This will beat the previous winner in castles 1,2,3,4,5,6,7,9,10, giving 47 points
+winnerb2 <- c(6,8,11,13,16,10,8,7,10,11)
+#This will beat b1 in all but castle 8 and beat the previous winner in all but 7 and 8.
+winnerb3 <- c(2,2,13,15,4,12,12,9,12,15)
+winnerb4 <- c(2,2,3,17,6,14,14,11,14,17)
+
+#Now to combine them together into one big data matrix
+previouswinnermatrix <-  t(matrix(rep(previouswinner),10,nrow(previousanswers) * 0.20))
+winnerb1matrix <- t(matrix(rep(winnerb1),10,nrow(previousanswers) * 0.15))
+winnerb2matrix <- t(matrix(rep(winnerb2),10,nrow(previousanswers) * 0.22))
+winnerb3matrix <- t(matrix(rep(winnerb3),10,nrow(previousanswers) * 0.20))
+winnerb4matrix <- t(matrix(rep(winnerb4),10,nrow(previousanswers) * 0.10))
+
+colnames(previouswinnermatrix) <- colnames(previousanswers)
+colnames(winnerb1matrix) <- colnames(previousanswers)
+colnames(winnerb2matrix) <- colnames(previousanswers)
+colnames(winnerb3matrix) <- colnames(previousanswers)
+colnames(winnerb4matrix) <- colnames(previousanswers)
+
+datamatrix <- rbind(previousanswers, previouswinnermatrix, winnerb1matrix, winnerb2matrix, winnerb3matrix, winnerb4matrix)
+
+#Now that I have my data, it's time to figure out what the expected number of points I can expect
+#from each castle, for each number of soldiars at that castle.
+
+expectedmatrix <- matrix(0,100,10)
+colnames(expectedmatrix) <- colnames(datamatrix)
+#Only 100 rows.  I'm precluding strategies that include 0 people at any castle.
+
+#Now, to go by for each castle...
+for (i in 1:ncol(expectedmatrix))
+{
+  #...and go through each number of soldiers in that castle...
+  for (j in 1:nrow(expectedmatrix))
+  {
+    #And replace that value with the expected number of net wins with that number of people
+    #+1 if win, 0 if tie, -1 if lose.
+    expectedmatrix[j,i] <- (length(datamatrix[(datamatrix[,i] < j),i]) - length(datamatrix[(datamatrix[,i] > j),i])) / length(datamatrix[,i])
+  }
+  #Multiple each column by the value of that castle, to get expected # of points
+  expectedmatrix[,i] <- expectedmatrix[,i] * i
+}
+
+
+#Now, to make a looped function to continue taking away from the castle with the lowest expected loss
+#And giving to the castle with the highest expected gain
+#Until lowest loss > greatest gain
+strategy <- c(10,10,10,10,10,10,10,10,10,10)
+losses <- strategy
+gains <- strategy
+keepgoing <- TRUE
+while (keepgoing)
+{
+  for (i in 1:10)
+  {
+    #calculte losses
+    if (strategy[i] == 1)
+    {
+      losses[i] <- 10
+    }
+    else
+    {
+      losses[i] <- expectedmatrix[strategy[i],i] - expectedmatrix[strategy[i]-1,i]
+    }
+    
+    #calculate gains
+    if (strategy[i] == 100)
+    {
+      gains[i] <- 0
+    }
+    else
+    {
+      gains[i] <- expectedmatrix[strategy[i]+1,i] - expectedmatrix[strategy[i],i]
+    }
+    
+  }
+  #If the biggest gain and smallest loss are the same castle, break
+  if (which.max(gains) == which.min(losses))
+  {
+    keepgoing <- FALSE
+  }
+  else
+  {
+    #If the biggest gain is less than the smallest loss, break
+    if (max(gains) < min(losses))
+    {
+      keepgoing <- FALSE
+    }
+    else
+    {
+      #Otherwise, evolve the strategy.
+      strategy[which.max(gains)] <- strategy[which.max(gains)] + 1
+      strategy[which.min(losses)] <- strategy[which.min(losses)] - 1
+    }
+  }
+}
+
+#Cool, that was quick.
+#How many expected points can we get?
+
+expectednetpoints <- 0
+for (i in 1:10)
+{
+  expectednetpoints <- expectednetpoints + expectedmatrix[strategy[i],i]
+}
+#Based on the datamatrix I generated (which is dubious), this strategy will get 8.18 points more than a given opponent, on average."
+1,"a) Challenging hard for castles 9,7,6. (If someone outbid me on one of those, It's likely that they lowballed 10 and/or 8 and I can pick those up instead)
+b) For the remaining ~6 points I need to win, I ignore 5 and try to pick up any combination of the lower castles with modest deployments in each one, focusing on 4 and 2
+c) ""win by a little, lose by a lot""
+d) My strategy loses against (10,10,10,..,10) but I don't think that is important. It also wins against last year's winner, but hopefully it beats everyone else who is trying to beat last year's winner."
+6,"Based on previous distribution, wanted a decent chance to win 10, without sacrificing much, and also to win 9, 7, 6, which would give me a win. I also wanted to maybe steal a couple points with low castles, too, hence the couple armies in the low castles. This wasn't super scientific."
+2,"People normally submit numbers that are multiples of five, so I added one to the soldier count."
+1,"In order to win, I'll need 28 points. My strategy depends on winning castles 5, 6, 8 and 9, which sum to 28. Assuming a number of warlords will choose a round number like 20, I've put 21 at each. Then, I divided the remainder amongst the other six castles, using the scout strategy and weighting troops towards castles 10 and 7."
+0,"Selected 10, 7, 6, 5 as a main win condition with extras placed on other castles to contest them against strategies with overlapping win conditions."
+1,"This is my second entry, and it focuses on countering the most successful strategies from Round 1 along with some very basic strategies (10's all-around, simple progressive, mid-focus, high-focus, etc). I focus on castles 4, 6, 8, and 10, since winning all four yields a total of 28 points. I placed small forces in the remaining castles - enough to capture or tie with many other strategies that also neglect them. I focus heavily on castle 8 because it was so competitive in round 1, though I acknowledge this could backfire if a large number of entries shift forces away from castle 8. We'll see what happens!"
+0,"You only need 28 points to win, so we will focus on winning 10, 6, 5, 4, and 3 (total 28), sending troops proportional to the point totals (rounding down for #10 since people doing complicated things are more likely to concede #10). Going all-in on a linear strategy is often good in a situation where a large part of the field is trying to out-metagame each other. This may be the situation this time since the data from the last challenge was posted!"
+0,"Several months have passed since the battle of a thousand armies and a new general arrives on the battle torn lands with a sizeable army behind him. He believes that the practice of sending only one soldier to battle in the hope it would be abandoned, which was common in the first war is unethical and he vowed to send at least 3 fine soldiers to each battle, if one got wounded the plan was that one would stay behind and the other would return for help. With that in mind he still had 70 troops to send out. The general was greedy and decided he liked the look of the two largest castles, one as his home and the other as a guest house so he sent a sizeable platoon to those two. Expecting to secure at least one of the two palaces he admired most he set his 60 remaining loyal soldiers to fight for 4 other palaces. He decided to send some troops to the third outpost, a small group of buildings barley worth fighting over. The forth and fifth castles also looked inviting so he sent an larger group to them. He then had 20 soldiers left over, all eager for battle. He decided that they would be best suited to attacking the seventh fort, a fine set of buildings which were reasonably contested in previous battles. He decided that this would be where his stronghold would be and decided to command the army from there. The night before the attack a trio of soldier approached the general saying they were told to attack the smallest of the forts. They thought that their attack was pointless and against many enemies they wouldn't be needed so they requested to be promoted. The general considered this that night and in the morning he approached the three soldiers and told them he agreed with them and thought they would be more useful to him in the squadron fighting for his proposed guest house. Finally he was set for battle and gave the order to attack to his officers. The army crested the hill, ready for the fight. ""ATTACK"" the general screamed..."
+2,This was one of the better performers in the simulations I ran.
+0,need a total of 28 to win a battle.  concentration of forces into a few strong holds and abandon all others.  this will be clearly fail against a more balanced strategy if I loose castle 6 or 5 (assumption is I would win 10 and 9 against a balanced strategy).  a tie in castle 5 with wins in the other 3 leads to an overall tie.  I thought of adding more to 5 & 6 - even to the point of completely balancing across the 4 but I think that would be a risk against anyone using a strategy similar to mine.  it's really an all or nothing approach.  curious so see what happens.
+2,I decided to focus on the (9+7+5+4+3=28) strategy. I hope that this configuration will give me the five castles that give a majority. I decided to send a few soldiers to castle 10 and 8 in order to take it in the event of my opponent taking those loosely too.
+3,"It had to beat two strategies- one where every troop was deployed evenly in marginal value (so, castle 10 gets 18 troops, castle 5 gets 9 troops, etc) and it had to beat the winner last time (as that's a focal strategy that lots of people will adopt, or at least adopt a small variation on). Also, looking at the distributions from last time, many people went with 0,1, or 2 troops at some relatively high value castles, so I set a minimum of 3 troops per castle to round up some cheap points- that fits with a strategy where you want to win a castle by having just one more troop than your opponent at a given castle. Those conditions allocated over 80 of the troops. The remainder were allocated split across some of the high value castles, leaving castles 7 and 8 at low levels to provide extra troops at castles 5, 9 and 10."
+1,"The equilibria of the previous tournament are almost ludicrously nonlinear. My approach is to start from the previous tournament's submissions (human nature hasn't changed much in the past few months) then add in the obvious strategies - a few dozen copycats of the top five and about a hundred copies of strategies tailored to beat the previous tournament (the best one I could find was 6-6-7-11-12-21-26-2-4-5). Once I found an optimal solution, I tweaked it some more. It's nothing like the Nash equilibrium strategy will look like; but a Nash equilibrium usually winds up in the middle of the pack and I want to win. Banzai!"
+0,Modified basic data; optimalization.
+5,"Punt on 7, 8, 9.  Try to win the rest."
+0,"Tried to place the numbers to fall in the abandoned distribution points.  Either just ahead of the low end or just ahead of the high end.  And I want Castle 8, 6, & 5 with the hope to steal 9 or 10 or (7 + 3 or 4)."
+2,Modified the winners strategy but gave up on 8 and put more resources elsewhere. Figured a lot of people would follow the old results.
+1,"I expect the ""abandon 9 and 10"" strategy to not be as widespread this time, so substantial resources have to be deployed there this time. I chose to abandon 8 and 6 with half-effort in 10 and 9 - the goal is to beat the people who mostly abandon 10 and 9, and split with people who fight hard for just 1 of those two castles."
+3,"I aimed for something that could do well against the naive strategies, the past results, and the people trying to learn from the last winner. I targeted castle 9, sacrificed castles 5 and 8, and had a good spread of the rest. I have a good chance of getting 19-25 points in the top 5 castles plus just enough of the lower 4 to give me over half the points."
+3,next level
+8,"The goal of the game is not to win as many castle as possible, its to get 28 points. The easy way (looking at the graphs) to do this it to win castles 10,9,8,and 1. The hardest of these is 8 so I invest enough to beat most people on 8 first. I then invest enough to win 1 and 2 as a back up for 1. This leaves me with 49 points. I place one on the castles I'm not going for because the ROI is ridiculously high. (Around 8% chance of getting the points for 1 troop) and split the final 22 between 10 and 9 which should be enough to win most of the time."
+1,"This time we're aiming for a 10, 9, any 2 of <6, 5, 4> strategy."
+4,Just tried to figure out where I would have put my troops as a level 0 strategy and then one-uped all the other castles while sacrificing one of them.
+2,Increasing all biggish castles slightly from last winner except 8. Trying to end amounts in a 2 or 7; seems less common than 0/5 or 1/6.
+10,Intuitiveness
+5,"Given the previous troop deployment, this is the optimal strategy. Assuming your readers don't learn, this wins about 90% of battles. But it may be worse if they do in fact read and learn"
+1,https://pastebin.com/LSXrjJJV
+5,Let Castle 8 go.... Keep something on the lower numbers and not go overboard on 9 and 10!
+0,not enough time to submit too.
+2,Avi Mahajan
+4,I assume the bulk of players aren't going to change their strategy. I then select levels that seem to be just to the right of a large area of the curve.
+6,"This troop deployment was quasi-random with a slight bias towards low-value castles and a bigger bias towards high-value castles, mostly ignoring medium-value castles, since those will probably be hotly contested."
+7,Totally random distribution
+4,"You only need 28 points to win, so I know that 1-7 equals 28 and I went for it."
+2,geddylee1717@yahoo.com
+0,https://github.com/norvig/pytudes/blob/master/Riddler%20Battle%20Royale.ipynb
+2,"win a decent amount of 9 and 10 because everyone will lowball them based on the data, forfeit 8 and try to win 4-7 at a decent clip"
+7,"Ideally, I will win castles 10, 9, 8, and 1, giving me 27 points. Especially for 10 and 9, a majority of people put less than 10, and those who put more usually put 20 or more troops there. To defend against someone gaining the 9 or the 8, I have put many troops on the 4 and 5 castles to gain 9 points back. In addition, I have scattered a few troops on the rest of the towers in the hopes that some people put no (or very few) troops there."
+5,Need 28 points to win the battle. So I go aggressive on small numbers (1-4) and super aggressive on 8 and 10. 1+2+3+4+8+10 = 28. Left 5 each for 5-7 and 9 for in case of a steal.
+7,"I first redistributed to beat the original distribution, but assumed everyone else would do that. So I redistributed again to beat that distribution."
+0,"Going for close wins and major losses. Hoping to win 7-9 and 3&4. Will lose to opponents who used more than placeholders anywhere, but hopefully get lots of wins in the two groups that can help reach 28."
+0,"I programmed a solver in Python to find optimal solutions for a given field by evaluating all nearest neighbors, then stepping in the best direction until no step improves the strategy, i.e. gives it a better win-loss% for the given field. In the case of 10 castles, there are 81 nearest neighbors, which can be found by adding a single troop to one castle while subtracting one from another. This strategy finds locally optimal solutions (not better than any neighbor), but by re-starting the solver from different random entries, one can be relatively certain (~95%) of having found the global optima after around 100 random starts. I used this to find all locally optimal solutions greater than the 90th-percentile entry in the original field. Since some of those entries are very close to each other (but greater than one step obviously), I filtered those for only the top solutions more than 5 steps apart to avoid repeating similar strategies. This left me with 365 locally optimal entries, which I combined with the top 10% of entries from round 1 for a theoretical round 2 field. My submission is the globally optimal solution for this ""round 2"" field. Fingers crossed!"
+0,"Based on how many folks de-emphasized going after Castles 9 and 10 last time, I figure there's a minor market inefficiency there, and increased my deployments. Others no doubt noticed the same thing, so I didn't go overboard; might be enough to steal them in a few showdowns, but without putting all my eggs in those baskets. As before, the majority of my efforts go towards Castles 7 and 8, with an additional over-deployment for Castle 4. The rest are essentially punted (I gave myself a chance to steal or split on 5 and 6, just in case). Generally speaking, I feel like this gives me a chance to steal either 9 or 10 in some battles, with 7 and 8 going to me in almost all. Making sure I can take #4 is all I need to reach 28 points if I do manage to catch 3 of the top 4. It'll come down how others adjust to the realization that 9 and 10 are ripe for the pickin's based on last time around, and if they choose to put even more of their resources into the top 2 castles. If they do, then I could be in trouble."
+6,I chose numbers that were slightly larger than the key clusters shown in the prior results.  I generally bumped my troops up one or two from those clusters (anticipating that others might use this same strategy).
+3,Science! And maths! With data! And computers!
+0,"Looked for holes and inflections in prior troop deployment data.  Decided to commit at least a couple to almost all castles (except 1), to pick up cheap points, if opponent goes 0 on some."
+1,"i counted up by perfect squares, then down to 7, then used the rest.  nothing brilliant bro."
+7,"It's a simple all or nothing assault. The goal is to directly seize the 28 points needed to win. The 10, 9, 8, and 1 castles do just this. Contesting any other fortress distracts from this goal. The strategy is designed to overwhelm balanced assaults on the various castles."
+7,"The total number of points is 55, so a player needs more than 27.5 points to win. From  there, I decided to minimize the number of castles that must be conquered (although that strategy runs contrary to what the previous winner did) in order to maximize the number of troops that can be sent to each one.
+
+Using the previous contest's distribution, I (not very rigorously) determined that I would only send 7 troops to Castle 1. The resulting occurrence of sending 31 troops to each remaining castle was a happy accident (although, I wanted to divide them up as evenly as possible; if I lose one castle, I almost definitely lose, so in a sense they should all be weighted equally. However, the opponent might choose to send troops based more strictly on the proportion of points that each castle offers, in which case I would have to re-evaluate my divisions)."
+7,Win all my castles with troops.
+7,Win the fewest number of castles needed by loading them up with troops.
+0,"This has the best record against the original batch, plus a smaller batch that all have the best record against all the aforementioned deployments, plus a smaller batch that all have the best record against all the aforementioned deployments, etc."
+1,"This approach aims to win with castles 10, 6, 5, 4, and 3. I'm hoping people will either avoid castle 10 or try to win it cheaply, and give less support to castles 3-6."
+4,Above 50% on previous plans
+4,"Simple, balanced strategy, trying to beat players who attack the middle hard and sacrifice too much at the top and bottom."
+13,Because you asked me to.
+1,"DAW: Too many people cared about 8 last time. I'm aiming at a 9-7-5-4-3 combo most of the time, with some hedged soldiers at 10 and 6."
+3,Higher point castles get more guys.  Go a few over the even 10's because that was the pattern last time
+6,I banged my head on the keyboard until something added up to 100
+0,Modify from one of the best sample
+4,Trying to get the mid scores + probably 1 of the higher ones
+1,Compared to previous winning distribution graph
+3,Angery reacts only. Shoutout to UC Berkeley memes for edgey teens!
+1,"Just kind of threw some troops at it,  no big crazy strategy"
+2,"I avoided placing troops on multiples of 5 and aimed to create a strong 9,8,7,4 core to get the 28 points to win.  I left troops in 10 and 5 to try and cover up any losses in the main core."
+6,This is sparta
+6,Only need a few victories.
+1,Trying to break the 'top 3/4 castles' approach while claiming some cheap ones down the order
+0,Simulated annealing using total wins against prior entries as objective function
+5,"I just did a ""natural selection"" process on random walks beginning with randomly chosen top-50 (in terms of wins) strategies and taking smallish (1-3 troops shifted at a time) steps. I also did a few more walks of the winning-est strategy from the first competition. This one does the best among those (including the newly generated 'good' models)"
+2,I thought it might perform well?
+2,"Created a strategy to beat Round 1 Median values, then assumed that would be most popular selection this Round and chose strategy to beat that."

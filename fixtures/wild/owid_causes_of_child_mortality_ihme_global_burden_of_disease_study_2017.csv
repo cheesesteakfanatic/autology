@@ -1,0 +1,151 @@
+Entity,Year,"Share of children dying in first 5 years globally, by cause (IHME (2017))",Deaths (IHME (2017))
+Acute glomerulonephritis,1990,,1037.484748
+Acute glomerulonephritis,2000,0.008755,
+Acute glomerulonephritis,2015,0.0038083,255.7403122
+Adverse effects of medical treatment,1990,,29952.70725
+Adverse effects of medical treatment,2000,0.359005,
+Adverse effects of medical treatment,2015,0.212296,14256.24915
+African trypanosomiasis,1990,,1704.237458
+African trypanosomiasis,2000,0.0287651,
+African trypanosomiasis,2015,0.003889,261.1552601
+Animal contact,1990,,23280.80926
+Animal contact,2000,0.271507,
+Animal contact,2015,0.146754,9854.885288
+Appendicitis,1990,,8194.160571
+Appendicitis,2000,0.0852019,
+Appendicitis,2015,0.0473796,3181.663796
+Asthma,1990,,36645.1579
+Asthma,2000,0.349717,
+Asthma,2015,0.141219,9483.232057
+Brain and nervous system cancer,1990,,7319.038622
+Brain and nervous system cancer,2000,0.100497,
+Brain and nervous system cancer,2015,0.0799366,5367.953985
+Cardiomyopathy and myocarditis,1990,,17525.68986
+Cardiomyopathy and myocarditis,2000,0.216231,
+Cardiomyopathy and myocarditis,2015,0.146031,9806.349318
+Cerebrovascular disease,1990,,45589.39741
+Cerebrovascular disease,2000,0.459602,
+Cerebrovascular disease,2015,0.222508,14942.0091
+Chagas disease,1990,,12.05153457
+Chagas disease,2000,9.39E-5,
+Chagas disease,2015,3.73E-5,2.50427621
+Chronic kidney disease,1990,,23021.72173
+Chronic kidney disease,2000,0.283428,
+Chronic kidney disease,2015,0.173682,11663.22631
+Chronic obstructive pulmonary disease,1990,,56588.88058
+Chronic obstructive pulmonary disease,2000,0.486717,
+Chronic obstructive pulmonary disease,2015,0.187566,12595.58048
+Cirrhosis and other chronic liver diseases due to hepatitis B,1990,,197.8930516
+Cirrhosis and other chronic liver diseases due to hepatitis B,2000,0.0020785,
+Cirrhosis and other chronic liver diseases due to hepatitis B,2015,0.0011209,75.27112375
+Cirrhosis and other chronic liver diseases due to hepatitis C,1990,,104.3320655
+Cirrhosis and other chronic liver diseases due to hepatitis C,2000,0.0011114,
+Cirrhosis and other chronic liver diseases due to hepatitis C,2015,0.0005772,38.76268564
+Cirrhosis and other chronic liver diseases due to other causes,1990,,24805.2428
+Cirrhosis and other chronic liver diseases due to other causes,2000,0.266028,
+Cirrhosis and other chronic liver diseases due to other causes,2015,0.141138,9477.804053
+Collective violence and legal intervention,1990,,11451.05659
+Collective violence and legal intervention,2000,0.167843,
+Collective violence and legal intervention,2015,0.350555,23540.6604
+Congenital birth defects,1990,,646946.3295
+Congenital birth defects,2000,8.91053,
+Congenital birth defects,2015,7.39486,496584.5646
+Cystic echinococcosis,1990,,227.4780777
+Cystic echinococcosis,2000,0.0017814,
+Cystic echinococcosis,2015,0.0006039,40.55174306
+Cysticercosis,1990,,21.94403578
+Cysticercosis,2000,0.0002572,
+Cysticercosis,2015,0.0001119,7.515289437
+Dengue,1990,,2910.849291
+Dengue,2000,0.0454164,
+Dengue,2015,0.0732927,4921.79851
+Diabetes mellitus,1990,,4369.090715
+Diabetes mellitus,2000,0.0499604,
+Diabetes mellitus,2015,0.0253239,1700.567656
+Diarrheal diseases,1990,,1387614.431
+Diarrheal diseases,2000,14.1923,
+Diarrheal diseases,2015,7.42918,498888.7531
+Diphtheria,1990,,12006.47014
+Diphtheria,2000,0.121159,
+Diphtheria,2015,0.0232334,1560.183983
+Drowning,1990,,206538.3275
+Drowning,2000,1.94231,
+Drowning,2015,0.835236,56088.30447
+Drug use disorders,1990,,30.20765913
+Drug use disorders,2000,0.000487,
+Drug use disorders,2015,0.000408,27.39849785
+Ebola,1990,,0
+Ebola,2000,0.0004655,
+Ebola,2015,0.0061873,415.4957674
+Encephalitis,1990,,62337.00836
+Encephalitis,2000,0.874421,
+Encephalitis,2015,0.638773,42895.30891
+Endocarditis,1990,,5330.997003
+Endocarditis,2000,0.0714405,
+Endocarditis,2015,0.0519258,3486.952338
+"Endocrine, metabolic, blood, and immune disorders",1990,,20572.96591
+"Endocrine, metabolic, blood, and immune disorders",2000,0.229665,
+"Endocrine, metabolic, blood, and immune disorders",2015,0.185049,12426.53053
+Environmental heat and cold exposure,1990,,7292.899263
+Environmental heat and cold exposure,2000,0.0715026,
+Environmental heat and cold exposure,2015,0.0374574,2515.360409
+Epilepsy,1990,,18777.35148
+Epilepsy,2000,0.255644,
+Epilepsy,2015,0.188716,12672.75839
+Exposure to forces of nature,1990,,5797.81223
+Exposure to forces of nature,2000,0.0131213,
+Exposure to forces of nature,2015,0.0127659,857.2665894
+Exposure to mechanical forces,1990,,56933.02129
+Exposure to mechanical forces,2000,0.673282,
+Exposure to mechanical forces,2015,0.428142,28750.89833
+Falls,1990,,39630.98747
+Falls,2000,0.432995,
+Falls,2015,0.347629,23344.18737
+"Fire, heat, and hot substances",1990,,54060.53657
+"Fire, heat, and hot substances",2000,0.591901,
+"Fire, heat, and hot substances",2015,0.334838,22485.25059
+Foreign body,1990,,72934.87763
+Foreign body,2000,0.882014,
+Foreign body,2015,0.5893,39573.0443
+Gallbladder and biliary diseases,1990,,3356.590528
+Gallbladder and biliary diseases,2000,0.0300859,
+Gallbladder and biliary diseases,2015,0.0169861,1140.660557
+Gastritis and duodenitis,1990,,1955.881197
+Gastritis and duodenitis,2000,0.0201972,
+Gastritis and duodenitis,2015,0.0121236,814.1335145
+Hemoglobinopathies and hemolytic anemias,1990,,90264.99159
+Hemoglobinopathies and hemolytic anemias,2000,1.64549,
+Hemoglobinopathies and hemolytic anemias,2015,1.24376,83521.64276
+Hemolytic disease and other neonatal jaundice,1990,,124653.3591
+Hemolytic disease and other neonatal jaundice,2000,1.39144,
+Hemolytic disease and other neonatal jaundice,2015,0.671432,45088.4251
+Hepatitis,1990,,42281.93585
+Hepatitis,2000,0.41585,
+Hepatitis,2015,0.156617,10517.21736
+HIV/AIDS,1990,,35602.92251
+HIV/AIDS,2000,2.73005,
+HIV/AIDS,2015,1.32359,88882.25072
+Hodgkin lymphoma,1990,,1115.087637
+Hodgkin lymphoma,2000,0.0095698,
+Hodgkin lymphoma,2015,0.0034883,234.2491219
+Hypertensive heart disease,1990,,1090.887912
+Hypertensive heart disease,2000,0.011389,
+Hypertensive heart disease,2015,0.0061091,410.2420639
+Inflammatory bowel disease,1990,,4140.11288
+Inflammatory bowel disease,2000,0.0383865,
+Inflammatory bowel disease,2015,0.0258145,1733.510176
+"Inguinal, femoral, and abdominal hernia",1990,,2274.709473
+"Inguinal, femoral, and abdominal hernia",2000,0.0231077,
+"Inguinal, femoral, and abdominal hernia",2015,0.0107944,724.8716185
+Interpersonal violence,1990,,23959.51853
+Interpersonal violence,2000,0.287422,
+Interpersonal violence,2015,0.156598,10515.94566
+Interstitial lung disease and pulmonary sarcoidosis,1990,,382.8812266
+Interstitial lung disease and pulmonary sarcoidosis,2000,0.0055073,
+Interstitial lung disease and pulmonary sarcoidosis,2015,0.0044936,301.7576569
+Intestinal infectious diseases,1990,,71361.46387
+Intestinal infectious diseases,2000,0.985644,
+Intestinal infectious diseases,2015,0.62781,42159.07505
+Intestinal nematode infections,1990,,5575.722518
+Intestinal nematode infections,2000,0.0579113,
+Intestinal nematode infections,2015,0.0276503,1856.793144

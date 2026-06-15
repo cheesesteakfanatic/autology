@@ -54,7 +54,9 @@ __all__ = [
     "MANIFEST_NAME",
     "OPENFLIGHTS_HEADERS",
     "ROW_CAP",
+    "classify_domain",
     "default_fixtures_dir",
+    "describe",
     "fetch",
     "load_manifest",
 ]
@@ -107,12 +109,50 @@ _FTE_LICENSE = "CC BY 4.0 — github.com/fivethirtyeight/data"
 _VEGA_LICENSE = "BSD-3-Clause repo; public example data — github.com/vega/vega-datasets"
 _SEABORN_LICENSE = "public example datasets collected for seaborn docs — github.com/mwaskom/seaborn-data"
 _DATASETS_FALLBACK_LICENSE = "open data (see repo; datasets-org packages are typically PDDL/CC0/ODC-BY)"
+#: OWID publishes every dataset in owid-datasets under Creative Commons BY (the
+#: repo's standing policy, https://ourworldindata.org/faqs#how-can-i-cite-your-work);
+#: upstream primary sources vary and are named per dataset in the manifest url.
+_OWID_LICENSE = "CC BY 4.0 — Our World in Data (ourworldindata.org); see upstream source per dataset"
+_PLOTLY_LICENSE = "MIT — github.com/plotly/datasets (public example data)"
 
 SEABORN_DATASETS = [
     "iris", "tips", "titanic", "penguins", "diamonds", "planets", "flights",
     "exercise", "mpg", "taxis", "car_crashes", "anagrams", "attention",
     "brain_networks", "dots", "fmri", "gammas", "geyser", "glue", "healthexp",
     "seaice", "anscombe",
+]
+
+#: curated plotly/datasets CSVs (a recursive tree listing of that repo times the
+#: API out, so this is a fixed reachable-on-2026-06-15 list rather than a probe).
+#: deliberately weighted toward JOIN KEYS: country names + ISO-3 codes thread
+#: into the datasets-org/OWID country clusters; US state names + postal codes
+#: thread into the FiveThirtyEight/census state columns; year threads everywhere.
+PLOTLY_DATASETS = [
+    "gapminderDataFiveYear.csv",          # country + year (gapminder thread)
+    "2014_world_gdp_with_codes.csv",      # COUNTRY + ISO-3 CODE
+    "2014_usa_states.csv",                # State + Postal (US state thread)
+    "2011_us_ag_exports.csv",             # code + state (US state thread)
+    "2010_alcohol_consumption_by_country.csv",  # location (country names)
+    "us-cities-top-1k.csv",               # City + State (US state thread)
+    "solar.csv",                          # State (US state thread)
+    "2014_ebola.csv",                     # Country + Year + Month
+    "laucnty16.csv",                      # State FIPS + County FIPS (FIPS thread)
+    "fips-unemp-16.csv",                  # fips county codes (FIPS thread)
+    "volcano_db.csv",                     # Country + Region
+    "1962_2006_walmart_store_openings.csv",  # st (US state thread)
+    "school_earnings.csv",
+    "wind_speed_laurel_nebraska.csv",
+    "wellspublic.csv",
+    "Mining-BTC-180.csv",
+    "finance-charts-apple.csv",
+    "2014_apple_stock.csv",
+    "tips.csv",
+    "diabetes.csv",
+    "iris-data.csv",
+    "wind_rose.csv",
+    "auto-mpg.csv",
+    "beers.csv",
+    "hobbs-pearson-trials.csv",
 ]
 
 _SLUG_RE = re.compile(r"[^a-z0-9]+")
@@ -148,6 +188,124 @@ def slugify(name: str) -> str:
     """Stable lowercase identifier (same alphabet as pipeline discovery slugs)."""
     s = _SLUG_RE.sub("_", name.lower()).strip("_")
     return s or "dataset"
+
+
+# --------------------------------------------------------- domain + description
+#
+# Both are derived DETERMINISTICALLY from (source, slug, column names) at
+# admission time and written into every manifest row, so the catalog endpoint
+# can surface a domain tag + a one-line "what is this" without re-reading the
+# CSV. No network, no model — pure keyword voting over the schema text.
+
+#: ordered (domain, keyword-set) table; the FIRST domain whose keywords hit the
+#: most schema tokens wins (ties broken by table order, so the result is stable
+#: regardless of dict iteration). "geography" is the catch-all for anything that
+#: looks country/region keyed; "misc" is the final fallback.
+_DOMAIN_KEYWORDS: list[tuple[str, frozenset[str]]] = [
+    ("aviation", frozenset({
+        "airport", "airline", "airlines", "iata", "icao", "flight", "flights",
+        "aircraft", "aviation", "route", "routes", "plane", "planes", "callsign",
+    })),
+    ("health", frozenset({
+        "cancer", "disease", "diabetes", "obesity", "mortality", "deaths",
+        "death", "health", "healthcare", "hospital", "patient", "vaccine",
+        "covid", "epidemic", "life_expectancy", "fertility", "births", "birth",
+        "alcohol", "smoking", "tobacco", "bmi", "medical", "malaria", "hiv",
+    })),
+    ("economics", frozenset({
+        "gdp", "gni", "income", "inflation", "cpi", "price", "prices", "wage",
+        "wages", "trade", "exports", "imports", "tariff", "currency", "exchange",
+        "debt", "deficit", "surplus", "bond", "yield", "tax", "revenue",
+        "poverty", "gini", "unemployment", "economy", "economic", "fiscal",
+        "expenditure", "spending", "investment", "stock", "stocks",
+    })),
+    ("demographics", frozenset({
+        "population", "demographic", "census", "migration", "migrant",
+        "refugee", "household", "households", "age", "gender", "literacy",
+        "education", "school", "schools", "enrollment", "urban", "rural",
+    })),
+    ("climate", frozenset({
+        "co2", "emissions", "emission", "temperature", "climate", "carbon",
+        "warming", "greenhouse", "ppm", "fossil", "renewable", "pollution",
+        "energy", "electricity", "weather", "rainfall", "wind", "seaice",
+    })),
+    ("sports", frozenset({
+        "tennis", "atp", "wta", "match", "tournament", "player", "players",
+        "team", "teams", "league", "score", "scores", "nba", "nfl", "soccer",
+        "football", "olympic", "olympics", "medal", "medals", "race", "races",
+    })),
+    ("food", frozenset({
+        "food", "crop", "crops", "agriculture", "agricultural", "wine", "beer",
+        "coffee", "diet", "calories", "nutrition", "harvest", "fish", "meat",
+        "dairy", "fruit", "fruits", "vegetable", "veggies", "tips", "restaurant",
+    })),
+    ("politics", frozenset({
+        "election", "elections", "vote", "votes", "voter", "poll", "polls",
+        "senate", "congress", "president", "candidate", "candidates", "party",
+        "government", "governance", "democracy", "corruption", "trust",
+    })),
+    ("technology", frozenset({
+        "browser", "internet", "software", "github", "phone", "mobile",
+        "computer", "web", "twitter", "facebook", "social", "users", "traffic",
+    })),
+    ("biology", frozenset({
+        "species", "iris", "penguin", "penguins", "flower", "petal", "sepal",
+        "biodiversity", "habitat", "biomass", "taxa", "animal", "plant",
+    })),
+    ("geography", frozenset({
+        "country", "countries", "iso", "region", "state", "city", "cities",
+        "latitude", "longitude", "fips", "locode", "geo", "continent",
+        "province", "district", "capital", "border",
+    })),
+]
+
+
+def classify_domain(slug: str, columns: Iterable[str]) -> str:
+    """Deterministic single-word DOMAIN tag from the slug + column names.
+
+    Pure keyword voting over the normalized schema tokens (slug + columns).
+    Stable: the first domain in ``_DOMAIN_KEYWORDS`` with the maximal hit count
+    wins, so the result never depends on set/dict iteration order.
+    """
+    tokens: set[str] = set()
+    for text in (slug, *columns):
+        tokens.update(t for t in _SLUG_RE.split(str(text).lower()) if t)
+        # also keep underscore-joined bigrams so "life_expectancy" can match
+        words = [t for t in _SLUG_RE.split(str(text).lower()) if t]
+        tokens.update(f"{a}_{b}" for a, b in zip(words, words[1:]))
+    best_domain, best_hits = "misc", 0
+    for domain, keywords in _DOMAIN_KEYWORDS:
+        hits = len(tokens & keywords)
+        if hits > best_hits:
+            best_domain, best_hits = domain, hits
+    return best_domain
+
+
+_SOURCE_LABEL: dict[str, str] = {
+    "openflights": "OpenFlights",
+    "datasets-org": "datasets.io",
+    "fivethirtyeight": "FiveThirtyEight",
+    "vega": "vega-datasets",
+    "seaborn": "seaborn-data",
+    "owid": "Our World in Data",
+    "plotly": "plotly/datasets",
+}
+
+
+def describe(source: str, slug: str, columns: list[str], rows: int, domain: str) -> str:
+    """Deterministic one-line catalog blurb from the snapshot facts.
+
+    Reads like a card caption: ``<Source> <domain> table — <n> rows keyed on
+    <first cols>; columns: <a, b, c…>``. No prose model, just the schema.
+    """
+    label = _SOURCE_LABEL.get(source, source)
+    cols = [c.strip() for c in columns if c.strip()]
+    lead = ", ".join(cols[:3])
+    more = f" (+{len(cols) - 3} more)" if len(cols) > 3 else ""
+    return (
+        f"{label} {domain} table — {rows} rows x {len(cols)} cols; "
+        f"columns: {lead}{more}"
+    )
 
 
 # ------------------------------------------------------------------ HTTP layer
@@ -361,6 +519,8 @@ class _Corpus:
         out.to_csv(path, index=False, encoding="utf-8", lineterminator="\n")
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
         self.slugs.add(slug)
+        cols = [str(c) for c in out.columns]
+        domain = classify_domain(slug, cols)
         self.datasets.append(
             {
                 "slug": slug,
@@ -369,11 +529,13 @@ class _Corpus:
                 "license_note": license_note,
                 "rows_kept": int(len(out)),
                 "cols": int(out.shape[1]),
+                "domain": domain,
+                "description": describe(source, slug, cols, int(len(out)), domain),
                 "sha256": digest,
             }
         )
         st["kept"] += 1
-        self.log(f"  + {slug}.csv  ({len(out)} rows x {out.shape[1]} cols)")
+        self.log(f"  + {slug}.csv  ({len(out)} rows x {out.shape[1]} cols) [{domain}]")
         return True
 
     def write_manifest(self, api_calls_used: int) -> dict[str, Any]:
@@ -501,7 +663,7 @@ def _fetch_vega(corpus: _Corpus, budget: _Budget) -> None:
         corpus.admit("vega", f"vg_{slugify(name[:-4])}", url, _VEGA_LICENSE, df)
 
 
-def _fetch_fivethirtyeight(corpus: _Corpus, budget: _Budget, max_kept: int = 60) -> None:
+def _fetch_fivethirtyeight(corpus: _Corpus, budget: _Budget, max_kept: int = 95) -> None:
     """The wonderful randoms: ~60 directories' primary CSVs (misses tolerated).
 
     One git-trees API call lists every file; each directory's *primary* CSV is
@@ -621,12 +783,67 @@ def _fetch_datasets_org(corpus: _Corpus, budget: _Budget, csvs_per_repo: int = 3
             corpus.admit("datasets-org", slug, url, license_note, df)
 
 
+def _fetch_owid(corpus: _Corpus, budget: _Budget, max_kept: int = 110) -> None:
+    """Our World in Data's ``owid-datasets`` repo: hundreds of country/year tables.
+
+    Every OWID dataset's CSV is keyed on ``Entity`` (country/region name) + ``Year``
+    — a single dense join thread that wires the whole cluster into the existing
+    country-name and year columns. One git-trees API call lists the dataset dirs;
+    each dir holds ``<dir>/<dir>.csv`` (raw host, rate-unlimited). Wide panels
+    (>60 cols) fail the column gate and are skipped, leaving the narrow indicator
+    tables — which is exactly the joinable long tail we want.
+    """
+    import urllib.parse
+
+    corpus.log("[owid] listing owid-datasets/datasets (1 API call)")
+    listing = _api_json(
+        f"{_GH_API}/repos/owid/owid-datasets/contents/datasets?ref=master", budget
+    )
+    names = sorted(
+        str(e["name"]) for e in (listing or [])
+        if isinstance(e, dict) and e.get("type") == "dir" and e.get("name")
+    )
+    kept = 0
+    for name in names:
+        if kept >= max_kept:
+            break
+        enc = urllib.parse.quote(name)
+        url = f"{_GH_RAW}/owid/owid-datasets/master/datasets/{enc}/{enc}.csv"
+        raw = _http_bytes(url)
+        df = None
+        if raw:
+            try:
+                df = parse_csv_bytes(raw)
+            except Exception:
+                df = None
+        if corpus.admit("owid", f"owid_{slugify(name)}", url, _OWID_LICENSE, df):
+            kept += 1
+
+
+def _fetch_plotly(corpus: _Corpus) -> None:
+    """plotly/datasets — a fixed curated list (recursive tree listing times out),
+    weighted toward country/ISO/US-state/FIPS join keys. Zero API calls."""
+    corpus.log("[plotly] fetching the curated join-key CSVs")
+    for fname in PLOTLY_DATASETS:
+        url = f"{_GH_RAW}/plotly/datasets/master/{fname}"
+        raw = _http_bytes(url)
+        df = None
+        if raw:
+            try:
+                df = parse_csv_bytes(raw)
+            except Exception:
+                df = None
+        corpus.admit("plotly", f"pl_{slugify(fname[:-4])}", url, _PLOTLY_LICENSE, df)
+
+
 _SOURCES: dict[str, str] = {
     "openflights": "OpenFlights .dat cluster (joinable: airports/airlines/routes/planes/countries)",
     "datasets-org": "github.com/datasets org (world data; ISO codes thread through)",
+    "owid": "owid/owid-datasets (country+year thread: Entity/Year on every table)",
     "fivethirtyeight": "fivethirtyeight/data primary CSVs",
     "vega": "vega/vega-datasets data/*.csv",
     "seaborn": "mwaskom/seaborn-data example CSVs",
+    "plotly": "plotly/datasets curated CSVs (country/ISO/US-state/FIPS join keys)",
 }
 
 
@@ -682,12 +899,16 @@ def fetch(
         _fetch_openflights(corpus)
     if "datasets-org" in wanted:
         _fetch_datasets_org(corpus, budget)
+    if "owid" in wanted:
+        _fetch_owid(corpus, budget)
     if "fivethirtyeight" in wanted:
         _fetch_fivethirtyeight(corpus, budget)
     if "vega" in wanted:
         _fetch_vega(corpus, budget)
     if "seaborn" in wanted:
         _fetch_seaborn(corpus)
+    if "plotly" in wanted:
+        _fetch_plotly(corpus)
 
     manifest = corpus.write_manifest(budget.used)
     manifest["stats"]["fetch_seconds"] = round(time.monotonic() - t0, 1)

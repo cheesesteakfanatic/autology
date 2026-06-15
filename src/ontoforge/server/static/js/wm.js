@@ -542,7 +542,7 @@ export function createWM({ desktop, bus, registry, onWindows, dockTarget }) {
 
   return {
     open, close, focus, minimize, restore, list, topWin,
-    serialize, restoreLayout, loadLayout,
+    serialize, restoreLayout, loadLayout, snapTo, applyRect,
     find: (pred) => list().find(pred),
     findAll: (pred) => list().filter(pred),
     get: (id) => windows.get(id),

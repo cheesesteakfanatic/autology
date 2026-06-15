@@ -1,0 +1,151 @@
+Entity,Year,Manuscript production per century,Production of printed books per half century,Annual per capita consumption of books
+Austria,500,0,,
+Austria,600,0,,
+Austria,700,2735,,
+Austria,800,9414,,
+Austria,900,0,,
+Austria,1000,2808,,
+Austria,1100,37370,,
+Austria,1200,37408,,
+Austria,1300,39777,,
+Austria,1400,88623,,
+Belgium,500,0,,
+Belgium,600,127,,
+Belgium,700,1111,,
+Belgium,800,3029,,
+Belgium,900,1555,,
+Belgium,1000,8529,,
+Belgium,1100,43219,,
+Belgium,1200,119588,,
+Belgium,1300,106148,,
+Belgium,1400,572124,,
+Belgium,1475,,394000,0.0047
+Belgium,1525,,1963000,0.0177
+Belgium,1575,,5720000,0.0482
+Belgium,1625,,4334000,0.0332
+Belgium,1675,,7203000,0.0736
+Belgium,1725,,3016000,0.0307
+Belgium,1775,,4817000,0.0445
+Bohemia,500,0,,
+Bohemia,600,0,,
+Bohemia,700,0,,
+Bohemia,800,0,,
+Bohemia,900,0,,
+Bohemia,1000,657,,
+Bohemia,1100,1136,,
+Bohemia,1200,5377,,
+Bohemia,1300,42066,,
+Bohemia,1400,45363,,
+British Isles,500,81,,
+British Isles,600,1026,,
+British Isles,700,5474,,
+British Isles,800,7926,,
+British Isles,900,9793,,
+British Isles,1000,20360,,
+British Isles,1100,81044,,
+British Isles,1200,200654,,
+British Isles,1300,155513,,
+British Isles,1400,208729,,
+Central Europe,500,0,,
+Central Europe,600,0,,
+Central Europe,700,0,,
+Central Europe,800,0,,
+Central Europe,900,0,,
+Central Europe,1000,3983,,
+Central Europe,1100,27530,,
+Central Europe,1200,120987,,
+Central Europe,1300,301833,,
+Central Europe,1400,376650,,
+France,550,1682,,
+France,650,2441,,
+France,750,15920,,
+France,850,74190,,
+France,950,12752,,
+France,1050,45061,,
+France,1150,197831,,
+France,1250,510828,,
+France,1350,564624,,
+France,1450,1195783,,
+France,1475,,2861000,0.0032
+France,1525,,34736000,0.0299
+France,1575,,39084000,0.0337
+France,1625,,61257000,0.0522
+France,1675,,85163000,0.0701
+France,1725,,73631000,0.0587
+France,1775,,157153000,0.1179
+Germany,500,0,,
+Germany,600,0,,
+Germany,700,7503,,
+Germany,800,59771,,
+Germany,900,45703,,
+Germany,1000,49548,,
+Germany,1100,166876,,
+Germany,1200,270392,,
+Germany,1300,293814,,
+Germany,1400,515116,,
+Germany,1475,,3227000,0.0041
+Germany,1525,,15603000,0.0212
+Germany,1575,,32112000,0.0434
+Germany,1625,,40553000,0.054
+Germany,1675,,57708000,0.0787
+Germany,1725,,78205000,0.0997
+Germany,1775,,116814000,0.1224
+Great Britain,1475,,208000,0.002
+Great Britain,1525,,2807000,0.0146
+Great Britain,1575,,7999000,0.0273
+Great Britain,1625,,32912000,0.08
+Great Britain,1675,,89306000,0.1918
+Great Britain,1725,,89259000,0.1683
+Great Britain,1775,,138355000,0.192
+Iberia,500,1594,,
+Iberia,600,2512,,
+Iberia,700,3770,,
+Iberia,800,21693,,
+Iberia,900,48763,,
+Iberia,1000,40871,,
+Iberia,1100,114422,,
+Iberia,1200,237818,,
+Iberia,1300,344284,,
+Iberia,1400,390478,,
+Ireland,1475,,0,0
+Ireland,1525,,0,0
+Ireland,1575,,4000,0.0001
+Ireland,1625,,268000,0.0038
+Ireland,1675,,1341000,0.0142
+Ireland,1725,,8586000,0.0617
+Ireland,1775,,17598000,0.0777
+Italy,500,10194,,
+Italy,600,4478,,
+Italy,700,6536,,
+Italy,800,20307,,
+Italy,900,15215,,
+Italy,1000,38768,,
+Italy,1100,95207,,
+Italy,1200,253013,,
+Italy,1300,879364,,
+Italy,1400,1423668,,
+Italy,1475,,4532000,0.0068
+Italy,1525,,16719000,0.0213
+Italy,1575,,41641000,0.051
+Italy,1625,,35067000,0.0421
+Italy,1675,,43293000,0.0563
+Italy,1725,,37930000,0.0484
+Italy,1775,,75500000,0.0865
+Netherlands,500,0,,
+Netherlands,600,26,,
+Netherlands,700,60,,
+Netherlands,800,82,,
+Netherlands,900,58,,
+Netherlands,1000,354,,
+Netherlands,1100,1731,,
+Netherlands,1200,2066,,
+Netherlands,1300,13179,,
+Netherlands,1400,171974,,
+Netherlands,1475,,473000,0.0079
+Netherlands,1525,,1045000,0.0142
+Netherlands,1575,,2842000,0.0335
+Netherlands,1625,,15009000,0.139
+Netherlands,1675,,30149000,0.2594
+Netherlands,1725,,40950000,0.3913
+Netherlands,1775,,53063000,0.4883
+Other countries,1475,,22000,0

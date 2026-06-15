@@ -256,3 +256,16 @@ export function dropCaches() {
   cache.atlas = null;
   cache.atlasPromise = null;
 }
+
+/* ───────────────────── playground workspace (the Studio data state)
+   GET /api/workspace/state tells us whether a model has been built and
+   how big it is, so every mode can guide the user honestly when the data
+   isn't ready. The endpoint may 404 in older builds — resolve a safe
+   "not built" shape rather than throwing into the DOM. */
+export async function workspaceState() {
+  try {
+    return await api("/api/workspace/state");
+  } catch {
+    return { datasets: [], built: false, active_world: null, stats: {} };
+  }
+}

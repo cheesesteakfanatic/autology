@@ -61,8 +61,19 @@ class ProjectWorld:
 
     def __init__(self, project: Path) -> None:
         self.project = Path(project)
+        #: the ACTIVE world reads come from: the demo project by default, the
+        #: playground after a successful build. Switched under self.lock by
+        #: ``activate_world``; reads (ask/ontology/atlas/entities/extract/...)
+        #: all route through self.active_project.
+        self.active_project = Path(project)
+        self.active_world = "demo"
         self.lock = threading.RLock()
         self._ledger: Optional[SqliteLedger] = None
+        #: ident of the thread that opened ``_ledger`` — sqlite connections are
+        #: created check_same_thread=True, so we only ever ``.close()`` from the
+        #: owning thread (a playground worker that flips the world via
+        #: ``activate_world`` must NOT close the server's request-thread handle).
+        self._ledger_owner: Optional[int] = None
         self._hearth: Optional[Hearth] = None
         self._ontology: Optional[Ontology] = None
         self._spine: Optional[DecisionSpine] = None
@@ -76,45 +87,56 @@ class ProjectWorld:
         self.answer_cache: dict[str, dict[str, Any]] = {}
         #: parsed <project>/atlas.json keyed by mtime; dropped on reload()
         self._atlas_cache: Optional[tuple[int, dict[str, Any]]] = None
+        #: in-memory playground build job store (job_id -> PlaygroundJob). Per
+        #: process and NOT durable across restart — only the live animation
+        #: stream is ephemeral; a completed playground's atlas/ontology persist
+        #: on disk and survive (read back as the active world).
+        self._jobs: dict[str, Any] = {}
+        #: last requested dataset selection (for the workspace-state echo)
+        self._selected_datasets: list[str] = []
+        #: optional catalog-root override (None -> the repo fixtures/ dir)
+        self._fixtures_root_override: Optional[Path] = None
 
     # ----------------------------------------------------------- project IO
 
     @property
     def config(self) -> dict[str, Any]:
-        cfg = self.project / "config.json"
+        cfg = self.active_project / "config.json"
         if not cfg.is_file():
-            raise ProjectError(f"no project at {self.project} — run `ontoforge init` first")
+            raise ProjectError(f"no project at {self.active_project} — run `ontoforge init` first")
         return json.loads(cfg.read_text(encoding="utf-8"))
 
     def state(self) -> dict[str, Any]:
-        p = self.project / "state.json"
+        p = self.active_project / "state.json"
         if p.is_file():
             return json.loads(p.read_text(encoding="utf-8"))
         return {"limit": None, "cdc": {}, "stages": []}
 
     @property
     def ledger_path(self) -> Path:
-        return self.project / self.config.get("ledger", "ledger.sqlite")
+        return self.active_project / self.config.get("ledger", "ledger.sqlite")
 
     @property
     def hearth_dir(self) -> Path:
-        return self.project / self.config.get("hearth_root", "hearth")
+        return self.active_project / self.config.get("hearth_root", "hearth")
 
     @property
     def dashboards_dir(self) -> Path:
-        return self.project / "dashboards"
+        return self.active_project / "dashboards"
 
     @property
     def workspace_path(self) -> Path:
+        # the window-layout blob always lives on the BASE project (a build does
+        # not relocate the user's saved desktop layout)
         return self.project / "workspace.json"
 
     @property
     def exports_dir(self) -> Path:
-        return self.project / "exports"
+        return self.active_project / "exports"
 
     @property
     def atlas_path(self) -> Path:
-        return self.project / ATLAS_FILE
+        return self.active_project / ATLAS_FILE
 
     # --------------------------------------------------------------- atlas
 
@@ -145,6 +167,7 @@ class ProjectWorld:
                         f"project has no ledger ({self.ledger_path.name}) — run `ontoforge ingest`"
                     )
                 self._ledger = SqliteLedger(str(self.ledger_path))
+                self._ledger_owner = threading.get_ident()
             return self._ledger
 
     @property
@@ -166,15 +189,16 @@ class ProjectWorld:
             return self._ontology
 
     def _resolve_ontology(self) -> Ontology:
-        """Materialized (per state.json) -> induced -> gold, like the CLI."""
+        """Materialized (per state.json) -> induced -> gold, like the CLI.
+        Reads from the ACTIVE world (the playground after a build)."""
         from ontoforge.vista._pipeline import load_ontology
 
         materialized = self.state().get("materialized") or {}
         if materialized.get("ontology"):
-            mat = self.project / materialized.get("ontology_file", MATERIALIZED_ONTOLOGY_FILE)
+            mat = self.active_project / materialized.get("ontology_file", MATERIALIZED_ONTOLOGY_FILE)
             if mat.is_file():
                 return load_ontology(mat)
-        induced = self.project / "ontology.json"
+        induced = self.active_project / "ontology.json"
         if induced.is_file():
             return load_ontology(induced)
         try:
@@ -410,28 +434,395 @@ class ProjectWorld:
 
         return executor
 
+    # ------------------------------------------------------ catalog + build
+
+    @property
+    def fixtures_root(self) -> Path:
+        """The repo's ``fixtures/`` dir — the catalog reads wild/meridian/
+        aviation from here. Resolved from the package location (server ships
+        from a source checkout for the playground). Tests may set
+        ``world.fixtures_root = <dir>`` to root the catalog at a synthetic
+        fixtures tree."""
+        if self._fixtures_root_override is not None:
+            return self._fixtures_root_override
+        from ontoforge import estates  # the package next to fixtures/
+
+        # estates lives under src/ontoforge; fixtures/ is the repo root sibling
+        pkg = Path(estates.__file__).resolve().parent  # .../src/ontoforge/estates
+        repo_root = pkg.parents[2]  # .../<repo>
+        return repo_root / "fixtures"
+
+    @fixtures_root.setter
+    def fixtures_root(self, value: Path | str) -> None:
+        self._fixtures_root_override = Path(value)
+
+    def catalog(self) -> tuple[list[Any], list[dict[str, Any]]]:
+        """(entries, domains) for GET /api/catalog. Read-only from disk."""
+        from .catalog import build_catalog, catalog_domains
+
+        entries = build_catalog(self.fixtures_root)
+        return entries, catalog_domains(entries)
+
+    def workspace_state(self) -> dict[str, Any]:
+        """The playground workspace state (GET /api/workspace/state)."""
+        with self.lock:
+            built = self.active_world == "playground"
+            stats = {"types": 0, "confirmed": 0, "likely": 0, "silos": 0}
+            if built:
+                atlas = self.read_atlas()
+                if atlas:
+                    s = atlas.get("stats", {})
+                    stats = {
+                        "types": int(s.get("classes", 0)),
+                        "confirmed": int(s.get("confirmed", 0)),
+                        "likely": int(s.get("likely", 0)),
+                        "silos": int(s.get("silos", 0)),
+                    }
+            return {
+                "datasets": list(self._selected_datasets),
+                "built": built,
+                "active_world": self.active_world,
+                "stats": stats,
+            }
+
+    def start_build(self, dataset_ids: list[str], mode: str = "replace") -> str:
+        """Resolve the selection, start a threaded PlaygroundJob, return job_id.
+
+        The job opens its OWN ledger on the worker thread (sqlite is
+        thread-affine — never shares ``self.ledger``). On success it flips the
+        active world to the playground via ``activate_world`` (taken under
+        ``self.lock``)."""
+        import uuid
+
+        from ontoforge.pipeline.playground import MAX_DATASETS, PlaygroundJob
+
+        from .catalog import build_catalog
+
+        if not dataset_ids:
+            raise ProjectError("no datasets selected")
+        if len(dataset_ids) > MAX_DATASETS:
+            raise ProjectError(
+                f"too many datasets: {len(dataset_ids)} selected, max {MAX_DATASETS} "
+                "per playground build — remove some and try again"
+            )
+        # mode "add" unions the new ids with the already-built selection (the
+        # playground grows); "replace" starts from just the new ids
+        effective_ids = list(dataset_ids)
+        if mode == "add" and self.active_world == "playground":
+            for did in self._selected_datasets:
+                if did not in effective_ids:
+                    effective_ids.append(did)
+            if len(effective_ids) > MAX_DATASETS:
+                raise ProjectError(
+                    f"adding {len(dataset_ids)} would exceed the {MAX_DATASETS}-dataset "
+                    f"cap (playground already has {len(self._selected_datasets)})"
+                )
+
+        entries = build_catalog(self.fixtures_root)
+        by_id = {e.id: e for e in entries}
+        selections: list[tuple[str, str, Path]] = []
+        missing: list[str] = []
+        for did in effective_ids:
+            e = by_id.get(did)
+            if e is None:
+                missing.append(did)
+                continue
+            selections.append((did, e.name, Path(e.file)))
+        if missing:
+            raise ProjectError(f"unknown dataset id(s): {', '.join(missing)}")
+
+        job_id = uuid.uuid4().hex[:12]
+        play_dir = self.project / "playground" / job_id
+        job = PlaygroundJob(
+            job_id=job_id, selections=selections, project_dir=play_dir, mode=mode
+        )
+        with self.lock:
+            self._jobs[job_id] = job
+            # record the EFFECTIVE selection (the union for add-mode), so a
+            # subsequent add unions against everything actually built
+            self._selected_datasets = list(effective_ids)
+
+        def on_done(j: Any) -> None:
+            # flip reads to the freshly-built playground world
+            self.activate_world(j.project_dir)
+
+        job.start(on_done=on_done)
+        return job_id
+
+    def build_status(self, job_id: str, since: int = 0) -> Optional[dict[str, Any]]:
+        with self.lock:
+            job = self._jobs.get(job_id)
+        if job is None:
+            return None
+        return job.snapshot(since=since)
+
+    def activate_world(self, project_dir: Path) -> None:
+        """Switch the ACTIVE world reads to ``project_dir`` and drop all cached
+        handles so the next read re-opens from the new world."""
+        with self.lock:
+            self._drop_handles()
+            self.active_project = Path(project_dir)
+            self.active_world = "playground" if Path(project_dir) != self.project else "demo"
+
+    # ----------------------------------------------------------- engineer
+
+    def engineer_service(self) -> Any:
+        """An EngineerService over the ACTIVE world (ontology + hearth + ledger
+        + spine). Fresh per call so a /interpret never sees a half-applied
+        engine; /apply re-derives it and applies through the real TEMPER
+        machinery."""
+        from ontoforge.engineer import EngineerService
+
+        with self.lock:
+            onto = self.ontology
+            try:
+                hearth = self.hearth
+            except ProjectError:
+                hearth = None
+            ledger = self.ledger if self.ledger_path.is_file() else None
+            spine = self.spine if ledger is not None else None
+            return EngineerService(onto, hearth=hearth, ledger=ledger, spine=spine)
+
+    def engineer_schema(self) -> Any:
+        """The SchemaView the parser matches against (live ontology + profiles).
+        Profiles are recovered from the materialized estate when available; the
+        ontology alone still grounds class/property slots."""
+        from ontoforge.engineer.commands import SchemaView
+
+        with self.lock:
+            onto = self.ontology
+            return SchemaView.from_world(onto, profiles=self._estate_profiles())
+
+    def _estate_profiles(self) -> Optional[dict[str, Any]]:
+        """Best-effort profile map for slot grounding (table/column names).
+        Returns None when no estate is reconstructable — the parser then grounds
+        slots against the ontology only (class/property names)."""
+        return None
+
+    def interpret(self, command: str) -> dict[str, Any]:
+        """Parse a command and PREVIEW it (never mutates). The discriminated
+        union the API contract specifies."""
+        from ontoforge.engineer import (
+            ClarificationNeeded,
+            ProposedCommand,
+            UnsupportedCommand,
+            parse_command,
+        )
+
+        schema = self.engineer_schema()
+        parsed = parse_command(command, schema)
+        if isinstance(parsed, UnsupportedCommand):
+            return {
+                "unsupported": True,
+                "reason": parsed.reason,
+                "supported_examples": list(parsed.supported_examples),
+            }
+        if isinstance(parsed, ClarificationNeeded):
+            return {"clarification": parsed.clarification, "options": list(parsed.options)}
+        assert isinstance(parsed, ProposedCommand)
+        svc = self.engineer_service()
+        preview = svc.preview(parsed)
+        return {
+            "op": {
+                "kind": parsed.kind,
+                "params": parsed.params,
+                "human_summary": parsed.human_summary,
+                "confidence": parsed.confidence,
+            },
+            "preview": {
+                "description": preview.description,
+                "affected_count": preview.affected_count,
+                "sample": preview.sample,
+                "coverage": preview.coverage,
+                "tier": preview.tier,
+                "spine_gated": preview.spine_gated,
+                "blocked": preview.blocked,
+                "block_reason": preview.block_reason,
+                "valid": preview.valid,
+                "reason": preview.reason,
+                "op_token": preview.op_dict,
+            },
+        }
+
+    def engineer_apply(self, op_token: dict[str, Any]) -> dict[str, Any]:
+        """Apply a previewed op through the real TEMPER engine on the active
+        world, persist the new ontology + atlas, and return undo info."""
+        with self.lock:
+            svc = self.engineer_service()
+            out = svc.apply(op_token)
+            if out.get("ok"):
+                self._persist_engineered(svc)
+            return out
+
+    def engineer_undo(self, undo_token: dict[str, Any]) -> dict[str, Any]:
+        with self.lock:
+            svc = self.engineer_service()
+            out = svc.undo(undo_token)
+            if out.get("ok"):
+                self._persist_engineered(svc)
+            return out
+
+    def _persist_engineered(self, svc: Any) -> None:
+        """Persist the engine's post-state ontology to the active world and drop
+        cached ontology/atlas so the next read reflects the edit."""
+        from ontoforge.vista._pipeline import save_ontology
+
+        onto = svc.engine.ontology
+        save_ontology(onto, self.active_project / "ontology.materialized.json")
+        save_ontology(onto, self.active_project / "ontology.json")
+        self._ontology = None
+        self._atlas_cache = None
+        self._engine = None
+        self._search_index = None
+
+    # ------------------------------------------------------------- extract
+
+    def extract(
+        self,
+        type_uri: str,
+        filters: list[dict[str, Any]],
+        columns: list[str],
+        limit: int,
+    ) -> dict[str, Any]:
+        """Filtered entity rows + per-cell citations for one class (the active
+        world). Returns {columns, rows, citations}."""
+        from ontoforge.lodestone.model import all_props
+        from ontoforge.temper import storage_key
+
+        with self.lock:
+            onto = self.ontology
+            c = onto.get(type_uri)
+            if c is None:
+                raise ProjectError(f"unknown type uri: {type_uri}")
+            hearth = self.hearth
+            props = all_props(onto, type_uri)
+            # column selection: requested columns IN REQUESTED ORDER (∩ known),
+            # else all non-link props in ontology order
+            if columns:
+                wanted: list[str] = []
+                for col in columns:  # preserve the caller's order, dedup
+                    if col in props and col not in wanted:
+                        wanted.append(col)
+            else:
+                wanted = [name for name, p in props.items() if not p.is_link]
+
+            # read the current extent straight from the entity shard
+            try:
+                shard = hearth.shard(Layer.ENTITY, type_uri)
+            except Exception as exc:  # pragma: no cover - empty/absent shard
+                raise ProjectError(f"no extent for {type_uri}: {exc}") from exc
+
+            key_of = {name: storage_key(p) for name, p in props.items()}
+            # entity -> {prop_name: ValueCell}
+            by_entity: dict[str, dict[str, Any]] = {}
+            for (entity, key), seq in getattr(shard, "current", {}).items():
+                cell = shard.cells[seq]
+                for name in wanted:
+                    if key_of.get(name) == key:
+                        by_entity.setdefault(entity, {})[name] = cell
+
+            def passes(cells: dict[str, Any]) -> bool:
+                for f in filters:
+                    prop = f.get("prop")
+                    op = f.get("op", "==")
+                    ref = f.get("value")
+                    cell = cells.get(prop)
+                    val = None if cell is None else cell.value
+                    if not _compare(val, op, ref):
+                        return False
+                return True
+
+            rows: list[list[Any]] = []
+            citations: list[dict[str, Any]] = []
+            for entity in sorted(by_entity):
+                cells = by_entity[entity]
+                if filters and not passes(cells):
+                    continue
+                if len(rows) >= max(1, limit):
+                    break
+                row_idx = len(rows)
+                row: list[Any] = []
+                for col in wanted:
+                    cell = cells.get(col)
+                    value = None if cell is None else jsonable(cell.value)
+                    row.append(value)
+                    if cell is not None:
+                        atom_ids = self._atoms_for_prov(cell.prov_ref)
+                        citations.append(
+                            {"row": row_idx, "column": col, "value": value, "atom_ids": atom_ids}
+                        )
+                rows.append(row)
+        return {"columns": wanted, "rows": rows, "citations": citations}
+
+    def _atoms_for_prov(self, prov_ref: Optional[str]) -> list[str]:
+        """The atom ids backing a cell's provenance ref (citation evidence)."""
+        if not prov_ref:
+            return []
+        try:
+            return sorted(self.ledger.valuate_ref(prov_ref, "citations"))
+        except Exception:
+            return []
+
     # ------------------------------------------------------------- reload
+
+    def _drop_handles(self) -> None:
+        # Only close the sqlite connection from the thread that opened it; a
+        # playground WORKER thread that flips the world (via activate_world ->
+        # _drop_handles) must not close the server request thread's handle
+        # (check_same_thread would raise). Off-thread, we just drop the
+        # reference — the owning thread reopens lazily, GC reclaims the old one.
+        if self._ledger is not None and self._ledger_owner == threading.get_ident():
+            try:
+                self._ledger.close()
+            except Exception:
+                pass
+        self._ledger = None
+        self._ledger_owner = None
+        self._hearth = None
+        self._ontology = None
+        self._spine = None
+        self._engine = None
+        self._search_index = None
+        self._atlas_cache = None
+        self.answer_cache.clear()
 
     def reload(self) -> None:
         """Drop every open handle and cache; the next request re-opens the
         project from disk (for when the CLI mutates it underneath us)."""
         with self.lock:
-            if self._ledger is not None:
-                try:
-                    self._ledger.close()
-                except Exception:
-                    pass
-            self._ledger = None
-            self._hearth = None
-            self._ontology = None
-            self._spine = None
-            self._engine = None
-            self._search_index = None
-            self._atlas_cache = None
-            self.answer_cache.clear()
+            self._drop_handles()
 
 
 # ----------------------------------------------------------------- file utils
+
+
+def _compare(value: Any, op: str, ref: Any) -> bool:
+    """Extract filter predicate. String-tolerant: numeric comparisons coerce
+    both sides to float when possible, else fall back to string compare; a None
+    cell never matches (except the explicit '!=' against a non-None ref)."""
+    if op == "contains":
+        return value is not None and str(ref).lower() in str(value).lower()
+    if value is None:
+        return op == "!=" and ref is not None
+    if op == "==":
+        return str(value) == str(ref)
+    if op == "!=":
+        return str(value) != str(ref)
+    # ordered comparisons: try numeric, fall back to lexical
+    try:
+        a: Any = float(value)
+        b: Any = float(ref)
+    except (TypeError, ValueError):
+        a, b = str(value), str(ref)
+    if op == "<":
+        return a < b
+    if op == "<=":
+        return a <= b
+    if op == ">":
+        return a > b
+    if op == ">=":
+        return a >= b
+    return False
 
 
 def write_json_atomic(path: Path, blob: Any) -> None:

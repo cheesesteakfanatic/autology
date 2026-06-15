@@ -10,8 +10,8 @@ const ER_PAIR_RE = /^er:([^:]+):(.+)\|\|(.+)$/;
 export function createReviewApp() {
   return {
     id: "review",
-    title: "Review",
-    tagline: "adjudication queue & recalibration",
+    title: "Confirm suggestions",
+    tagline: "are these the same thing?",
     glyph: "⚖",
     w: 620, h: 560, multi: false,
 
@@ -19,8 +19,8 @@ export function createReviewApp() {
       const tally = el("div", { class: "review-tally" });
       const keysHint = el("div", { class: "review-keys" },
         el("span", {}, el("kbd", {}, "j"), "/", el("kbd", {}, "k"), " move"),
-        el("span", {}, el("kbd", {}, "a"), " accept"),
-        el("span", {}, el("kbd", {}, "r"), " reject"));
+        el("span", {}, el("kbd", {}, "a"), " confirm"),
+        el("span", {}, el("kbd", {}, "r"), " not the same"));
       const queue = el("div", { class: "review-queue" }, el("div", { class: "skeleton-card" }));
       ctx.root.append(tally, keysHint, queue);
       ctx.root.classList.add("app-review");
@@ -59,9 +59,9 @@ export function createReviewApp() {
           tally.append(el("div", { class: "tally-block" },
             tallyArc(toward, data.threshold, recals),
             el("div", {},
-              el("div", { class: "tally-kind" }, `${kind} — toward recalibration`),
+              el("div", { class: "tally-kind" }, `${kind} — learning from your confirmations`),
               el("div", { class: "tally-sub" },
-                `${n} verdict${n === 1 ? "" : "s"} · ${recals} recalibration${recals === 1 ? "" : "s"} · refit at every ${data.threshold}`))));
+                `${n} confirmation${n === 1 ? "" : "s"} · ${recals} time${recals === 1 ? "" : "s"} the engine learned`))));
         }
       }
 
@@ -76,12 +76,12 @@ export function createReviewApp() {
             ? el("div", {}, el("button", {
                 class: "range-link", type: "button", style: "font-size:var(--fs-0)",
                 onclick: () => ctx.emit("entity:open", { uri }),
-              }, "inspect entity →"))
+              }, "explore record →"))
             : null);
         return el("div", { class: "pair-grid" },
-          side("left record", a),
-          el("span", { class: "pair-vs" }, "same?"),
-          side("right record", b));
+          side("one record", a),
+          el("span", { class: "pair-vs" }, "same thing?"),
+          side("the other record", b));
       }
 
       function reviewCard(item, idx) {
@@ -96,12 +96,12 @@ export function createReviewApp() {
           try {
             const out = await api(`/api/review/${encodeURIComponent(item.decision_id)}`,
               { verdict: v, note: note.value });
-            const msg = `${v === "accept" ? "accepted" : "rejected"} · ${out.verdicts_for_kind} ${out.kind} verdict${out.verdicts_for_kind === 1 ? "" : "s"}`;
+            const msg = `${v === "accept" ? "confirmed" : "marked not the same"} · ${out.verdicts_for_kind} confirmation${out.verdicts_for_kind === 1 ? "" : "s"}`;
             clear(actions).append(el("span", {
               class: `verdict-result${out.recalibrated ? " recalibrated" : ""}`,
-            }, msg, out.recalibrated ? ` · ⚒ ${out.kind} recalibrated` : ""));
+            }, msg, out.recalibrated ? " · the engine learned from this" : ""));
             toast(
-              out.recalibrated ? `${out.kind} recalibrated — the spine refit` : msg,
+              out.recalibrated ? "the engine learned from your confirmations" : msg,
               { kind: out.recalibrated ? "ok" : "info" });
             clearTimeout(reloadTimer);
             reloadTimer = setTimeout(load, 750);
@@ -112,8 +112,8 @@ export function createReviewApp() {
         }
 
         actions.append(
-          el("button", { class: "btn btn-accept", type: "button", onclick: () => verdict("accept") }, "accept (a)"),
-          el("button", { class: "btn btn-reject", type: "button", onclick: () => verdict("reject") }, "reject (r)"),
+          el("button", { class: "btn btn-accept", type: "button", onclick: () => verdict("accept") }, "Confirm (a)"),
+          el("button", { class: "btn btn-reject", type: "button", onclick: () => verdict("reject") }, "Not the same (r)"),
           note);
 
         const card = el("div", {
@@ -137,7 +137,7 @@ export function createReviewApp() {
                   onclick: () => ctx.emit("evidence:atoms", {
                     atomIds: item.prov_atoms, label: item.decision_id,
                   }),
-                }, `evidence ⌗${item.prov_atoms.length}`)
+                }, `where this came from ⌗${item.prov_atoms.length}`)
               : null),
           el("div", {}, item.conformal_set.map((c) =>
             el("span", { class: `conformal-chip${c === item.outcome ? " chosen" : ""}` }, c))),
@@ -160,10 +160,12 @@ export function createReviewApp() {
           const data = await api("/api/review");
           renderTally(data);
           clear(queue);
-          ctx.setTitle(data.items.length ? `Review — ${data.items.length} pending` : "Review");
+          ctx.setTitle(data.items.length ? `Confirm suggestions — ${data.items.length} pending` : "Confirm suggestions");
+          // tell the shell how many are pending, for the STUDIO badge
+          ctx.emit("review:count", { count: data.items.length });
           if (!data.items.length) {
             queue.append(el("div", { class: "empty-note" },
-              "no review items — the spine is confident today"));
+              "Nothing to confirm — the engine is confident right now."));
             reviewSel = -1;
             return;
           }
