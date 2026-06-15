@@ -141,6 +141,12 @@ class ReviewItem(BaseModel):
     tier: int
     deferred_to_human: bool
     quarantined: bool
+    #: WHY this decision is in the queue — never faked. One of:
+    #: 'deferred' (tiers exhausted, no auto-decision), 'quarantined' (budget
+    #: fail-close), 'low-confidence' (auto-resolved below the floor), or
+    #: 'low-margin' (escalated past the deterministic auto-bands and resolved
+    #: with an unresolved conformal set — a genuine low-margin auto-decision).
+    review_reason: str = ""
     rationale: str = ""
     prov_atoms: list[str] = Field(default_factory=list)
     created_at: str = ""

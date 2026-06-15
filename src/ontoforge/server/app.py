@@ -53,12 +53,57 @@ STATIC_DIR = Path(__file__).parent / "static"
 
 #: decision kinds the review queue surfaces (per spec: ER + QI judgments).
 REVIEW_KINDS = ("er", "qi")
+#: a deferred decision or one auto-resolved below this confidence is queued.
 REVIEW_CONFIDENCE_FLOOR = 0.7
+#: A genuine low-margin auto-decision is one the spine could NOT settle
+#: deterministically (it escalated PAST the T0 rules / FS auto-accept-reject
+#: bands into the calibrated/model tiers, ``tier >= T1``) AND resolved with an
+#: UNRESOLVED conformal set (size > 1 — the conformal predictor never collapsed
+#: to a singleton at level alpha) below this ceiling. These carry honest
+#: residual uncertainty even though they auto-decided, so the human-in-the-loop
+#: queue surfaces them — clearly labeled ``review_reason='low-margin'`` — rather
+#: than pretending the estate was uncertain when it was not. On a clean estate
+#: where every decision clears a deterministic band this band is simply empty.
+REVIEW_LOW_MARGIN_CEILING = 0.95
+ESCALATED_TIER = 1  # contracts.Tier.T1 — first tier past the deterministic bands
 
 
 def _kind_of(decision_id: str) -> str:
     """Decision kind = the decision_id prefix ('er:a||b' -> 'er', 'qi-x' -> 'qi')."""
     return re.split(r"[:\-/]", decision_id, maxsplit=1)[0].lower()
+
+
+def _review_reason(
+    deferred: bool, quarantined: bool, confidence: float, tier: int, conformal_set: list[str]
+) -> Optional[str]:
+    """Why a decision belongs in the review queue, or None to skip it.
+
+    The flywheel is HONEST: it surfaces only decisions that carry genuine
+    residual uncertainty — never fabricated doubt over a clean auto-decision.
+    Precedence:
+
+    * ``deferred``    — tiers exhausted, the spine refused to auto-decide;
+    * ``quarantined`` — budget fail-close, also no auto-decision;
+    * ``low-confidence`` — auto-resolved but below ``REVIEW_CONFIDENCE_FLOOR``;
+    * ``low-margin``  — escalated PAST the deterministic T0/FS bands
+      (``tier >= ESCALATED_TIER``) and resolved with an UNRESOLVED conformal
+      set (size > 1) below ``REVIEW_LOW_MARGIN_CEILING``. The spine had to
+      deliberate and the conformal predictor never collapsed to a singleton,
+      so the answer is real but low-margin and worth a human glance.
+    """
+    if deferred:
+        return "deferred"
+    if quarantined:
+        return "quarantined"
+    if confidence < REVIEW_CONFIDENCE_FLOOR:
+        return "low-confidence"
+    if (
+        tier >= ESCALATED_TIER
+        and len(conformal_set) > 1
+        and confidence < REVIEW_LOW_MARGIN_CEILING
+    ):
+        return "low-margin"
+    return None
 
 
 def _parse_stance(raw: str) -> Stance:
@@ -463,7 +508,11 @@ def create_app(project: Path | str) -> FastAPI:
                     seen.add(did)
                     if did in reviewed_ids:
                         continue
-                    if not (deferred or float(conf) < REVIEW_CONFIDENCE_FLOOR):
+                    conf_set = list(json.loads(cset))
+                    reason = _review_reason(
+                        bool(deferred), bool(quarantined), float(conf), int(tier), conf_set
+                    )
+                    if reason is None:
                         continue
                     items.append(
                         S.ReviewItem(
@@ -471,10 +520,11 @@ def create_app(project: Path | str) -> FastAPI:
                             kind=kind,
                             outcome=str(outcome),
                             confidence=float(conf),
-                            conformal_set=list(json.loads(cset)),
+                            conformal_set=conf_set,
                             tier=int(tier),
                             deferred_to_human=bool(deferred),
                             quarantined=bool(quarantined),
+                            review_reason=reason,
                             rationale=str(rationale),
                             prov_atoms=list(json.loads(patoms)),
                             created_at=str(ts),

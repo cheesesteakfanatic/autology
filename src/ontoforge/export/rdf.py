@@ -230,6 +230,28 @@ def _numeric_literal(v: float) -> Literal:
 # ---------------------------------------------------------------------------
 
 
+def _entity_uris(hearth: Any, stance: Stance, layer: Layer) -> set[str]:
+    """Every stance-visible entity URI in the store (the link-resolution
+    target set): a value committed under a link property is a real object
+    triple only if its value names one of these."""
+    out: set[str] = set()
+    for shard in hearth.value_shard_items():
+        if shard.layer is not layer:
+            continue
+        for c in shard.cells:
+            if c.visible_under(stance):
+                out.add(c.entity_uri)
+    return out
+
+
+def _is_resolvable_entity(value: Any, entity_uris: set[str]) -> bool:
+    """A link cell value resolves to an object triple iff it is a string that
+    is a URI (has a scheme) AND names a known stance-visible entity."""
+    if not isinstance(value, str) or "://" not in value:
+        return False
+    return value in entity_uris
+
+
 def data_to_rdf(
     hearth: Any,
     ontology: Ontology,
@@ -242,9 +264,19 @@ def data_to_rdf(
     deterministic ``of:CellAnnotation`` resource per asserted triple carrying
     the cell's interned provenance ref + confidence (RDF-star deferral, see
     module doc). Survivorship is applied per (entity, prop) with the exact
-    HEARTH ordering (one rule, third call site)."""
+    HEARTH ordering (one rule, third call site).
+
+    A value cell committed under a property the ontology types as a LINK is
+    not necessarily a bug in the data — a generic-induced ``is_link`` property
+    can hold a foreign-key *literal* (a code or name) that never resolved to an
+    entity. When the value names a known entity it is asserted as the object
+    triple it is; otherwise it is preserved LOSSLESSLY as an XSD-typed literal
+    on a minted ``of:`` annotation property (``of:linkLiteral/<prop>``) and
+    flagged with ``of:unresolvedLink true`` rather than silently dropped or
+    raising — the export must succeed and round-trip with full provenance."""
     g = Graph()
     _bind(g)
+    entity_uris = _entity_uris(hearth, stance, layer)
     for shard in hearth.value_shard_items():
         if shard.layer is not layer:
             continue
@@ -258,14 +290,29 @@ def data_to_rdf(
         for (entity_uri, prop) in sorted(per_key):
             seq, win = min(per_key[(entity_uri, prop)], key=lambda sc: survivorship_key(*sc))
             pdef = _resolve_prop(ontology, shard.class_uri, prop)
+            su = URIRef(entity_uri)
             if pdef is not None and pdef.is_link:
-                raise ExportError(
-                    f"value cell committed under link property {prop!r} of {shard.class_uri!r}"
-                )
+                if _is_resolvable_entity(win.value, entity_uris):
+                    # the value IS an entity URI: assert the object triple
+                    pu = URIRef(pdef.uri)
+                    ou = URIRef(str(win.value))
+                    g.add((su, pu, ou))
+                    ann = URIRef(f"{entity_uri}#prov-{_slug(prop)}")
+                    _annotate(g, ann, su, pu, win.prov_ref, win.confidence)
+                    g.add((ann, OF.object, ou))
+                    continue
+                # link-typed property holding a non-entity literal: preserve it
+                # losslessly as a typed literal on a minted annotation property
+                pu = URIRef(f"{OF}linkLiteral/{_slug(prop)}")
+                g.add((su, pu, _value_literal(win.value, None)))
+                ann = URIRef(f"{entity_uri}#prov-{_slug(prop)}")
+                _annotate(g, ann, su, pu, win.prov_ref, win.confidence)
+                g.add((ann, OF.unresolvedLink, Literal(True)))
+                continue
             pu = URIRef(pdef.uri) if pdef is not None else URIRef(property_uri(shard.class_uri, prop))
-            g.add((URIRef(entity_uri), pu, _value_literal(win.value, pdef)))
+            g.add((su, pu, _value_literal(win.value, pdef)))
             ann = URIRef(f"{entity_uri}#prov-{_slug(prop)}")
-            _annotate(g, ann, URIRef(entity_uri), pu, win.prov_ref, win.confidence)
+            _annotate(g, ann, su, pu, win.prov_ref, win.confidence)
     for lshard in hearth.links.link_shard_items():
         pdef = _resolve_prop(ontology, lshard.class_uri, lshard.predicate)
         pu = (

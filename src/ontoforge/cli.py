@@ -941,8 +941,27 @@ def demo(
         _DEMO_MEMO = None
 
 
+def _build_demo_atlas(project_dir: Path) -> None:
+    """Build <project>/atlas.json as the demo's final step, reusing the EXACT
+    code path `python -m ontoforge.pipeline.atlas <project>` runs (so the demo
+    project lights up GET /api/atlas and the UI Constellation instead of 404ing
+    into plain star-mode). Imported and called in-process — never shelled out."""
+    from ontoforge.pipeline.atlas import rebuild_for_project
+
+    report = rebuild_for_project(project_dir)
+    s = report.stats
+    islands = s["components"] - s["silos"]
+    console.print(
+        f"[green]atlas: {islands} islands · {s['silos']} silos[/] "
+        f"({s['classes']} classes, {s['confirmed']} confirmed / "
+        f"{s['likely']} likely / {s['hint']} hint arcs) -> {project_dir / 'atlas.json'}"
+    )
+
+
 def _run_demo(estate: str, project_dir: Path) -> None:
-    stages = 7 if estate == "meridian" else 6
+    # init/generate + ingest + profile + induce + resolve + materialize + atlas;
+    # meridian prepends a corpus-generation banner
+    stages = 8 if estate == "meridian" else 7
     step = 0
     ingest_limit: Optional[int] = None
 
@@ -1005,6 +1024,8 @@ def _run_demo(estate: str, project_dir: Path) -> None:
     resolve(project=project_dir)
     banner("materialize (commit the world into HEARTH)")
     materialize(project=project_dir, ontology=None)
+    banner("atlas (tier every cross-dataset connection)")
+    _build_demo_atlas(project_dir)
 
     console.rule("[bold green]demo ready")
     if estate == "wild":
