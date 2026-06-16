@@ -1,16 +1,14 @@
 /* ══════
-   OntoForge OS — THE WARM REDESIGN.
-   A mid-century-modern operating surface: the whole OS sits on warm
-   oatmeal paper with a 3% grain tooth; windows float as molded-fiberglass
-   shells (cream/warm-white, generous radii) each capped by a COLORED
-   title-bar strip in its app's atlas hue. Espresso ink (never black);
-   warm-amber shadows (never black). One marigold primary action per view.
-   The eight categorical atlas hues carry every island, tag and series.
-   Geometric-sans chrome, mono data values; the confidence gauge is a 270°
-   arc; abstention is dignified taupe, never red.
-   Refs: Charley Harper, Saul Bass, Eames/Herman Miller, Dieter Rams,
-   mid-century cartography. WCAG: espresso/cream 14.7:1, walnut/cream 6:1.
-   ══════ */
+   OntoForge OS — WARM, EDITORIAL, GROWN-UP.
+   Warm oatmeal paper, quiet ~2.5% grain; calm window shells (10px radii)
+   capped by a NEUTRAL hairline title strip + a tiny accent (no colored bezel).
+   Espresso ink (never black); small warm-amber shadows (no plastic inset).
+   ONE marigold primary action per view; teal = confirmed/cited. The eight
+   categorical hues are MUTED (25-40% S) and carry INFORMATION only (islands,
+   chips, cite-dots), never decoration. Humanist-sans chrome, a system serif
+   for hero headlines, mono data; small-caps only for tiny eyebrow kickers;
+   270° confidence arc; abstention is dignified taupe, never red.
+   WCAG: espresso/cream 14.7:1, walnut/cream 6:1, teal/cream 7.2:1. ══════ */
 
 :root {
   /* ── warm neutral grounds (the paper the OS sits on) ── */
@@ -26,53 +24,52 @@
   --bg3:          #F1E7D3;
 
   /* ── ink: espresso, never black ──
-     PALETTE GOVERNANCE — the ink ramp is HCL-disciplined so contrast can't
-     drift. All inks share hue ≈ 34° / chroma ≈ 18–24 (one warm espresso
-     family); only LIGHTNESS steps down the ramp. Measured on Card Cream
-     (#FBF4E6): ink 14.7:1, walnut 6.0:1, ink-faint 4.6:1 — all ≥ AA. Never
-     add an ink darker-or-lighter than these without re-measuring contrast. */
-  --ink:          #2A1F14;   /* L≈14  primary text — 14.7:1 on cream       */
-  --walnut:       #6B5A45;   /* L≈39  secondary text, captions — 6.0:1     */
-  --ink-dim:      #6B5A45;   /* alias                                      */
-  --ink-faint:    #8A7860;   /* L≈51  tertiary / placeholders — 4.6:1      */
+     PALETTE GOVERNANCE — HCL-disciplined ink ramp (hue ≈34°, only L steps).
+     On cream (#FBF4E6): ink 14.7:1, walnut 6.0:1, ink-faint 4.6:1 — all ≥ AA.
+     Don't add an ink without re-measuring contrast. */
+  --ink:          #2A1F14;   /* primary text — 14.7:1 on cream */
+  --walnut:       #6B5A45;   /* secondary — 6.0:1 */
+  --ink-dim:      #6B5A45;   /* alias */
+  --ink-faint:    #8A7860;   /* tertiary / placeholders — 4.6:1 */
 
   /* ── ATTENTION-HIERARCHY chrome tier ──
-     "Don't compete for attention you haven't earned." Orientation/navigation
-     chrome (menubar wordmark + meta, mode subtitles, dock, Studio rail,
-     window title bars) RECEDES so the ACTIVE work surface — which keeps full
-     --ink — visually dominates. Same espresso hue family (≈34°); only
-     lightness lifts. Both tiers stay AA on the CREAM grounds they touch:
-       --chrome-ink  on cream 9.84:1  — recessed PRIMARY chrome (wordmark, meta value)
-       --chrome-dim  on cream 4.53:1  — recessed SECONDARY chrome (meta caption)
-     Primary NAV LABELS on the bisque switcher/rail never recede below
-     --walnut (AA 4.60 on bisque) — their recede is carried by the active
-     segment's elevation + background + inset ring, never by failing AA. */
-  --chrome-ink:   #4A3B29;   /* L≈25  recessed chrome label/value — quieter than --ink */
-  --chrome-dim:   #806D56;   /* L≈47  recessed chrome subtitle/meta — AA on cream        */
+     Orientation chrome (wordmark/meta/subtitles/dock/rail/title bars) RECEDES
+     so the ACTIVE work surface (full --ink) dominates. On cream:
+     --chrome-ink 9.84:1, --chrome-dim 4.53:1 — both AA. Nav labels on bisque
+     never fall below --walnut; the active segment's recede is carried by
+     elevation, not by failing AA. */
+  --chrome-ink:   #4A3B29;   /* recessed primary chrome */
+  --chrome-dim:   #806D56;   /* recessed secondary chrome — AA on cream */
 
-  /* ── marigold: PRIMARY ACTION + 'likely' accent (fill/stroke only) ── */
-  --marigold:     #E0A126;
-  --marigold-press: #C98E1F; /* −6% L on hover/press                      */
-  --marigold-wash: rgba(224, 161, 38, 0.14);
-  --marigold-line: rgba(224, 161, 38, 0.55);
-  --marigold-glow: rgba(224, 161, 38, 0.28);  /* the focus ring halo      */
+  /* ── marigold: THE one primary-action fill + 'likely' accent ──
+     Muted #E0A126 (75% S) → #D09735 (~62% S). Stays warmer than the wheel: it
+     is the single primary FILL, ink-on-marigold must read (6.26:1). */
+  --marigold:     #D09735;
+  --marigold-press: #BE892D; /* −6% L on hover/press                      */
+  --marigold-wash: rgba(208, 151, 53, 0.13);
+  --marigold-line: rgba(208, 151, 53, 0.48);
+  --marigold-glow: rgba(208, 151, 53, 0.26);  /* the focus ring halo      */
 
   /* legacy 'amber' aliases (kept so old hooks still resolve to marigold) */
-  --amber:        #E0A126;
-  --amber-dim:    #9A6B2F;    /* mustard brown — marigold's text-safe kin */
-  --amber-wash:   rgba(224, 161, 38, 0.14);
-  --amber-line:   rgba(224, 161, 38, 0.55);
-  --amber-glow:   rgba(224, 161, 38, 0.28);
+  --amber:        #D09735;
+  --amber-dim:    #86663C;    /* mustard — marigold's text-safe kin */
+  --amber-wash:   rgba(208, 151, 53, 0.13);
+  --amber-line:   rgba(208, 151, 53, 0.48);
+  --amber-glow:   rgba(208, 151, 53, 0.26);
 
-  /* ── the locked atomic-age 8-hue categorical wheel ── */
-  --teal:         #1F6F6B;   /* anchor / confirmed                        */
-  --terracotta:   #C75B39;
-  --avocado:      #7C8A3B;
-  --ocean:        #2D6E8E;
-  --persimmon:    #B8532A;
-  --plum:         #6E4A63;
-  --mustard:      #9A6B2F;
-  --dusty-rose:   #C98B7A;
+  /* ── the locked 8-hue wheel — MUTED into a 25-40% S band (chroma discipline)
+     Same angle + order (ATLAS_HUES contract, mirrored in js/core.js); color =
+     information (islands/chips/cite-dots), never decoration. Text uses clear
+     AA 4.5:1 on cream (teal 7.2 · terracotta 5.3 · avocado 4.6 · ocean 6.4 ·
+     plum 7.5 · mustard 4.8); dusty-rose decorative only. */
+  --teal:         #2C5956;   /* anchor / confirmed */
+  --terracotta:   #945442;
+  --avocado:      #6C733A;
+  --ocean:        #375E72;
+  --persimmon:    #945942;
+  --plum:         #713D68;
+  --mustard:      #86663C;
+  --dusty-rose:   #A97060;   /* decorative only */
 
   /* ── verdicts (refuted/supported) — distinct from the wheel ── */
   --verdict-green: #4F7A3A;
@@ -85,35 +82,39 @@
   --hairline:        rgba(42, 31, 20, 0.14);
   --hairline-strong: rgba(42, 31, 20, 0.26);
 
-  /* ── warm-amber shadows, never black ── */
-  --shadow-1: 0 1px 2px rgba(90, 55, 20, 0.10);
-  --shadow-2: 0 6px 18px rgba(90, 55, 20, 0.16), 0 1px 0 rgba(255, 253, 247, 0.6) inset;
-  --shadow-3: 0 16px 48px rgba(90, 55, 20, 0.22);
-  --recess:   inset 0 1px 2px rgba(90, 55, 20, 0.14);
+  /* ── warm-amber shadows, never black — SMALLER, no plastic inset highlight
+     (warm cast kept; the bright rgba(255,253,247,0.6) inset is removed) ── */
+  --shadow-1: 0 1px 2px rgba(90, 55, 20, 0.09);
+  --shadow-2: 0 4px 14px rgba(90, 55, 20, 0.12);
+  --shadow-3: 0 12px 36px rgba(90, 55, 20, 0.18);
+  --recess:   inset 0 1px 2px rgba(90, 55, 20, 0.12);
 
-  /* ── type: geometric chrome, mono data, no serif body ── */
-  --sans:  "Futura", "Avenir Next", "Century Gothic", "Twentieth Century",
-           -apple-system, "Segoe UI", system-ui, sans-serif;
-  --serif: var(--sans);  /* the MCM system has no serif — chrome is geometric */
+  /* ── type: humanist sans chrome, a SYSTEM serif (no webfont) for hero
+     headlines only, mono data; small-caps reserved for tiny eyebrow kickers ── */
+  --sans:  -apple-system, "Inter", "Segoe UI", system-ui, "Helvetica Neue", Arial, sans-serif;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, ui-serif, serif;
   --mono:  ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
 
-  /* strict scale */
-  --fs-0: 0.6875rem;   /* 11   — micro labels, badge counts             */
+  /* editorial scale — two weights only (400 body, 600 emphasis) */
+  --fs-0: 0.6875rem;   /* 11   — micro labels, eyebrow kickers          */
   --fs-1: 0.78125rem;  /* 12.5 — caption, meta, chips                   */
   --fs-2: 0.875rem;    /* 14   — body / data / table cells              */
   --fs-3: 1rem;        /* 16   — primary prose                          */
   --fs-4: 1.25rem;     /* 20   — the ask field, card titles             */
-  --fs-5: 1.75rem;     /* 28   — headline values                        */
+  --fs-5: 2rem;        /* 32   — headline values                        */
+  --fs-6: 2.75rem;     /* 44   — serif hero display                     */
 
-  /* motion: lands softly, never wobbles */
+  /* motion: confident, short ease-out — never bouncy/springy */
   --ease:   140ms cubic-bezier(0.2, 0.8, 0.2, 1);   /* quick: hover/press */
   --ease-std: 180ms cubic-bezier(0.2, 0.8, 0.2, 1); /* open/settle        */
   --ease-out: 160ms cubic-bezier(0.4, 0, 0.6, 1);   /* exit               */
 
   --menubar-h: 40px;
   --dock-h: 64px;
-  --radius: 12px;
-  --radius-win: 14px;
+  /* FORM RESTRAINT: tighter radii read pro; >20px + pills read toy/candy */
+  --radius: 8px;
+  --radius-win: 10px;
+  --radius-pill: 6px;   /* former 999px pills become quiet rounded-rects */
 
   /* per-window accent: the WM writes --accent on each .window inline.
      A neutral walnut default keeps unowned chrome warm. */
@@ -134,22 +135,21 @@ body {
   color: var(--ink);
   font-family: var(--sans);
   font-size: var(--fs-2);
-  line-height: 1.6;
+  line-height: 1.55;
   background: var(--canvas);
   -webkit-font-smoothing: antialiased;
 }
 
-/* the shared paper-grain tooth: one tiled fractal-noise layer at ~3%,
-   pinned behind everything on the canvas. Registers as tooth, never as a
-   visible texture. Vendored as a data-URI — no network at runtime. */
+/* the shared paper-grain tooth: one tiled fractal-noise layer (~2.5%),
+   pinned behind everything; a data-URI, no network at runtime. */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 ::selection { background: var(--marigold-wash); color: var(--ink); }
@@ -173,7 +173,7 @@ kbd {
   display: block;
   font-family: var(--sans);
   font-size: var(--fs-0);
-  letter-spacing: 0.14em;
+  letter-spacing: 0.08em;       /* eyebrow kicker tracking, down from 0.14em */
   text-transform: uppercase;
   color: var(--walnut);
   margin: 0 0 1rem;
@@ -211,22 +211,21 @@ body.wm-gesture { cursor: inherit; }
   user-select: none;
 }
 
-/* the wordmark — geometric small-caps with an atomic starburst dot */
+/* the wordmark — humanist, quiet; the spark dot is now a small neutral mark */
 .wordmark {
   font-family: var(--sans);
   font-size: 1.0625rem;
   font-weight: 600;
-  font-variant: small-caps;
-  letter-spacing: 0.06em;
-  color: var(--chrome-ink);     /* orientation chrome recedes; the spark keeps the meaning */
+  letter-spacing: 0.01em;
+  color: var(--chrome-ink);     /* orientation chrome recedes */
   white-space: nowrap;
 }
 .wm-spark {
   display: inline-block;
   color: var(--marigold);
-  font-size: 0.62em;
-  vertical-align: 0.18em;
-  padding: 0 0.1em;
+  font-size: 0.5em;
+  vertical-align: 0.28em;
+  padding: 0 0.12em;
 }
 
 .mb-meta {
@@ -302,10 +301,8 @@ body.wm-gesture { cursor: inherit; }
 }
 .snap-preview.visible { opacity: 1; }
 
-/* ══════ window chrome
-   Each window is a molded shell: elevation-2 warm-white body + a 28px
-   COLORED title strip in its app accent, square-bottomed so it reads as a
-   TV bezel cap over the screen. */
+/* ══════ window chrome — a calm cream shell + a hairline title strip
+   carrying a thin accent underline (no colored bezel). */
 
 .window {
   position: absolute;
@@ -344,30 +341,31 @@ body.wm-gesture { cursor: inherit; }
 }
 .window.win-gesture, .window.win-gesture * { transition: none !important; }
 
-/* the colored title strip: square bottom corners (the bezel cap) */
+/* NEUTRAL title strip: a calm cream cap with a hairline border and a thin
+   2px accent underline carrying var(--accent) — color is a quiet marker, not
+   a painted bezel. The work surface, not the chrome, owns the color budget. */
 .titlebar {
   display: flex;
   align-items: center;
   gap: 0.625rem;
   height: 28px;
   padding: 0 0.5rem 0 0.75rem;
-  background: var(--accent);
+  background: var(--cream);
+  border-bottom: 2px solid var(--accent);
   cursor: default;
   user-select: none;
   touch-action: none;
   flex: none;
   border-radius: calc(var(--radius-win) - 1px) calc(var(--radius-win) - 1px) 0 0;
 }
-/* inactive windows recede further: the strip desaturates AND quiets, so the
-   one focused window's work surface is unambiguously primary */
-.window:not(.focused) .titlebar { filter: saturate(0.32) brightness(1.05) opacity(0.92); }
+/* inactive windows recede: the accent underline quiets so the one focused
+   window's title is unambiguously primary */
+.window:not(.focused) .titlebar { border-bottom-color: var(--hairline-strong); }
+.window:not(.focused) .win-title { color: var(--ink-faint); }
 
-/* the traffic-light disks: flat solid Charley-Harper coins, glyph on hover.
-   They live at the LEFT of the strip (we re-order via flex). */
-/* the per-app glyph is identity, not navigation — it sits quieter than the
-   title so the strip reads as a calm cap, not a competing label (noise cut) */
+/* the per-app glyph is a quiet identity dot in the accent hue */
 .win-glyph {
-  color: rgba(255, 253, 247, 0.7);
+  color: var(--accent);
   font-size: var(--fs-0);
   line-height: 1;
   order: 2;
@@ -376,9 +374,8 @@ body.wm-gesture { cursor: inherit; }
   font-family: var(--sans);
   font-size: var(--fs-1);
   font-weight: 600;
-  font-variant: small-caps;
-  letter-spacing: 0.06em;
-  color: rgba(255, 253, 247, 0.94);   /* the title-bar cap recedes; the work surface dominates */
+  letter-spacing: 0.01em;
+  color: var(--chrome-ink);   /* the title-bar cap recedes; the work surface dominates */
   margin: 0;
   order: 3;
   overflow: hidden;
@@ -387,28 +384,29 @@ body.wm-gesture { cursor: inherit; }
 }
 .win-spacer { flex: 1; order: 4; }
 
-/* the three flat disks: close=terracotta, min=marigold, zoom handled by dbl-click.
-   We restyle the existing win-min/win-close buttons into disks. */
+/* the two window controls: quiet neutral disks, glyph on hover — close gets a
+   single restrained terracotta tint, min stays neutral (no traffic-light row) */
 .win-btn {
   position: relative;
-  width: 13px;
-  height: 13px;
+  width: 11px;
+  height: 11px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 253, 247, 0.45);
+  background: var(--hairline-strong);
   border: 0;
   border-radius: 50%;
   color: transparent;
-  font-size: 10px;
+  font-size: 9px;
   line-height: 1;
   cursor: pointer;
   padding: 0;
   transition: color var(--ease), background var(--ease);
 }
-.titlebar .win-min  { order: 0; background: var(--marigold); }
-.titlebar .win-close { order: 1; background: var(--terracotta); }
-.win-btn:hover { color: rgba(42, 31, 20, 0.85); }
+.titlebar .win-min  { order: 0; }
+.titlebar .win-close { order: 1; }
+.win-btn:hover { color: var(--ink); background: var(--bisque); }
+.titlebar .win-close:hover { background: var(--terracotta); color: var(--cream); }
 
 .win-body {
   flex: 1;
@@ -430,10 +428,8 @@ body.wm-gesture { cursor: inherit; }
 .rs-se { bottom: -6px; right: -6px; width: 16px; height: 16px; cursor: se-resize; }
 .rs-sw { bottom: -6px; left: -6px; width: 16px; height: 16px; cursor: sw-resize; }
 
-/* ══════ the dock
-   One cream pill floating above the canvas; app icons are rounded-square
-   tiles each in their atlas hue with a flat espresso glyph; a marigold
-   starburst dot beneath running apps. */
+/* ══════ the dock — one cream bar; rounded-square tiles in their (muted)
+   atlas hue; a small flat marigold dot beneath running apps. */
 
 .dock {
   position: fixed;
@@ -446,7 +442,7 @@ body.wm-gesture { cursor: inherit; }
   padding: 0.4rem 0.55rem;
   background: var(--cream);
   border: 1px solid var(--hairline);
-  border-radius: 18px;
+  border-radius: 12px;
   box-shadow: var(--shadow-2);
   z-index: 1000;
   user-select: none;
@@ -488,8 +484,7 @@ body.wm-gesture { cursor: inherit; }
   left: 50%;
   transform: translateX(-50%) translateY(2px);
   font-size: var(--fs-0);
-  font-variant: small-caps;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.01em;
   color: var(--ink);
   background: var(--warm-white);
   border: 1px solid var(--hairline);
@@ -506,35 +501,21 @@ body.wm-gesture { cursor: inherit; }
   transform: translateX(-50%) translateY(0);
 }
 
-/* the running indicator: a small marigold starburst beneath the tile */
+/* the running indicator: a small flat marigold dot beneath the tile
+   (the conic starburst + scale(2) bounce were the literal 'childish' tell) */
 .di-dot {
   position: absolute;
-  bottom: -7px;
+  bottom: -6px;
   left: 50%;
-  width: 9px;
-  height: 9px;
-  margin-left: -4.5px;
-  color: var(--marigold);
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  border-radius: 50%;
+  background: var(--marigold);
   opacity: 0;
   transition: opacity var(--ease);
-  background:
-    radial-gradient(circle, var(--marigold) 30%, transparent 31%);
-}
-.di-dot::before {
-  content: "";
-  position: absolute; inset: 0;
-  background: conic-gradient(from 0deg,
-    transparent 0 8%, var(--marigold) 8% 12%, transparent 12% 33%,
-    var(--marigold) 33% 37%, transparent 37% 58%,
-    var(--marigold) 58% 62%, transparent 62% 83%,
-    var(--marigold) 83% 87%, transparent 87%);
-  -webkit-mask: radial-gradient(circle, transparent 40%, #000 41%);
-          mask: radial-gradient(circle, transparent 40%, #000 41%);
-  opacity: 0.8;
 }
 .dock-icon.running .di-dot { opacity: 1; }
-.dock-icon.running.pulse-once .di-dot { animation: dot-pulse 140ms ease-out; }
-@keyframes dot-pulse { 0% { transform: scale(2); } 100% { transform: scale(1); } }
 
 /* minimized windows collect as inset bisque tiles */
 .dock-tile {
@@ -550,7 +531,7 @@ body.wm-gesture { cursor: inherit; }
 .dock-tile:hover { transform: translateY(-3px); }
 .dock-tile .di-glyph { font-size: 0.9375rem; color: var(--walnut); }
 .dock-tile .di-label { font-variant: normal; text-transform: none; }
-.dock-tile span:not(.di-label) { font-variant: small-caps; letter-spacing: 0.04em; }
+.dock-tile span:not(.di-label) { letter-spacing: 0.01em; }
 
 /* ══════ spotlight
    Elevation-3 modal on a 32% espresso scrim with blur. A single warm-white
@@ -683,14 +664,14 @@ body.wm-gesture { cursor: inherit; }
 /* secondary button (cream fill, walnut border) is the .btn default */
 .btn {
   font-family: var(--sans);
-  font-size: var(--fs-1);
-  font-variant: small-caps;
-  letter-spacing: 0.06em;
+  font-size: var(--fs-2);
+  font-weight: 600;
+  letter-spacing: 0.01em;
   color: var(--ink);
   background: var(--cream);
   border: 1.5px solid var(--walnut);
-  border-radius: 10px;
-  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  padding: 0.45rem 0.95rem;
   cursor: pointer;
   transition: color var(--ease), border-color var(--ease), background var(--ease), transform var(--ease);
 }
@@ -738,7 +719,7 @@ input[type="text"]::placeholder { color: var(--ink-faint); }
   font-size: var(--fs-1);
   color: var(--ink);
   border: 1px solid var(--hairline-strong);
-  border-left: 3px solid var(--terracotta);
+  border-left: 2px solid var(--terracotta);
   border-radius: 8px;
   background: var(--cream);
   padding: 0.75rem 1rem;
@@ -780,8 +761,8 @@ input[type="text"]::placeholder { color: var(--ink-faint); }
   color: var(--ink);
   background: var(--cream);
   border: 1px solid var(--hairline);
-  border-radius: 999px;
-  padding: 0.1875rem 0.75rem;
+  border-radius: var(--radius-pill);
+  padding: 0.1875rem 0.625rem;
   cursor: pointer;
   max-width: 100%;
   overflow: hidden;
@@ -794,11 +775,11 @@ input[type="text"]::placeholder { color: var(--ink-faint); }
 
 .badge {
   font-size: var(--fs-0);
-  font-variant: small-caps;
+  font-variant: small-caps;     /* a genuine tiny eyebrow kicker — reserved use */
   letter-spacing: 0.06em;
   color: var(--walnut);
   border: 1px solid var(--hairline-strong);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 0.0625rem 0.5rem;
   white-space: nowrap;
 }
@@ -817,12 +798,12 @@ table.data {
 table.data th {
   font-family: var(--sans);
   font-size: var(--fs-0);
-  font-variant: small-caps;
-  letter-spacing: 0.08em;
+  text-transform: uppercase;       /* a tiny eyebrow kicker, not a costume */
+  letter-spacing: 0.06em;
   font-weight: 600;
   color: var(--walnut);
   text-align: left;
-  padding: 0.5rem 1rem 0.5rem 0.75rem;
+  padding: 0.375rem 0.75rem;       /* density ~20% tighter for pros */
   background: var(--bisque);
   border-bottom: 1px solid var(--hairline-strong);
   position: sticky;
@@ -832,7 +813,7 @@ table.data td {
   font-family: var(--mono);
   font-variant-numeric: tabular-nums;
   color: var(--ink);
-  padding: 0.5rem 1rem 0.5rem 0.75rem;
+  padding: 0.375rem 0.75rem;
   border-bottom: 1px solid var(--hairline);
   vertical-align: top;
 }
@@ -955,21 +936,22 @@ table.data tbody tr:hover td { background: rgba(227, 214, 187, 0.4); }
 .history-chip { max-width: 20rem; font-style: italic; }
 
 /* the answer card of record — warm-white, teal left-edge for a cited answer */
+/* a cited answer wears the ONE confirmed-accent: a thin teal left-edge */
 .answer-card {
   background: var(--warm-white);
   border: 1px solid var(--hairline);
-  border-left: 3px solid var(--teal);
+  border-left: 2px solid var(--teal);
   border-radius: var(--radius);
-  padding: 1.5rem;
+  padding: 1.125rem 1.25rem;
   margin-top: 0.5rem;
   box-shadow: var(--shadow-1);
 }
 
 .answer-q {
-  font-family: var(--sans);
-  font-variant: small-caps;
-  letter-spacing: 0.04em;
-  font-size: 1.125rem;
+  font-family: var(--serif);
+  letter-spacing: 0.01em;
+  font-size: 1.25rem;
+  line-height: 1.3;
   color: var(--walnut);
   margin: 0 0 1rem;
 }
@@ -1052,7 +1034,7 @@ td.cited { position: relative; }
   border: 1px solid var(--walnut);
   border-radius: 50%;
   color: var(--ink);
-  font-weight: 700;
+  font-weight: 600;
 }
 .state-abstained .abstain-line {
   font-size: var(--fs-4);
@@ -1075,14 +1057,17 @@ td.cited { position: relative; }
 .clarify-card {
   background: var(--warm-white);
   border: 1px solid var(--hairline);
-  border-left: 3px solid var(--marigold);
+  border-left: 2px solid var(--marigold);
   border-radius: var(--radius);
-  padding: 1.5rem;
+  padding: 1.125rem 1.25rem;
   margin-top: 0.5rem;
   box-shadow: var(--shadow-1);
 }
 .clarify-q {
-  font-size: var(--fs-4);
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
   margin: 0.5rem 0 1rem;
 }
 .clarify-options { display: flex; flex-wrap: wrap; gap: 0.625rem; }
@@ -1117,7 +1102,7 @@ td.cited { position: relative; }
 
 .atom-chip {
   border: 1px solid var(--hairline);
-  border-left: 3px solid var(--mustard);
+  border-left: 2px solid var(--mustard);
   border-radius: 8px;
   background: var(--bisque);
   box-shadow: var(--recess);
@@ -1148,9 +1133,8 @@ td.cited { position: relative; }
   border: 0;
   padding: 0.125rem 0;
   cursor: pointer;
-  font-size: var(--fs-0);
-  font-variant: small-caps;
-  letter-spacing: 0.08em;
+  font-size: var(--fs-1);
+  letter-spacing: 0.01em;
   color: var(--walnut);
 }
 .prov-op:hover { color: var(--ink); }
@@ -1179,6 +1163,18 @@ td.cited { position: relative; }
 
 .constellation { display: block; width: 100%; flex: 1; min-height: 0; cursor: grab; }
 .constellation:active { cursor: grabbing; }
+/* the canvas-acceleration layer sits BEHIND the svg, sharing its box; the svg
+   stays the interaction layer (labels + arc hit-twins + pan), so the canvas
+   takes no pointer events. Only present past CANVAS_THRESHOLD elements. */
+.constellation-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+.constellation-wrap .constellation { position: relative; z-index: 1; background: transparent; }
 
 .constellation .edge-sub  { stroke: var(--hairline-strong); stroke-width: 1; fill: none; }
 .constellation .edge-link { stroke: var(--teal); stroke-opacity: 0.34; stroke-width: 1.5; fill: none; }
@@ -1241,11 +1237,9 @@ td.cited { position: relative; }
 .node-card .nc-prop .dt { color: var(--walnut); }
 
 /* ══════ the Atlas — the grammar of certainty ═══════
-   Islands are flat categorical-hue kidney/blob shapes on the oatmeal
-   ground with a contour halo. Link tiers are map roads: confirmed = solid
-   teal; likely = dashed marigold (opacity ∝ score, breathing on hover);
-   hint = dotted walnut, off by default. Silos band as a quiet archipelago,
-   never error-red. */
+   Flat muted-hue island blobs on oatmeal. Link tiers: confirmed = solid
+   teal; likely = dashed marigold (opacity ∝ score); hint = dotted walnut,
+   off by default. Silos band as a quiet archipelago, never error-red. */
 
 .constellation .island-hull {
   fill: var(--teal);                /* default; the engine may tint per island */
@@ -1281,16 +1275,10 @@ td.cited { position: relative; }
   vector-effect: non-scaling-stroke;
 }
 
+/* a hovered/lit arc simply lifts to full opacity — no breathing pulse */
 .constellation path.lit.tier-confirmed { stroke-opacity: 0.95; }
 .constellation path.lit.tier-hint { stroke-opacity: 0.55; }
-.constellation path.lit.tier-likely { animation: likely-breathe 1.8s ease-in-out infinite; }
-@keyframes likely-breathe {
-  0%, 100% { stroke-opacity: 0.9; }
-  50%      { stroke-opacity: 0.45; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .constellation path.lit.tier-likely { animation: none; stroke-opacity: 0.9; }
-}
+.constellation path.lit.tier-likely { stroke-opacity: 0.9; }
 
 /* legend chips are filter toggles — these classes hide whole tiers */
 .constellation.hide-confirmed .tier-confirmed,
@@ -1319,12 +1307,11 @@ td.cited { position: relative; }
   gap: 0.4em;
   background: var(--cream);
   border: 1px solid var(--hairline);
-  border-radius: 999px;
-  padding: 0.1rem 0.65rem;
+  border-radius: var(--radius-pill);
+  padding: 0.15rem 0.65rem;
   font-family: var(--sans);
-  font-size: var(--fs-0);
-  font-variant: small-caps;
-  letter-spacing: 0.06em;
+  font-size: var(--fs-1);
+  letter-spacing: 0.01em;
   color: var(--ink-faint);
   cursor: pointer;
   transition: color var(--ease), border-color var(--ease), background var(--ease);
@@ -1408,9 +1395,10 @@ td.cited { position: relative; }
 }
 .class-uri { font-family: var(--mono); font-size: var(--fs-0); color: var(--ink-faint); overflow-wrap: anywhere; }
 .class-detail h2 {
-  font-family: var(--sans);
+  font-family: var(--serif);
   font-weight: 600;
-  font-size: var(--fs-4);
+  font-size: 1.5rem;
+  letter-spacing: 0.01em;
   margin: 0.25rem 0 0.5rem;
   display: flex;
   align-items: center;
@@ -1524,9 +1512,9 @@ tr.prop-highlight td { background: var(--marigold-wash); }
   white-space: nowrap;
   padding-right: 1.5rem;
 }
-.stance-card td.value-changed { animation: value-flash 900ms ease-out; }
+.stance-card td.value-changed { animation: value-flash 700ms ease-out; }
 @keyframes value-flash {
-  0%   { background: var(--marigold-wash); box-shadow: inset 3px 0 0 var(--marigold); }
+  0%   { background: var(--marigold-wash); }
   100% { background: transparent; }
 }
 .stance-empty {
@@ -1677,7 +1665,7 @@ tr.prop-highlight td { background: var(--marigold-wash); }
 }
 .review-card.selected {
   border-color: var(--marigold);
-  border-left: 3px solid var(--marigold);
+  border-left: 2px solid var(--marigold);
   box-shadow: var(--shadow-2);
 }
 
@@ -1759,7 +1747,7 @@ tr.prop-highlight td { background: var(--marigold-wash); }
   margin: 0.75rem 0;
 }
 .dash-head { display: flex; align-items: baseline; gap: 0.875rem; flex-wrap: wrap; }
-.dash-rank { font-family: var(--mono); font-weight: 600; color: var(--avocado); }
+.dash-rank { font-family: var(--mono); font-weight: 600; color: var(--walnut); }
 .dash-title { font-family: var(--sans); font-weight: 600; font-size: var(--fs-3); }
 .dash-score { font-family: var(--mono); font-size: var(--fs-0); color: var(--walnut); margin-left: auto; }
 .dash-rationale { font-size: var(--fs-1); color: var(--walnut); margin: 0.375rem 0 0; }
@@ -1871,10 +1859,8 @@ tr.prop-highlight td { background: var(--marigold-wash); }
   .gauge-fill-arc.sweep { transition: none; }
 }
 
-/* ══════ dark mode (opt-in)
-   A quiet warm-dark for night use — NOT the default, never the first
-   impression. Espresso-deep grounds keep the warm cast; the atlas hues
-   and marigold carry through. Activated by data-theme="dark" on <html>. */
+/* ══════ dark mode (opt-in) — a quiet warm-dark; espresso-deep grounds
+   keep the warm cast, the muted hues carry through. data-theme="dark". */
 
 html[data-theme="dark"] {
   --canvas:     #1A140C;
@@ -1892,20 +1878,17 @@ html[data-theme="dark"] {
   --hairline:        rgba(242, 233, 214, 0.12);
   --hairline-strong: rgba(242, 233, 214, 0.24);
   --abstain:    #2C2519;
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-2: 0 6px 18px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 253, 247, 0.04) inset;
-  --shadow-3: 0 16px 48px rgba(0, 0, 0, 0.55);
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.38);
+  --shadow-2: 0 4px 14px rgba(0, 0, 0, 0.46);
+  --shadow-3: 0 12px 36px rgba(0, 0, 0, 0.5);
   color-scheme: dark;
 }
 html[data-theme="dark"] body::before { opacity: 0.05; }
 html[data-theme="dark"] .btn-forge { color: #1A140C; }
 html[data-theme="dark"] .cite-dot { color: #1A140C; }
 
-/* ══════
-   THE THREE-MODE SHELL — ASK | BUILD | STUDIO.
-   One always-visible segmented switcher in the top bar; each mode shows
-   only its own surfaces. Reuses the warm tokens — no repaint.
-   ══════ */
+/* ══════ THE THREE-MODE SHELL — ASK | BUILD | STUDIO.
+   One always-visible switcher; each mode shows only its own surfaces. ══════ */
 
 /* ── the mode switcher: the clearest thing on screen ── */
 .mode-switcher {
@@ -1914,14 +1897,9 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
   padding: 3px;
   background: var(--bisque);
   border: 1px solid var(--hairline);
-  border-radius: 11px;
+  border-radius: var(--radius);
   box-shadow: var(--recess);
 }
-.mode-switcher.coach-lit {
-  box-shadow: 0 0 0 3px var(--marigold-glow), var(--recess);
-  animation: switcher-halo 1.6s ease-in-out 2;
-}
-@keyframes switcher-halo { 50% { box-shadow: 0 0 0 6px var(--marigold-glow), var(--recess); } }
 .mode-seg {
   position: relative;
   display: flex; flex-direction: column; align-items: center;
@@ -1935,7 +1913,7 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
 .mode-seg:hover { color: var(--ink); }
 .mode-seg .seg-name {
   font-family: var(--sans); font-weight: 600; font-size: var(--fs-2);
-  font-variant: small-caps; letter-spacing: 0.05em;
+  letter-spacing: 0.01em;
 }
 .mode-seg .seg-sub {
   font-size: 0.625rem; letter-spacing: 0.04em; color: var(--ink-faint);
@@ -1953,7 +1931,7 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
   position: absolute; top: 2px; right: 6px;
   min-width: 15px; height: 15px; padding: 0 3px;
   background: var(--marigold); color: var(--ink);
-  border-radius: 8px; font-size: 0.6rem; font-weight: 700;
+  border-radius: 8px; font-size: 0.6rem; font-weight: 600;
   display: inline-flex; align-items: center; justify-content: center;
   font-variant-numeric: tabular-nums;
 }
@@ -1962,7 +1940,7 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
   display: inline-flex; align-items: center; justify-content: center;
   width: 26px; height: 26px;
   background: none; border: 1px solid var(--hairline); border-radius: 8px;
-  color: var(--walnut); font-size: 0.85rem; font-weight: 700; cursor: pointer;
+  color: var(--walnut); font-size: 0.85rem; font-weight: 600; cursor: pointer;
   transition: color var(--ease), border-color var(--ease);
 }
 .help-toggle:hover { color: var(--ink); border-color: var(--hairline-strong); }
@@ -1995,13 +1973,14 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
   max-width: 1120px; margin: 0 auto;
 }
 .ask-stage { width: 100%; max-width: 680px; text-align: center; }
-.ask-tagline { font-size: var(--fs-3); color: var(--walnut); margin: 0 0 1.25rem; }
+/* the Ask hero is the one place the system raises its voice — a calm serif line */
+.ask-tagline { font-family: var(--serif); font-size: var(--fs-6); line-height: 1.15; letter-spacing: 0.005em; color: var(--ink); margin: 0 0 1.5rem; }
 .ask-form-big { width: 100%; }
 .ask-field-big {
   display: flex; gap: 0.6rem;
   background: var(--warm-white);
   border: 1.5px solid var(--marigold-line);
-  border-radius: 14px;
+  border-radius: 10px;
   padding: 0.5rem 0.5rem 0.5rem 1.1rem;
   box-shadow: var(--shadow-2);
   transition: border-color var(--ease), box-shadow var(--ease);
@@ -2052,7 +2031,7 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
   border-radius: var(--radius); padding: 2rem 1.75rem; box-shadow: var(--shadow-2);
 }
 .ask-notready, .build-notready { display: grid; place-items: center; min-height: 100%; padding: 2rem; }
-.notready-title { font-size: var(--fs-4); margin: 0 0 0.5rem; }
+.notready-title { font-family: var(--serif); font-size: 1.5rem; letter-spacing: 0.01em; margin: 0 0 0.5rem; }
 .notready-line { color: var(--walnut); margin: 0 0 1.25rem; }
 
 /* ══════ BUILD — the two-pane data builder */
@@ -2084,17 +2063,18 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
 .build-right { display: flex; flex-direction: column; gap: 1rem; }
 .proposals-label { font-size: var(--fs-1); }
 .chart-placeholder {
-  border: 1.5px dashed var(--hairline-strong); border-radius: var(--radius);
+  border: 1px dashed var(--hairline-strong); border-radius: var(--radius);
   padding: 3rem 1rem; text-align: center; color: var(--ink-faint);
-  background: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(42,31,20,0.02) 8px, rgba(42,31,20,0.02) 16px);
+  background: var(--cream);
 }
 .build-outputs { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+/* NEUTRAL:ACCENT — both cards default to a hairline; only the primary action
+   inside (the marigold Build/Export button) carries color, not the container */
 .build-extract, .build-export {
   background: var(--cream); border: 1px solid var(--hairline);
+  border-left: 1px solid var(--hairline);
   border-radius: var(--radius); padding: 0.9rem 1rem;
 }
-.build-export { border-left: 3px solid var(--persimmon); }
-.build-extract { border-left: 3px solid var(--avocado); }
 .extract-actions { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin: 0.5rem 0; flex-wrap: wrap; }
 .extract-target { font-size: var(--fs-1); color: var(--walnut); }
 
@@ -2121,7 +2101,7 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
   position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%);
   min-width: 16px; height: 16px; padding: 0 4px;
   background: var(--marigold); color: var(--ink); border-radius: 8px;
-  font-size: 0.6rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.6rem; font-weight: 600; display: inline-flex; align-items: center; justify-content: center;
 }
 #desktop { position: relative; top: 0; flex: 1; z-index: 1; }
 
@@ -2138,7 +2118,7 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
   font-family: var(--sans); color: var(--ink); text-align: left;
 }
 .domain-twist { color: var(--marigold); width: 0.9em; }
-.domain-name { font-weight: 600; font-variant: small-caps; letter-spacing: 0.04em; }
+.domain-name { font-weight: 600; letter-spacing: 0.01em; }
 .domain-count { margin-left: auto; font-size: var(--fs-1); color: var(--ink-faint); font-family: var(--mono); }
 .catalog-row { border-top: 1px solid var(--hairline); }
 .catalog-row.selected { background: var(--marigold-wash); }
@@ -2178,11 +2158,13 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
 .scroll-outcome { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--teal); }
 .scroll-undo { background: none; border: 1px solid var(--hairline); border-radius: 6px; padding: 0.1rem 0.5rem; cursor: pointer; color: var(--walnut); font-size: var(--fs-0); }
 .scroll-undone { font-size: var(--fs-0); color: var(--ink-faint); }
-.console-card { background: var(--warm-white); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 0.9rem 1rem; box-shadow: var(--shadow-1); margin-bottom: 0.5rem; }
-.preview-card { border-left: 3px solid var(--marigold); }
-.preview-card.destructive { border-left-color: var(--persimmon); }
-.console-card.unsupported { border-left: 3px solid var(--walnut); }
-.console-card.clarify { border-left: 3px solid var(--ocean); }
+.console-card { background: var(--warm-white); border: 1px solid var(--hairline); border-left: 1px solid var(--hairline); border-radius: var(--radius); padding: 0.9rem 1rem; box-shadow: var(--shadow-1); margin-bottom: 0.5rem; }
+/* SEMANTIC accents only: marigold = the previewed primary action; terracotta
+   warns the destructive one. Clarify/unsupported stay neutral hairline. */
+.preview-card { border-left: 2px solid var(--marigold); }
+.preview-card.destructive { border-left-color: var(--terracotta); }
+.console-card.unsupported { border-left: 1px solid var(--hairline); }
+.console-card.clarify { border-left: 1px solid var(--hairline); }
 .preview-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
 .preview-desc { font-size: var(--fs-2); color: var(--ink); margin: 0.4rem 0; }
 .preview-count { font-size: var(--fs-1); color: var(--walnut); font-family: var(--mono); margin: 0.2rem 0; }
@@ -2210,11 +2192,10 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
 .build-bar-fill { display: block; height: 100%; width: 0; background: var(--marigold); transition: width 0.4s ease; }
 .build-tally { color: var(--walnut); white-space: nowrap; }
 .live-map { width: 100%; height: 100%; }
-.live-node { opacity: 0; transform-box: fill-box; transition: opacity 180ms ease; }
+/* live-build nodes fade in calmly — no scale overshoot pop */
+.live-node { opacity: 0; transform-box: fill-box; transition: opacity 160ms ease-out; }
 .live-node.in { opacity: 1; }
-.live-node.in .live-dot { animation: node-pop 180ms cubic-bezier(0.2,0.8,0.2,1); }
-@keyframes node-pop { from { transform: scale(0.9); } to { transform: scale(1); } }
-.live-dot { fill: var(--marigold); filter: drop-shadow(0 0 4px var(--marigold-glow)); }
+.live-dot { fill: var(--marigold); }
 .live-label { font-family: var(--sans); font-size: 11px; fill: var(--walnut); }
 .live-arc { fill: none; stroke-width: 2; transition: stroke-dashoffset 220ms ease; }
 .live-arc.tier-confirmed { stroke: var(--teal); }
@@ -2225,9 +2206,6 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
   .live-node, .live-node.in .live-dot, .live-arc { transition: none; animation: none; }
 }
 
-/* ── the standalone (no link found) tier swatch + group rename ── */
-.lg-hintline { display: inline-block; width: 14px; border-top: 2px dotted var(--ink-faint); }
-
 /* ══════ first-run orientation coach */
 .coach { position: fixed; inset: 0; z-index: 2200; display: grid; place-items: center; }
 .coach[hidden] { display: none; }
@@ -2237,10 +2215,10 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
   border-radius: var(--radius-win); padding: 1.5rem 1.75rem; box-shadow: var(--shadow-3);
 }
 .coach-x { position: absolute; top: 0.5rem; right: 0.6rem; background: none; border: none; font-size: 1.2rem; color: var(--walnut); cursor: pointer; }
-.coach-title { font-variant: small-caps; letter-spacing: 0.05em; margin: 0 0 0.75rem; font-size: var(--fs-4); }
+.coach-title { font-family: var(--serif); letter-spacing: 0.01em; margin: 0 0 0.75rem; font-size: var(--fs-5); }
 .coach-lines { list-style: none; padding: 0; margin: 0 0 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
 .coach-lines li { font-size: var(--fs-2); color: var(--walnut); }
-.coach-lines b { color: var(--ink); font-variant: small-caps; letter-spacing: 0.04em; }
+.coach-lines b { color: var(--ink); font-weight: 600; letter-spacing: 0.01em; }
 
 @media (max-width: 720px) {
   .mode-seg .seg-sub { display: none; }

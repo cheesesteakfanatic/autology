@@ -103,10 +103,9 @@ def profile_column(
 
     hll = HyperLogLog(seed=seed)
     mh = MinHash(k=64, seed=seed)
-    for v in nn:
-        k = value_key(v)
-        hll.add(k)
-        mh.add(k)
+    keys = [value_key(v) for v in nn]
+    hll.add_all(keys)
+    mh.add_all(keys)  # P3: one base hash + vectorized lane min per distinct value
 
     quantiles: tuple[float, ...] = ()
     if dtype in _NUMERIC:

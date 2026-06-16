@@ -89,6 +89,7 @@ def test_signal_kind_membership():
     assert names == {
         "VALUE_CONTAINMENT",
         "VALUE_JACCARD",
+        "INFREQUENT_TOKEN",
         "DISTRIBUTION_DIVERGENCE",
         "CARDINALITY_RATIO",
         "KEY_UNIQUENESS",

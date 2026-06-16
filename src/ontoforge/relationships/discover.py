@@ -39,8 +39,9 @@ from ontoforge.contracts import (
 )
 
 from .classify import TableShape, classify_relationship
-from .score import compute_signals, score_pair
+from .score import IND_PRUNE_FLOOR, compute_signals, ind_candidate_score, score_pair
 from .signals import SampledColumn
+from .weighting import WeightingProfile, weighting_for_estate
 
 __all__ = ["PairProfiles", "SampleProvider", "discover_relationships"]
 
@@ -57,6 +58,14 @@ _GROUP: dict[Datatype, str] = {
 }
 # columns this small (distinct) make a table look like a reference/dimension table
 _SMALL_TABLE_DISTINCT = 64
+
+# the JOIN-shaped (inclusion-dependency-anchored) relationship types, subject to the
+# Tursio IND-candidate prune; non-join types are governed by the confidence floor.
+_JOIN_TYPES = frozenset({
+    RelationshipType.FK_JOIN,
+    RelationshipType.LOOKUP_DIMENSION,
+    RelationshipType.M2M_BRIDGE,
+})
 
 
 @dataclass(frozen=True, slots=True)
@@ -105,11 +114,14 @@ def _table_shape(tp: TableProfile) -> TableShape:
     is_small = 0 < tp.row_count <= _SMALL_TABLE_DISTINCT or all(
         c.distinct_estimate <= _SMALL_TABLE_DISTINCT for c in cols
     ) if cols else False
+    max_distinct = max((c.distinct_estimate for c in cols), default=0)
     return TableShape(
         total_columns=len(cols),
         fk_like_columns=0 if has_surrogate_key else fk_like,
         descriptive_columns=descriptive,
         is_small=bool(is_small),
+        row_count=tp.row_count,
+        max_distinct=max_distinct,
     )
 
 
@@ -132,6 +144,8 @@ def discover_relationships(
     samples: Optional[SampleProvider] = None,
     min_confidence: float = 0.5,
     keep_unrelated: bool = True,
+    profile: Optional[WeightingProfile] = None,
+    ind_prune_floor: float = IND_PRUNE_FLOOR,
 ) -> list[RelationshipCandidate]:
     """Discover and rank typed relationship candidates across tables.
 
@@ -149,10 +163,15 @@ def discover_relationships(
     keep_unrelated : keep the explicit UNRELATED verdict (auditable false-positive
         decision) even below ``min_confidence`` when the pair was IND-seeded or
         name/type tempting.
+    profile : the PER-ESTATE :class:`~.weighting.WeightingProfile` for the signal
+        fusion. ``None`` (the default) AUTO-DETECTS the estate kind (clean-relational
+        vs messy-lake) from ``table_profiles`` and re-weights accordingly; pass
+        :data:`~.weighting.BALANCED` to force the unbiased global formula.
 
     Returns a list of :class:`RelationshipCandidate`, ranked by descending proxy
     confidence then by column address (stable).
     """
+    est_profile = profile if profile is not None else weighting_for_estate(table_profiles)
     by_addr: dict[tuple[str, str], ColumnProfile] = {}
     shapes: dict[tuple[str, str], TableShape] = {}
     for tp in table_profiles:
@@ -194,12 +213,21 @@ def discover_relationships(
             rel_type=result.rel_type,
             rationale=result.rationale,
             signals=sigs,
+            profile=est_profile,
         )
 
         if cand.rel_type is RelationshipType.UNRELATED:
             if keep_unrelated:
                 out.append(cand)
             continue
+        # Tursio IND prune (RESEARCH_ENGINE_SOTA §4): a JOIN-shaped candidate whose
+        # 5-component IND/candidate score is below the floor is too weak to carry an
+        # inclusion-dependency edge — prune it at candidate generation, unless it is
+        # explicitly flagged for adjudication. Non-join types (DENORM / DERIVED /
+        # UNKNOWN) are governed by the confidence floor below, not the IND score.
+        if cand.rel_type in _JOIN_TYPES and not cand.needs_adjudication:
+            if ind_candidate_score(sigs) < ind_prune_floor:
+                continue
         if cand.rel_type is RelationshipType.UNKNOWN and cand.confidence < min_confidence:
             continue
         if cand.confidence < min_confidence and not cand.needs_adjudication:

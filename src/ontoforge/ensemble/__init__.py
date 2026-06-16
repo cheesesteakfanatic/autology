@@ -57,6 +57,8 @@ from .paths import (
 from .relgate import (
     AMBIGUOUS_BAND,
     CONSENSUS_THRESHOLD,
+    TOP_CONFIDENCE_RATIO,
+    TOP_K_COMMIT,
     RelationshipGate,
     should_vote,
 )
@@ -76,6 +78,8 @@ __all__ = [
     "ReasoningPathExpert",
     "RelationshipGate",
     "SchemaPath",
+    "TOP_CONFIDENCE_RATIO",
+    "TOP_K_COMMIT",
     "TypeCompatExpert",
     "ValueOverlapExpert",
     "ValuePath",

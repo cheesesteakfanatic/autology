@@ -54,7 +54,7 @@ def test_score_pair_emits_candidate_with_evidence_and_rationale() -> None:
     assert isinstance(cand, RelationshipCandidate)
     assert cand.rel_type is RelationshipType.FK_JOIN
     assert cand.rationale == "fk"
-    assert len(cand.evidence) == 10        # full reasoning trail rides along
+    assert len(cand.evidence) == 11        # full reasoning trail rides along (+ infrequent-token)
     assert cand.left.table == "orders" and cand.right.table == "customers"
 
 

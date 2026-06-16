@@ -10,6 +10,7 @@ from ontoforge.relationships import (
     containment_signals,
     distribution_divergence_signal,
     entropy_signal,
+    infrequent_token_signal,
     jaccard_signal,
     jensen_shannon,
     key_uniqueness_signal,
@@ -19,7 +20,11 @@ from ontoforge.relationships import (
     shannon_entropy,
     type_compat_signal,
 )
-from ontoforge.relationships.signals import trigram_similarity
+from ontoforge.relationships.signals import (
+    infrequent_token_sets,
+    trigram_similarity,
+    value_tokens,
+)
 
 from .rel_helpers import make_col
 
@@ -165,3 +170,72 @@ def test_artifact_values_are_rounded_and_bounded() -> None:
         assert 0.0 <= art.value <= 1.0
         # rounded to <= 6 dp (no long float tails)
         assert abs(art.value - round(art.value, 6)) < 1e-12
+
+
+# ----------------------------------------------- infrequent-token (St ↔ Street)
+
+
+def test_value_tokens_splits_and_drops_singletons() -> None:
+    assert value_tokens("123 Main St.") == frozenset({"123", "main", "st"})
+    # length-1 tokens carry no discriminating power
+    assert value_tokens("a b cd") == frozenset({"cd"})
+
+
+def test_infrequent_token_sets_drop_boilerplate_keep_rare() -> None:
+    left = frozenset({"1 Main St", "2 Oak St", "3 Elm St"})
+    right = frozenset({"1 Main Street", "2 Oak Street", "3 Elm Street"})
+    la, ra = infrequent_token_sets(left, right)
+    # the discriminating street names survive on both sides …
+    assert {"main", "oak", "elm"} <= la
+    assert {"main", "oak", "elm"} <= ra
+    # … and the rare-token sets agree on them while differing only on st/street.
+    assert "st" in la and "st" not in ra
+    assert "street" in ra and "street" not in la
+
+
+def test_infrequent_token_signal_catches_st_street_format_variant() -> None:
+    """The headline case: "St" vs "Street" addresses share ZERO whole values, so
+    Jaccard/containment collapse — but the rare-token signal recovers the join."""
+    addr_short = make_col(
+        "address",
+        ["1 Main St", "2 Oak St", "3 Elm St", "4 Pine St", "5 Cedar St"],
+        table="customers",
+    )
+    addr_long = make_col(
+        "addr",
+        ["1 Main Street", "2 Oak Street", "3 Elm Street", "4 Pine Street", "5 Cedar Street"],
+        table="shipments",
+    )
+    # verbatim overlap is gone …
+    jac = jaccard_signal(addr_short, addr_long)
+    assert jac.value < 0.2
+    # … but the infrequent-token signal fires strongly on the shared rare tokens.
+    sig = infrequent_token_signal(addr_short, addr_long)
+    assert sig.kind is SignalKind.INFREQUENT_TOKEN
+    assert sig.value >= 0.5
+    assert sig.fired
+    assert not sig.conflicts  # positive corroborator only — never a veto
+
+
+def test_infrequent_token_signal_silent_on_disjoint_numeric_ids() -> None:
+    """Disjoint numeric-id ranges share no tokens ⇒ the signal stays silent (0.0,
+    not fired) rather than manufacturing a relationship out of two id spaces."""
+    a = make_col("id", list(range(1000, 1100)), table="t")
+    b = make_col("id", list(range(9000, 9100)), table="u")
+    sig = infrequent_token_signal(a, b)
+    assert sig.value == 0.0
+    assert not sig.fired
+
+
+def test_infrequent_token_signal_low_on_unrelated_text() -> None:
+    a = make_col("city", ["London Town", "Paris City", "Berlin Hub"], table="t")
+    b = make_col("note", ["red apple", "green pear", "blue plum"], table="u")
+    sig = infrequent_token_signal(a, b)
+    assert sig.value == 0.0
+    assert not sig.fired
+
+
+def test_infrequent_token_signal_deterministic() -> None:
+    a = make_col("address", ["1 Main St", "2 Oak St", "3 Elm St"], table="t")
+    b = make_col("addr", ["1 Main Street", "2 Oak Street", "3 Elm Street"], table="u")
+    assert infrequent_token_signal(a, b) == infrequent_token_signal(a, b)

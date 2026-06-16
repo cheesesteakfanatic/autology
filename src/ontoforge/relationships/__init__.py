@@ -35,23 +35,35 @@ Layers (all reading ``ontoforge.contracts`` + ``ontoforge.profiling`` read-only)
   column pair across a set of :class:`~ontoforge.contracts.TableProfile`s.
 """
 
-from .classify import ClassifierResult, classify_relationship
+from .classify import (
+    PK_BAND_TOLERANCE,
+    PK_DISTINCT_RATIO,
+    ClassifierResult,
+    classify_relationship,
+    is_pk_candidate,
+)
 from .discover import PairProfiles, discover_relationships
 from .roadspy import build_scout
 from .score import (
     AMBIGUOUS_BAND,
     FK_PROXY_FLOOR,
+    IND_PRUNE_FLOOR,
     SignalSet,
     compute_signals,
+    fuse_confidence,
+    ind_candidate_score,
     score_pair,
 )
 from .signals import (
+    INFREQUENT_TOKEN_FRACTION,
     SAMPLE_CAP,
     SampledColumn,
     cardinality_ratio_signal,
     containment_signals,
     distribution_divergence_signal,
     entropy_signal,
+    infrequent_token_signal,
+    infrequent_token_sets,
     jaccard_signal,
     jensen_shannon,
     key_uniqueness_signal,
@@ -60,24 +72,55 @@ from .signals import (
     sampled_row_signal,
     shannon_entropy,
     type_compat_signal,
+    value_tokens,
+)
+from .weighting import (
+    BALANCED,
+    LAKE,
+    RELATIONAL,
+    EstateFingerprint,
+    EstateKind,
+    SignalGroup,
+    WeightingProfile,
+    classify_estate,
+    fingerprint_estate,
+    weighting_for_estate,
 )
 
 __all__ = [
     "AMBIGUOUS_BAND",
+    "BALANCED",
     "FK_PROXY_FLOOR",
+    "IND_PRUNE_FLOOR",
+    "INFREQUENT_TOKEN_FRACTION",
+    "LAKE",
+    "PK_BAND_TOLERANCE",
+    "PK_DISTINCT_RATIO",
+    "RELATIONAL",
     "SAMPLE_CAP",
     "ClassifierResult",
+    "EstateFingerprint",
+    "EstateKind",
     "PairProfiles",
     "SampledColumn",
+    "SignalGroup",
     "SignalSet",
+    "WeightingProfile",
     "build_scout",
     "cardinality_ratio_signal",
+    "classify_estate",
     "classify_relationship",
     "compute_signals",
     "containment_signals",
     "discover_relationships",
     "distribution_divergence_signal",
     "entropy_signal",
+    "fingerprint_estate",
+    "fuse_confidence",
+    "ind_candidate_score",
+    "infrequent_token_signal",
+    "infrequent_token_sets",
+    "is_pk_candidate",
     "jaccard_signal",
     "jensen_shannon",
     "key_uniqueness_signal",
@@ -87,4 +130,6 @@ __all__ = [
     "score_pair",
     "shannon_entropy",
     "type_compat_signal",
+    "value_tokens",
+    "weighting_for_estate",
 ]

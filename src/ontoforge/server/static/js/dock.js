@@ -39,14 +39,9 @@ export function createDock({ root, registry, wm }) {
   function update(wins) {
     const running = new Set(wins.map((w) => w.app.id));
     for (const [appId, icon] of iconEls) {
-      const was = icon.classList.contains("running");
       const now = running.has(appId);
+      // a quiet running dot fades in — no launch bounce
       icon.classList.toggle("running", now);
-      // a single marigold starburst pulse confirms a fresh launch
-      if (now && !was) {
-        icon.classList.add("pulse-once");
-        setTimeout(() => icon.classList.remove("pulse-once"), 200);
-      }
     }
 
     const minimized = wins.filter((w) => w.minimized);

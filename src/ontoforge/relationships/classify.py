@@ -41,7 +41,14 @@ from ontoforge.contracts import RelationshipType
 from .score import SignalSet
 from .signals import SampledColumn
 
-__all__ = ["ClassifierResult", "TableShape", "classify_relationship"]
+__all__ = [
+    "PK_BAND_TOLERANCE",
+    "PK_DISTINCT_RATIO",
+    "ClassifierResult",
+    "TableShape",
+    "classify_relationship",
+    "is_pk_candidate",
+]
 
 
 @dataclass(frozen=True, slots=True)
@@ -51,13 +58,18 @@ class TableShape:
     ``fk_like_columns`` is how many columns of the table look like foreign keys
     (compatible-typed, non-unique, low-ish cardinality). ``total_columns`` is the
     column count. A table with ``fk_like_columns >= 2`` and few other columns is a
-    bridge candidate (M2M). All values derive from profiles — never bulk rows.
+    bridge candidate (M2M). ``row_count`` / ``max_distinct`` feed the Tursio PK band
+    (a column is a PK candidate when its distinct count is near the row count AND
+    near the table's MAX distinct). All values derive from profiles — never bulk
+    rows.
     """
 
     total_columns: int = 0
     fk_like_columns: int = 0
     descriptive_columns: int = 0  # non-key descriptive attrs (lookup/dimension signal)
     is_small: bool = False        # few distinct rows ⇒ reference/dimension-table-like
+    row_count: int = 0            # table row count (for the PK band)
+    max_distinct: int = 0         # max distinct count across the table's columns (PK band)
 
     @property
     def is_bridge_like(self) -> bool:
@@ -79,6 +91,41 @@ _DIVERGE_CONFLICT = 0.5  # distribution divergence that denies a relationship
 _NAME_SIM = 0.6         # "looks similar" name threshold for the FP verdict
 _DENORM_DIVERGE = 0.2   # denormalized copy: distributions must nearly match
 _DERIVED_EQ = 0.95      # sampled-row equality fraction for a derived/equal field
+
+# Tursio author-tuned PK defaults (RESEARCH_ENGINE_SOTA §4 — adopted as documented
+# defaults, kept tunable; x=0.95 is the reported best). A column is a PRIMARY-KEY
+# candidate when its distinct count is ≥ PK_DISTINCT_RATIO × row_count AND within
+# ±PK_BAND_TOLERANCE of the table's MAX distinct count (so a near-unique column that
+# is still far below the widest column is NOT mistaken for the table's key).
+PK_DISTINCT_RATIO = 0.95
+PK_BAND_TOLERANCE = 0.05
+
+
+def is_pk_candidate(
+    profile,
+    shape: Optional[TableShape],
+    *,
+    distinct_ratio: float = PK_DISTINCT_RATIO,
+    band_tolerance: float = PK_BAND_TOLERANCE,
+) -> bool:
+    """Tursio PK band: is ``profile`` a primary-key candidate for its table?
+
+    Requires distinct ≥ ``distinct_ratio`` × row_count AND distinct within
+    ±``band_tolerance`` of the table's max distinct (from ``shape``). When no shape
+    is supplied we fall back to the row-count test alone (uniqueness ≥ ratio).
+    Pure, deterministic, profile-only.
+    """
+    rows = getattr(profile, "row_count", 0)
+    distinct = getattr(profile, "distinct_estimate", 0)
+    if rows <= 0 or distinct <= 0:
+        return False
+    if distinct < distinct_ratio * rows:
+        return False
+    if shape is not None and shape.max_distinct > 0:
+        lo = (1.0 - band_tolerance) * shape.max_distinct
+        if distinct < lo:
+            return False
+    return True
 
 
 def _sampled_equality(left: SampledColumn, right: SampledColumn) -> float:
@@ -225,6 +272,12 @@ def classify_relationship(
 
     # ---- Rule 2: FK_JOIN / LOOKUP_DIMENSION — contained child → unique parent --
     if contain_lr >= _FK_CONTAIN and key_uniq >= _FK_KEY_UNIQ and divergence < _DIVERGE_CONFLICT:
+        # Tursio PK band: does the parent column read as the table's PRIMARY key
+        # (distinct near row-count AND near the table's widest column)? Recorded as
+        # corroboration on the rationale; it strengthens the FK reading without
+        # being able to veto a high-containment unique-key match.
+        parent_is_pk = is_pk_candidate(right.profile, right_table)
+        pk_note = "parent clears PK band; " if parent_is_pk else ""
         # dimension if the parent is a small reference table with descriptive attrs
         is_lookup = (
             (right_table is not None and right_table.is_small and right_table.descriptive_columns >= 1)
@@ -234,12 +287,13 @@ def classify_relationship(
             return ClassifierResult(
                 RelationshipType.LOOKUP_DIMENSION,
                 f"child values contained in a small unique reference key "
-                f"(containment={contain_lr:.2f}, parent uniqueness={key_uniq:.2f}); fact→dimension lookup",
+                f"({pk_note}containment={contain_lr:.2f}, parent uniqueness={key_uniq:.2f}); "
+                f"fact→dimension lookup",
             )
         return ClassifierResult(
             RelationshipType.FK_JOIN,
             f"child values contained in unique parent key "
-            f"(containment={contain_lr:.2f}, parent uniqueness={key_uniq:.2f}, "
+            f"({pk_note}containment={contain_lr:.2f}, parent uniqueness={key_uniq:.2f}, "
             f"distributions aligned divergence={divergence:.2f}); foreign-key join",
         )
 

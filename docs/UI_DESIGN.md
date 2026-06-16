@@ -470,3 +470,95 @@ induce the model or store the artifacts in the first place. The shell is
 thin — it merely refuses to hide what the engine knows, and now it hands that
 knowledge to three different kinds of user without making any of them learn
 the engine's vocabulary.
+
+## 9. Maturation pass — from "warm but childish" to natural / premium
+
+The founder's read of the first warm system: *"I like the colors but it feels
+childish."* This pass keeps the exact same warm-midcentury **direction** and
+grows it up — calmer, more editorial, fewer bytes. Five disciplines, all
+test-enforced in `tests/server/test_spa.py`:
+
+**9.1 Chroma discipline — color is information, not decoration.** The 8-hue
+wheel + marigold were pulled out of the ~50-70% "crayon" saturation band into
+a muted **25-40% S** band (desaturated ~30-40%, *not* to gray — the warmth the
+founder likes is kept). Each hue holds its angle and its **locked `ATLAS_HUES`
+order** (mirrored in `js/core.js` and the import-free `js/constellation.js`),
+and its lightness drops so any hue used as *text* clears AA on cream:
+
+| token | was (crayon) | now (muted) | S% | on cream |
+|---|---|---|---|---|
+| `--marigold` | `#E0A126` | `#D09735` | 62 | fill only — ink-on-marigold 6.26:1 |
+| `--teal` (= confirmed) | `#1F6F6B` | `#2C5956` | 34 | 7.2:1 |
+| `--terracotta` | `#C75B39` | `#945442` | 38 | 5.3:1 |
+| `--avocado` | `#7C8A3B` | `#6C733A` | 33 | 4.6:1 |
+| `--ocean` | `#2D6E8E` | `#375E72` | 35 | 6.4:1 |
+| `--persimmon` | `#B8532A` | `#945942` | 38 | 5.1:1 |
+| `--plum` | `#6E4A63` | `#713D68` | 30 | 7.5:1 |
+| `--mustard` | `#9A6B2F` | `#86663C` | 38 | 4.8:1 |
+| `--dusty-rose` | `#C98B7A` | `#A97060` | 30 | decorative only |
+
+Marigold stays a touch warmer than the wheel deliberately: it is the **single
+primary FILL** and ink-on-marigold must read. WCAG was re-measured after every
+L/S change. The wheel is now used **only as information** — atlas islands,
+category chips, cite-dots — never as decoration.
+
+**9.2 Neutral : accent ratio — one accent per view.** The colored window
+**title-bar strip is neutralized**: it is now a cream cap with a hairline
+border and a thin **2px accent underline** (it still carries `var(--accent)`,
+but as a marker, not a hue fill). The five per-card 3px colored left-edges
+(`.build-export` persimmon, `.build-extract` avocado, `.console-card.clarify`
+ocean, `.dash-rank` avocado-text, the scrub-stance ocean-text) collapse to a
+**hairline default** plus exactly **two semantic accents**: **teal = confirmed
+/ cited** (the answer card's left-edge, the gauge "confirmed" band) and
+**marigold = the one primary action** (the previewed apply, the clarify edge,
+the selected review card). Color now touches a small fraction of pixels.
+
+**9.3 Type maturity.** A real **system serif** (`--serif: 'Iowan Old Style',
+Palatino, Georgia, ui-serif` — a system stack, no webfont, honors the offline
+invariant) carries **hero headlines only**: the Ask tagline, the clarify
+question, the not-ready title, the type-detail `h2`, the answer question, the
+coach title. The chrome sans drops Futura for a **humanist** stack
+(`-apple-system, Inter, system-ui`). `font-variant:small-caps` is **removed
+from buttons / dock / window titles / mode segments / table headers / domain
+names** (the retro-poster "costume" tell) and **reserved for tiny eyebrow
+kickers only** (`.badge`, the gauge band, counter/stage/pair labels). Tracking
+is capped at ~0.01em on body/labels (eyebrows keep ~0.08em); exactly two
+weights (400 / 600 — the stray 700s dropped to 600); the editorial scale gains
+`--fs-6: 2.75rem` for the serif hero.
+
+**9.4 Form restraint + calmer motion.** Radii tighten — `--radius 12→8`,
+`--radius-win 14→10`, the dock `18→12`, and the 999px pills become a `6px`
+rounded-rect (`--radius-pill`). The **toy motifs are deleted**: the dock
+`dot-pulse` scale(2) launch-bounce and its conic-gradient starburst running
+indicator (now a flat 5px dot), the `switcher-halo` coach ring, the `node-pop`
+overshoot, the `likely-breathe` pulse (a lit arc now simply holds full
+opacity), and the 45° striped `chart-placeholder` (now a flat dashed box). The
+`value-flash` is a one-shot bg fade. Shadows shrink and the plasticky
+`rgba(255,253,247,0.6) inset` highlight is gone (the warm-amber cast stays —
+the differentiator vs gray SaaS). Grain is quieter (`baseFrequency 0.9→0.65`,
+`opacity 0.03→0.025`). Data surfaces tighten ~15-20% (table cells, cards).
+
+**9.5 Performance — a canvas render path for the Data Map (constellation).**
+`js/constellation.js` (which had 23 `svgEl` sites per island, SVG ceiling
+~1-2k elements) gains a **canvas acceleration layer**. Past
+`CANVAS_THRESHOLD = 300` (nodes + arcs), the geometry — island hulls, node
+cores/halos, and arc strokes — paints to **one `<canvas>`** on the *same
+seeded-force settled positions* and the *same viewBox transform*, in a single
+rAF-scheduled pass (`drawCanvas`), holding the frame budget to several-thousand
+nodes. The `<svg>` stays the **interaction layer**: it keeps the arc hit-twins,
+the island labels, and the selection ring, so pan/zoom (viewBox-only) and arc
+hover/pin are unchanged; node hover/click uses a cheap **JS nearest-node
+hit-test** (`canvasNodeAt`) over the same node list the canvas paints. The
+canvas sits *behind* the svg with `pointer-events: none`, so the svg still owns
+every gesture (the security/hover discipline is intact). **Below the threshold
+NOTHING changes — the pure-SVG path renders for crisp text + accessibility (the
+fallback).** The Meridian demo (202 elements) uses the SVG fallback; the
+250-node / 620-arc synthetic atlas exercises the canvas path. The Atlas tier
+filters (`hide-confirmed/likely/hint/silos`), the evidence card, the island
+labels, and the `ATLAS SCALE GUARD` are all honored in both paths.
+
+**Net result.** The decorative bloat (keyframes, gradients, verbose comments,
+a duplicate rule) was removed so `style.css` *shrank* below its pre-maturation
+size, and the whole non-vendor shell — even with the additive canvas layer —
+stays under the 290 KB payload budget. The system reads calmer, more editorial,
+and unmistakably grown-up while staying the same warm paper it always was.

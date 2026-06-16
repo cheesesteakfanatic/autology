@@ -12,29 +12,31 @@ import {
   el, clear, api, errorNote, fmt, toast, loadOntology, ontologyNow,
 } from "../core.js";
 
-/* the warm mid-century chart theme — shared with the legacy dashboards app */
-const ATLAS_RANGE = ["#1F6F6B", "#E0A126", "#C75B39", "#7C8A3B", "#2D6E8E", "#B8532A", "#6E4A63", "#9A6B2F"];
+/* the warm editorial chart theme — the MUTED atlas wheel (kept in sync with
+   core.js ATLAS_HUES); humanist sans chrome, mono labels */
+const ATLAS_RANGE = ["#2C5956", "#D09735", "#945442", "#6C733A", "#375E72", "#945942", "#713D68", "#86663C"];
 const INK = "#2A1F14", WALNUT = "#6B5A45";
+const CHART_SANS = "-apple-system, 'Inter', 'Segoe UI', system-ui, sans-serif";
 const VEGA_CONFIG = {
   background: "transparent",
   view: { stroke: "transparent" },
-  font: "Futura, 'Avenir Next', 'Century Gothic', system-ui, sans-serif",
+  font: CHART_SANS,
   axis: {
     labelColor: WALNUT, titleColor: WALNUT,
     gridColor: "rgba(42,31,20,0.08)", domainColor: "rgba(42,31,20,0.26)",
     tickColor: "rgba(42,31,20,0.26)",
-    labelFont: "ui-monospace, Menlo, monospace", titleFont: "Futura, 'Avenir Next', system-ui, sans-serif",
+    labelFont: "ui-monospace, Menlo, monospace", titleFont: CHART_SANS,
     labelFontSize: 10, titleFontSize: 10, gridDash: [1, 3],
   },
   legend: { labelColor: WALNUT, titleColor: WALNUT },
-  title: { color: INK, font: "Futura, 'Avenir Next', system-ui, sans-serif", fontWeight: 600 },
+  title: { color: INK, font: CHART_SANS, fontWeight: 600 },
   range: { category: ATLAS_RANGE },
-  mark: { color: "#E0A126" },
-  bar: { fill: "#E0A126" },
-  line: { stroke: "#1F6F6B", strokeWidth: 2 },
-  point: { fill: "#1F6F6B" },
-  area: { fill: "#E0A126", fillOpacity: 0.65 },
-  arc: { fill: "#E0A126" },
+  mark: { color: "#D09735" },
+  bar: { fill: "#D09735" },
+  line: { stroke: "#2C5956", strokeWidth: 2 },
+  point: { fill: "#2C5956" },
+  area: { fill: "#D09735", fillOpacity: 0.65 },
+  arc: { fill: "#D09735" },
   text: { fill: INK, font: "ui-monospace, Menlo, monospace" },
 };
 

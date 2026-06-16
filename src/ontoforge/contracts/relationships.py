@@ -57,6 +57,7 @@ class SignalKind(str, Enum):
 
     VALUE_CONTAINMENT = "value_containment"            # values(lhs) ⊆ values(rhs)
     VALUE_JACCARD = "value_jaccard"                    # MinHash Jaccard of value sets
+    INFREQUENT_TOKEN = "infrequent_token"              # Jaccard over RARE value tokens ("St"↔"Street")
     DISTRIBUTION_DIVERGENCE = "distribution_divergence"  # JSD/KL / quantile divergence
     CARDINALITY_RATIO = "cardinality_ratio"            # distinct(lhs) : distinct(rhs)
     KEY_UNIQUENESS = "key_uniqueness"                  # rhs side near-unique (key-like)

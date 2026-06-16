@@ -76,14 +76,14 @@ export function errorNote(err) {
    cite-dot picks from here, deterministically, so a concept keeps its hue
    across the whole OS. Index 0 (teal) doubles as 'confirmed'. */
 export const ATLAS_HUES = [
-  "#1F6F6B", // teal      — anchor / confirmed
-  "#E0A126", // marigold
-  "#C75B39", // terracotta
-  "#7C8A3B", // avocado
-  "#2D6E8E", // ocean
-  "#B8532A", // persimmon rust
-  "#6E4A63", // plum raisin
-  "#9A6B2F", // mustard brown
+  "#2C5956", // teal      — anchor / confirmed   (muted from #1F6F6B)
+  "#D09735", // marigold                          (muted from #E0A126)
+  "#945442", // terracotta                        (muted from #C75B39)
+  "#6C733A", // avocado                           (muted from #7C8A3B)
+  "#375E72", // ocean                             (muted from #2D6E8E)
+  "#945942", // persimmon rust                    (muted from #B8532A)
+  "#713D68", // plum raisin                       (muted from #6E4A63)
+  "#86663C", // mustard brown                     (muted from #9A6B2F)
 ];
 
 /** Stable hue for any string key (uri / id / name) — same key, same hue. */
@@ -97,14 +97,14 @@ export function hueFor(key) {
 /** Per-app accent (the title-strip / dock-tile hue) — the dock order is the
     wheel order, so the eight apps each own a distinct atlas hue. */
 export const APP_HUE = {
-  ask: "#E0A126",          // marigold — the primary console
-  constellation: "#1F6F6B",// teal — the map
-  inspector: "#2D6E8E",    // ocean
-  evidence: "#9A6B2F",     // mustard brown — the index-card tray
-  review: "#6E4A63",       // plum raisin — adjudication
-  dashboards: "#7C8A3B",   // avocado
-  pulse: "#C75B39",        // terracotta — the instrument cluster
-  exporter: "#B8532A",     // persimmon rust
+  ask: "#D09735",          // marigold — the primary console
+  constellation: "#2C5956",// teal — the map
+  inspector: "#375E72",    // ocean
+  evidence: "#86663C",     // mustard brown — the index-card tray
+  review: "#713D68",       // plum raisin — adjudication
+  dashboards: "#6C733A",   // avocado
+  pulse: "#945442",        // terracotta — the instrument cluster
+  exporter: "#945942",     // persimmon rust
 };
 export function appHue(appId) { return APP_HUE[appId] || "#6B5A45"; }
 

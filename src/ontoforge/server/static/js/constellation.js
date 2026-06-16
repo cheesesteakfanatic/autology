@@ -23,18 +23,28 @@
    · hover/click ride ONE delegated listener set on the <svg> — never
      per-node handlers;
    · class labels hide below the zoom threshold (.labels-hidden); island
-     labels counterscale so they read at every altitude. */
+     labels counterscale so they read at every altitude.
+
+   CANVAS ACCELERATION — past CANVAS_THRESHOLD the geometry (hulls, node
+   cores/halos, arc strokes) paints to ONE <canvas> on the same viewBox
+   instead of 30+ createElementNS sites (SVG ceils ~1-2k). The <svg> stays the
+   interaction layer (arc hit-twins, labels, selection); node hover/click uses
+   a JS nearest-node hit-test. Below the threshold the pure-SVG fallback
+   renders unchanged for crisp text + accessibility. */
 
 const BASE_W = 960, BASE_H = 600;
+/* over this many (nodes + arcs) the canvas paints; under it, SVG fallback */
+const CANVAS_THRESHOLD = 300;
 
-/* the locked atomic-age categorical wheel — each ISLAND draws a distinct
-   warm hue from here so the map reads as mid-century cartography (kept in
-   sync with core.js ATLAS_HUES; the engine stays import-free for the
-   scale-guard discipline). */
+/* the muted categorical wheel — each ISLAND draws a distinct hue (kept in
+   sync with core.js ATLAS_HUES; the engine stays import-free). */
 const ISLAND_HUES = [
-  "#1F6F6B", "#E0A126", "#C75B39", "#7C8A3B",
-  "#2D6E8E", "#B8532A", "#6E4A63", "#9A6B2F",
+  "#2C5956", "#D09735", "#945442", "#6C733A",
+  "#375E72", "#945942", "#713D68", "#86663C",
 ];
+/* literal warm tokens the canvas paints with (no CSS var() in 2d ctx) */
+const TEAL = "#2C5956", MARIGOLD = "#D09735", WALNUT = "#6B5A45",
+      CREAM = "#FBF4E6", BISQUE = "#E3D6BB";
 
 /* seeded PRNG (mulberry32) over a string hash — same input, same sky */
 function hash32(s) {
@@ -55,8 +65,8 @@ function mulberry32(seed) {
   };
 }
 
-/** el()-style child discipline for raw DOM appends: arrays flatten, null/
-    undefined/false vanish, strings become TEXT nodes (never markup). */
+/** el()-style child discipline: arrays flatten, null/undefined/false vanish,
+    strings become TEXT nodes (never markup). */
 function fill(node, ...children) {
   for (const c of children.flat(Infinity)) {
     if (c === null || c === undefined || c === false) continue;
@@ -144,12 +154,18 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
   let atlasLinks = [];          // the served links, by index
   let visPaths = [];            // index-aligned visible arc paths
   let pinnedLi = -1;            // the pinned evidence arc, -1 = none
+  let litLi = -1;               // the hover-lit arc (canvas path), -1 = none
   let selectedUri = null;
   let world = { w: BASE_W, h: BASE_H };
   let view = { x: 0, y: 0, w: BASE_W, h: BASE_H };
   let viewRaf = 0;
   let viewSettle = 0;
   let lastLabelScale = 0;
+
+  // canvas-acceleration layer (created lazily, only past CANVAS_THRESHOLD)
+  let canvas = null, cctx = null, useCanvas = false;
+  let drawList = null;   // { hulls:[], nodes:[], arcs:[] } in WORLD coordinates
+  let drawRaf = 0;       // drawList.nodes doubles as the nearest-node hit list
 
   // the evidence card may be supplied by the app; otherwise it is grown here
   if (!evCard) {
@@ -158,10 +174,100 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
     wrap.append(evCard);
   }
 
+  /* ─────────────────────────────────────────── canvas paint (dense sky) */
+
+  function ensureCanvas() {
+    if (canvas) return canvas;
+    canvas = document.createElement("canvas");
+    canvas.className = "constellation-canvas";
+    svg.parentNode.insertBefore(canvas, svg);
+    cctx = canvas.getContext("2d");
+    return canvas;
+  }
+
+  /** Repaint the canvas for the view — one pass, no per-element DOM. */
+  function drawCanvas() {
+    drawRaf = 0;
+    if (!useCanvas || !cctx || !drawList) return;
+    const cw = svg.clientWidth || canvas.clientWidth || 800;
+    const ch = svg.clientHeight || canvas.clientHeight || 600;
+    const dpr = Math.min(2, (typeof devicePixelRatio === "number" && devicePixelRatio) || 1);
+    if (canvas.width !== Math.round(cw * dpr) || canvas.height !== Math.round(ch * dpr)) {
+      canvas.width = Math.round(cw * dpr);
+      canvas.height = Math.round(ch * dpr);
+      canvas.style.width = `${cw}px`;
+      canvas.style.height = `${ch}px`;
+    }
+    const sx = (cw / view.w) * dpr, sy = (ch / view.h) * dpr;
+    const ox = -view.x * sx, oy = -view.y * sy;
+    cctx.setTransform(1, 0, 0, 1, 0, 0);
+    cctx.clearRect(0, 0, canvas.width, canvas.height);
+    const X = (x) => x * sx + ox, Y = (y) => y * sy + oy;
+    const labelsHidden = svg.classList.contains("labels-hidden");
+
+    for (const h of drawList.hulls) {
+      cctx.globalAlpha = 0.10;
+      cctx.fillStyle = h.hue;
+      roundRect(cctx, X(h.x), Y(h.y), h.w * sx, h.h * sy, 18 * sx);
+      cctx.fill();
+    }
+    cctx.globalAlpha = 1;
+
+    for (const a of drawList.arcs) {
+      if (svg.classList.contains(`hide-${a.tier}`)) continue;
+      if (a.touchesSilo && svg.classList.contains("hide-silos")) continue;
+      cctx.beginPath();
+      cctx.moveTo(X(a.ax), Y(a.ay));
+      cctx.quadraticCurveTo(X(a.cx), Y(a.cy), X(a.bx), Y(a.by));
+      const lit = a.li === pinnedLi || a.li === litLi;
+      cctx.strokeStyle = a.color;
+      cctx.lineWidth = a.tier === "hint" ? 1 : 2;
+      cctx.globalAlpha = lit ? a.litAlpha : (labelsHidden ? a.dimAlpha : a.alpha);
+      if (a.dash) cctx.setLineDash(a.dash); else cctx.setLineDash([]);
+      cctx.stroke();
+    }
+    cctx.globalAlpha = 1; cctx.setLineDash([]);
+
+    for (const n of drawList.nodes) {
+      const cx = X(n.x), cy = Y(n.y), r = n.r * Math.sqrt(sx * sy / (dpr * dpr)) * dpr;
+      if (n.lum > 0.02) {
+        cctx.globalAlpha = 0.12 * n.lum;
+        cctx.fillStyle = MARIGOLD;
+        cctx.beginPath(); cctx.arc(cx, cy, r * 2.1, 0, 6.2832); cctx.fill();
+      }
+      cctx.globalAlpha = 1;
+      cctx.beginPath(); cctx.arc(cx, cy, r, 0, 6.2832);
+      cctx.fillStyle = n.silo ? BISQUE : CREAM;
+      cctx.fill();
+      cctx.lineWidth = (n.uri === selectedUri ? 2.5 : 1.5) * dpr;
+      cctx.strokeStyle = n.uri === selectedUri ? MARIGOLD : (n.hue || TEAL);
+      cctx.globalAlpha = Math.max(0.15, n.lum);
+      cctx.stroke();
+    }
+    cctx.globalAlpha = 1;
+  }
+
+  function roundRect(c, x, y, w, h, r) {
+    r = Math.max(0, Math.min(r, w / 2, h / 2));
+    c.beginPath();
+    c.moveTo(x + r, y);
+    c.arcTo(x + w, y, x + w, y + h, r);
+    c.arcTo(x + w, y + h, x, y + h, r);
+    c.arcTo(x, y + h, x, y, r);
+    c.arcTo(x, y, x + w, y, r);
+    c.closePath();
+  }
+
+  function scheduleDraw() {
+    if (!useCanvas) return;
+    if (!drawRaf) drawRaf = requestAnimationFrame(drawCanvas);
+  }
+
   /* ─────────────────────────────────────────────────── view machinery */
 
   function applyView() {
     svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.w} ${view.h}`);
+    scheduleDraw();   // the canvas layer (if active) repaints on the same view
     const cw = svg.clientWidth || 800;
     // class labels hide below the zoom threshold — atlas only; the small
     // star chart keeps its labels at every zoom, as it always has
@@ -313,17 +419,20 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
     if (evt) placeCard(evCard, evt);
   }
 
+  function litArc(li, on) {
+    if (visPaths[li]) visPaths[li].classList.toggle("lit", on);
+    else scheduleDraw();   // canvas mode reads pinnedLi/litLi at paint time
+  }
+
   function pinEvidence(li, evt) {
-    if (pinnedLi >= 0 && pinnedLi !== li && visPaths[pinnedLi]) {
-      visPaths[pinnedLi].classList.remove("lit");
-    }
+    if (pinnedLi >= 0 && pinnedLi !== li) litArc(pinnedLi, false);
     pinnedLi = li;
-    if (visPaths[li]) visPaths[li].classList.add("lit");
+    litArc(li, true);
     showEvidence(li, evt, true);
   }
 
   function unpinEvidence() {
-    if (pinnedLi >= 0 && visPaths[pinnedLi]) visPaths[pinnedLi].classList.remove("lit");
+    if (pinnedLi >= 0) litArc(pinnedLi, false);
     pinnedLi = -1;
     evCard.hidden = true;
   }
@@ -335,6 +444,7 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
   function select(uri) {
     selectedUri = uri;
     for (const [u, g] of groups) g.classList.toggle("selected", u === uri);
+    scheduleDraw();
   }
 
   /** Spotlight lands here: in atlas mode, flying to the class's island. */
@@ -382,12 +492,21 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
     return g;
   }
 
-  function arcPath(a, b, liftCap) {
+  /** Canvas-mode node: push paint geometry (also serves as the hit list). */
+  function pushCanvasNode(uri, x, y, c, { halo = true, hue = null, silo = false } = {}) {
+    const r = nodeRadius(c);
+    drawList.nodes.push({ uri, x, y, r, hue, silo, lum: halo ? Math.max(0.15, c.confidence) : 0 });
+  }
+
+  function arcMid(a, b, liftCap) {
     const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
     const dx = b.x - a.x, dy = b.y - a.y;
     const d = Math.sqrt(dx * dx + dy * dy) || 1;
     const lift = Math.min(liftCap, d * 0.22);
-    const cx = mx - (dy / d) * lift, cy = my + (dx / d) * lift;
+    return { cx: mx - (dy / d) * lift, cy: my + (dx / d) * lift };
+  }
+  function arcPath(a, b, liftCap) {
+    const { cx, cy } = arcMid(a, b, liftCap);
     return `M ${a.x.toFixed(1)} ${a.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
   }
 
@@ -400,9 +519,15 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
     atlasLinks = [];
     visPaths = [];
     lastLabelScale = 0;
+    litLi = -1;
     unpinEvidence();
     hideCard();
     clear(svg);
+    // tear the canvas layer down between renders; renderAtlas re-arms it if dense
+    useCanvas = false; drawList = null;
+    if (drawRaf) { cancelAnimationFrame(drawRaf); drawRaf = 0; }
+    if (cctx && canvas) cctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (canvas) canvas.style.display = "none";
   }
 
   /* ════════════════════════════════ STAR mode — the ontology sky ═════ */
@@ -571,6 +696,17 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
       h: Math.max(BASE_H, bandTop + (rows ? 48 + rows * 50 : 0) + 44),
     };
 
+    // CANVAS DECISION — past the threshold the geometry paints to canvas; the
+    // SVG keeps only labels + arc hit-twins (interaction layer). Under it, the
+    // crisp accessible pure-SVG fallback renders exactly as before.
+    const nodeCount = islands.reduce((s, c) => s + c._local.length, 0) + siloUris.length;
+    useCanvas = (nodeCount + atlasLinks.length) > CANVAS_THRESHOLD;
+    if (useCanvas) {
+      ensureCanvas();
+      canvas.style.display = "";
+      drawList = { hulls: [], nodes: [], arcs: [] };
+    }
+
     // 5 · paint, bottom to top: hulls, arcs, archipelago, hit twins, stars
     const hullLayer = svgEl("g", { class: "island-layer" });
     const edgeLayer = svgEl("g", { class: "edge-layer" });
@@ -590,11 +726,15 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
       const bb = { x: x0 - pad, y: y0 - pad, w: (x1 - x0) + 2 * pad, h: (y1 - y0) + 2 * pad };
       islandGeo.set(String(comp.id), bb);
       // the hull — a flat categorical-hue blob with a faint contour halo
-      hullLayer.append(svgEl("rect", {
-        class: "island-hull", x: bb.x.toFixed(1), y: bb.y.toFixed(1),
-        width: bb.w.toFixed(1), height: bb.h.toFixed(1), rx: 26,
-        style: `fill:${comp._hue}`,
-      }));
+      if (useCanvas) {
+        drawList.hulls.push({ x: bb.x, y: bb.y, w: bb.w, h: bb.h, hue: comp._hue });
+      } else {
+        hullLayer.append(svgEl("rect", {
+          class: "island-hull", x: bb.x.toFixed(1), y: bb.y.toFixed(1),
+          width: bb.w.toFixed(1), height: bb.h.toFixed(1), rx: 26,
+          style: `fill:${comp._hue}`,
+        }));
+      }
       const label = svgEl("text", {
         class: "island-label", "data-island": String(comp.id),
         x: (bb.x + bb.w / 2).toFixed(1), y: (bb.y + bb.h + 18).toFixed(1),
@@ -614,19 +754,30 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
       const touchesSilo = !uriIsland.has(l.src_class) || !uriIsland.has(l.dst_class);
       const srcIsl = uriIsland.get(l.src_class), dstIsl = uriIsland.get(l.dst_class);
       const bridge = touchesSilo || srcIsl !== dstIsl; // spans two islands
-      const cls = `atlas-edge tier-${tier}${touchesSilo ? " touches-silo" : ""}${bridge ? " bridge" : ""}`;
       const d = arcPath(a, b, 110);
-      const path = svgEl("path", { class: cls, d, "data-li": String(li) });
-      if (tier === "likely") {
-        // a hypothesis carries its own weight: opacity ∝ score — but it
-        // whispers until hovered (the breathe animation lifts it to 0.9),
-        // and a cross-island bridge whispers quieter than a local guess
-        const score = Math.max(0, Math.min(1, Number(l.score) || 0));
-        path.setAttribute("stroke-opacity",
-          ((bridge ? 0.65 : 1) * (0.1 + 0.38 * score)).toFixed(3));
+      // a likely hypothesis carries its weight: opacity ∝ score; it whispers
+      // until lit; a cross-island bridge whispers quieter than a local guess
+      const score = Math.max(0, Math.min(1, Number(l.score) || 0));
+      const likelyAlpha = (bridge ? 0.65 : 1) * (0.1 + 0.38 * score);
+      if (useCanvas) {
+          const m = arcMid(a, b, 110);
+        const base = tier === "confirmed" ? 0.7 : tier === "likely" ? likelyAlpha : 0.2;
+        drawList.arcs.push({
+          li, tier, touchesSilo,
+          ax: a.x, ay: a.y, bx: b.x, by: b.y, cx: m.cx, cy: m.cy,
+          color: tier === "confirmed" ? TEAL : tier === "likely" ? MARIGOLD : WALNUT,
+          dash: tier === "likely" ? [5, 6] : tier === "hint" ? [1, 5] : null,
+          alpha: base, dimAlpha: tier === "likely" ? 0.15 : tier === "hint" ? 0.06 : base,
+          litAlpha: tier === "confirmed" ? 0.95 : tier === "hint" ? 0.55 : 0.9,
+        });
+        visPaths.push(null);
+      } else {
+        const cls = `atlas-edge tier-${tier}${touchesSilo ? " touches-silo" : ""}${bridge ? " bridge" : ""}`;
+        const path = svgEl("path", { class: cls, d, "data-li": String(li) });
+        if (tier === "likely") path.setAttribute("stroke-opacity", likelyAlpha.toFixed(3));
+        visPaths.push(path);
+        edgeLayer.append(path);
       }
-      visPaths.push(path);
-      edgeLayer.append(path);
       hitLayer.append(svgEl("path", {
         class: `edge-hit tier-${tier}${touchesSilo ? " touches-silo" : ""}`,
         d, "data-li": String(li),
@@ -646,17 +797,20 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
       islandLabels.push(archLabel);
       for (const u of siloUris) {
         const p = positions.get(u);
-        appendNode(arch, u, p.x, p.y, nodeInfo.get(u), { halo: false });
+        if (useCanvas) pushCanvasNode(u, p.x, p.y, nodeInfo.get(u), { halo: false, silo: true });
+        else appendNode(arch, u, p.x, p.y, nodeInfo.get(u), { halo: false });
       }
     }
 
     for (const comp of islands) {
       for (const p of comp._local) {
         const q = positions.get(p.id);
-        appendNode(nodeLayer, p.id, q.x, q.y, nodeInfo.get(p.id), { hue: comp._hue });
+        if (useCanvas) pushCanvasNode(p.id, q.x, q.y, nodeInfo.get(p.id), { hue: comp._hue });
+        else appendNode(nodeLayer, p.id, q.x, q.y, nodeInfo.get(p.id), { hue: comp._hue });
       }
     }
 
+    if (useCanvas) scheduleDraw();
     fitWorld();
   }
 
@@ -664,29 +818,46 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
 
   const asEl = (t) => (t instanceof Element ? t : null);
 
+  /** Canvas mode: nearest node within its radius (world coords), or null. */
+  function canvasNodeAt(e) {
+    if (!useCanvas || !drawList || !drawList.nodes.length) return null;
+    const rect = svg.getBoundingClientRect();
+    const wx = view.x + ((e.clientX - rect.left) / rect.width) * view.w;
+    const wy = view.y + ((e.clientY - rect.top) / rect.height) * view.h;
+    let best = null, bestD = Infinity;
+    for (const n of drawList.nodes) {
+      const dx = n.x - wx, dy = n.y - wy, d2 = dx * dx + dy * dy;
+      const rr = (n.r + 4) * (n.r + 4);
+      if (d2 <= rr && d2 < bestD) { bestD = d2; best = n.uri; }
+    }
+    return best;
+  }
+
   svg.addEventListener("pointerover", (e) => {
     const t = asEl(e.target);
     if (!t) return;
     const hit = t.closest("[data-li]");
     if (hit) {
       const li = Number(hit.getAttribute("data-li"));
-      if (visPaths[li]) visPaths[li].classList.add("lit");
+      litLi = li; litArc(li, true);
       if (pinnedLi < 0) showEvidence(li, e, false);
       return;
     }
     const g = t.closest("g[data-uri]");
-    if (g) {
-      const c = nodeInfo.get(g.getAttribute("data-uri"));
-      if (c) showCard(c, e);
-    }
+    const uri = g ? g.getAttribute("data-uri") : canvasNodeAt(e);
+    if (uri) { const c = nodeInfo.get(uri); if (c) showCard(c, e); }
   });
 
   svg.addEventListener("pointermove", (e) => {
     const t = asEl(e.target);
     if (!t) return;
-    if (!card.hidden && t.closest("g[data-uri]")) {
-      const c = nodeInfo.get(t.closest("g[data-uri]").getAttribute("data-uri"));
-      if (c) showCard(c, e);
+    const g = t.closest("g[data-uri]");
+    const uri = g ? g.getAttribute("data-uri") : canvasNodeAt(e);
+    if (uri) {
+      const c = nodeInfo.get(uri);
+      if (c) showCard(c, e); else if (useCanvas) hideCard();
+    } else if (useCanvas && !card.hidden) {
+      hideCard();
     } else if (pinnedLi < 0 && !evCard.hidden && t.closest("[data-li]")) {
       placeCard(evCard, e);
     }
@@ -698,7 +869,8 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
     const hit = t.closest("[data-li]");
     if (hit) {
       const li = Number(hit.getAttribute("data-li"));
-      if (li !== pinnedLi && visPaths[li]) visPaths[li].classList.remove("lit");
+      if (li !== pinnedLi) litArc(li, false);
+      if (litLi === li) litLi = -1;
       hideEvidence();
     }
     if (t.closest("g[data-uri]")) hideCard();
@@ -722,6 +894,8 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
     }
     const hit = t.closest("[data-li]");
     if (hit) { pinEvidence(Number(hit.getAttribute("data-li")), e); return; }
+    const cu = canvasNodeAt(e);
+    if (cu) { const c = nodeInfo.get(cu); select(cu); if (c && onSelect) onSelect(c); return; }
     unpinEvidence(); // a click on the void releases the pinned card
   });
 
@@ -733,6 +907,7 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
     const t = asEl(e.target);
     // capture would re-target the click — interactive targets opt out of pan
     if (t && t.closest("g[data-uri], [data-li], .island-label")) return;
+    if (canvasNodeAt(e)) return;
     panning = { sx: e.clientX, sy: e.clientY, vx: view.x, vy: view.y };
     svg.setPointerCapture(e.pointerId);
   });

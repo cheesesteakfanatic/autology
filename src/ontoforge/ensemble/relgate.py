@@ -61,12 +61,23 @@ from .paths import PathExpert, default_paths
 __all__ = [
     "AMBIGUOUS_BAND",
     "CONSENSUS_THRESHOLD",
+    "TOP_K_COMMIT",
+    "TOP_CONFIDENCE_RATIO",
     "RelationshipGate",
     "should_vote",
 ]
 
 #: median-of-path confidence a plurality type must clear to be committed.
 CONSENSUS_THRESHOLD = 0.6
+
+#: precision-over-recall commit calibration (RESEARCH_ENGINE_SOTA §3, Tursio
+#: "top-3 candidates within 0.9 confidence"). A typed relationship may COMMIT only
+#: when it is among the top-:data:`TOP_K_COMMIT` candidates for its slot AND no
+#: COMPETING candidate sits within :data:`TOP_CONFIDENCE_RATIO` of the leader's
+#: confidence — a near-tie 2nd candidate is ambiguous and routes to a human. This
+#: trades recall for precision: a wrong committed join corrupts downstream SQL.
+TOP_K_COMMIT = 3
+TOP_CONFIDENCE_RATIO = 0.9
 
 #: the uncertain heuristic-proxy band in which a candidate is worth voting on.
 #: Below ``lo`` the proxy is confidently-low (skip — it's a clear non/weak link);
@@ -229,6 +240,94 @@ class RelationshipGate:
             routed_to_human=routed_to_human,
             prov_ref="",
         )
+
+    # ------------------------------------- top-3-within-0.9 commit calibration
+
+    def calibrate_commits(
+        self,
+        candidates: Sequence[RelationshipCandidate],
+        validations: Optional[Sequence[Optional[JoinValidation]]] = None,
+        *,
+        top_k: int = TOP_K_COMMIT,
+        confidence_ratio: float = TOP_CONFIDENCE_RATIO,
+    ) -> list[RelationshipVerdict]:
+        """Precision-over-recall commit/abstain over a FIELD of competing candidates.
+
+        ``candidates`` are the rival hypotheses for ONE slot (e.g. the possible
+        parents a single FK child could point into). The Tursio calibration
+        (RESEARCH_ENGINE_SOTA §3): a candidate COMMITS only when ALL hold —
+
+          1. it is among the TOP-``top_k`` candidates by confidence;
+          2. it is within ``confidence_ratio`` of the TOP confidence (the leader
+             trivially is; this gates the rest);
+          3. its own gate :meth:`decide` reaches consensus (paths agree, median ≥
+             threshold, validation does not contradict);
+          4. NO OTHER candidate sits within ``confidence_ratio`` of the leader —
+             a near-tie means the field is AMBIGUOUS, so even the leader abstains
+             and routes to a human (a borderline 2nd candidate within 0.9 ⇒ route).
+
+        Otherwise the candidate is ``routed_to_human``. Returns one
+        :class:`RelationshipVerdict` per input candidate, in INPUT order (the
+        per-candidate ``decide`` is preserved; only the commit/route flags are
+        re-derived under the field-level rule). Deterministic in the inputs.
+        """
+        cands = list(candidates)
+        n = len(cands)
+        if validations is None:
+            vals: list[Optional[JoinValidation]] = [None] * n
+        else:
+            vals = list(validations)
+            if len(vals) != n:
+                raise ValueError("validations must align 1:1 with candidates")
+        if n == 0:
+            return []
+
+        # base per-candidate verdicts (unchanged decide math)
+        base = [self.decide(c, v) for c, v in zip(cands, vals)]
+
+        # rank by confidence (desc), stable tie-break on column address, to pick the
+        # top-k field and detect near-ties deterministically.
+        order = sorted(
+            range(n),
+            key=lambda i: (
+                -cands[i].confidence,
+                cands[i].left.table, cands[i].left.column,
+                cands[i].right.table, cands[i].right.column,
+            ),
+        )
+        top_conf = cands[order[0]].confidence
+        cutoff = confidence_ratio * top_conf
+        top_set = set(order[:top_k])
+        # how many candidates are "within ratio of the top" — >1 means a near-tie.
+        contenders = [i for i in range(n) if cands[i].confidence >= cutoff]
+        ambiguous_field = len(contenders) > 1
+
+        out: list[RelationshipVerdict] = []
+        for i in range(n):
+            v = base[i]
+            in_top_k = i in top_set
+            within_ratio = cands[i].confidence >= cutoff
+            commit = bool(
+                v.consensus
+                and in_top_k
+                and within_ratio
+                and not ambiguous_field
+            )
+            out.append(
+                RelationshipVerdict(
+                    left=v.left,
+                    right=v.right,
+                    rel_type=v.rel_type,
+                    confidence=v.confidence,
+                    consensus=v.consensus,
+                    votes=v.votes,
+                    validation=v.validation,
+                    committed=commit,
+                    routed_to_human=not commit,
+                    prov_ref=v.prov_ref,
+                )
+            )
+        return out
 
     # ------------------------------------------------------- provenance
 

@@ -18,6 +18,13 @@ VALUE_CONTAINMENT  |A∩B|/|A| in BOTH directions. A genuine FK child is (near-)
     DECREASE confidence, never manufacture it.
 VALUE_JACCARD      MinHash-estimated J(A,B) over the full value sets (φ carries a
     k=64 signature). Symmetric overlap.
+INFREQUENT_TOKEN   Jaccard restricted to the RARE tokens of the two sampled value
+    sets. Whole-value overlap collapses on format variants — ``"123 Main St"`` and
+    ``"123 Main Street"`` share zero values yet are the same address. Tokenizing the
+    values and keeping only the INFREQUENT tokens (the discriminating ones — a
+    street name, an account stem — not the boilerplate ``"st"``/``"street"``/``"inc"``
+    that appears everywhere) recovers the join: the rare tokens still coincide.
+    Fused as one more EvidenceArtifact, never a single-metric gate.
 DISTRIBUTION_DIVERGENCE  THE false-positive killer. Two columns can overlap on
     *which* values appear yet disagree wildly on *how often* / *where* — that is
     "looks similar, isn't related." Jensen-Shannon divergence over the
@@ -57,13 +64,17 @@ from ontoforge.profiling import name_token_jaccard
 
 __all__ = [
     "SAMPLE_CAP",
+    "INFREQUENT_TOKEN_FRACTION",
     "SampledColumn",
     "shannon_entropy",
     "jensen_shannon",
     "quantile_divergence",
     "trigram_similarity",
+    "value_tokens",
+    "infrequent_token_sets",
     "containment_signals",
     "jaccard_signal",
+    "infrequent_token_signal",
     "distribution_divergence_signal",
     "cardinality_ratio_signal",
     "key_uniqueness_signal",
@@ -75,6 +86,12 @@ __all__ = [
 
 # Defensive cap: a scout/sample set is small by construction; we never iterate bulk.
 SAMPLE_CAP = 512
+
+# A token is "infrequent" (discriminating) when it appears in at most this FRACTION
+# of the combined distinct value sample. Boilerplate ("st", "street", "inc", "the")
+# recurs across many values and is filtered out; the rare tokens that actually
+# identify a row (a street name, an account stem) survive. Tunable.
+INFREQUENT_TOKEN_FRACTION = 0.5
 
 _NUMERIC = (Datatype.INTEGER, Datatype.FLOAT)
 _STRINGY = (Datatype.STRING, Datatype.TEXT)
@@ -204,6 +221,65 @@ def trigram_similarity(a: str, b: str) -> float:
     return 2 * len(ga & gb) / (len(ga) + len(gb))
 
 
+def value_tokens(value: str) -> frozenset[str]:
+    """Split a value string into lowercased word tokens (alnum runs).
+
+    Pure and deterministic: lowercases, splits on any non-alphanumeric boundary,
+    and drops length-1 tokens (single letters/digits carry no discriminating
+    power). ``"123 Main St."`` → ``{"123", "main", "st"}``.
+    """
+    out: set[str] = set()
+    cur: list[str] = []
+    for ch in value.lower():
+        if ch.isalnum():
+            cur.append(ch)
+        elif cur:
+            tok = "".join(cur)
+            if len(tok) > 1:
+                out.add(tok)
+            cur = []
+    if cur:
+        tok = "".join(cur)
+        if len(tok) > 1:
+            out.add(tok)
+    return frozenset(out)
+
+
+def infrequent_token_sets(
+    left_values: frozenset[str],
+    right_values: frozenset[str],
+    *,
+    fraction: float = INFREQUENT_TOKEN_FRACTION,
+) -> tuple[frozenset[str], frozenset[str]]:
+    """Per-side sets of INFREQUENT tokens, computed over the COMBINED sample.
+
+    Document-frequency = how many distinct values (across both sides pooled)
+    contain a token. A token kept only when its combined document-frequency ≤
+    ``fraction`` × (distinct values pooled): boilerplate that appears in most
+    values is dropped, the rare discriminating tokens survive. Returns
+    (left_rare_tokens, right_rare_tokens) so the caller can Jaccard them.
+    """
+    docs = list(left_values) + list(right_values)
+    n_docs = len(docs)
+    if n_docs == 0:
+        return frozenset(), frozenset()
+    tokenized = [value_tokens(v) for v in docs]
+    df: dict[str, int] = {}
+    for toks in tokenized:
+        for t in toks:
+            df[t] = df.get(t, 0) + 1
+    cutoff = max(1, int(fraction * n_docs))
+    rare = {t for t, c in df.items() if c <= cutoff}
+
+    def side(values: frozenset[str]) -> frozenset[str]:
+        acc: set[str] = set()
+        for v in values:
+            acc |= value_tokens(v) & rare
+        return frozenset(acc)
+
+    return side(left_values), side(right_values)
+
+
 # ----------------------------------------------------------------- signal helpers
 
 
@@ -281,6 +357,39 @@ def jaccard_signal(left: SampledColumn, right: SampledColumn, *, fire_at: float 
         fired=j >= fire_at,
         conflicts=False,
         detail=f"MinHash J≈{j:.3f}",
+    )
+
+
+def infrequent_token_signal(
+    left: SampledColumn, right: SampledColumn, *, fire_at: float = 0.3
+) -> EvidenceArtifact:
+    """INFREQUENT_TOKEN — Jaccard over the RARE tokens of the two value samples.
+
+    Whole-value overlap (containment / Jaccard) collapses to zero on FORMAT
+    VARIANTS: ``"123 Main St"`` and ``"123 Main Street"`` are the same address yet
+    share no value. We tokenize both samples, keep only the INFREQUENT tokens (the
+    discriminating ones — ``"main"``, ``"123"`` — not the boilerplate ``"st"`` /
+    ``"street"`` that recurs everywhere), and Jaccard them. A real format-variant
+    join still scores high here even when the verbatim Jaccard is ~0; this is fused
+    as ONE more positive signal, never a single-metric gate.
+
+    Returns 0.0 (no fire) when either side yields no rare tokens (numeric ids,
+    single-word codes) so it never manufactures a relationship out of thin air.
+    """
+    la, ra = infrequent_token_sets(left.value_set(), right.value_set())
+    if not la or not ra:
+        sim = 0.0
+    else:
+        inter = la & ra
+        union = la | ra
+        sim = len(inter) / len(union) if union else 0.0
+    return _artifact(
+        SignalKind.INFREQUENT_TOKEN,
+        sim,
+        weight=0.12,
+        fired=sim >= fire_at,
+        conflicts=False,  # a positive corroborator only; absence is silence, not a veto
+        detail=f"rare-token J≈{sim:.3f} (|rare∩|={len(la & ra) if la and ra else 0})",
     )
 
 

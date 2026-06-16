@@ -218,8 +218,8 @@ def test_build_surface_is_the_two_pane_builder(client):
     # the free-text box feeds the same synthesis
     assert "describe what you want to see" in build
     assert "/api/dashboards" in build, "proposals come from VISTA synthesis"
-    # warm chart theme (the atlas wheel, never the dark palette)
-    assert "ATLAS_RANGE" in build and "#1F6F6B" in build and "#E0A126" in build
+    # warm chart theme (the MUTED atlas wheel, never the dark palette)
+    assert "ATLAS_RANGE" in build and "#2C5956" in build and "#D09735" in build
     assert "#9b978e" not in build, "the old dark chart inks are gone"
     css = client.get("/static/style.css").text
     assert ".build-layout" in css and ".build-left" in css and ".build-right" in css
@@ -469,10 +469,13 @@ def test_warm_theme_is_preserved_not_repainted(client):
     assert "#ECE1CB" in root, "Canvas Oatmeal is the desktop ground"
     assert "#FBF4E6" in root, "Card Cream is the resting surface"
     assert "#2A1F14" in root, "Espresso Ink is the primary text — never #000"
-    assert "#E0A126" in root, "Marigold is the primary-action fill"
+    # CHROMA DISCIPLINE: marigold + the wheel are MUTED into a 25-40% S band
+    # (the maturation pass). The warm cream/oatmeal/espresso grounds are
+    # unchanged; only the saturated accent hues were pulled down.
+    assert "#D09735" in root, "Marigold (muted) is the primary-action fill"
     assert "#D8CDB8" in css, "Abstention-Taupe — the dignified 'no reading' ground"
-    for hue in ("#1F6F6B", "#C75B39", "#7C8A3B", "#2D6E8E", "#6E4A63"):
-        assert hue in css, f"the atlas categorical hue {hue} is in the wheel"
+    for hue in ("#2C5956", "#945442", "#6C733A", "#375E72", "#713D68"):
+        assert hue in css, f"the muted atlas categorical hue {hue} is in the wheel"
     default_block = css.split('html[data-theme="dark"]')[0]
     for dead in ("#0b0d10", "#0e1116", "#11141a", "#161a22"):
         assert dead not in default_block, f"the old dark ground {dead} is gone from the warm default"
@@ -636,7 +639,12 @@ def test_likely_joins_are_dashed_marigold_with_score_opacity():
     likely_rule = re.search(r"\.tier-likely\s*\{([^}]*)\}", css)
     assert likely_rule and "stroke-dasharray" in likely_rule.group(1)
     assert "--marigold" in likely_rule.group(1)
-    assert "likely-breathe" in css and "prefers-reduced-motion" in css
+    # MATURATION: the 'likely-breathe' pulse is gone (calm motion) — a hovered/
+    # lit likely arc simply lifts to full opacity, no infinite breathing loop.
+    assert "likely-breathe" not in css, "the breathing pulse motif is removed"
+    lit = re.search(r"\.constellation path\.lit\.tier-likely\s*\{([^}]*)\}", css)
+    assert lit and "stroke-opacity" in lit.group(1), "a lit likely arc lifts to full opacity"
+    assert "prefers-reduced-motion" in css
     engine = _engine_src()
     assert "tier-${tier}" in engine
     assert 'setAttribute("stroke-opacity"' in engine
@@ -710,3 +718,151 @@ def test_synthetic_250_node_atlas_fixture_matches_the_contract():
     for key in ("components", "links", "stats", "class_uris", "dataset_count",
                 "is_silo", "src_class", "dst_class", "tier", "score", "evidence"):
         assert key in src, f"the JS never reads contract key {key}"
+
+
+# ════════════════════════════ UI MATURATION — warm, grown-up, calmer
+# These guard the "childish → natural/intuitive/premium" pass: chroma
+# discipline, the neutral:accent ratio, type maturity, form restraint, and
+# the calmer motion — without weakening any security/payload/abstention gate.
+
+
+def _root(css):
+    return css.split("}", 1)[0]
+
+
+def _strip_css_comments(css):
+    """Drop /* ... */ blocks so token assertions test DECLARATIONS, not the
+    documentation prose (which may name old values when explaining a swap)."""
+    return re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+
+
+def test_chroma_discipline_hues_are_muted(client):
+    """CHROMA DISCIPLINE: the 8-hue wheel + marigold are pulled out of the
+    ~50-70% crayon band into a muted 25-40% S band — desaturated, NOT grayed.
+    The old saturated literals are gone; the muted ones carry the wheel."""
+    css = client.get("/static/style.css").text
+    root = _root(css)
+    # the muted wheel, in ATLAS_HUES order (mirrored in core.js)
+    muted = ("#2C5956", "#945442", "#6C733A", "#375E72", "#945942", "#713D68", "#86663C")
+    for hue in muted:
+        assert hue in root, f"the muted hue {hue} declares in :root"
+    # marigold is muted but stays a readable primary FILL (ink-on-marigold AA)
+    assert "#D09735" in root, "marigold muted from the crayon #E0A126"
+    # the old crayon literals must be gone from the warm default DECLARATIONS
+    # (comments may still name them when documenting the swap)
+    default_block = _strip_css_comments(css.split('html[data-theme="dark"]')[0])
+    for crayon in ("#E0A126", "#1F6F6B", "#C75B39", "#B8532A", "#2D6E8E", "#6E4A63"):
+        assert crayon not in default_block, f"the saturated crayon {crayon} is gone"
+    # the JS categorical contract is muted in lockstep (core.js + constellation.js)
+    core_raw = (JS_DIR / "core.js").read_text(encoding="utf-8")
+    engine = (JS_DIR / "constellation.js").read_text(encoding="utf-8")
+    for hue in ("#2C5956", "#D09735"):
+        assert hue in core_raw and hue in engine, f"{hue} is in the JS wheel contract"
+    # strip // line + /* */ block comments before checking old literals are gone
+    core_code = re.sub(r"//[^\n]*", "", _strip_css_comments(core_raw))
+    assert "#E0A126" not in core_code and "#1F6F6B" not in core_code, \
+        "old crayon hues gone from the core.js wheel values"
+
+
+def test_neutral_accent_ratio_titlebar_is_not_a_colored_bezel(client):
+    """NEUTRAL:ACCENT — the window title strip is a neutral cream cap with a
+    thin accent (it keeps var(--accent), but as a hairline, not a hue fill).
+    The per-card colored left-edges collapse to a hairline default."""
+    css = client.get("/static/style.css").text
+    titlebar = re.search(r"\.titlebar\s*\{([^}]*)\}", css)
+    assert titlebar, "the title strip rule exists"
+    body = titlebar.group(1)
+    assert "var(--accent)" in body, "the accent survives as a quiet marker"
+    assert "background: var(--accent)" not in body, "the strip is NOT a full hue fill"
+    assert "background: var(--cream)" in body, "the strip is a neutral cream cap"
+    # the build outputs no longer wear persimmon/avocado bezel edges
+    assert "border-left: 3px solid var(--persimmon)" not in css
+    assert "border-left: 3px solid var(--avocado)" not in css
+    assert "border-left: 3px solid var(--ocean)" not in css, "console clarify edge neutralized"
+
+
+def test_type_maturity_serif_added_and_smallcaps_off_buttons(client):
+    """TYPE MATURITY: a system serif (no webfont, offline-safe) carries hero
+    headlines; the chrome sans is humanist (not Futura); small-caps is OFF the
+    buttons/dock/titles and reserved for tiny eyebrow kickers only."""
+    css = client.get("/static/style.css").text
+    root = _root(css)
+    assert "--serif:" in root and "ui-serif" in root, "a system serif stack is declared"
+    assert "Futura" not in root, "the geometric Futura-first chrome is gone"
+    # buttons must NOT use small-caps anymore
+    btn = re.search(r"\n\.btn\s*\{([^}]*)\}", css)
+    assert btn and "small-caps" not in btn.group(1), "the .btn label is no longer small-caps"
+    # the hero headlines wear the serif
+    assert "var(--serif)" in css, "the serif is actually applied to a hero headline"
+    # small-caps survives ONLY as the reserved tiny-kicker use (e.g. .badge)
+    assert "small-caps" in css, "small-caps is retained for tiny eyebrow kickers"
+
+
+def test_form_restraint_radii_reduced_and_toy_motifs_removed(client):
+    """FORM RESTRAINT: radii drop (12→8, 14→10, 999px pills → a small
+    rounded-rect token) and the toy motifs are deleted — the dot-pulse bounce,
+    the conic starburst running-dot, the switcher coach halo, the node-pop
+    overshoot, the likely-breathe pulse, the 45° striped chart placeholder."""
+    css = client.get("/static/style.css").text
+    root = _root(css)
+    assert "--radius: 8px" in root and "--radius-win: 10px" in root, "radii are tighter"
+    assert "--radius-pill:" in root, "a small rounded-rect pill token replaces 999px"
+    # the deleted motif keyframes / gradients are gone
+    for motif in ("@keyframes dot-pulse", "@keyframes switcher-halo",
+                  "@keyframes node-pop", "@keyframes likely-breathe",
+                  "conic-gradient", "repeating-linear-gradient"):
+        assert motif not in css, f"the toy motif '{motif}' is removed"
+    # the plasticky bright inset highlight on shadow-2 is gone
+    assert "rgba(255, 253, 247, 0.6) inset" not in css, "the plastic inset highlight is gone"
+    # the JS hooks for the removed motifs are gone too
+    dock = (JS_DIR / "dock.js").read_text(encoding="utf-8")
+    modes = (JS_DIR / "modes.js").read_text(encoding="utf-8")
+    assert "pulse-once" not in dock, "the launch-bounce hook is removed"
+    assert "coach-lit" not in modes, "the switcher coach-halo hook is removed"
+
+
+def test_grain_is_quieter(client):
+    """The paper grain is calmer: lower frequency + lower opacity."""
+    css = client.get("/static/style.css").text
+    assert "baseFrequency='0.65'" in css, "the grain frequency is lowered"
+    assert "opacity: 0.025" in css, "the grain opacity is lowered from 0.03"
+
+
+def test_datamap_has_a_canvas_render_path_with_svg_fallback():
+    """PERFORMANCE: the constellation/Data Map gains a CANVAS acceleration
+    layer for dense skies (60fps to several-thousand nodes), while keeping the
+    crisp accessible SVG fallback under the threshold. The canvas paints on the
+    same viewBox transform; the <svg> stays the interaction layer."""
+    engine = (JS_DIR / "constellation.js").read_text(encoding="utf-8")
+    # the threshold-gated canvas layer exists
+    assert "CANVAS_THRESHOLD" in engine, "a documented element-count threshold gates the canvas"
+    assert 'createElement("canvas")' in engine, "it creates a real <canvas>"
+    assert 'getContext("2d")' in engine and "drawCanvas" in engine, "it paints to a 2d context"
+    # the SVG fallback is explicit: under the threshold the pure-SVG path renders
+    assert "useCanvas" in engine, "a flag switches between canvas and the SVG fallback"
+    assert "ATLAS SCALE GUARD" in engine, "the scale-guard discipline is documented and held"
+    # interaction stays honest: pan/zoom on viewBox, a JS nearest-node hit-test
+    assert "canvasNodeAt" in engine, "canvas mode hit-tests the nearest node in JS"
+    assert 'setAttribute("viewBox"' in engine, "pan/zoom still rides the viewBox"
+    # the canvas takes NO pointer events — the svg owns interaction (security/hover)
+    css = (STATIC_DIR / "style.css").read_text(encoding="utf-8")
+    cv = re.search(r"\.constellation-canvas\s*\{([^}]*)\}", css)
+    assert cv and "pointer-events: none" in cv.group(1), "the canvas takes no pointer events"
+    # the canvas paints with literal warm tokens (no CSS var() in a 2d context),
+    # and they are the MUTED palette
+    assert "#2C5956" in engine and "#D09735" in engine, "the canvas paints the muted wheel"
+
+
+def test_payload_dropped_and_under_budget():
+    """The maturation NET-shrinks the decorative bloat; even with the additive
+    canvas layer the whole non-vendor shell stays under the 290 KB budget."""
+    total = sum(
+        p.stat().st_size
+        for p in STATIC_DIR.rglob("*")
+        if p.is_file() and "vendor" not in p.parts
+    )
+    assert total < PAYLOAD_BUDGET, f"non-vendor payload is {total} bytes (budget {PAYLOAD_BUDGET})"
+    # the stylesheet itself shrank vs the pre-maturation ~79.5 KB (chroma swaps
+    # are value-neutral; the deleted keyframes/gradients + comment trim shrink it)
+    css_bytes = (STATIC_DIR / "style.css").stat().st_size
+    assert css_bytes < 79480, f"style.css ({css_bytes}) is smaller than the pre-maturation 79480"

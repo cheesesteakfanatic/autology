@@ -37,6 +37,7 @@ from typing import Any, Mapping, Optional, Sequence
 
 from ontoforge.contracts import FD
 
+from . import _fd_kernels as _k
 from ._values import columns_of, is_null, value_key
 
 __all__ = [
@@ -127,10 +128,15 @@ def _fds_from_columns(
     if n == 0 or not cols:
         return []
 
-    keys: dict[str, list[str]] = {c: _row_keys(cols_map[c]) for c in cols}
-    parts: dict[frozenset[str], Partition] = {frozenset(): ((tuple(range(n)),) if n > 1 else ())}
+    # P1: factorize every column's per-row equality keys to int32 codes ONCE; the
+    # whole lattice search then runs over codes (np.argsort segment scans +
+    # bincount) instead of Counter-per-class / dict bucketize. Byte-identical to
+    # the pure-python reference (tests/profiling/test_perf_fds.py asserts equality).
+    codes: dict[str, Any] = {c: _k.codes_of(_row_keys(cols_map[c])) for c in cols}
+    maxcode: dict[str, int] = {c: (int(codes[c].max()) + 1 if codes[c].size else 0) for c in cols}
+    parts: dict[frozenset[str], _k.CodedPartition] = {frozenset(): _k.full_partition(n)}
     for c in cols:
-        parts[frozenset((c,))] = stripped_partition(keys[c])
+        parts[frozenset((c,))] = _k.stripped_partition_coded(codes[c])
 
     allcols = frozenset(cols)
     cplus: dict[frozenset[str], set[str]] = {frozenset(): set(cols)}
@@ -152,7 +158,7 @@ def _fds_from_columns(
             x = frozenset(t)
             for a in sorted(x & cplus[x]):
                 lhs = x - {a}
-                viol = _violations(parts[lhs], keys[a])
+                viol = _k.violations_coded(parts[lhs], codes[a], maxcode[a])
                 if viol == 0:
                     lhs_t = tuple(sorted(lhs))
                     exact.append(FD(table=table, lhs=lhs_t, rhs=a, confidence=1.0))
@@ -185,7 +191,7 @@ def _fds_from_columns(
                     zf = frozenset(z)
                     if not all((zf - {a}) in present for a in z):
                         continue
-                    parts[zf] = partition_product(
+                    parts[zf] = _k.partition_product_coded(
                         parts[frozenset(group[i])], parts[frozenset(group[j])], n
                     )
                     nxt.append(z)
@@ -231,14 +237,14 @@ def _keys_from_columns(
         return ()
     # entity integrity: columns containing nulls cannot participate in a key
     eligible = sorted(c for c, vals in cols_map.items() if not any(is_null(v) for v in vals))
-    keys = {c: _row_keys(cols_map[c]) for c in eligible}
-    parts = {c: stripped_partition(keys[c]) for c in eligible}
+    codes = {c: _k.codes_of(_row_keys(cols_map[c])) for c in eligible}
+    parts = {c: _k.stripped_partition_coded(codes[c]) for c in eligible}
 
-    out: list[tuple[str, ...]] = [(c,) for c in eligible if not parts[c]]
+    out: list[tuple[str, ...]] = [(c,) for c in eligible if _k.is_empty(parts[c])]
     if max_key_size >= 2:
-        rest = [c for c in eligible if parts[c]]  # minimality: skip supersets of unary keys
+        rest = [c for c in eligible if not _k.is_empty(parts[c])]  # skip supersets of unary keys
         for c1, c2 in combinations(rest, 2):
-            if not partition_product(parts[c1], parts[c2], n):
+            if _k.is_empty(_k.partition_product_coded(parts[c1], parts[c2], n)):
                 out.append((c1, c2))
     return tuple(out)
 

@@ -38,6 +38,8 @@ from ontoforge.ensemble.paths import (
 from ontoforge.ensemble.relgate import (
     AMBIGUOUS_BAND,
     CONSENSUS_THRESHOLD,
+    TOP_CONFIDENCE_RATIO,
+    TOP_K_COMMIT,
     RelationshipGate,
     should_vote,
 )
@@ -427,3 +429,111 @@ def test_gate_rejects_duplicate_paths() -> None:
         RelationshipGate([SchemaPath(), SchemaPath()])
     with pytest.raises(ValueError):
         RelationshipGate([])
+
+
+# --------------------------------------------------------------------------
+# top-3-within-0.9 commit/abstain calibration (§3 — precision over recall)
+# --------------------------------------------------------------------------
+
+
+def _unanimous_paths(rt: RT, conf: float):
+    return [
+        _FixedPath(ReasoningPath.SCHEMA, rt, conf),
+        _FixedPath(ReasoningPath.VALUE, rt, conf),
+        _FixedPath(ReasoningPath.BUSINESS_LOGIC, rt, conf),
+    ]
+
+
+def test_calibration_constants_are_documented_defaults() -> None:
+    assert TOP_K_COMMIT == 3
+    assert TOP_CONFIDENCE_RATIO == 0.9
+
+
+def test_calibration_commits_a_clear_winner() -> None:
+    """One strong candidate, the rest far below the 0.9-of-top band ⇒ the leader
+    commits (it is top-3, within ratio, consensus holds, no near-tie)."""
+    gate = RelationshipGate(_unanimous_paths(RT.FK_JOIN, 0.95))
+    cands = [
+        _cand(confidence=0.95, right_table="parcels"),       # leader
+        _cand(confidence=0.50, right_table="depots"),        # 0.50 < 0.9*0.95
+        _cand(confidence=0.30, right_table="hubs"),
+    ]
+    verdicts = gate.calibrate_commits(cands)
+    assert verdicts[0].committed is True
+    assert verdicts[1].committed is False and verdicts[1].routed_to_human is True
+    assert verdicts[2].committed is False
+
+
+def test_calibration_borderline_second_within_0_9_routes_to_human() -> None:
+    """The headline rule: a 2nd candidate within 0.9 of the top is a near-tie ⇒
+    the field is AMBIGUOUS, so EVEN THE LEADER abstains and routes to a human."""
+    gate = RelationshipGate(_unanimous_paths(RT.FK_JOIN, 0.95))
+    cands = [
+        _cand(confidence=0.95, right_table="parcels"),   # leader
+        _cand(confidence=0.90, right_table="packages"),  # 0.90 >= 0.9*0.95=0.855 ⇒ near-tie
+    ]
+    verdicts = gate.calibrate_commits(cands)
+    assert verdicts[0].committed is False
+    assert verdicts[0].routed_to_human is True
+    assert verdicts[1].committed is False
+
+
+def test_calibration_outside_top_k_never_commits() -> None:
+    """A 4th candidate, even with decent consensus, is outside the top-3 ⇒ route."""
+    gate = RelationshipGate(_unanimous_paths(RT.FK_JOIN, 0.8))
+    # leader clearly ahead (no near-tie), then three more well below the band
+    cands = [
+        _cand(confidence=0.90, right_table="a"),
+        _cand(confidence=0.40, right_table="b"),
+        _cand(confidence=0.35, right_table="c"),
+        _cand(confidence=0.30, right_table="d"),  # 4th — outside top-3
+    ]
+    verdicts = gate.calibrate_commits(cands)
+    assert verdicts[0].committed is True       # clear winner commits
+    assert verdicts[3].committed is False      # outside top-k routes
+    assert verdicts[3].routed_to_human is True
+
+
+def test_calibration_no_consensus_blocks_commit_even_as_clear_leader() -> None:
+    """A clear confidence leader with NO path consensus still must route — the
+    calibration ANDs the field rule with the per-candidate consensus gate."""
+    split = [
+        _FixedPath(ReasoningPath.SCHEMA, RT.FK_JOIN, 0.9),
+        _FixedPath(ReasoningPath.VALUE, RT.M2M_BRIDGE, 0.9),
+        _FixedPath(ReasoningPath.BUSINESS_LOGIC, RT.DENORMALIZATION, 0.9),
+    ]
+    gate = RelationshipGate(split)
+    cands = [_cand(confidence=0.95), _cand(confidence=0.20, right_table="z")]
+    verdicts = gate.calibrate_commits(cands)
+    assert verdicts[0].committed is False  # no plurality ⇒ no commit
+    assert verdicts[0].routed_to_human is True
+
+
+def test_calibration_validation_veto_still_blocks() -> None:
+    """A clear leader whose executed join FAILS validation must not commit, even
+    though it is the lone top candidate — the data veto composes with calibration."""
+    gate = RelationshipGate(_unanimous_paths(RT.FK_JOIN, 0.95))
+    cands = [_cand(confidence=0.95), _cand(confidence=0.30, right_table="z")]
+    verdicts = gate.calibrate_commits(cands, [_bad_validation(), None])
+    assert verdicts[0].committed is False
+    assert verdicts[0].routed_to_human is True
+
+
+def test_calibration_empty_and_alignment() -> None:
+    import pytest
+    gate = RelationshipGate()
+    assert gate.calibrate_commits([]) == []
+    with pytest.raises(ValueError):
+        gate.calibrate_commits([_cand()], [None, None])  # misaligned validations
+
+
+def test_calibration_is_deterministic() -> None:
+    g1, g2 = (RelationshipGate(_unanimous_paths(RT.FK_JOIN, 0.95)) for _ in range(2))
+    cands = [
+        _cand(confidence=0.95, right_table="parcels"),
+        _cand(confidence=0.50, right_table="depots"),
+    ]
+    v1 = g1.calibrate_commits(cands)
+    v2 = g2.calibrate_commits(cands)
+    assert [RelationshipGate.to_provenance(v) for v in v1] == \
+           [RelationshipGate.to_provenance(v) for v in v2]

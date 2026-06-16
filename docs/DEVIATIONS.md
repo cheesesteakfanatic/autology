@@ -103,3 +103,45 @@ affected modules, justification referencing acceptance tests, and migration note
   parses through the API schema — the compatibility gate).
 - **Migration note:** none — caps are constants; lifting them is a one-line change when the UI
   renderer's arc budget grows.
+
+## AMD-0010 — ADD SignalKind.INFREQUENT_TOKEN + per-estate weighting + Tursio thresholds (engine accuracy)
+
+- **GIVEN** the M-REL §1.1 evidence-fusion engine fuses a fixed signal menu under one global formula,
+  **WHEN** hardening accuracy per the verified `docs/RESEARCH_ENGINE_SOTA.md` (Tursio + multi-signal
+  fusion), **THEN** four additive, KEYLESS/DETERMINISTIC refinements land, all behind the same
+  contracts and gates:
+  (1) **NEW signal `SignalKind.INFREQUENT_TOKEN`** (contracts `relationships.py`) — Jaccard restricted
+  to the RARE value tokens, catching format-variant joins ("123 Main St"↔"123 Main Street") where
+  verbatim containment/Jaccard collapse to ~0. Fused as one more `EvidenceArtifact` (weight 0.12,
+  positive corroborator only — never a veto). The fusion's hard divergence veto and the divergence
+  NEGATIVE are damped ONLY when rare-token overlap is high AND verbatim containment is low (a
+  format-artifact, not a genuine frequency clash) — gated so a genuine look-alike (no rare-token
+  agreement) or an identical-vocabulary frequency-swap (high containment) is UNAFFECTED.
+  (2) **Tursio PK band + IND-0.4 prune** (`relationships/classify.py`, `relationships/score.py`) as
+  documented, tunable constants: `PK_DISTINCT_RATIO=0.95` / `PK_BAND_TOLERANCE=0.05` (a PK candidate
+  has distinct ≥ 0.95·rows AND within ±5% of the table's max distinct); `IND_PRUNE_FLOOR=0.4` over a
+  5-component IND/candidate score (containment backbone + key-uniqueness + cardinality + type + weak
+  name), with containment as a necessary backbone so a near-key target with zero value overlap cannot
+  pass. The distribution-divergence false-positive killer is unchanged.
+  (3) **NEW `relationships/weighting.py`** — a per-estate `WeightingProfile` (RELATIONAL / LAKE /
+  BALANCED) detected from profiles alone (keyed-table fraction, string-column fraction, avg
+  uniqueness); `fuse_confidence` scales each signal's weight by its GROUP (structural / overlap /
+  semantic) — structure+overlap dominate clean relational estates, semantic metadata dominates messy
+  lakes. The FP-killer negatives are NEVER scaled. `discover_relationships` auto-detects by default.
+  (4) **top-3-within-0.9 commit calibration** (`ensemble/relgate.py`) — `RelationshipGate.
+  calibrate_commits` (precision-over-recall): a typed relationship COMMITS only when it is top-3 by
+  confidence, within `TOP_CONFIDENCE_RATIO=0.9` of the leader, reaches per-candidate consensus, AND no
+  competing candidate sits within 0.9 of the leader (a borderline 2nd candidate routes the whole field
+  to a human). `should_vote` stays the cost scalpel; `decide` is unchanged.
+- **Affected:** contracts (`relationships.py`: one ADD-only `SignalKind` member — the pinned membership
+  test updated); relationships (`signals.py`, `score.py`, `classify.py`, `discover.py`, new
+  `weighting.py`, `__init__.py`); ensemble (`relgate.py`, `__init__.py`). No change to `profiling/`,
+  `static/`, the spine, or any existing gate.
+- **Justification:** `tests/relationships/test_signals.py` (St↔Street recovery, silence on disjoint
+  ids), `tests/relationships/test_weighting.py` (estate detection, re-weighting moves the proxy, FP
+  killer survives every profile, PK band 0.95/±5%, IND prune at 0.4), `tests/ensemble/test_relgate.py`
+  (top-3-within-0.9 commit/abstain incl. borderline-2nd routing, validation-veto composition,
+  determinism), `tests/contracts/test_relationships_contracts.py` (enum membership). `tests/relationships`
+  + `tests/ensemble` green; full suite green.
+- **Migration note:** none — all four are additive and tunable via the new module-level constants; the
+  default `BALANCED` profile reproduces the prior global fusion when no estate fingerprint is supplied.

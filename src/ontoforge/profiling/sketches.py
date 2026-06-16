@@ -22,10 +22,18 @@ HyperLogLog
     into the registers, so nothing seen before the switch is lost).
 
 MinHash
-    k independent xxhash64 seeds (seed+i for lane i); signature lane i is the
-    minimum hash of the value set under seed i. Pr[sig_a[i] == sig_b[i]] = J(A,B),
-    so contracts.minhash_jaccard (fraction of equal lanes) is an unbiased Jaccard
-    estimator with std error sqrt(J(1-J)/k) ≤ 0.0625 at k=64.
+    Universal-hashing permutation trick (P3): each value is hashed ONCE to a base
+    64-bit fingerprint h; lane i applies the affine permutation
+    ``π_i(h) = ((a_i·h + b_i) mod P)`` over the Mersenne prime ``P = 2^61 - 1``,
+    with ``(a_i, b_i)`` a deterministic per-seed multiplier/offset pair (a_i odd,
+    in [1,P)). Signature lane i is the minimum of π_i over the value set. The
+    family {π_i} is (approximately) min-wise independent, so
+    Pr[sig_a[i] == sig_b[i]] ≈ J(A,B) and contracts.minhash_jaccard (fraction of
+    equal lanes) stays an (essentially) unbiased Jaccard estimator with std error
+    sqrt(J(1-J)/k) ≤ 0.0625 at k=64. This replaces the old k-hash-passes-per-value
+    scheme (which paid 64 xxhash64 calls per distinct value); the signature *bytes*
+    differ from that scheme but the Jaccard semantics are preserved (no test pins
+    literal MinHash signature values; ColumnProfile.sketch_key omits minhash).
 """
 
 from __future__ import annotations
@@ -34,11 +42,17 @@ import math
 import random
 from typing import Iterable
 
+import numpy as np
+
 from ._values import hash64
 
 __all__ = ["KLLSketch", "HyperLogLog", "MinHash"]
 
 _U64 = (1 << 64) - 1
+#: Mersenne prime for the universal-hashing permutation family (fits in int64 math).
+_MINHASH_PRIME = (1 << 61) - 1
+#: rows per batch in MinHash.add_all (bounds the (chunk × k) permutation matrix)
+_MINHASH_CHUNK = 8192
 
 
 # --------------------------------------------------------------------------- KLL
@@ -200,37 +214,130 @@ class HyperLogLog:
 # ----------------------------------------------------------------------- MinHash
 
 
+def _minhash_coeffs(k: int, seed: int) -> tuple[np.ndarray, np.ndarray]:
+    """Deterministic per-seed (a, b) affine-permutation coefficients over P=2^61-1.
+
+    a_i ∈ [1, P) is forced odd (gcd with the odd prime is 1), b_i ∈ [0, P). Drawn
+    from a seeded RNG so two MinHash(seed=s) instances are byte-identical. a_i is
+    kept < 2^31 so the vectorized modmul below stays inside int64.
+    """
+    rng = np.random.default_rng(seed & _U64)
+    a = (rng.integers(1, 1 << 31, size=k, dtype=np.int64) | 1)
+    b = rng.integers(0, _MINHASH_PRIME, size=k, dtype=np.int64)
+    return a, b
+
+
+def _shift31_mod(u: np.ndarray) -> np.ndarray:
+    """``(u << 31) mod (2^61-1)`` for u < 2^61, staying inside int64.
+
+    With P = 2^61-1, 2^61 ≡ 1 (mod P). Split u = u_hi·2^30 + u_lo (u_hi < 2^31,
+    u_lo < 2^30); then u·2^31 = u_hi·2^61 + u_lo·2^31 ≡ u_hi + u_lo·2^31, and
+    u_lo·2^31 < 2^61 fits in int64.
+    """
+    P = _MINHASH_PRIME
+    u_hi = u >> 30
+    u_lo = u & ((1 << 30) - 1)
+    return (u_hi + (u_lo << 31)) % P
+
+
+def _modmul_perm(fp: np.ndarray, a: np.ndarray, b: np.ndarray) -> np.ndarray:
+    """Vectorized ``(a*fp + b) mod (2^61-1)`` staying inside int64.
+
+    fp < 2^61, a < 2^31 (see :func:`_minhash_coeffs`). Split fp = hi·2^31 + lo
+    (hi < 2^30, lo < 2^31): a·fp = (a·hi)·2^31 + a·lo. a·hi < 2^61 and a·lo < 2^62
+    both fit int64; the ·2^31 is folded through :func:`_shift31_mod`.
+    Shapes broadcast: fp is (...,1) or (...,), a/b are (k,).
+    """
+    P = _MINHASH_PRIME
+    hi = fp >> 31
+    lo = fp & ((1 << 31) - 1)
+    t = _shift31_mod((a * hi) % P)        # ((a*hi) mod P) << 31  (mod P)
+    return (t + (a * lo) % P + b) % P
+
+
 class MinHash:
-    """k-MinHash signature over a value set; lanes use xxhash64 seeds seed+0..seed+k-1."""
+    """k-MinHash signature over a value set (universal-hashing permutation trick).
+
+    Each value is hashed once to a base fingerprint; lane i applies the affine
+    permutation ``(a_i·h + b_i) mod (2^61-1)`` and keeps the running minimum.
+    """
 
     def __init__(self, k: int = 64, seed: int = 0) -> None:
         if k < 1:
             raise ValueError("k must be >= 1")
         self._k = k
         self._seed = seed
-        self._sig = [_U64] * k
+        self._a, self._b = _minhash_coeffs(k, seed)
+        self._sig = np.full(k, _MINHASH_PRIME, dtype=np.int64)  # P is an unreachable sentinel max
         self._seen: set[int] = set()  # dedupe inserts: multiset == set for MinHash
         self._empty = True
 
+    def _base_fp(self, key: str) -> int:
+        """One xxhash64 → fingerprint in [0, P) (the permutation domain)."""
+        return hash64(key, seed=self._seed ^ 0x9E3779B97F4A7C15) % _MINHASH_PRIME
+
     def add(self, key: str) -> None:
-        fp = hash64(key, seed=self._seed ^ 0x9E3779B97F4A7C15)
+        fp = self._base_fp(key)
         if fp in self._seen:
             return
         self._seen.add(fp)
         self._empty = False
-        sig = self._sig
-        seed0 = self._seed
-        for i in range(self._k):
-            h = hash64(key, seed=seed0 + i)
-            if h < sig[i]:
-                sig[i] = h
+        # lane i: (a_i*fp + b_i) mod P, vectorized over k lanes; keep per-lane min.
+        perm = _modmul_perm(np.int64(fp), self._a, self._b)
+        np.minimum(self._sig, perm, out=self._sig)
 
     def add_all(self, keys: Iterable[str]) -> None:
-        for k in keys:
-            self.add(k)
+        """Batched fast path: dedupe fingerprints, then one vectorized lane min.
+
+        Computes ``perm`` as a (distinct × k) int64 matrix via the overflow-safe
+        Mersenne modmul, reduced to per-lane minima — O(distinct·k) numpy ops
+        instead of k hash passes per value. Identical result to repeated
+        :meth:`add` (min is order/multiplicity invariant). Chunked to bound memory.
+        """
+        fresh: list[int] = []
+        seen = self._seen
+        for key in keys:
+            fp = self._base_fp(key)
+            if fp not in seen:
+                seen.add(fp)
+                fresh.append(fp)
+        if not fresh:
+            return
+        self._empty = False
+        a, b = self._a[None, :], self._b[None, :]
+        for start in range(0, len(fresh), _MINHASH_CHUNK):
+            chunk = np.array(fresh[start : start + _MINHASH_CHUNK], dtype=np.int64)
+            perm = _modmul_perm(chunk[:, None], a, b)   # (chunk, k)
+            lane_min = perm.min(axis=0)
+            np.minimum(self._sig, lane_min, out=self._sig)
 
     def signature(self) -> tuple[int, ...]:
         """Empty set -> empty tuple (contracts.minhash_jaccard then returns 0.0)."""
         if self._empty:
             return ()
-        return tuple(self._sig)
+        return tuple(int(x) for x in self._sig)
+
+    @classmethod
+    def signature_from_hashes(
+        cls, hashes: "np.ndarray", *, k: int = 64, seed: int = 0
+    ) -> tuple[int, ...]:
+        """k-MinHash signature of a value set given its precomputed 64-bit hashes.
+
+        Lets a caller that already hashed each distinct value (e.g. IND discovery)
+        reuse those hashes as the base fingerprints — folded into the permutation
+        domain ``mod P`` exactly as :meth:`add` would, then run the same vectorized
+        lane minimum. Equivalent to feeding the same value set through
+        :meth:`add_all` (same (a, b) family per seed). Used only for the cheap IND
+        containment prefilter, never persisted, so the base-hash provenance differs
+        from the string path without affecting any pinned signature.
+        """
+        if hashes.shape[0] == 0:
+            return ()
+        a, b = _minhash_coeffs(k, seed)
+        fps = (hashes.astype(np.uint64) % np.uint64(_MINHASH_PRIME)).astype(np.int64)
+        sig = np.full(k, _MINHASH_PRIME, dtype=np.int64)
+        for start in range(0, fps.shape[0], _MINHASH_CHUNK):
+            chunk = fps[start : start + _MINHASH_CHUNK]
+            perm = _modmul_perm(chunk[:, None], a[None, :], b[None, :])
+            np.minimum(sig, perm.min(axis=0), out=sig)
+        return tuple(int(x) for x in sig)

@@ -102,13 +102,9 @@ export function createModeShell({ bus, surfaces }) {
     }
     if (x) x.onclick = dismissCoach;
     coach.hidden = false;
-    // light the switcher so the eye lands on it
-    const sw = $("#mode-switcher");
-    if (sw) sw.classList.add("coach-lit");
     function dismissCoach() {
       store.set(COACH_KEY, true);
       coach.hidden = true;
-      if (sw) sw.classList.remove("coach-lit");
     }
   }
 
