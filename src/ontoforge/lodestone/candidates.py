@@ -75,6 +75,65 @@ NUMERIC = (Datatype.INTEGER, Datatype.FLOAT)
 DATELIKE = (Datatype.DATE, Datatype.DATETIME)
 
 
+def _is_live(client: ModelClient) -> bool:
+    """True iff ``client`` is a LIVE model (a ``_RoutedClient`` with a live adapter
+    wired). Reads ONLY the public ``activation.model_status`` over the ``.active``
+    attribute. Any failure degrades to False (keyless/deterministic)."""
+    try:
+        from ontoforge.aimodels.activation import model_status
+
+        return bool(model_status(client).live)
+    except Exception:  # noqa: BLE001 — never let the live-check break the pipeline
+        return False
+
+
+def _render_prompt_for(client: ModelClient, task: str, payload_prompt: str,
+                       grounding: Optional[str] = None) -> str:
+    """Parity-safe prompt selection (see strata/emit.py for the contract).
+
+    Keyless/deterministic: returns ``payload_prompt`` UNCHANGED — the exact bytes
+    the ``lodestone.generate`` HeuristicAdapter handler parses via ``json.loads``
+    on the WHOLE prompt. Live: wraps that same payload as the INPUT slot of the
+    rich PromptLibrary template (instruction + grounding + few-shot). Never raises.
+    """
+    if not _is_live(client):
+        return payload_prompt
+    try:
+        from ontoforge.aimodels.library import PromptLibrary
+
+        return PromptLibrary().get(task).render(user_input=payload_prompt, grounding=grounding)
+    except Exception:  # noqa: BLE001 — never let prompt selection break the pipeline
+        return payload_prompt
+
+
+#: model_id the deterministic HeuristicAdapter stamps; see strata/emit.py.
+_DETERMINISTIC_MODEL_ID = "heuristic"
+
+
+def _propose_richly(client: ModelClient, *, task: str, payload_prompt: str, schema: str,
+                    grounding: Optional[str], temperature: float = 0.0):
+    """Propose with the rich prompt on LIVE, BARE prompt keyless — preserving the
+    parity-sacred fall-through (see strata/emit.py::_propose_richly for the full
+    contract). The ``lodestone.generate`` deterministic fallback ``json.loads`` the
+    WHOLE prompt, so it RAISES on a rich prompt; we additionally guard on
+    ``model_id == 'heuristic'`` so any deterministic degrade is recomputed on the
+    BARE prompt — byte-identical to today."""
+    bare_req = ModelRequest(task=task, prompt=payload_prompt, schema=schema, temperature=temperature)
+    if not _is_live(client):
+        return client.propose(bare_req)
+    rich_prompt = _render_prompt_for(client, task, payload_prompt, grounding)
+    if rich_prompt == payload_prompt:
+        return client.propose(bare_req)
+    rich_req = ModelRequest(task=task, prompt=rich_prompt, schema=schema, temperature=temperature)
+    try:
+        resp = client.propose(rich_req)
+    except Exception:  # noqa: BLE001 — deterministic fallback crashed on rich; degrade to bare
+        return client.propose(bare_req)
+    if getattr(resp, "model_id", "") == _DETERMINISTIC_MODEL_ID:
+        return client.propose(bare_req)
+    return resp
+
+
 # --------------------------------------------------------- spec (de)serialization
 #
 # Terms cross the ModelClient boundary as JSON specs so a live tier can emit
@@ -851,19 +910,27 @@ def generate_candidates(
 ) -> CandidateSet:
     """Run grounding bindings through the ModelClient generator, decode, score,
     and type-check. Ill-typed candidates are dropped (kept as TypeError_)."""
-    prompt = json.dumps(
+    digest = sorted(onto.classes[c].name for c in onto.classes)
+    # Deterministic 'payload prompt' (json.loads on the WHOLE prompt by the
+    # keyless handler). On the LIVE path it becomes the INPUT slot of the rich
+    # library template; keyless it is sent byte-identical.
+    payload_prompt = json.dumps(
         {
             "question": question,
             "coverage": grounding.coverage,
             "bindings": [binding_to_spec(b) for b in grounding.bindings],
-            "ontology_digest": sorted(
-                onto.classes[c].name for c in onto.classes
-            ),
+            "ontology_digest": digest,
         },
         sort_keys=True,
     )
-    resp = client.propose(
-        ModelRequest(task=GENERATE_TASK, prompt=prompt, schema=GENERATE_SCHEMA, temperature=0.0)
+    grounding_text = "reachable classes: " + (", ".join(digest) if digest else "(none)")
+    resp = _propose_richly(
+        client,
+        task=GENERATE_TASK,
+        payload_prompt=payload_prompt,
+        schema=GENERATE_SCHEMA,
+        grounding=grounding_text,
+        temperature=0.0,
     )
     specs = resp.parsed if resp.parsed is not None else json.loads(resp.text)
 

@@ -71,7 +71,9 @@ def test_init_generic_estate(gproject):
 def test_init_rejects_missing_source_dir(tmp_path):
     result = runner.invoke(app, ["init", str(tmp_path / "p"), "--source", str(tmp_path / "nope")])
     assert result.exit_code == 1
-    assert "not a directory" in result.output
+    # collapse whitespace: Rich wraps the error across lines under a narrow
+    # terminal width, so match against the un-wrapped message (width-robust).
+    assert "not a directory" in " ".join(result.output.split())
 
 
 def test_ingest_discovers_and_mirrors_every_csv(gproject):

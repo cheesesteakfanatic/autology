@@ -64,6 +64,97 @@ __all__ = ["emit_ontology", "concept_name_payload"]
 MIN_COUNT_NULL_RATE = 0.005
 
 
+def _is_live(client: Optional[ModelClient]) -> bool:
+    """True iff the resolved ``client`` is a LIVE model (a ``_RoutedClient`` with
+    a wired live adapter). Reads ONLY the public ``activation.model_status`` over
+    the ``.active`` attribute resolve_client attaches — a bare HeuristicAdapter /
+    CassetteAdapter / explicitly-injected deterministic client is False. Any
+    failure (e.g. an import edge) degrades to False (keyless/deterministic)."""
+    try:
+        from ontoforge.aimodels.activation import model_status
+
+        return bool(model_status(client).live)
+    except Exception:  # noqa: BLE001 — never let the live-check break the pipeline
+        return False
+
+
+def _render_prompt_for(client: Optional[ModelClient], task: str, payload_prompt: str,
+                       grounding: Optional[str] = None) -> str:
+    """Parity-safe prompt selection.
+
+    Keyless/deterministic: returns ``payload_prompt`` UNCHANGED — the exact bytes
+    the HeuristicAdapter/CassetteAdapter handlers parse (here, whole-prompt JSON).
+    Live: wraps that SAME structured payload in the rich, versioned PromptLibrary
+    template for ``task`` (instruction framing + ontology grounding + few-shot),
+    with the verbatim ``payload_prompt`` as the INPUT slot. Any failure (import,
+    missing template) degrades to ``payload_prompt`` — selection NEVER raises."""
+    if not _is_live(client):
+        return payload_prompt
+    try:
+        from ontoforge.aimodels.library import PromptLibrary
+
+        return PromptLibrary().get(task).render(user_input=payload_prompt, grounding=grounding)
+    except Exception:  # noqa: BLE001 — never let prompt selection break the pipeline
+        return payload_prompt
+
+
+#: model_id the deterministic HeuristicAdapter stamps on every response. When a
+#: live propose degrades to this fallback, it ran on whatever prompt we sent — so
+#: we must guarantee that prompt was the BARE one (parity), never the rich one.
+_DETERMINISTIC_MODEL_ID = "heuristic"
+
+
+def _propose_richly(
+    client: ModelClient,
+    *,
+    task: str,
+    payload_prompt: str,
+    schema: str,
+    grounding: Optional[str],
+    temperature: float = 0.0,
+    max_tokens: int = 1024,
+):
+    """Propose with the rich prompt on the LIVE path, BARE prompt keyless —
+    preserving the parity-sacred fall-through.
+
+    The resolved live client (``_RoutedClient``) routes a single ``req`` to BOTH a
+    live adapter AND a deterministic fallback that re-parses ``req.prompt``. The
+    keyless handlers parse the CURRENT minimal prompt — a rich prompt either crashes
+    them (whole-prompt-is-JSON) or makes them silently misparse (spine's brace
+    slicing). So a live failure/cassette-miss on a RICH request must NEVER let a
+    deterministic handler run on the rich bytes.
+
+    Mechanism: (keyless) send the BARE request directly. (live) try the RICH
+    request; if it RAISES (whole-prompt-JSON fallback can't parse rich) OR the
+    response came from the DETERMINISTIC fallback (``model_id == 'heuristic'`` — it
+    degraded and ran on the rich prompt, untrustworthy) we re-issue the BARE request
+    so the deterministic verdict is computed on the byte-identical current prompt.
+    The rich prompt is only ever CONSUMED by a genuine live model; deterministic
+    behavior is always byte-identical to today."""
+    bare_req = ModelRequest(
+        task=task, prompt=payload_prompt, schema=schema,
+        temperature=temperature, max_tokens=max_tokens,
+    )
+    if not _is_live(client):
+        return client.propose(bare_req)
+    rich_prompt = _render_prompt_for(client, task, payload_prompt, grounding)
+    if rich_prompt == payload_prompt:  # no rich template (e.g. unknown task)
+        return client.propose(bare_req)
+    rich_req = ModelRequest(
+        task=task, prompt=rich_prompt, schema=schema,
+        temperature=temperature, max_tokens=max_tokens,
+    )
+    try:
+        resp = client.propose(rich_req)
+    except Exception:  # noqa: BLE001 — deterministic fallback crashed on rich; degrade to bare
+        return client.propose(bare_req)
+    if getattr(resp, "model_id", "") == _DETERMINISTIC_MODEL_ID:
+        # the live leg degraded to the deterministic fallback (which ran on the
+        # rich prompt): recompute on the BARE prompt for byte-identical parity.
+        return client.propose(bare_req)
+    return resp
+
+
 # ---------------------------------------------------------------------------
 # naming
 # ---------------------------------------------------------------------------
@@ -118,6 +209,23 @@ def concept_name_payload(
     }
 
 
+def _name_grounding(payload: Mapping[str, Any]) -> str:
+    """Deterministic ontology-grounding subset for the live naming prompt:
+    the distinguishing properties, the candidate hint, event flag, and the
+    evidence tables this concept is induced over. (Used ONLY on the live path;
+    the keyless prompt is the bare payload JSON and never sees this.)"""
+    props = ", ".join(str(p) for p in payload.get("distinguishing_props", [])) or "(none)"
+    tables = ", ".join(str(t) for t in payload.get("tables", [])) or "(none)"
+    hint = payload.get("object_hint") or "(none)"
+    lines = [
+        f"distinguishing properties: {props}",
+        f"candidate name hint: {hint}",
+        f"event_like: {bool(payload.get('event_like'))}",
+        f"evidence tables: {tables}",
+    ]
+    return "\n".join(lines)
+
+
 def _resolve_names(
     admitted_hashes: Sequence[str],
     lattice: ConceptLattice,
@@ -142,14 +250,18 @@ def _resolve_names(
             name = payload["object_hint"] or "Concept"
             definition = ""
         else:
-            resp = client.propose(
-                ModelRequest(
-                    task=NAME_TASK,
-                    prompt=json.dumps(payload, sort_keys=True),
-                    schema=_NAME_SCHEMA,
-                    temperature=0.0,
-                    max_tokens=256,
-                )
+            # Deterministic 'payload prompt' (the exact bytes the keyless handler
+            # parses with json.loads on the WHOLE prompt). On the LIVE path this is
+            # wrapped in the rich library template; keyless it is sent unchanged.
+            payload_prompt = json.dumps(payload, sort_keys=True)
+            resp = _propose_richly(
+                client,
+                task=NAME_TASK,
+                payload_prompt=payload_prompt,
+                schema=_NAME_SCHEMA,
+                grounding=_name_grounding(payload),
+                temperature=0.0,
+                max_tokens=256,
             )
             parsed = resp.parsed if isinstance(resp.parsed, dict) else {}
             name = str(parsed.get("name") or "Concept")
