@@ -27,6 +27,7 @@ from typing import Any, Optional
 
 import typer
 from rich.console import Console
+from rich.markup import escape
 from rich.table import Table
 from rich.tree import Tree
 
@@ -220,8 +221,57 @@ def init(
         help="ANY directory of *.csv / *.parquet files -> a GENERIC estate "
         "(tables discovered, keys profiled, ontology induced).",
     ),
+    db_url: Optional[str] = typer.Option(
+        None,
+        "--db-url",
+        help="SQLAlchemy connection URL for a SQL source (Postgres/MySQL/SQLite); "
+        "pair with --db-table. Requires the 'connectors' extra "
+        "(pip install 'ontoforge[connectors]').",
+    ),
+    db_table: Optional[str] = typer.Option(
+        None, "--db-table", help="Table to ingest from the --db-url source (repeatable)."
+    ),
+    db_key: Optional[list[str]] = typer.Option(
+        None, "--db-key", help="Key column(s) for the SQL table; omitted -> introspected PK."
+    ),
+    db_schema: Optional[str] = typer.Option(
+        None, "--db-schema", help="Optional database schema/namespace for --db-table."
+    ),
+    object_uri: Optional[str] = typer.Option(
+        None,
+        "--object-uri",
+        help="Object-store URI of a CSV/Parquet object (s3://, gcs://, file://, or a "
+        "bare path). Requires the 'connectors' extra for remote schemes "
+        "(local file:// works offline).",
+    ),
+    object_key: Optional[list[str]] = typer.Option(
+        None, "--object-key", help="Key column(s) for the object-store source."
+    ),
+    object_fmt: Optional[str] = typer.Option(
+        None, "--object-fmt", help="Force the object format: 'csv' or 'parquet' (else inferred)."
+    ),
 ) -> None:
-    """Create the project layout + config.json."""
+    """Create the project layout + config.json.
+
+    A project sources its estate one of three ways: the bundled aviation
+    fixtures (default), a GENERIC directory of files (``--source``), or one or
+    more OPEN-SHELL CONNECTORS (``--db-url``/``--db-table`` for SQL, ``--object-uri``
+    for an S3/GCS/local object). Connectors are deterministic snapshot-diff pulls
+    behind the same Connector protocol as the file connectors; remote drivers ship
+    in the optional ``connectors`` extra and are lazy-imported only at ingest time.
+    """
+    # `init` is also called directly as a Python function (by `demo` and tests),
+    # where unsupplied typer.Option params arrive as their OptionInfo sentinel
+    # rather than None. Normalize those to None so the connector flags only fire
+    # when a real value was passed on the command line.
+    db_url = _opt(db_url)
+    db_table = _opt(db_table)
+    db_key = _opt(db_key)
+    db_schema = _opt(db_schema)
+    object_uri = _opt(object_uri)
+    object_key = _opt(object_key)
+    object_fmt = _opt(object_fmt)
+
     project_dir.mkdir(parents=True, exist_ok=True)
     (project_dir / "dashboards").mkdir(exist_ok=True)
     cfg: dict[str, Any] = {
@@ -229,7 +279,22 @@ def init(
         "hearth_root": "hearth",
         "raw_root": "raw",
     }
-    if source is not None:
+    connectors = _build_connector_specs(
+        db_url=db_url,
+        db_table=db_table,
+        db_key=db_key,
+        db_schema=db_schema,
+        object_uri=object_uri,
+        object_key=object_key,
+        object_fmt=object_fmt,
+    )
+    if connectors and source is not None:
+        console.print("[red]use --source OR connector flags (--db-url/--object-uri), not both[/]")
+        raise typer.Exit(code=1)
+    if connectors:
+        cfg["estate"] = "connectors"
+        cfg["connectors"] = connectors
+    elif source is not None:
         if not source.is_dir():
             console.print(f"[red]--source {source} is not a directory[/]")
             raise typer.Exit(code=1)
@@ -243,7 +308,99 @@ def init(
     _config_path(project_dir).write_text(json.dumps(cfg, indent=1, sort_keys=True), encoding="utf-8")
     if not _state_path(project_dir).is_file():
         _write_state(project_dir, {"limit": None, "cdc": {}, "stages": []})
-    console.print(f"[green]initialized project at {project_dir}[/] (estate: {cfg['estate']})")
+    msg = f"[green]initialized project at {project_dir}[/] (estate: {cfg['estate']})"
+    if connectors:
+        msg += f" — {len(connectors)} connector source(s); run `ontoforge ingest -p {project_dir}`"
+    # soft_wrap: a long project path must not split `estate: <kind>` across lines.
+    console.print(msg, soft_wrap=True)
+
+
+def _build_connector_specs(
+    *,
+    db_url: Optional[str],
+    db_table: Optional[str],
+    db_key: Optional[list[str]],
+    db_schema: Optional[str],
+    object_uri: Optional[str],
+    object_key: Optional[list[str]],
+    object_fmt: Optional[str],
+) -> list[dict[str, Any]]:
+    """Validate the connector flags and freeze them into JSON specs for state.json.
+
+    The specs are pure data (the connector objects are constructed at ingest time
+    so the optional drivers stay lazy); raises a clear typer.Exit on misuse.
+    """
+    specs: list[dict[str, Any]] = []
+    if db_url is not None or db_table is not None:
+        if not db_url or not db_table:
+            console.print("[red]--db-url and --db-table must be given together[/]")
+            raise typer.Exit(code=1)
+        specs.append(
+            {
+                "kind": "sql",
+                "source_id": _slug(db_table),
+                "table": db_table,
+                "url": db_url,
+                "key_columns": list(db_key or []),
+                "schema": db_schema,
+            }
+        )
+    if object_uri is not None:
+        fmt = (object_fmt or "").lower() or None
+        if fmt is not None and fmt not in ("csv", "parquet"):
+            console.print(f"[red]--object-fmt must be 'csv' or 'parquet' (got {object_fmt!r})[/]")
+            raise typer.Exit(code=1)
+        specs.append(
+            {
+                "kind": "object",
+                "source_id": _slug(Path(object_uri).stem or "object"),
+                "uri": object_uri,
+                "key_columns": list(object_key or []),
+                "fmt": fmt,
+            }
+        )
+    return specs
+
+
+def _opt(value: Any) -> Any:
+    """Coerce a typer.Option sentinel to None.
+
+    ``init`` is invoked both via Typer (real values) and directly as a Python
+    function by ``demo``/tests (where unsupplied options arrive as their
+    ``OptionInfo`` default object). Treat those sentinels as 'not provided'.
+    """
+    return None if isinstance(value, typer.models.OptionInfo) else value
+
+
+def _slug(text: str) -> str:
+    """Lowercase identifier from a free string (matches the generic-estate slugger)."""
+    from ontoforge.pipeline.discover import slugify
+
+    return slugify(text)
+
+
+def _connector_from_spec(spec: dict[str, Any]):
+    """Build the live Connector for one frozen spec (drivers lazy-imported in pull())."""
+    if spec["kind"] == "sql":
+        from ontoforge.cdc import SqlConnector
+
+        return SqlConnector(
+            source_id=spec["source_id"],
+            url=spec["url"],
+            table=spec["table"],
+            key_columns=spec["key_columns"] or None,
+            schema=spec.get("schema"),
+        )
+    if spec["kind"] == "object":
+        from ontoforge.cdc import ObjectStoreConnector
+
+        return ObjectStoreConnector(
+            source_id=spec["source_id"],
+            uri=spec["uri"],
+            key_columns=spec.get("key_columns") or (),
+            fmt=spec.get("fmt"),
+        )
+    raise ValueError(f"unknown connector kind {spec['kind']!r}")
 
 
 @app.command()
@@ -262,7 +419,17 @@ def ingest(
         state["limit"] = limit
     effective_limit = state.get("limit")
 
-    if cfg["estate"] == "generic":
+    if cfg["estate"] == "connectors":
+        connectors = []
+        for spec in cfg.get("connectors", []):
+            name = spec.get("table") or Path(spec.get("uri", spec["source_id"])).stem
+            try:
+                conn = _connector_from_spec(spec)
+            except Exception as exc:  # construction-time misuse (bad URI/format)
+                console.print(f"[red]connector {name!r}:[/] {escape(str(exc))}")
+                raise typer.Exit(code=1)
+            connectors.append((name, spec["source_id"], conn))
+    elif cfg["estate"] == "generic":
         estate = _load_estate(project, cfg, state)
         connectors = []
         for name, meta in estate["metadata"]["tables"].items():
@@ -295,7 +462,19 @@ def ingest(
     total_deltas = 0
     try:
         for name, source_id, connector in connectors:
-            batch, new_state = cdc_ingest(connector, ledger, state["cdc"].get(name), mirror=mirror)
+            try:
+                batch, new_state = cdc_ingest(connector, ledger, state["cdc"].get(name), mirror=mirror)
+            except ImportError as exc:
+                # an optional connector driver (sqlalchemy / fsspec) is not installed:
+                # the connector constructs fine but pull() names the missing extra.
+                # escape: the hint contains "[connectors]", which rich markup would eat.
+                console.print(f"[red]connector {name!r}:[/] {escape(str(exc))}")
+                console.print(
+                    "[yellow]install the connectors extra:[/] "
+                    + escape("pip install 'ontoforge[connectors]'")
+                    + " (or `uv sync --all-extras`)"
+                )
+                raise typer.Exit(code=1)
             kinds = Counter(d.kind for d in batch.deltas)
             registered = kinds["insert"] + kinds["update"]
             total_deltas += len(batch.deltas)
@@ -312,6 +491,107 @@ def ingest(
     if total_deltas == 0:
         console.print("[green]no changes detected (CDC steady state)[/]")
     _mark_stage(state, "ingest")
+    _write_state(project, state)
+
+
+@app.command()
+def plan(
+    project: Path = _PROJECT_OPT,
+    budget: int = typer.Option(..., "--budget", "-b", help="Total rows to keep across all tables."),
+    hypothesis: Optional[Path] = typer.Option(
+        None,
+        "--hypothesis",
+        help="Optional ontology-hypothesis JSON: "
+        '{"join_keys": [[table, col], ...], "key_columns": {table: [col, ...]}}.',
+    ),
+    out: Optional[Path] = typer.Option(
+        None,
+        "--out",
+        help="Write the governed subset (JSON) here; default <project>/plan_subset.json.",
+    ),
+) -> None:
+    """PLAN mode: pull a governed, budget-bounded SUBSET that preserves schema
+    shape + joinability (v2.1 mode one).
+
+    The cheap entry into a new estate — instead of ingesting everything, it keeps a
+    smart, budget-bounded slice (cardinality boundaries, distribution edges, and
+    enough cross-table key overlap that relationship discovery still fires) and
+    reports exactly what it kept and why. PLAN profiles the raw tables itself, so it
+    runs standalone before ingest. Keyless, zero-network, deterministic.
+    """
+    from ontoforge.pipeline import OntologyHypothesis, plan_subset
+
+    cfg = _load_config(project)
+    state = _read_state(project)
+    if cfg["estate"] == "connectors":
+        console.print(
+            "[red]PLAN profiles local files (the cheap entry before pulling everything). "
+            "A connector source (SQL/object-store) has nothing local to plan over — "
+            "run `ontoforge ingest` to pull it first.[/]"
+        )
+        raise typer.Exit(code=1)
+    tables = _load_tables(project, cfg, state)
+
+    hyp: Optional[OntologyHypothesis] = None
+    if hypothesis is not None:
+        if not hypothesis.is_file():
+            console.print(f"[red]--hypothesis {hypothesis} not found[/]")
+            raise typer.Exit(code=1)
+        raw = json.loads(hypothesis.read_text(encoding="utf-8"))
+        hyp = OntologyHypothesis(
+            join_keys=tuple(tuple(pair) for pair in raw.get("join_keys", [])),
+            key_columns={t: tuple(cols) for t, cols in raw.get("key_columns", {}).items()},
+        )
+
+    subset, report = plan_subset(tables, budget=budget, hypothesis=hyp)
+
+    tbl = Table(title=f"PLAN subset (budget {budget}, seed {report.seed})")
+    for col in ("table", "kept/total", "kept %", "key columns (min cov)", "edge columns", "top reasons"):
+        tbl.add_column(col)
+    for tp in report.tables:
+        keys = "+".join(tp.candidate_keys[0]) if tp.candidate_keys else "-"
+        min_cov = min(tp.key_coverage.values()) if tp.key_coverage else 0.0
+        reasons = ", ".join(
+            f"{k}:{v}" for k, v in sorted(tp.reasons.items(), key=lambda kv: -kv[1])[:3]
+        )
+        tbl.add_row(
+            tp.table,
+            f"{tp.kept_rows}/{tp.total_rows}",
+            f"{tp.kept_fraction:.0%}",
+            f"{keys} ({min_cov:.2f})" if tp.candidate_keys else "-",
+            ", ".join(tp.edge_columns[:4]) + ("…" if len(tp.edge_columns) > 4 else "") or "-",
+            reasons or "-",
+        )
+    console.print(tbl)
+
+    if report.overlaps:
+        jt = Table(title="joinability (cross-table key overlap)")
+        for col in ("join", "full", "kept", "achievable", "coverage", "survives"):
+            jt.add_column(col)
+        for o in report.overlaps:
+            jt.add_row(
+                f"{o.lhs_table}.{o.lhs_column} -> {o.rhs_table}.{o.rhs_column}",
+                str(o.full_overlap), str(o.kept_overlap), str(o.achievable),
+                f"{o.coverage:.2f}", "yes" if o.survives else "[red]NO[/]",
+            )
+        console.print(jt)
+
+    console.print(
+        f"total kept: {report.total_kept}/{budget}  "
+        f"within budget: {'yes' if report.within_budget else '[red]NO[/]'}  "
+        f"joinability ok: {'yes' if report.joinability_ok() else '[red]NO[/]'}"
+    )
+    if not report.joinability_ok():
+        severed = ", ".join(
+            f"{o.lhs_table}.{o.lhs_column}->{o.rhs_table}.{o.rhs_column}"
+            for o in report.severed_joins()
+        )
+        console.print(f"[yellow]warning: budget severed join(s): {severed}[/]")
+
+    out_path = out if out is not None else project / "plan_subset.json"
+    out_path.write_text(json.dumps(subset, indent=1, sort_keys=True), encoding="utf-8")
+    console.print(f"-> {out_path}")
+    _mark_stage(state, "plan")
     _write_state(project, state)
 
 
@@ -867,7 +1147,12 @@ def status(project: Path = _PROJECT_OPT) -> None:
     """Project state summary from the ledger + state.json."""
     cfg = _load_config(project)
     state = _read_state(project)
-    console.print(f"project: {project}  estate: {cfg['estate']}  limit: {state.get('limit')}")
+    # soft_wrap: never insert hard line breaks into this header — a long project
+    # path must not split `estate: <kind>` across lines (terminal handles overflow).
+    console.print(
+        f"project: {project}  estate: {cfg['estate']}  limit: {state.get('limit')}",
+        soft_wrap=True,
+    )
     console.print(f"stages completed: {', '.join(state['stages']) or '(none)'}")
 
     ledger_path = project / cfg["ledger"]

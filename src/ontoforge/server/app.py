@@ -192,6 +192,160 @@ def _extract_csv_response(payload: dict[str, Any]) -> StreamingResponse:
     )
 
 
+# ---------------------------------------------------------- observability helpers
+# Pure read-side surfacing of the existing append-only substrate. None of these
+# recompute anything: they parse atom uris, resolve interned provenance, and
+# bucket decision/artifact rows the pipeline already wrote.
+
+#: ingest mints raw atoms as ``atom://<source>/<table>/<rowkey>#<COLUMN>``.
+_ATOM_URI_RE = re.compile(r"^atom://(?P<source>[^/]+)/(?P<table>[^/]+)/(?P<row>.+)#(?P<col>[^#]+)$")
+
+#: artifact kinds that are TEMPER ontology-evolution ops (the calculus).
+_TEMPER_KINDS = frozenset(
+    {"retype", "rename", "merge", "split", "delete", "insert", "update", "decomp", "synonym"}
+)
+#: artifact kinds that are engineer / relationship commits carrying evidence.
+_COMMIT_KINDS = frozenset({"link", "operator", "atlas", "hub", "g-join", "g-table", "g-decomp"})
+
+
+def _lineage_atom(ledger: Any, atom_id: str) -> "S.LineageAtom":
+    """One RAW leaf with source/table/row/column PARSED from its minted uri."""
+    a = ledger.get_atom(atom_id)
+    uri = a.uri if a else ""
+    m = _ATOM_URI_RE.match(uri)
+    return S.LineageAtom(
+        atom_id=atom_id,
+        uri=uri,
+        value=jsonable(a.value) if a else None,
+        source=m.group("source") if m else None,
+        table=m.group("table") if m else None,
+        row=m.group("row") if m else None,
+        column=m.group("col") if m else None,
+    )
+
+
+def _cell_prov_ref(world: Any, entity_uri: str, prop: str) -> Optional[tuple[str, Any]]:
+    """The current HEARTH cell's (prov_ref, value) for one entity property, or
+    None. SURFACES hearth.read + the matching value cell — never recomputes."""
+    from ontoforge.contracts import Layer
+
+    hearth = world.hearth
+    for s in hearth.value_shard_items():
+        if s.layer is not Layer.ENTITY or entity_uri not in s.by_entity:
+            continue
+        # latest write for this prop wins (highest seq); the cell carries prov
+        best: Any = None
+        for seq in s.by_entity.get(entity_uri, ()):
+            cell = s.cells[seq]
+            if cell.prop == prop and (best is None or seq >= best[0]):
+                best = (seq, cell)
+        if best is not None:
+            cell = best[1]
+            return cell.prov_ref, jsonable(cell.value)
+    return None
+
+
+def _audit_entries(conn: Any, limit: int) -> list["S.AuditEntry"]:
+    """Merge DECISION + ARTIFACT rows into one append-only audit stream, newest
+    first. Decisions bucket as 'decision'; artifacts bucket by kind into
+    verdict / recalibration / temper (the evolution calculus) / commit."""
+    out: list[S.AuditEntry] = []
+    for did, outcome, conf, tier, deferred, quar, rationale, ts, seq in conn.execute(
+        "SELECT decision_id, outcome, confidence, tier, deferred_to_human, "
+        "quarantined, rationale, created_at, seq FROM decision ORDER BY seq DESC LIMIT ?",
+        (limit,),
+    ).fetchall():
+        out.append(
+            S.AuditEntry(
+                seq=int(seq),
+                category="decision",
+                kind=_kind_of(str(did)),
+                summary=str(rationale or did),
+                tier=int(tier),
+                confidence=float(conf),
+                outcome=str(outcome),
+                deferred=bool(deferred),
+                quarantined=bool(quar),
+                created_at=str(ts),
+            )
+        )
+    for aid, akind, payload, ref, ts, seq in conn.execute(
+        "SELECT artifact_id, kind, payload, prov_ref, created_at, seq FROM artifact "
+        "ORDER BY seq DESC LIMIT ?",
+        (limit,),
+    ).fetchall():
+        kind = str(akind)
+        if kind == "review-verdict":
+            cat = "verdict"
+        elif kind == "recalibration":
+            cat = "recalibration"
+        elif kind in _TEMPER_KINDS:
+            cat = "temper"
+        elif kind in _COMMIT_KINDS:
+            cat = "commit"
+        else:
+            # questions and other recorded artifacts read as commits to the
+            # estate (they too are append-only, provenance-grounded facts).
+            cat = "commit"
+        detail: dict[str, Any] = {}
+        try:
+            parsed = json.loads(payload)
+            if isinstance(parsed, dict):
+                detail = parsed
+        except (TypeError, ValueError):
+            pass
+        out.append(
+            S.AuditEntry(
+                seq=int(seq),
+                category=cat,  # type: ignore[arg-type]
+                kind=kind,
+                summary=str(detail.get("human_summary") or detail.get("verdict") or aid),
+                prov_ref=str(ref),
+                detail=detail,
+                created_at=str(ts),
+            )
+        )
+    out.sort(key=lambda e: e.seq, reverse=True)
+    return out[:limit]
+
+
+def _run_rollup(conn: Any, stages: list[str]) -> list["S.RunOut"]:
+    """Per-kind run history from the append-only artifact stream: each artifact
+    kind is one 'run lane' with its first-seen timestamp + decision/artifact/
+    cost roll-ups. Pipeline stages that left no artifact still list (count 0)."""
+    runs: list[S.RunOut] = []
+    seen_kinds: set[str] = set()
+    for kind, n, first_ts in conn.execute(
+        "SELECT kind, COUNT(*), MIN(created_at) FROM artifact GROUP BY kind "
+        "ORDER BY MIN(seq)"
+    ).fetchall():
+        seen_kinds.add(str(kind))
+        runs.append(
+            S.RunOut(
+                run_id=f"artifact:{kind}",
+                kind=str(kind),
+                label=str(kind),
+                started_at=str(first_ts or ""),
+                artifacts=int(n),
+            )
+        )
+    # decisions as their own lane (the spine's adjudication history)
+    dn, dts = conn.execute(
+        "SELECT COUNT(*), MIN(created_at) FROM decision"
+    ).fetchone()
+    if dn:
+        runs.append(
+            S.RunOut(
+                run_id="decision",
+                kind="decision",
+                label="spine decisions",
+                started_at=str(dts or ""),
+                decisions=int(dn),
+            )
+        )
+    return runs
+
+
 def create_app(project: Path | str) -> FastAPI:
     """Build the FastAPI app over one project directory."""
     world = ProjectWorld(Path(project))
@@ -897,6 +1051,172 @@ def create_app(project: Path | str) -> FastAPI:
             columns=payload["columns"],
             rows=payload["rows"],
             citations=[S.ExtractCitation(**c) for c in payload["citations"]],
+        )
+
+    # ----------------------------------------------------- observability
+    # The OBSERVATORY surface (R0 P1): four read-only views that SURFACE the
+    # existing append-only substrate (atoms/decisions/artifacts/cost). Nothing
+    # here recomputes — every number is read straight from what the pipeline
+    # already wrote. The headline differentiator is VALUE-LEVEL lineage.
+
+    @app.get("/api/lineage", response_model=S.LineageOut)
+    async def api_lineage(
+        cell: str = "", prop: str = "", atom: str = "", prov_ref: str = ""
+    ) -> S.LineageOut:
+        """The value-level lineage trail: answer-cell → prov term → atoms → RAW
+        source rows. Address it three ways (in precedence): ``?prov_ref=`` (a
+        cell's interned provenance), ``?atom=`` (a single source record), or
+        ``?cell=<entity_uri>&prop=<property>`` (the current HEARTH cell). Column-
+        level catalogs stop at the table; this resolves to the exact row+column."""
+        try:
+            with world.lock:
+                ledger = world.ledger
+                resolved_value: Any = None
+                ref = prov_ref.strip()
+                if not ref and atom.strip():
+                    # a single raw atom: its provenance is the leaf over itself
+                    a = ledger.get_atom(atom.strip())
+                    if a is None:
+                        raise HTTPException(
+                            status_code=404, detail=f"unknown atom_id: {atom}"
+                        )
+                    ref = ledger.intern(leaf(a.atom_id))
+                if not ref and cell.strip():
+                    if not prop.strip():
+                        raise HTTPException(
+                            status_code=422, detail="cell lineage needs ?prop=<property>"
+                        )
+                    found = _cell_prov_ref(world, cell.strip(), prop.strip())
+                    if found is None:
+                        raise HTTPException(
+                            status_code=404,
+                            detail=f"no cell {prop!r} on {cell!r} in the current world",
+                        )
+                    ref, resolved_value = found
+                if not ref:
+                    raise HTTPException(
+                        status_code=422,
+                        detail="lineage needs ?cell=&prop= | ?atom= | ?prov_ref=",
+                    )
+                try:
+                    term = ledger.resolve(ref)
+                except KeyError as exc:
+                    raise HTTPException(
+                        status_code=404, detail=f"unknown prov_ref: {ref}"
+                    ) from exc
+                atom_ids = sorted(ledger.valuate_ref(ref, "citations"))
+                atoms = [_lineage_atom(ledger, aid) for aid in atom_ids]
+                tree = _term_tree(term, ledger)
+        except ProjectError as exc:
+            raise fail(exc) from exc
+        sources = sorted({a.source for a in atoms if a.source})
+        return S.LineageOut(
+            cell=cell.strip() or None,
+            prop=prop.strip() or None,
+            value=resolved_value,
+            prov_ref=ref,
+            n_atoms=len(atoms),
+            atoms=atoms,
+            sources=sources,
+            resolved=S.ProvNode(**tree),
+        )
+
+    @app.get("/api/audit", response_model=S.AuditOut)
+    async def api_audit(limit: int = 500) -> S.AuditOut:
+        """The append-only decision/verdict log, newest first: spine decisions
+        (by kind/tier), human review verdicts, §4.8 recalibrations, TEMPER
+        ontology-evolution ops, and engineer typed-relationship commits with
+        their evidence. SURFACED from the DECISION + ARTIFACT tables verbatim."""
+        try:
+            with world.lock:
+                conn = world.ledger.connection
+                entries = _audit_entries(conn, max(1, min(int(limit), 2000)))
+                total = (
+                    conn.execute("SELECT COUNT(*) FROM decision").fetchone()[0]
+                    + conn.execute("SELECT COUNT(*) FROM artifact").fetchone()[0]
+                )
+        except ProjectError as exc:
+            raise fail(exc) from exc
+        by_cat: Counter[str] = Counter()
+        by_kind: Counter[str] = Counter()
+        by_tier: Counter[str] = Counter()
+        for e in entries:
+            by_cat[e.category] += 1
+            by_kind[e.kind] += 1
+            if e.tier is not None:
+                by_tier[str(e.tier)] += 1
+        return S.AuditOut(
+            entries=entries,
+            by_category=dict(sorted(by_cat.items())),
+            by_kind=dict(sorted(by_kind.items())),
+            by_tier=dict(sorted(by_tier.items())),
+            total=int(total),
+        )
+
+    @app.get("/api/runs", response_model=S.RunsOut)
+    async def api_runs() -> S.RunsOut:
+        """Run history: the pipeline stages this estate cleared plus per-kind
+        roll-ups of decisions, artifacts, and compute drawn from the ledger."""
+        stages = list(world.state().get("stages", []))
+        try:
+            with world.lock:
+                conn = world.ledger.connection
+                runs = _run_rollup(conn, stages)
+                td = conn.execute("SELECT COUNT(*) FROM decision").fetchone()[0]
+                ta = conn.execute("SELECT COUNT(*) FROM artifact").fetchone()[0]
+                tc = world.ledger.total_cost_tokens()
+        except ProjectError as exc:
+            raise fail(exc) from exc
+        return S.RunsOut(
+            runs=runs,
+            stages=stages,
+            total_decisions=int(td),
+            total_artifacts=int(ta),
+            total_cost_tokens=int(tc),
+        )
+
+    @app.get("/api/compute-ledger", response_model=S.ComputeLedgerOut)
+    async def api_compute_ledger() -> S.ComputeLedgerOut:
+        """The per-project CostMeter, rolled up by task AND by decision tier —
+        the compute-at-cost transparency artifact (zero margin: here is exactly
+        what ran). Reconciles with the ledger: ``by_task`` totals == the COST
+        table sum == ``/api/status.cost_tokens``."""
+        try:
+            cfg_estate = str(world.config.get("estate", "?"))
+        except ProjectError:
+            cfg_estate = "?"
+        try:
+            with world.lock:
+                conn = world.ledger.connection
+                by_task = [
+                    S.ComputeRow(label=str(task), calls=int(calls), tokens=int(tok))
+                    for task, calls, tok in conn.execute(
+                        "SELECT task, COUNT(*), COALESCE(SUM(tokens), 0) FROM cost "
+                        "GROUP BY task ORDER BY SUM(tokens) DESC, task"
+                    ).fetchall()
+                ]
+                by_tier = [
+                    S.ComputeRow(
+                        label=f"tier {tier}", calls=int(calls), tokens=int(tok or 0)
+                    )
+                    for tier, calls, tok in conn.execute(
+                        "SELECT tier, COUNT(*), COALESCE(SUM(cost_tokens), 0) FROM decision "
+                        "GROUP BY tier ORDER BY tier"
+                    ).fetchall()
+                ]
+                total_tokens = world.ledger.total_cost_tokens()
+                decision_tokens = conn.execute(
+                    "SELECT COALESCE(SUM(cost_tokens), 0) FROM decision"
+                ).fetchone()[0]
+        except ProjectError as exc:
+            raise fail(exc) from exc
+        return S.ComputeLedgerOut(
+            by_task=by_task,
+            by_tier=by_tier,
+            total_tokens=int(total_tokens),
+            total_calls=sum(r.calls for r in by_task),
+            decision_tokens=int(decision_tokens),
+            estate=cfg_estate,
         )
 
     # ----------------------------------------------------------- the SPA

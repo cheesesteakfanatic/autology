@@ -20,17 +20,23 @@ through the ``aimodels`` router behind the same interface.
 """
 
 from .cached_work import (
+    CachedAnswer,
     CachedWorkStore,
     WorkKind,
     WorkObject,
     WorkRetrieval,
     describe_work,
+    fingerprint_atoms,
+    normalize_question,
 )
 
 __all__ = [
+    "CachedAnswer",
     "CachedWorkStore",
     "WorkKind",
     "WorkObject",
     "WorkRetrieval",
     "describe_work",
+    "fingerprint_atoms",
+    "normalize_question",
 ]

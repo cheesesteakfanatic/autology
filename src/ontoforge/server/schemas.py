@@ -558,3 +558,130 @@ class ExtractOut(BaseModel):
     columns: list[str] = Field(default_factory=list)
     rows: list[list[Any]] = Field(default_factory=list)
     citations: list[ExtractCitation] = Field(default_factory=list)
+
+
+# ==================================================================== OBSERVATORY
+# The OBSERVABILITY surface (R0 P1): four read-only views over the EXISTING
+# ledger/HEARTH/CostMeter substrate. Nothing here recomputes — every field is
+# SURFACED from what the pipeline already wrote (append-only atoms/decisions/
+# artifacts/cost). The differentiator vs column-level incumbents is value-LEVEL
+# lineage: a single answer cell resolves all the way back to the RAW source row
+# and column it was derived from.
+
+
+# ---------------------------------------------------------------------- lineage
+
+
+class LineageAtom(BaseModel):
+    """One RAW source record an answer cell rests on — the leaf of the trail.
+
+    ``source`` / ``table`` / ``row`` / ``column`` are PARSED, not recomputed,
+    from the atom uri the ingest stage minted
+    (``atom://<source>/<table>/<rowkey>#<COLUMN>``); when the uri does not match
+    that shape they are simply ``None`` and the full uri still identifies it."""
+
+    atom_id: str
+    uri: str
+    value: Any = None
+    source: Optional[str] = None
+    table: Optional[str] = None
+    row: Optional[str] = None
+    column: Optional[str] = None
+
+
+class LineageOut(BaseModel):
+    """GET /api/lineage — the answer-cell → prov term → atoms → RAW rows trail.
+
+    ``resolved`` is the polynomial provenance tree (the same shape /api/provenance
+    returns); ``atoms`` is the flattened RAW leaf set with source/table/row/column
+    parsed out — the value-level lineage incumbents cannot show."""
+
+    cell: Optional[str] = None        # the entity uri (when asked by cell)
+    prop: Optional[str] = None        # the property (when asked by cell)
+    value: Any = None                 # the cell's current value (when by cell)
+    prov_ref: str
+    n_atoms: int
+    atoms: list[LineageAtom] = Field(default_factory=list)
+    sources: list[str] = Field(default_factory=list)   # distinct source systems
+    resolved: ProvNode
+
+
+# ------------------------------------------------------------------------ audit
+
+
+class AuditEntry(BaseModel):
+    """One line of the append-only decision/verdict log.
+
+    ``category`` buckets the heterogeneous substrate so the UI can group it:
+    ``decision`` (a spine adjudication), ``verdict`` (a human review verdict),
+    ``recalibration`` (the §4.8 loop firing), ``temper`` (an ontology-evolution
+    op — retype/rename/merge/split/link/delete), or ``commit`` (an engineer
+    typed-relationship / operator commit, with its evidence in ``detail``)."""
+
+    seq: int
+    category: Literal["decision", "verdict", "recalibration", "temper", "commit"]
+    kind: str
+    summary: str = ""
+    tier: Optional[int] = None
+    confidence: Optional[float] = None
+    outcome: Optional[str] = None
+    deferred: bool = False
+    quarantined: bool = False
+    prov_ref: Optional[str] = None
+    detail: dict[str, Any] = Field(default_factory=dict)
+    created_at: str = ""
+
+
+class AuditOut(BaseModel):
+    entries: list[AuditEntry] = Field(default_factory=list)
+    by_category: dict[str, int] = Field(default_factory=dict)
+    by_kind: dict[str, int] = Field(default_factory=dict)
+    by_tier: dict[str, int] = Field(default_factory=dict)
+    total: int = 0
+
+
+# ------------------------------------------------------------------------- runs
+
+
+class RunOut(BaseModel):
+    """One pipeline/answer run surfaced from the ledger's append-only history."""
+
+    run_id: str
+    kind: str                          # ingest|profile|...|ask|engineer|export
+    label: str = ""
+    started_at: str = ""
+    decisions: int = 0
+    artifacts: int = 0
+    cost_tokens: int = 0
+
+
+class RunsOut(BaseModel):
+    runs: list[RunOut] = Field(default_factory=list)
+    stages: list[str] = Field(default_factory=list)
+    total_decisions: int = 0
+    total_artifacts: int = 0
+    total_cost_tokens: int = 0
+
+
+# --------------------------------------------------------------- compute-ledger
+
+
+class ComputeRow(BaseModel):
+    """One rolled-up line of the per-project CostMeter (task or tier)."""
+
+    label: str
+    calls: int
+    tokens: int
+
+
+class ComputeLedgerOut(BaseModel):
+    """GET /api/compute-ledger — the compute-at-cost transparency artifact:
+    zero margin, exactly what ran. Rolled up two ways from the COST + DECISION
+    tables (which never diverge — ``LedgerCostMeter`` writes through both)."""
+
+    by_task: list[ComputeRow] = Field(default_factory=list)
+    by_tier: list[ComputeRow] = Field(default_factory=list)
+    total_tokens: int = 0
+    total_calls: int = 0
+    decision_tokens: int = 0    # tokens attributed to spine decisions (by tier)
+    estate: str = ""

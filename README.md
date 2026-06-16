@@ -14,7 +14,7 @@ typed amendments in [docs/DEVIATIONS.md](docs/DEVIATIONS.md).
 
 ```bash
 uv sync --all-extras
-uv run pytest tests/ -q          # full suite (1186 tests)
+uv run pytest tests/ -q          # full suite (1720 tests)
 
 # One line, zero setup — the Meridian enterprise estate (10 tables, ~9,000 rows
 # of supply-chain/retail/quality data, regenerated from code, full pipeline):
@@ -29,6 +29,14 @@ uv run ontoforge ingest -p myproject && uv run ontoforge profile -p myproject
 uv run ontoforge induce -p myproject && uv run ontoforge resolve -p myproject
 uv run ontoforge materialize -p myproject
 uv run ontoforge serve -p myproject        # → http://localhost:8765 — the full web app
+
+# Or pull from a live source via a CONNECTOR (open shell; needs the connectors extra):
+uv run ontoforge init mydb --db-url "postgresql://user@host/db" --db-table orders
+uv run ontoforge init mylake --object-uri "s3://bucket/sales.parquet" --object-key id
+uv run ontoforge ingest -p mydb            # snapshot-diff pull into the ledger + RAW mirror
+
+# Decide a SMART subset before pulling everything — Plan mode (governed, joinability-preserving):
+uv run ontoforge plan -p myproject --budget 500   # → plan_subset.json + a PlanReport
 
 # Or the bundled aviation demo estate:
 uv run ontoforge init demo
@@ -65,7 +73,9 @@ switcher (no reload between them):
   **Console** that turns data-engineering imperatives into preview → apply with exact undo. The
   Console clarifies one question when ambiguous, falls to worked examples when unsupported, and
   **refuses a confidently-wrong join** (sub-floor coverage) rather than asserting it. Studio's
-  Confirm / Activity / Record / Where-this-came-from apps round out the workbench.
+  Confirm / Activity / Record / Where-this-came-from apps round out the workbench, plus an
+  **Observatory** (Lineage / Audit / Runs / Compute tabs) that surfaces value-level provenance, the
+  append-only decision log, run lanes, and the per-project compute ledger — all read-only.
 
 **Spotlight** (⌘K, `/`, or just start typing) is the front door: one search box over classes,
 entities, properties, saved questions, and apps, backed by `GET /api/search` — with an "Ask the
@@ -75,7 +85,7 @@ The look is a **warm midcentury-modern system**: oatmeal/cream paper grounds, es
 locked atomic-age 8-hue atlas wheel (each app, island, and chart series owns a deterministic hue),
 marigold accents, warm-amber shadows (never black), a 270° arc confidence gauge, and a quiet
 calm-dark night theme as an opt-in. Vanilla ES modules, no build chain, ships fully offline
-(vendored Vega only); the non-vendor payload is **287,370 bytes — under the 290 KB budget**
+(vendored Vega only); the non-vendor payload is **308,042 bytes — under the 304 KB budget**
 (test-enforced), with API data reaching the DOM only through `createTextNode`/`el()` (no
 `innerHTML`). Design system + the full de-jargon naming map in [docs/UI_DESIGN.md](docs/UI_DESIGN.md);
 shell internals in [docs/UI_SHELL_README.md](docs/UI_SHELL_README.md); competitive positioning in
@@ -164,13 +174,55 @@ path verdict as ledger provenance (`result.typed_relationship`), and adds one mo
 existing coverage floor: if the **executed** data refuses the inferred type, the link is routed to
 review (the floor is never weakened).
 
+## Connectors, Plan mode, Observability & the Ask flywheel
+
+Four production features make OntoForge usable against real, live, large estates. The connectors
+and Plan-mode CLI are **open shell**; observability surfaces the **existing** ledger / HEARTH /
+CostMeter substrate (it recomputes nothing); the Ask flywheel is closed-core.
+
+- **Source connectors** (`ontoforge.cdc`) — pull from beyond local files, all behind the existing
+  `Connector` protocol so atoms / state / delta are byte-identical to the file connectors (keyless
+  preserved: a table with a PK is tracked per-cell, a keyless one falls back to content-addressed
+  rows): **`SqlConnector`** (any SQLAlchemy URL — Postgres / MySQL / SQLite — deterministic
+  snapshot-diff over `ORDER BY` chunks, PK introspected or supplied), **`ObjectStoreConnector`**
+  (S3 / GCS / local CSV or Parquet via fsspec, with an offline local-filesystem fallback for
+  `file://` and bare paths), and **`LargeCsvConnector`** (CSV-at-scale: chunked streaming, RAW
+  snapshot written incrementally, output identical to `CsvConnector` at any chunk size). Optional
+  drivers (`sqlalchemy`, `fsspec`) are **lazy-imported inside `pull()`** — `import ontoforge.cdc`
+  needs only stdlib + pyarrow, the engine still ships keyless and offline, and `pip install
+  'ontoforge[connectors]'` adds them. Wired into `ontoforge init` (`--db-url`/`--db-table`,
+  `--object-uri`) + `ingest`, which exits cleanly with the extra named if a driver is missing.
+- **Plan mode** (`ontoforge plan -p X --budget N`, `pipeline/plan.py`) — the cheap entry into a new
+  estate: instead of ingesting everything, pull a **governed, budget-bounded subset** that still lets
+  profiling / IND-discovery / induction work. It is **schema-informed stratified sampling** —
+  candidate-key distinct coverage, cardinality boundaries (min/max/rarest/modal), distribution edges
+  — and crucially **joinability-preserving**: it re-runs M3 profiling + credible-FK IND discovery and
+  co-keeps shared key values across both sides of each join, then **asserts** the join survives
+  (`PlanReport.joinability_ok()` / `severed_joins()`). An optional ontology **hypothesis** oversamples
+  hypothesized join keys. Deterministic (`PLAN_SEED=0`), keyless, zero-network. It writes the subset
+  to `plan_subset.json` and prints a per-table what/why report + the cross-table overlap table.
+- **Observability** (REST, additive) — `GET /api/lineage` resolves an answer cell → its interned
+  provenance term → the backing RAW atoms → the exact **source / table / row / column** (value-level,
+  not just column-level; addressable by `?cell=&prop=` | `?atom=` | `?prov_ref=`); `GET /api/audit`
+  is the append-only DECISION + ARTIFACT log newest-first with roll-ups; `GET /api/runs` lists
+  pipeline stages + per-kind run lanes; `GET /api/compute-ledger` is the per-project CostMeter by
+  task and by tier, **reconciling exactly** with `/api/status.cost_tokens`. The Studio **Observatory**
+  app is the UI over all four.
+- **Ask flywheel** (`lodestone/flywheel.py`) — a successful composed Ask **writes its result back** as
+  a versioned, searchable work object (description + provenance + validity fingerprint), so the next
+  identical ask is served from cache and skips candidate generation. **Validity is a hard gate:**
+  before serving a cache hit it re-executes the cached plan and recomputes the live provenance
+  fingerprint — any drift (a cited cell was edited or recommitted) is a miss that recomputes, so a
+  **stale or confidently-wrong cached answer is never served**; abstentions, clarifications, empty and
+  cheap single-type answers are never cached at all. Tenant-namespaced.
+
 ## Architecture
 
 | Layer | Module | Package |
 |---|---|---|
 | Provenance ledger N[X], atoms, model adapters | M0 | `ontoforge.ledger` |
 | Decision spine (calibration, conformal, budget) | M2 | `ontoforge.spine` |
-| CDC connectors + RAW mirror | M1 | `ontoforge.cdc` |
+| CDC connectors (file · SQL · object-store · large-CSV) + RAW mirror | M1 | `ontoforge.cdc` |
 | Profiler, FD/IND discovery, units | M3 | `ontoforge.profiling` |
 | STRATA type-lattice induction (FCA) | M4 | `ontoforge.strata` |
 | ER cascade (blocking, Fellegi–Sunter, clustering) | M5 | `ontoforge.er` |

@@ -42,6 +42,32 @@ from .base import JSONState, STATE_FORMAT, check_state, hash64, next_cycle, quot
 _STATE_KIND = "tabular"
 
 
+def parse_csv_text(text: str, where: str) -> tuple[list[str], list[dict[str, Any]]]:
+    """Parse CSV text into (ordered columns, rows) — the single CSV parsing rule.
+
+    Shared by ``CsvConnector`` (file) and ``ObjectStoreConnector`` (in-memory blob)
+    so both apply byte-for-byte identical semantics:
+    - all values are strings; a field present-but-empty is ``""`` while a missing
+      trailing field (short row) is ``None`` — distinct under ``value_repr``;
+    - completely blank records are skipped;
+    - rows longer than the header and duplicate header names raise ``ValueError``.
+    ``where`` is a source label used only in error messages.
+    """
+    reader = csv.reader(io.StringIO(text, newline=""))
+    records = [r for r in reader if r]  # drop blank records
+    if not records:
+        return [], []
+    columns = list(records[0])
+    if len(set(columns)) != len(columns):
+        raise ValueError(f"duplicate column names in CSV header of {where}: {columns}")
+    rows: list[dict[str, Any]] = []
+    for lineno, rec in enumerate(records[1:], start=2):
+        if len(rec) > len(columns):
+            raise ValueError(f"{where}:{lineno}: row has {len(rec)} fields, header has {len(columns)}")
+        rows.append({c: (rec[i] if i < len(rec) else None) for i, c in enumerate(columns)})
+    return columns, rows
+
+
 class _TabularConnector:
     """Shared per-row hash-diff engine; subclasses provide ``_load``/``_snapshot_table``."""
 
@@ -169,22 +195,7 @@ class CsvConnector(_TabularConnector):
     """
 
     def _load(self) -> tuple[list[str], list[dict[str, Any]]]:
-        text = read_text_robust(self.path)
-        reader = csv.reader(io.StringIO(text, newline=""))
-        records = [r for r in reader if r]  # drop blank records
-        if not records:
-            return [], []
-        columns = list(records[0])
-        if len(set(columns)) != len(columns):
-            raise ValueError(f"duplicate column names in CSV header of {self.path}: {columns}")
-        rows: list[dict[str, Any]] = []
-        for lineno, rec in enumerate(records[1:], start=2):
-            if len(rec) > len(columns):
-                raise ValueError(
-                    f"{self.path}:{lineno}: row has {len(rec)} fields, header has {len(columns)}"
-                )
-            rows.append({c: (rec[i] if i < len(rec) else None) for i, c in enumerate(columns)})
-        return columns, rows
+        return parse_csv_text(read_text_robust(self.path), str(self.path))
 
     def _snapshot_table(self, columns: list[str], rows: list[dict[str, Any]]) -> pa.Table:
         if not columns:
@@ -212,4 +223,4 @@ class ParquetConnector(_TabularConnector):
         return self._source_table
 
 
-__all__ = ["CsvConnector", "ParquetConnector"]
+__all__ = ["CsvConnector", "ParquetConnector", "parse_csv_text"]

@@ -145,3 +145,39 @@ affected modules, justification referencing acceptance tests, and migration note
   + `tests/ensemble` green; full suite green.
 - **Migration note:** none — all four are additive and tunable via the new module-level constants; the
   default `BALANCED` profile reproduces the prior global fusion when no estate fingerprint is supplied.
+
+## AMD-0011 — ADD W4-FEATURES: SQL/object-store/large-CSV connectors + Plan mode + Observability + Ask-flywheel
+- **Type:** ADD (open-shell connectors + cheap-entry CLI stage + read-only observability + closed-core cache).
+- **Deviation:** (1) **Connectors** — promote §17.3 SQL / object-store / large-CSV connectors from the
+  MVP-out-of-scope backlog to implemented as a deterministic **snapshot-diff** (NOT logical decoding /
+  binlog / API-cursor, which remain backlog): `cdc/sql.py` (`SqlConnector` over any SQLAlchemy URL),
+  `cdc/objectstore.py` (`ObjectStoreConnector`, fsspec + offline local fallback), `cdc/largecsv.py`
+  (`LargeCsvConnector`, chunked streaming). All behind the existing `Connector` protocol — atoms /
+  state / delta byte-identical to the file connectors; keyless content-addressed rows preserved.
+  Optional drivers (`sqlalchemy`, `fsspec`) are **lazy-imported inside `pull()`** and shipped in a new
+  `[project.optional-dependencies] connectors` extra; no required heavy dep added, engine stays keyless
+  + offline. (2) **Plan mode** (`pipeline/plan.py`, `plan_subset`) — a new pre-ingest stage that pulls a
+  governed, budget-bounded, joinability-preserving subset (schema-informed stratified sampling, asserts
+  the join survives); deterministic (`PLAN_SEED=0`). (3) **Observability** — additive read-only REST
+  (`/api/lineage`, `/api/audit`, `/api/runs`, `/api/compute-ledger`) + the Observatory Studio app over
+  the EXISTING ledger / HEARTH / CostMeter substrate (recomputes nothing). (4) **Ask flywheel** —
+  validity-gated write-back of composed answers (`lodestone/flywheel.py`, `discovery` `WorkKind.ASK`);
+  never serves a stale/confidently-wrong cached answer.
+- **CLI:** `ontoforge init` gains `--db-url`/`--db-table`/`--db-key`/`--db-schema` and `--object-uri`/
+  `--object-key`/`--object-fmt` (existing `--source` unchanged; a connector estate is recorded in
+  `config.json`); `ontoforge ingest` builds the connector and exits 1 with the `connectors` extra named
+  if a driver is missing; `ontoforge plan -p X --budget N` is the new subset stage. The non-vendor SPA
+  payload budget rises 290 → 304 KB to seat the ~13.6 KB Observatory app (test-enforced).
+- **Affected:** cdc (new `sql.py`/`objectstore.py`/`largecsv.py`, `tabular.parse_csv_text` extracted,
+  `__init__` exports); pipeline (`plan.py`, `__init__` exports); server (`app.py` 4 endpoints,
+  `schemas.py`, `static/js/apps/observatory.js` + `registry.js`); lodestone (`flywheel.py`, `__init__`
+  consult-first ask); discovery (`cached_work.py` ASK kind); cli (`init`/`ingest`/`plan` wiring);
+  pyproject (`connectors` extra). No engine gate weakened; no existing API contract changed (additive).
+- **Justification:** `tests/cdc` (in-memory sqlite via StaticPool, tmp-dir object fakes, generated
+  large CSVs — all zero-network), `tests/pipeline/test_plan.py` (28), `tests/server/test_observability.py`
+  (11) + extended `test_spa.py`, `tests/m12/test_flywheel.py` + `tests/discovery/test_answer_cache.py`.
+  Full suite green (1720); live smoke on the Meridian demo (plan → 500/500 within budget, joinability
+  ok; `/api/compute-ledger` + `/api/audit` + `/api/lineage` 200 with real data; ask-twice → 2nd cached).
+- **Migration note:** none — every change is additive. Remote connector drivers require
+  `pip install 'ontoforge[connectors]'` (or `uv sync --all-extras`); without it, local `file://`
+  objects still work and the SQL/remote paths raise a clear `ImportError` naming the extra.

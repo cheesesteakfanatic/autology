@@ -27,6 +27,7 @@ from .candidates import GENERATE_TASK, CandidateSet, generate_candidates, make_g
 from .citations import assemble_citations
 from .clarify import Clarification, resolve_choice, structural_diff
 from .execute import EmptyResult, ExecOutcome, execute_candidate
+from .flywheel import AskFlywheel, answer_fingerprint, requires_live_composition
 from .grounding import ValueIndex, build_value_index, ground
 from .model import Candidate
 from .typecheck import typecheck, infer, unit_convertible  # re-export
@@ -42,6 +43,9 @@ __all__ = [
     "generate_candidates",
     "make_generate_handler",
     "GENERATE_TASK",
+    "AskFlywheel",
+    "answer_fingerprint",
+    "requires_live_composition",
 ]
 
 MIN_COVERAGE = 0.6          # strong-grounding floor below which we abstain
@@ -63,6 +67,10 @@ class Lodestone:
         ledger,
         spine,
         model_client: Optional[ModelClient] = None,
+        *,
+        tenant_id: str = "",
+        work_store=None,
+        flywheel: bool = True,
     ) -> None:
         self.onto = ontology
         self.hearth = hearth
@@ -73,8 +81,42 @@ class Lodestone:
         )
         self._value_index: Optional[ValueIndex] = None
         self._pending: Optional[tuple[str, Clarification, float]] = None
+        # the Ask flywheel (v2.1 §4): a per-engine CachedWorkStore, created lazily
+        # so a world that never asks pays nothing. `flywheel=False` disables the
+        # close-the-loop path (always recompute) for benchmarking / debugging.
+        self.tenant_id = tenant_id
+        self._flywheel_on = flywheel
+        self._work_store = work_store
+        self._flywheel = None
+        self._current_question: Optional[str] = None
+        # a clarification-resolved answer is conditional on the human's choice and
+        # is NOT a stable property of the bare question — it is never cached, so an
+        # ambiguous question re-poses its clarification on every fresh ask.
+        self._suppress_write_back = False
         if hasattr(spine, "register_rule"):
             spine.register_rule(DecisionKind.QI, _qi_rule)
+
+    # ------------------------------------------------------------- flywheel
+
+    @property
+    def work_store(self):
+        """The project CachedWorkStore (lazily created; one per engine/world)."""
+        if self._work_store is None:
+            from ontoforge.discovery import CachedWorkStore
+
+            self._work_store = CachedWorkStore()
+        return self._work_store
+
+    @property
+    def flywheel(self):
+        if self._flywheel is None:
+            from .flywheel import AskFlywheel
+
+            self._flywheel = AskFlywheel(
+                self.work_store, self.onto, self.hearth, self.ledger,
+                tenant_id=self.tenant_id,
+            )
+        return self._flywheel
 
     # ------------------------------------------------------------ plumbing
 
@@ -91,6 +133,18 @@ class Lodestone:
 
     def ask(self, question: str) -> Answer:
         self._pending = None
+        self._current_question = question
+        self._suppress_write_back = False
+
+        # §4 step 2 — consult the cache FIRST. A still-valid cached answer for a
+        # previously composed Ask is served (marked cached) without re-grounding,
+        # re-generating candidates, or re-deciding through the spine. A stale entry
+        # (its provenance atoms moved) is silently invalidated here and recomputed.
+        if self._flywheel_on:
+            hit = self.flywheel.consult(question)
+            if hit is not None:
+                return hit
+
         g = ground(question, self.onto, self.value_index)
 
         # below the SOFT floor: genuinely ungroundable -> hard abstain (the
@@ -239,6 +293,9 @@ class Lodestone:
         if cand is None:
             return _abstain(f"clarification answer {choice!r} matches no offered option")
         self._pending = None
+        # a clarification-resolved answer is conditional on the choice — never cache
+        self._current_question = question
+        self._suppress_write_back = True
         confidence = round(min(0.98, 0.9 + 0.08 * coverage), 4)  # post-clarification singleton
         return self._execute_ranked([cand], confidence)
 
@@ -265,6 +322,19 @@ class Lodestone:
             oqir=cand.term,
         )
         a.citations = assemble_citations(out.rows, out.cell_provs, out.columns, self.ledger)
+        # §4 step 1 — close the loop: a successful Ask that required live
+        # composition (a plan over 2+ types or a fresh aggregate) is written back
+        # as a versioned, referenceable cached object so the next ask is faster.
+        # The write-back is best-effort and never affects the answer returned.
+        if (
+            self._flywheel_on
+            and not self._suppress_write_back
+            and self._current_question is not None
+        ):
+            try:
+                self.flywheel.write_back(self._current_question, cand, a)
+            except Exception:
+                pass
         return a
 
 

@@ -17,6 +17,18 @@ retrievable two ways:
 This is the flywheel: the more the system engineers, the faster the next ask is,
 because a previously-validated join is retrieved, not re-derived.
 
+**Close the loop (v2.1 §4).** A *novel cross-source Ask* that engineers a new
+answer (a non-trivial OQIR plan over 2+ types, or a fresh aggregate) writes its
+RESULT back here as a versioned :class:`WorkObject` of :data:`WorkKind.ASK`,
+carrying the normalized question, the OQIR plan, the answer + citations, an
+auto-generated description, and a **validity fingerprint** over the provenance
+atoms the answer cites. The next time that question is asked, the cache is
+consulted FIRST: a still-valid cached answer is served (a cache HIT) instead of
+recomputing; a *stale* one (its provenance atoms changed, so the live
+fingerprint no longer matches) is invalidated and recomputed. Validity is a hard
+gate — a cached answer is NEVER served once its provenance has moved underneath
+it, so the flywheel can never serve a confidently-wrong stale answer.
+
 KEYLESS / DETERMINISTIC / ZERO-NETWORK: retrieval is a pure-python hashing
 TF-IDF vectorizer (a fixed feature hashing into ``HASH_DIM`` buckets) with cosine
 similarity — no embeddings model, no network, no RNG, no wall clock. Identical
@@ -33,15 +45,18 @@ import re
 from collections import Counter
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Mapping, Optional
+from typing import Any, Iterable, Mapping, Optional
 
 __all__ = [
     "HASH_DIM",
+    "CachedAnswer",
     "CachedWorkStore",
     "WorkKind",
     "WorkObject",
     "WorkRetrieval",
     "describe_work",
+    "fingerprint_atoms",
+    "normalize_question",
 ]
 
 #: hashing-vectorizer dimensionality (feature-hashing bucket count). Fixed so the
@@ -57,6 +72,7 @@ class WorkKind(str, Enum):
     JOIN = "join"               # an executed/validated relationship join
     TRANSFORM = "transform"     # a synthesized column/row transform
     RESULT = "result"           # a materialized query/extract result
+    ASK = "ask"                 # a composed NL Ask answer (the closed-loop cache)
 
 
 @dataclass(frozen=True, slots=True)
@@ -95,6 +111,25 @@ class WorkRetrieval:
     score: float
 
 
+@dataclass(frozen=True, slots=True)
+class CachedAnswer:
+    """A served cache hit for an Ask: the stored answer payload plus the work
+    object it was reconstituted from. ``columns``/``rows``/``citations`` carry the
+    same answer the live composition produced; ``object_id`` + ``description``
+    make it referenceable downstream (the next planner can cite the cached work)."""
+
+    object_id: str
+    question: str
+    columns: tuple[str, ...]
+    rows: tuple[tuple[Any, ...], ...]
+    citations: tuple[Mapping[str, Any], ...]
+    oqir: str
+    confidence: float
+    provenance: str
+    description: str
+    fingerprint: str
+
+
 # --------------------------------------------------------------------- describe
 
 
@@ -124,10 +159,66 @@ def describe_work(kind: WorkKind, payload: Mapping[str, Any]) -> str:
         col = payload.get("column", "?")
         kind_s = payload.get("transform", "transform")
         return f"transform {kind_s} on {col}; " + str(payload.get("rationale", ""))
+    if kind is WorkKind.ASK:
+        q = payload.get("question") or "ask"
+        cols = payload.get("columns") or []
+        bits = [f"answer to: {q}"]
+        if cols:
+            bits.append("columns " + ", ".join(str(c) for c in cols))
+        nrows = payload.get("n_rows")
+        if nrows is not None:
+            bits.append(f"{int(nrows)} result row(s)")
+        if payload.get("oqir"):
+            bits.append(f"plan {payload['oqir']}")
+        conf = payload.get("confidence")
+        if conf is not None:
+            bits.append(f"confidence {float(conf):.2f}")
+        return "; ".join(bits)
     # RESULT
     q = payload.get("question") or payload.get("title") or "result"
     cols = payload.get("columns") or []
     return f"result for {q}; columns " + ", ".join(str(c) for c in cols)
+
+
+# ------------------------------------------------------------- normalization
+
+
+_STOPWORDS = frozenset({
+    "the", "a", "an", "of", "for", "to", "in", "on", "at", "by", "is", "was",
+    "were", "are", "and", "or", "what", "which", "who", "whom", "whose", "how",
+    "many", "much", "does", "do", "did", "with", "across", "its", "their",
+})
+
+
+def normalize_question(question: str) -> str:
+    """Canonical key for an Ask: lowercase, drop punctuation + stopwords, sort
+    the remaining content tokens. Deterministic and order-insensitive so that
+    'revenue by region in 2024' and 'In 2024, the revenue by region?' collapse
+    to the SAME cache key — the second phrasing of a question hits the first's
+    cached answer. Numbers and identifiers (the load-bearing literals) survive."""
+    toks = [t for t in _TOKEN_RE.findall(question.lower()) if t not in _STOPWORDS]
+    return " ".join(sorted(toks))
+
+
+def _ask_key(question: str, tenant_id: str) -> str:
+    """The logical store key for a cached Ask, namespaced by tenant so two tenants
+    asking the SAME question keep independent versions/history (§1.5)."""
+    return f"ask:{tenant_id or '_'}:{normalize_question(question)}"
+
+
+def fingerprint_atoms(atom_ids: Iterable[str]) -> str:
+    """A stable validity fingerprint over the provenance atoms an answer cites.
+
+    The cached answer stays valid iff the SET of source-cell atoms backing it is
+    unchanged. Atoms are content-addressed (their id is a hash of the source
+    cell), so any edit/recommit to a cited cell mints a new atom id, the set
+    moves, and this fingerprint changes — the cache invalidates and recomputes.
+    Deterministic (sorted, hashed); empty input yields a fixed sentinel."""
+    ids = sorted({a for a in atom_ids if a})
+    if not ids:
+        return "fp:0:empty"
+    h = hashlib.sha256("\x1f".join(ids).encode("utf-8")).hexdigest()[:32]
+    return f"fp:{len(ids)}:{h}"
 
 
 # --------------------------------------------------------------- vectorizer
@@ -264,6 +355,106 @@ class CachedWorkStore:
             payload.update(extra)
         return self.record(
             key, WorkKind.JOIN, payload, provenance=provenance, tenant_id=tenant_id
+        )
+
+    # -------------------------------------------------- the Ask flywheel (§4)
+
+    def cache_answer(
+        self,
+        question: str,
+        *,
+        columns: Iterable[str],
+        rows: Iterable[Iterable[Any]],
+        citations: Iterable[Mapping[str, Any]] = (),
+        atom_ids: Iterable[str] = (),
+        oqir: str = "",
+        confidence: float = 0.0,
+        provenance: str = "",
+        tenant_id: str = "",
+    ) -> WorkObject:
+        """Write a composed Ask's RESULT back as a versioned, referenceable cache
+        object (close the loop, §4). The logical key is the NORMALIZED question
+        (order-insensitive content tokens), so the same question re-asked is a new
+        VERSION, not a duplicate. The validity fingerprint over ``atom_ids`` (the
+        provenance atoms the answer cites) is stored so a later lookup can detect
+        staleness. Keyless / deterministic — no clock, no network, no RNG."""
+        cols = tuple(str(c) for c in columns)
+        rws = tuple(tuple(r) for r in rows)
+        cites = tuple(dict(c) for c in citations)
+        fp = fingerprint_atoms(atom_ids)
+        payload: dict[str, Any] = {
+            "question": question,
+            "columns": list(cols),
+            "rows": [list(r) for r in rws],
+            "citations": [dict(c) for c in cites],
+            "n_rows": len(rws),
+            "oqir": oqir,
+            "confidence": float(confidence),
+            "fingerprint": fp,
+            "atom_ids": sorted({a for a in atom_ids if a}),
+        }
+        return self.record(
+            _ask_key(question, tenant_id), WorkKind.ASK, payload,
+            provenance=provenance, tenant_id=tenant_id,
+        )
+
+    def lookup_answer(
+        self,
+        question: str,
+        *,
+        tenant_id: str = "",
+        current_fingerprint: Optional[str] = None,
+    ) -> Optional[CachedAnswer]:
+        """Consult the cache for a prior Ask (§4 step 2). Exact normalized-question
+        match within the tenant; the latest version wins. Returns the cached answer
+        ONLY when it is still VALID — when ``current_fingerprint`` is supplied it
+        must equal the stored fingerprint (the provenance atoms have not moved),
+        otherwise the cached object is STALE and ``None`` is returned so the caller
+        recomputes. Tenant-scoped: the cache key itself is namespaced by tenant, so
+        another tenant's cache can never surface here (and tenants never clobber
+        each other's versions under a shared store)."""
+        obj = self._latest.get(_ask_key(question, tenant_id))
+        if obj is None or obj.kind is not WorkKind.ASK:
+            return None
+        # §1.5 tenant isolation: belt-and-braces — the key is already scoped
+        if obj.tenant_id != tenant_id:
+            return None
+        stored_fp = str(obj.payload.get("fingerprint", ""))
+        if current_fingerprint is not None and current_fingerprint != stored_fp:
+            return None  # provenance changed underneath the cached answer -> stale
+        return self._as_cached_answer(obj)
+
+    def is_stale(self, question: str, current_fingerprint: str, *, tenant_id: str = "") -> bool:
+        """True iff a cached Ask exists for ``question`` but its provenance
+        fingerprint no longer matches the live one (it would be invalidated)."""
+        obj = self._latest.get(_ask_key(question, tenant_id))
+        if obj is None or obj.kind is not WorkKind.ASK or obj.tenant_id != tenant_id:
+            return False
+        return str(obj.payload.get("fingerprint", "")) != current_fingerprint
+
+    def latest_ask(self, question: str, *, tenant_id: str = "") -> Optional[WorkObject]:
+        """The latest-version cached ASK object for ``question`` within ``tenant_id``
+        (or ``None``). Exposes the raw object so a driver can revalidate against the
+        live world before serving — the tenant-namespaced lookup, not a plain get."""
+        obj = self._latest.get(_ask_key(question, tenant_id))
+        if obj is None or obj.kind is not WorkKind.ASK or obj.tenant_id != tenant_id:
+            return None
+        return obj
+
+    @staticmethod
+    def _as_cached_answer(obj: WorkObject) -> CachedAnswer:
+        p = obj.payload
+        return CachedAnswer(
+            object_id=obj.object_id,
+            question=str(p.get("question", "")),
+            columns=tuple(p.get("columns", ()) or ()),
+            rows=tuple(tuple(r) for r in (p.get("rows", ()) or ())),
+            citations=tuple(p.get("citations", ()) or ()),
+            oqir=str(p.get("oqir", "")),
+            confidence=float(p.get("confidence", 0.0)),
+            provenance=obj.provenance,
+            description=obj.description,
+            fingerprint=str(p.get("fingerprint", "")),
         )
 
     # ------------------------------------------------------------- read

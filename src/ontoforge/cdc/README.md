@@ -11,9 +11,67 @@ mirrors every pulled snapshot to the RAW layer (whitepaper §2).
 | file | contents |
 |---|---|
 | `base.py` | `Connector` protocol, `AtomRegistrar` slice of the Ledger protocol, xxh3 hashing, URI quoting, encoding-robust text reader, state versioning |
-| `tabular.py` | `CsvConnector`, `ParquetConnector` — per-row hash diff, per-cell deltas |
+| `tabular.py` | `CsvConnector`, `ParquetConnector` — per-row hash diff, per-cell deltas; `parse_csv_text` (the single CSV-parsing rule) |
 | `docs.py` | `DocConnector` — paragraph span atoms with content-hash re-anchoring |
+| `sql.py` | `SqlConnector` — SQLAlchemy table snapshot-diff (Postgres/MySQL/SQLite) |
+| `objectstore.py` | `ObjectStoreConnector` — S3-compatible CSV/Parquet object (fsspec, local fallback) |
+| `largecsv.py` | `LargeCsvConnector` — chunked, constant-memory CSV-at-scale |
 | `ingest.py` | `ingest()` driver + `RawMirror` (content-addressed Parquet snapshots) |
+
+## Source connectors (P0 — nothing flows without these)
+
+All three new connectors are **OPEN-SHELL** (`docs/IP_ARCHITECTURE.md`) and conform
+to the exact same `Connector` contract and delta semantics as the file connectors:
+`pull(state) -> (DeltaBatch, new_state)`, cell atoms with stable content-addressed
+URIs, per-cell update granularity, tombstone deletes, keyless content-addressed row
+fallback, JSON-able state, and a `snapshot_tables()` RAW Parquet mirror. The `SQL`
+and `ObjectStore` connectors **reuse `_TabularConnector`** so the diff engine, URI
+grammar, and state format are byte-for-byte identical to CSV/Parquet.
+
+**Optional-driver policy.** Each connector lazy-imports its optional driver *inside*
+`pull()` — importing `ontoforge.cdc` (or instantiating a connector) pulls in only
+stdlib + pyarrow, never the heavy driver, so the engine still ships keyless and
+offline. A missing driver raises a clear error naming the `connectors` extra
+(`pip install 'ontoforge[connectors]'`). The extra declares `sqlalchemy` and `fsspec`
+only; DBAPI drivers (psycopg2, PyMySQL) and object-store backends (s3fs, gcsfs) are
+user-chosen per URL and intentionally not pinned.
+
+### `SqlConnector` (`sql.py`)
+
+`SqlConnector(source_id, url, table, key_columns=None, *, schema=None, chunk_size=10_000)`.
+One interface for Postgres / MySQL / SQLite behind a SQLAlchemy connection URL
+(`postgresql+psycopg2://…`, `mysql+pymysql://…`, `sqlite:///file.db`). It introspects
+the table (columns + primary key) via SQLAlchemy reflection, pulls rows in
+deterministic chunks (`ORDER BY` the key columns, else every column — so the snapshot,
+the RAW bytes, and the keyless `~n` suffixes are stable regardless of physical row
+order), and maps every cell to a cell atom. `key_columns` omitted ⇒ the introspected
+PK is used; no PK ⇒ keyless content-addressed rows. Typed DB values (int/float/str/…)
+are preserved through `value_repr`; an in-memory SQLite key int `1` renders as row key
+`"1"`, matching CSV/Parquet for the same logical key. A snapshot-diff (not logical
+decoding) keeps it deterministic, privilege-free, and offline-testable.
+
+### `ObjectStoreConnector` (`objectstore.py`)
+
+`ObjectStoreConnector(source_id, uri, key_columns=(), *, fmt=None, object_name=None, storage_options=None)`.
+Reads one CSV or Parquet object from S3-compatible storage. Transport is behind a
+tiny `_open_bytes()` adapter: fsspec when installed (`s3://`, `gcs://`, … via the
+registered filesystem), else a clean local-filesystem fallback for `file://` URLs and
+bare paths (so it is usable and offline-testable without the extra; a real `s3://`
+URL without fsspec raises the actionable error). Format is chosen by suffix unless
+`fmt` is given. Bytes are parsed in-memory with the identical CSV/Parquet semantics
+as the file connectors (CSV via the shared `parse_csv_text`), so an object and its
+on-disk twin yield identical atoms.
+
+### `LargeCsvConnector` (`largecsv.py`)
+
+`LargeCsvConnector(source_id, path, key_columns=(), object_name=None, *, chunk_size=50_000)`.
+CSV-at-scale: streams the file in fixed-size row chunks, never materializing all rows
+or a full in-memory snapshot. Each row is diffed against prior state the moment it is
+read; the RAW snapshot is written incrementally to a content-addressed temp Parquet
+via `pq.ParquetWriter` (never held whole). Deletes (keys in prior state that never
+reappear) are detected after the stream by key-set difference — O(distinct keys),
+the irreducible cost of emitting deletes. Output is **identical to `CsvConnector` at
+any `chunk_size`** (tested: 1/7/100/10000) — `chunk_size` bounds memory only.
 
 ## Connector contract (`base.py`)
 
@@ -141,7 +199,11 @@ data yield identical atoms (uri **and** atom_id).
 
 - Explicit span atom_id (see above) — required by the citation-stability spec
   line; uses the `Atom.atom_id` field the contracts dataclass provides.
-- Postgres logical decoding, API-cursor, OSM/GLEIF/EDGAR connectors (§17.3
-  backlog) are out of MVP scope (§4.1): file hash-diff + doc snapshot-diff only.
+- **SQL / object-store / large-CSV connectors (§17.3 backlog promotion):** now
+  implemented behind the optional `connectors` extra as deterministic snapshot
+  diffs (see "Source connectors" above). They are P0 — the MVP file-only scope is
+  superseded. Postgres *logical decoding* / binlog CDC, API-cursor, and
+  OSM/GLEIF/EDGAR connectors remain backlog: a snapshot-diff over a SQLAlchemy
+  table covers the relational source need privilege-free and offline-testable.
 - Cell delete granularity: a vanished row tombstones each of its cells (one
   delta per atom), keeping `changed_atom_ids` exact for invalidation.

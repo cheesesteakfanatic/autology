@@ -161,6 +161,14 @@ class Answer:
     abstain_reason: str = ""
     clarification: Optional[str] = None      # the ONE question, when conformal set > 1
     clarification_options: tuple[str, ...] = ()
+    # --- the Ask flywheel (v2.1 §4): when this answer was SERVED from the
+    # cached-work store instead of freshly composed, `cached` is True and
+    # `cache_object_id` / `cache_description` reference the stored object so the
+    # served answer is itself referenceable downstream. A live composition leaves
+    # these at their defaults.
+    cached: bool = False
+    cache_object_id: Optional[str] = None
+    cache_description: str = ""
 
 
 @dataclass(frozen=True, slots=True)

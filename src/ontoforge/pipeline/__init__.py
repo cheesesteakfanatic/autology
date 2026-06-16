@@ -32,6 +32,13 @@ from .er_generic import ClassResolution, IdentityDomain, identity_domains, resol
 from .induce import InducedArtifacts, induce_estate, profile_estate
 from .mapping import ClassPlan, build_plans
 from .materialize import materialize_induced
+from .plan import (
+    JoinOverlap,
+    OntologyHypothesis,
+    PlanReport,
+    TablePlan,
+    plan_subset,
+)
 
 __all__ = [
     "ESTATE_NAME",
@@ -46,6 +53,11 @@ __all__ = [
     "ERLink",
     "IdentityDomain",
     "InducedArtifacts",
+    "JoinOverlap",
+    "OntologyHypothesis",
+    "PlanReport",
+    "TablePlan",
+    "plan_subset",
     "build_and_persist_atlas",
     "build_atlas",
     "build_plans",

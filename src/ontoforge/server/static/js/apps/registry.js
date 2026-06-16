@@ -16,6 +16,7 @@ import { createReviewApp } from "./review.js";
 import { createPulseApp } from "./pulse.js";
 import { createInspectorApp } from "./inspector.js";
 import { createEvidenceApp } from "./evidence.js";
+import { createObservatoryApp } from "./observatory.js";
 
 export function createRegistry() {
   const specs = [
@@ -26,6 +27,7 @@ export function createRegistry() {
     createPulseApp(),         // Activity (id: "pulse")
     createInspectorApp(),     // Explore record (id: "inspector")
     createEvidenceApp(),      // Where this came from (id: "evidence")
+    createObservatoryApp(),   // Observatory — lineage/audit/runs/compute (id: "observatory")
   ];
   const byId = new Map(specs.map((s) => [s.id, s]));
   return {

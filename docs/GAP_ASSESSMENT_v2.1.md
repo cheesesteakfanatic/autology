@@ -1,7 +1,7 @@
 # Gap Assessment — OntoForge build vs. Consolidated Build Instructions v2.1
 
 Honest mapping of the v2.1 handoff doc (the autonomous-data-engineering mandate) against the current
-codebase (Engine Wave 1 landed; 1400 tests green). Status: **HAVE** / **PARTIAL** / **GAP** / ✅ **DONE**.
+codebase (Engine Wave 1 + W4-FEATURES landed; 1720 tests green). Status: **HAVE** / **PARTIAL** / **GAP** / ✅ **DONE**.
 
 ## Phase 0 (§16) — the harness-first mandate: ✅ effectively SATISFIED
 - Property tests for the math substrate (semiring/lattice/bitemporal/DBSP incrementality) — **HAVE** (tests/m0,m4,m6 + hypothesis).
@@ -27,17 +27,17 @@ Shipped `src/ontoforge/validation/` — actually **synthesizes the join in DuckD
 ### §1.5 Per-tenant pattern learning (isolated) — ✅ **DONE (Wave 1)**
 Shipped `src/ontoforge/tenant/priors.py` — an **isolated** per-tenant store (key space `(tenant_id, kind, key)`; no global/cross-tenant rollup even on a shared SQLite file) learning name conventions, semtype habits, and accepted/rejected join shapes. `adjust_candidate` applies a **bounded** nudge (±0.08) that tunes ranking only and is suppressed by hard contrary evidence — it can never lift a sub-floor candidate over the join floor. `tests/tenant/test_priors.py` (18) green, isolation asserted.
 
-### §2 Tiered compute / model-agnosticism / stratified sampling — **PARTIAL**
-HAVE: `aimodels/router.py` (tiers, model-agnostic, OpenAI-compatible-ready), `secure.sample_rows` (stratified). GAP: **schema-informed stratified sampling around candidate keys / cardinality boundaries / distribution edges**, bootstrapped off an initial ontology hypothesis, for billion-row join inference. Current sampling is generic, not join-inference-targeted.
+### §2 Tiered compute / model-agnosticism / stratified sampling — ✅ **DONE (W4) for sampling; tiers HAVE**
+HAVE: `aimodels/router.py` (tiers, model-agnostic, OpenAI-compatible-ready), `secure.sample_rows` (stratified). ✅ **DONE (W4):** **Plan mode** (`pipeline/plan.py`, `plan_subset` + `ontoforge plan -p X --budget N`) is exactly the **schema-informed stratified sampling around candidate keys / cardinality boundaries / distribution edges**, bootstrapped off an initial ontology **hypothesis** (oversamples hypothesized join keys), for big-table join inference. It is **joinability-preserving** — it re-runs M3 profiling + credible-FK IND discovery and co-keeps shared key values so relationship discovery still fires on the subset, and **asserts** the join survives (`PlanReport.joinability_ok()`); deterministic (`PLAN_SEED=0`), keyless, zero-network. Remaining: wiring Plan to actually *gate* connector ingest end-to-end (today it runs standalone before ingest and writes `plan_subset.json`).
 
 ### §3 Prompt router + living library + observation — **PARTIAL → build (Wave 2)**
 HAVE: `aimodels/prompts.py` versioned templates. GAP: the **prompt ROUTER** (classifier → prompt by relationship-type/domain/complexity, logged), **RAG over prompts**, novel-case capture→sterilize→test→fold-in, the **observation layer** (flag out-of-library prompts + confidence divergence), live prompt update, bloat guardrails.
 
-### §4 Ask flywheel + dynamic ontology growth — **PARTIAL → build (Wave 2)**
-HAVE: LODESTONE Ask + the live playground build. GAP: the **flywheel** — a novel cross-source Ask with no pre-existing dataset triggers **live data engineering**, answers, and **writes the result back as a referenceable ontology object** so the next ask is faster; plus async/emailed result + ETA for heavy asks (latency SLAs §4).
+### §4 Ask flywheel + dynamic ontology growth — ✅ **DONE (W4): write-back loop**
+HAVE: LODESTONE Ask + the live playground build. ✅ **DONE (W4):** the **flywheel** (`lodestone/flywheel.py` + `discovery/cached_work.py` `WorkKind.ASK`) — a successful composed Ask **writes its result back as a versioned, referenceable work object** (description + provenance + validity fingerprint, tenant-namespaced); the next identical ask is served from cache (`consult`-first in `Lodestone.ask`, skips candidate generation) and is retrievable by semantic search. **Validity is a HARD gate:** `consult` re-executes the cached plan and recomputes the live provenance fingerprint — any mismatch (a cited cell was edited/recommitted → new atom) returns a miss and recomputes, so a **stale or confidently-wrong answer is never served**; abstentions/clarifications/empty/cheap-single-type results are never cached. **Verified live** (meridian demo): ask twice → 2nd carries `cached:true` with byte-identical rows + citations. Remaining: async/emailed result + ETA for heavy asks (latency SLAs §4).
 
 ### §5 Semantic search over cached DE work (humans + models) — ✅ **FOUNDATION DONE (Wave 1)**
-Shipped `src/ontoforge/discovery/cached_work.py` — a `CachedWorkStore` of **versioned** DE objects (executed joins / transforms / results) with provenance + an **auto-generated description** + **keyless semantic retrieval** (pure-python hashing TF-IDF + IDF-weighted cosine). `search(query)` for humans and `retrieve_for_model(context)` for the model RAG bootstrap ("what we already know about these joins"). Tenant-scoped retrieval. Real embeddings later route through `aimodels` behind the same interface. `tests/discovery/` (7) green. (Not yet surfaced on a `/api` route — that wiring is Wave 2.)
+Shipped `src/ontoforge/discovery/cached_work.py` — a `CachedWorkStore` of **versioned** DE objects (executed joins / transforms / results / **cached Answers**) with provenance + an **auto-generated description** + **keyless semantic retrieval** (pure-python hashing TF-IDF + IDF-weighted cosine). `search(query)` for humans and `retrieve_for_model(context)` for the model RAG bootstrap ("what we already know about these joins"). Tenant-scoped retrieval. Real embeddings later route through `aimodels` behind the same interface. ✅ **DONE (W4):** the store now also backs the **Ask flywheel** (`WorkKind.ASK`, validity-gated `lookup_answer`) and is exercised end-to-end through `Lodestone.ask`. `tests/discovery/` + `tests/m12/test_flywheel.py` green.
 
 ### §6 Lazy usage/criticality recomputation — **PARTIAL → build (Wave 2)**
 HAVE: HEARTH bitemporal + WARDEN drift + DBSP incrementality. GAP: a **usage/criticality-driven lazy recompute** policy (system-determined ∪ user-set ∪ blend dial); never nightly-everything.
@@ -45,8 +45,8 @@ HAVE: HEARTH bitemporal + WARDEN drift + DBSP incrementality. GAP: a **usage/cri
 ### §7 Client-side anonymization toolkit — **GAP (open-shell, separate track)**
 None yet. One-click anonymize/decipher, customer-held traceable-ID key, cloud computes on anonymized input. This is an **open-shell** deliverable + the headline trust/marketing wedge.
 
-### §8 Per-customer compute ledger (zero-margin pass-through) — **PARTIAL**
-HAVE: token CostMeter. GAP: a per-customer **compute ledger** surfaced as the pass-through/transparency artifact.
+### §8 Per-customer compute ledger (zero-margin pass-through) — ✅ **DONE (W4): surfaced**
+HAVE: token CostMeter. ✅ **DONE (W4):** `GET /api/compute-ledger` surfaces the per-project CostMeter as the transparency artifact — **by task** (from the COST table) and **by tier** (from `DECISION.cost_tokens`), with totals that **reconcile exactly** with the COST sum and `/api/status.cost_tokens` (test-asserted). Joined by the rest of the **Observability** surface: `GET /api/lineage` (value-level: answer cell → interned prov term → RAW atoms → exact source/table/row/column), `GET /api/audit` (append-only DECISION+ARTIFACT log), `GET /api/runs` (stages + per-kind run lanes), plus the **Observatory** Studio micro-app — all read-only over the existing ledger/HEARTH/CostMeter substrate (recomputes nothing). Remaining: true *per-customer* billing identity (see auth/multi-tenancy, deferred — human checkpoint).
 
 ## PART III — IP architecture (§18-20) — ✅ **DOCUMENTED + GUARDED (Wave 1); human checkpoint remains**
 Shipped [docs/IP_ARCHITECTURE.md](IP_ARCHITECTURE.md) documenting the closed-core ring (relationships, validation, ensemble, tenant, discovery, strata, temper, hearth, anvil, warden, lodestone, vista, amber, spine, aimodels) vs the open shell (cdc, estates connectors, server UI, pipeline/engineer scaffolding, the future anonymizer), plus `tests/test_ip_boundary.py` — a pragmatic AST import-guard asserting the open shell (`server`, `cdc`) does not reach into the NEW closed-core engine internals (only via package entrypoints / `contracts`), with a documented carve-out list for pre-existing established-module internals. **Human checkpoint (still open):** the actual private-repo split / open-sourcing decision.
@@ -59,4 +59,10 @@ The doc opens by naming §1 the central technical risk. Wave 1 targeted it head-
 4. ✅ `tenant/` — **per-tenant isolated pattern learning** (priors that re-weight candidates; never cross-tenant).
 5. ✅ wired into **atlas** (`rel_type` + evidence on every arc) and **engineer** (proxy + execution-validated confidence + typed provenance before commit); shipped the **semantic-search-over-cached-DE-work** foundation (`discovery/`) and the closed-core/open-shell **IP-boundary doc + import guard**.
 
-Wave 2 (next): living prompt library/router/observation, the Ask flywheel write-back, lazy recompute, anonymization toolkit, and surfacing `discovery` on a `/api` route.
+## W4-FEATURES — ✅ SHIPPED (what a real DE company needs)
+1. ✅ **Connectors** (open shell, `cdc/sql.py` · `cdc/objectstore.py` · `cdc/largecsv.py`): SQL via SQLAlchemy (Postgres/MySQL/SQLite), S3/GCS/local object-store (CSV/Parquet), and CSV-at-scale (chunked streaming). All behind the existing `Connector` protocol — byte-identical atoms/state/delta to the file connectors. Optional drivers (`sqlalchemy`, `fsspec`) are **lazy-imported inside `pull()`**; `pip install 'ontoforge[connectors]'` adds them. Engine stays keyless + offline; no required heavy dep added. Wired into `ontoforge init` (`--db-url`/`--db-table`/`--db-key`/`--db-schema`, `--object-uri`/`--object-key`/`--object-fmt`) + `ingest` (graceful exit-1 with the extra named when a driver is missing).
+2. ✅ **Plan mode** (§2 above) — `ontoforge plan -p X --budget N`.
+3. ✅ **Ask flywheel** write-back (§4 above) + **discovery surfaced** (§5 above).
+4. ✅ **Observability** — value-level lineage / audit / runs / **compute-ledger** (§8 above) + the Observatory Studio app.
+
+Next: living prompt library/router/observation (§3), lazy recompute (§6), anonymization toolkit (§7, open-shell trust wedge), and **auth/multi-tenancy enforcement** (deferred — needs a real identity provider + a human decision; the cache/flywheel tenant-namespacing substrate is already in place).

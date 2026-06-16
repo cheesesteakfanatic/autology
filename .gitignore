@@ -12,3 +12,6 @@ data/
 .DS_Store
 .claude/
 .tmp_test/
+.cctmp/
+.pytest_tmp/
+.t2/

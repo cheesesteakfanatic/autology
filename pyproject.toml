@@ -24,6 +24,15 @@ dependencies = [
 
 [project.optional-dependencies]
 graph = ["pyoxigraph>=0.4"]
+# M1 source connectors (SqlConnector / ObjectStoreConnector). Drivers are
+# lazy-imported inside pull(); none is a required runtime dependency, so the
+# engine still ships keyless and offline. DBAPI drivers (psycopg2, PyMySQL) and
+# object-store backends (s3fs, gcsfs) are user-chosen per URL and intentionally
+# NOT pinned here.
+connectors = [
+    "sqlalchemy>=2.0",
+    "fsspec>=2024.6",
+]
 
 [project.scripts]
 ontoforge = "ontoforge.cli:app"

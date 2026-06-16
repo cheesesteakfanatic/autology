@@ -14,9 +14,9 @@ Always run from the repo root with `uv` on PATH:
 ```bash
 export PATH="$HOME/.local/bin:$PATH"   # uv lives here; system python is 3.9 (too old)
 
-uv sync --all-extras                    # set up the 3.12 venv
-uv run pytest tests/ -q                 # full suite — 1186 tests, must stay green
-uv run pytest tests/m12 -q              # LODESTONE / free-text robustness gate (70)
+uv sync --all-extras                    # set up the 3.12 venv (incl. connectors extra)
+uv run pytest tests/ -q                 # full suite — 1720 tests, must stay green
+uv run pytest tests/m12 -q              # LODESTONE / free-text robustness gate + flywheel
 uv run pytest tests/m12/test_competency.py tests/meridian -q   # competency + gold gate
 uv run ruff check src/                  # lint (pre-existing debt isolated to temper/)
 
@@ -37,7 +37,18 @@ uv run ontoforge ask -p myproj "free-text question"   # cited answer or honest a
 
 Pipeline (the CLI subcommands, in order): **init → ingest → profile → induce →
 resolve → materialize**, then **ask / dashboard / snapshot / serve** over the
-materialized world. Each stage appends to the provenance ledger.
+materialized world. Each stage appends to the provenance ledger. **`plan`** is the
+optional cheap entry (run before `ingest`): `ontoforge plan -p X --budget N` pulls a
+governed, joinability-preserving subset (`pipeline/plan.py`) and writes `plan_subset.json`.
+
+`init` sources an estate three ways: the bundled aviation fixtures, a GENERIC directory
+(`--source`), or OPEN-SHELL **connectors** (`--db-url`/`--db-table` for SQL, `--object-uri`
+for an S3/GCS/local object) — connector drivers (`sqlalchemy`/`fsspec`) live in the optional
+`connectors` extra and are lazy-imported inside `pull()`. Observability is read-only over the
+existing ledger/HEARTH/CostMeter substrate: `GET /api/lineage` (value-level), `/api/audit`,
+`/api/runs`, `/api/compute-ledger`, surfaced by the Studio **Observatory** app. The **Ask
+flywheel** (`lodestone/flywheel.py`) write-backs composed answers and serves a cache hit only
+after a live provenance-fingerprint revalidation (never a stale/confidently-wrong answer).
 
 Modules under `src/ontoforge/` (whitepaper module → package):
 
@@ -120,8 +131,8 @@ ids/URIs/verdicts keep their names. Static-UI tests live in `tests/server/test_s
   `rgba(0,0,0,…)` shadows are legitimate. Don't reintroduce dark grounds to `:root`.
 - **Security invariant (test-enforced):** API data enters the DOM only via
   `el()`/`svgEl()`/`createTextNode`. Never assign data to `innerHTML`/`outerHTML`
-  (`tests/server/test_spa.py` greps for it). Non-vendor payload must stay **< 280 KB**
-  (currently 286,125 bytes — only ~600 bytes of headroom; minify/trim before adding copy).
+  (`tests/server/test_spa.py` greps for it). Non-vendor payload must stay **< 304 KB**
+  (currently 308,042 bytes — only ~3.2 KB of headroom; minify/trim before adding copy).
 - **Engineer apply re-checks the join floor server-side.** `/api/engineer/apply` never
   trusts the client to have honored the confidently-wrong guard: for any link op
   (`AddProperty` with a `range_class`) `EngineerService.apply` re-measures coverage from
