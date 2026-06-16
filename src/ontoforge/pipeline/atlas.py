@@ -79,12 +79,17 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Mapping, Optional, Sequence
 
-from ontoforge.contracts import IND, Atom, Ontology, leaf
+from ontoforge.contracts import IND, Atom, Ontology, RelationshipType, leaf
 from ontoforge.lodestone.model import all_props
 
 from .induce import InducedArtifacts
 from .mapping import ClassPlan, build_plans
 from .scale import ColumnFacts, _affinity, column_facts, pair_affinities
+
+# The typed-relationship overlay reuses the CLOSED-CORE relationships engine and
+# the ensemble reasoning-path gate (v2.1 §1.2 / §1.3) — distribution-aware proxy
+# scoring + the typed taxonomy + plurality voting for the ambiguous band. The
+# atlas tiering (confirmed/likely/hint) is unchanged; this only ADDS a type.
 
 __all__ = [
     "ATLAS_AFFINITY_FLOOR",
@@ -152,7 +157,17 @@ class AtlasEvidence:
 
 @dataclass(frozen=True, slots=True)
 class AtlasLink:
-    """One tiered arc between two class URIs (the UI link contract)."""
+    """One tiered arc between two class URIs (the UI link contract).
+
+    ``rel_type`` / ``rel_summary`` are the ADDITIVE typed-relationship overlay
+    (v2.1 §1.2): the relationship taxonomy verdict the closed-core
+    :mod:`ontoforge.relationships` engine assigned to this column pair
+    (``fk_join`` · ``lookup_dimension`` · ``m2m_bridge`` · ``denormalization`` ·
+    ``derived_field`` · ``unrelated`` · ``unknown``) plus a one-line evidence
+    summary (which signals fired / conflicted). Both default to ``None`` and are
+    omitted from :meth:`AtlasReport.to_payload` when unset, so the existing
+    ``/api/atlas`` link contract is unchanged for callers that don't read them.
+    """
 
     src_class: str
     dst_class: str
@@ -161,6 +176,8 @@ class AtlasLink:
     tier: str               # "confirmed" | "likely" | "hint"
     score: float
     evidence: AtlasEvidence
+    rel_type: Optional[str] = None       # the typed-relationship verdict
+    rel_summary: str = ""                # short evidence summary (fired/conflicted)
 
 
 @dataclass(frozen=True, slots=True)
@@ -194,26 +211,34 @@ class AtlasReport:
                 }
                 for c in self.components
             ],
-            "links": [
-                {
-                    "src_class": lk.src_class,
-                    "dst_class": lk.dst_class,
-                    "src_prop": lk.src_prop,
-                    "dst_prop": lk.dst_prop,
-                    "tier": lk.tier,
-                    "score": lk.score,
-                    "evidence": {
-                        "coverage": lk.evidence.coverage,
-                        "overlap_count": lk.evidence.overlap_count,
-                        "sample_shared_values": list(lk.evidence.sample_shared_values),
-                        "name_similarity": lk.evidence.name_similarity,
-                        "semtype_match": lk.evidence.semtype_match,
-                    },
-                }
-                for lk in self.links
-            ],
+            "links": [self._link_payload(lk) for lk in self.links],
             "stats": dict(self.stats),
         }
+
+    @staticmethod
+    def _link_payload(lk: "AtlasLink") -> dict[str, Any]:
+        out: dict[str, Any] = {
+            "src_class": lk.src_class,
+            "dst_class": lk.dst_class,
+            "src_prop": lk.src_prop,
+            "dst_prop": lk.dst_prop,
+            "tier": lk.tier,
+            "score": lk.score,
+            "evidence": {
+                "coverage": lk.evidence.coverage,
+                "overlap_count": lk.evidence.overlap_count,
+                "sample_shared_values": list(lk.evidence.sample_shared_values),
+                "name_similarity": lk.evidence.name_similarity,
+                "semtype_match": lk.evidence.semtype_match,
+            },
+        }
+        # ADDITIVE: only emit the typed-relationship overlay when populated, so
+        # the existing /api/atlas payload (and its round-trip tests) are byte-
+        # identical for links the relationships engine did not type.
+        if lk.rel_type is not None:
+            out["rel_type"] = lk.rel_type
+            out["rel_summary"] = lk.rel_summary
+        return out
 
 
 # ----------------------------------------------------- column <-> class index
@@ -287,6 +312,23 @@ class _ClassIndex:
         if uri.startswith(PSEUDO_SCHEME):
             return uri[len(PSEUDO_SCHEME):]
         return self.class_name.get(uri, uri)
+
+    def coord_of(self, class_uri: str, prop_label: str) -> Optional[tuple[str, str]]:
+        """Recover the backing (table, column) for a (class, prop) endpoint —
+        the inverse of :meth:`endpoint`. For a ``table://`` pseudo-class the
+        prop label IS the column; for an identity prop fall back to the class's
+        identity column. ``None`` when no column backs the endpoint."""
+        if class_uri.startswith(PSEUDO_SCHEME):
+            return (class_uri[len(PSEUDO_SCHEME):], prop_label)
+        # search the col_map for a (table, column) that maps to this endpoint
+        for (table, column), (uri, prop) in self._col_map.items():
+            if uri == class_uri and prop == prop_label:
+                return (table, column)
+        # identity prop fallback (link/identity props canonicalize to the key)
+        ident = self._identity.get(class_uri)
+        if ident is not None and self.endpoint(*ident)[1] == prop_label:
+            return ident
+        return None
 
 
 # ------------------------------------------------------------------ the build
@@ -610,6 +652,158 @@ def _components(
     ]
 
 
+# ------------------------------------------------ typed-relationship overlay
+
+
+def _rel_summary(cand: Any) -> str:
+    """A short, human evidence line from a RelationshipCandidate: which signals
+    FIRED vs which CONFLICTED (the false-positive discriminator) + the proxy.
+
+    Kept tiny and deterministic — this is the one-liner the UI shows on the arc,
+    not the full ScoutPayload."""
+    fired = [ev.kind.value for ev in cand.evidence if ev.fired and not ev.conflicts]
+    conflicted = [ev.kind.value for ev in cand.evidence if ev.conflicts]
+    parts = [f"proxy {cand.confidence:.2f}"]
+    if fired:
+        parts.append("fired: " + ", ".join(sorted(set(fired))[:4]))
+    if conflicted:
+        parts.append("conflict: " + ", ".join(sorted(set(conflicted))[:3]))
+    if cand.needs_adjudication:
+        parts.append("adjudicated")
+    return "; ".join(parts)
+
+
+def _typed_overlay(
+    profiles: Mapping[str, Any],
+    inds: Sequence[IND],
+    arc_pairs: Sequence[frozenset[tuple[str, str]]],
+) -> dict[frozenset[tuple[str, str]], tuple[str, str]]:
+    """Map each scored column pair to (rel_type, rel_summary).
+
+    Runs the closed-core :func:`~ontoforge.relationships.discover_relationships`
+    over the table profiles, SEEDED by the union of the admitted INDs and the
+    pairs the atlas actually DREW (``arc_pairs``). Seeding by the drawn arcs is
+    what lets the false-positive killer reach the likely / hint tiers — exactly
+    the "looks-similar-isn't-related" arcs (same-name, disjoint values) that a
+    pure IND seed (admitted at the 0.95 floor) would never include. The arc set
+    is already bounded by ``LIKELY_CAP`` / ``HINT_CAP``, so this stays O(arcs),
+    not O(n²), at wild scale.
+
+    For pairs the proxy flags ``needs_adjudication`` it consults the ensemble
+    :class:`~ontoforge.ensemble.RelationshipGate` (plurality reasoning-path vote)
+    so the surfaced type reflects the same adjudication the engineer uses.
+
+    Keyed by the UNORDERED column-coordinate pair (a frozenset), so a link drawn
+    either direction finds its type. Pure-deterministic; never invokes a model.
+    """
+    from ontoforge.ensemble import RelationshipGate, should_vote
+    from ontoforge.relationships import discover_relationships
+
+    table_profiles = list(profiles.values())
+    if not table_profiles:
+        return {}
+
+    # build the seed IND list: admitted INDs + a synthetic IND per drawn arc
+    # (both directions), so every arc the UI shows is offered to the engine.
+    seed: list[IND] = list(inds) if inds else []
+    seed.extend(_arc_seed_inds(arc_pairs))
+
+    # keep_unrelated=True so the auditable UNRELATED verdict (the false-positive
+    # killer) can surface on a same-name/disjoint arc; min_confidence low so we
+    # type as many viable pairs as the engine will speak to.
+    candidates = discover_relationships(
+        table_profiles,
+        inds=seed if seed else None,
+        min_confidence=0.0,
+        keep_unrelated=True,
+    )
+    gate = RelationshipGate()
+    overlay: dict[frozenset[tuple[str, str]], tuple[str, str]] = {}
+    for cand in candidates:
+        rel_type = cand.rel_type
+        summary = _rel_summary(cand)
+        if should_vote(cand):
+            # ambiguous / conflicting: let the reasoning-path gate decide the
+            # type (no SQL validation here — that is the engineer's commit-time
+            # job; the atlas is a derived view).
+            verdict = gate.decide(cand)
+            rel_type = verdict.rel_type
+            disp = "committed" if verdict.committed else "routed-to-human"
+            summary = f"{summary}; vote {rel_type.value} ({disp})"
+        pair = frozenset((
+            (cand.left.table, cand.left.column),
+            (cand.right.table, cand.right.column),
+        ))
+        # discover yields one ordered candidate per viable pair; the first to
+        # land on an unordered pair wins (ranked by descending proxy already).
+        overlay.setdefault(pair, (rel_type.value, summary))
+    return overlay
+
+
+def _arc_seed_inds(
+    arc_pairs: Sequence[frozenset[tuple[str, str]]],
+) -> list[IND]:
+    """Synthetic INDs (both directions) for every drawn arc, so the relationships
+    engine considers exactly the pairs the UI shows. These carry no admission
+    weight (coverage/score 0) — they are pair SEEDS, not evidence; the engine
+    re-derives all evidence from the profiles."""
+    out: list[IND] = []
+    for pair in arc_pairs:
+        members = sorted(pair)
+        if len(members) != 2:
+            continue
+        (lt, lc), (rt, rc) = members[0], members[1]
+        out.append(IND(lhs_table=lt, lhs_column=lc, rhs_table=rt, rhs_column=rc,
+                       coverage=0.0, score=0.0))
+        out.append(IND(lhs_table=rt, lhs_column=rc, rhs_table=lt, rhs_column=lc,
+                       coverage=0.0, score=0.0))
+    return out
+
+
+def _link_coords(
+    links: list[AtlasLink],
+    index: _ClassIndex,
+) -> dict[int, frozenset[tuple[str, str]]]:
+    """For each link, recover the unordered (table, column) pair it was drawn
+    from, so the typed-relationship overlay (keyed by column coords) can be
+    matched back to the class-URI link. Links whose endpoints have no backing
+    column (rare ER-only props) are omitted (no overlay attached)."""
+    out: dict[int, frozenset[tuple[str, str]]] = {}
+    for i, lk in enumerate(links):
+        src = index.coord_of(lk.src_class, lk.src_prop)
+        dst = index.coord_of(lk.dst_class, lk.dst_prop)
+        if src is not None and dst is not None and src != dst:
+            out[i] = frozenset((src, dst))
+    return out
+
+
+def _apply_overlay(
+    links: list[AtlasLink],
+    overlay: Mapping[frozenset[tuple[str, str]], tuple[str, str]],
+    coords: Mapping[int, frozenset[tuple[str, str]]],
+) -> list[AtlasLink]:
+    """Attach (rel_type, rel_summary) to each link whose column pair the engine
+    typed. Links the engine did not speak to keep ``rel_type=None`` (omitted from
+    the payload). Confirmed links with no typed verdict default to ``fk_join``
+    (a materialized link property IS a foreign-key join by construction)."""
+    import dataclasses
+
+    out: list[AtlasLink] = []
+    for i, lk in enumerate(links):
+        pair = coords.get(i)
+        typed = overlay.get(pair) if pair is not None else None
+        if typed is not None:
+            out.append(dataclasses.replace(lk, rel_type=typed[0], rel_summary=typed[1]))
+        elif lk.tier == "confirmed":
+            out.append(dataclasses.replace(
+                lk, rel_type=RelationshipType.FK_JOIN.value,
+                rel_summary="confirmed link property (materialized foreign key)",
+            ))
+        else:
+            out.append(lk)
+    return out
+
+
 def build_atlas(
     estate: dict[str, Any],
     artifacts: InducedArtifacts,
@@ -632,6 +826,13 @@ def build_atlas(
     hints = _hint_links(index, facts, profiles, used_pairs | likely_pairs)
 
     links = confirmed + likely + hints
+    # ADDITIVE typed-relationship overlay (§1.2): label each arc's column pair
+    # with the closed-core taxonomy verdict. Tiering is untouched. The overlay is
+    # seeded by the drawn arcs (already capped), so the false-positive killer can
+    # type the likely / hint tiers (the "looks-similar" arcs) too.
+    coords = _link_coords(links, index)
+    overlay = _typed_overlay(profiles, inds, list(coords.values()))
+    links = _apply_overlay(links, overlay, coords)
     components = _components(index, links, profiles)
     stats = {
         "classes": sum(len(c.class_uris) for c in components),

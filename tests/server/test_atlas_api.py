@@ -198,7 +198,11 @@ def test_schema_parses_the_shipped_ui_fixture():
     assert parsed.stats.classes == fixture["stats"]["classes"]
     assert {lk.tier for lk in parsed.links} == {"confirmed", "likely", "hint"}
 
-    dumped = parsed.model_dump()
+    # exclude_none mirrors how the atlas routes serialize (response_model_exclude_none):
+    # the ADDITIVE typed-relationship overlay (rel_type / rel_summary) is absent for
+    # arcs the relationships engine did not type, so a legacy fixture round-trips
+    # byte-identically — the original UI contract is preserved.
+    dumped = parsed.model_dump(exclude_none=True)
     assert dumped["stats"] == fixture["stats"]
     for got, want in zip(dumped["links"], fixture["links"]):
         assert got == want

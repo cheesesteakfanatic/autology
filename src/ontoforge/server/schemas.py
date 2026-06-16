@@ -307,7 +307,16 @@ class AtlasEvidence(BaseModel):
 
 
 class AtlasLink(BaseModel):
-    """One tiered arc between two class URIs."""
+    """One tiered arc between two class URIs.
+
+    ``rel_type`` / ``rel_summary`` are the ADDITIVE typed-relationship overlay
+    (v2.1 §1.2): the relationship-taxonomy verdict the closed-core relationships
+    engine assigned to this arc's column pair (``fk_join`` · ``lookup_dimension``
+    · ``m2m_bridge`` · ``denormalization`` · ``derived_field`` · ``unrelated`` ·
+    ``unknown``), plus a one-line evidence summary. Both default to ``None`` and
+    the atlas routes serialize with ``exclude_none`` so legacy clients (and the
+    pinned UI fixture) see the byte-identical original payload.
+    """
 
     src_class: str
     dst_class: str
@@ -316,6 +325,8 @@ class AtlasLink(BaseModel):
     tier: Literal["confirmed", "likely", "hint"]
     score: float
     evidence: AtlasEvidence
+    rel_type: Optional[str] = None
+    rel_summary: Optional[str] = None
 
 
 class AtlasComponent(BaseModel):

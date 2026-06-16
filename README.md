@@ -126,6 +126,44 @@ ledger provenance and surfaces them on `/api/engineer/apply` (`result.gate`) —
 the same `Vote` protocol; the gate math does not change. Full architecture and the copy-paste
 live-model layering guide in [docs/AI_NATIVE.md](docs/AI_NATIVE.md).
 
+## Typed relationship inference engine (§1)
+
+The central technical risk in autonomous data engineering is **"looks-similar-isn't-related"**: two
+columns can share a name, a type and a cardinality and still be unrelated. OntoForge ships a
+distribution-aware, evidence-bearing engine that kills those false positives and emits a **typed**
+relationship — not a binary join. All of it is **keyless, deterministic, zero-network** today (the
+"AI" adjudication seam routes through the `aimodels` router / `ensemble` gate but runs on
+deterministic adapters), and it is **CLOSED-CORE IP** (see [docs/IP_ARCHITECTURE.md](docs/IP_ARCHITECTURE.md)).
+
+- **`relationships/`** — a confidence **proxy** that fuses value OVERLAP (containment / MinHash
+  Jaccard) with value **DISTRIBUTION** alignment (Jensen-Shannon for categoricals, quantile divergence
+  for numerics), key uniqueness, entropy, cardinality and type compatibility into an
+  **EvidenceArtifact** trail (which signals *fired*, which *conflicted*), then classifies the pair into
+  the taxonomy the doc requires: **FK-join · lookup/dimension · many-to-many bridge · denormalization ·
+  derived field · unrelated-despite-similarity**. `RoadSpy` packages the evidence (never bulk data) for
+  an adjudicator.
+- **`validation/`** — **SQL synthesize-and-EXECUTE backward validation**: it doesn't trust a score, it
+  runs the join in DuckDB (in-process, `:memory:`) and measures match-rate / orphan-rate / fan-out /
+  null-key over real cells, then derives a typed verdict. The strongest correctness guarantee in the
+  system.
+- **`ensemble/` RelationshipGate** — three **distinct reasoning paths** (schema-centric,
+  value-centric, business-logic) vote on the relationship TYPE by plurality, with **median-of-path**
+  confidence and the executed validation as a strong **booster / veto**; commit only on consensus,
+  else route to a human. `should_vote` is a scalpel — confident FKs skip the vote.
+- **`tenant/`** — per-tenant **isolated** prior learning (naming conventions, accepted/rejected join
+  shapes) that nudges ranking within a bounded budget — **never cross-tenant**.
+- **`discovery/`** — semantic retrieval over **cached** validated DE work (versioned + auto-described,
+  keyless TF-IDF) for humans *and* a model RAG bootstrap ("what we already know about these joins").
+
+This engine is **wired into the product, not just present**: the **Connection Atlas** (`/api/atlas`)
+now carries an additive `rel_type` + evidence summary on every arc — so a same-name, distribution-
+disagreeing pair shows as **`unrelated`** right on the map, while a real FK shows as `fk_join`. The
+**common-language engineer** (`/api/engineer/apply`) consults the proxy *and* runs the backward
+validation before committing a link, records the EvidenceArtifacts + JoinValidation + the reasoning-
+path verdict as ledger provenance (`result.typed_relationship`), and adds one more veto on top of the
+existing coverage floor: if the **executed** data refuses the inferred type, the link is routed to
+review (the floor is never weakened).
+
 ## Architecture
 
 | Layer | Module | Package |

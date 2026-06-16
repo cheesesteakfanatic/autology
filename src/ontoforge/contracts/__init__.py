@@ -51,6 +51,19 @@ from .oqir import (
     TypeError_,
 )
 from .profiles import FD, IND, ColumnProfile, TableProfile, minhash_jaccard
+from .relationships import (
+    ColumnRef,
+    EvidenceArtifact,
+    JoinValidation,
+    PathVote,
+    ReasoningPath,
+    RelationshipCandidate,
+    RelationshipType,
+    RelationshipVerdict,
+    ScoutPayload,
+    SignalKind,
+    TenantPrior,
+)
 from .provenance import (
     ONE,
     ZERO,

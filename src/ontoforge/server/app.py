@@ -333,14 +333,23 @@ def create_app(project: Path | str) -> FastAPI:
             )
         return atlas
 
-    @app.get("/api/atlas", response_model=S.AtlasOut)
+    @app.get("/api/atlas", response_model=S.AtlasOut, response_model_exclude_none=True)
     async def api_atlas() -> S.AtlasOut:
         """The connection atlas (<project>/atlas.json): islands of
         confirmed-connected classes plus every tiered join arc with its
-        evidence. 404 until built; /api/reload drops the cache."""
+        evidence. 404 until built; /api/reload drops the cache.
+
+        ``exclude_none`` keeps the payload byte-identical for arcs the
+        relationships engine did not type (the ADDITIVE ``rel_type`` /
+        ``rel_summary`` fields are simply absent), so legacy clients and the
+        pinned UI fixture are unaffected."""
         return S.AtlasOut(**_atlas_or_404())
 
-    @app.get("/api/atlas/link", response_model=S.AtlasLinksOut)
+    @app.get(
+        "/api/atlas/link",
+        response_model=S.AtlasLinksOut,
+        response_model_exclude_none=True,
+    )
     async def api_atlas_link(src: str, dst: str) -> S.AtlasLinksOut:
         """Every atlas arc between two class URIs (either direction), with
         full evidence — the evidence-card deep link."""

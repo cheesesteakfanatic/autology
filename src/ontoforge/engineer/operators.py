@@ -55,7 +55,47 @@ __all__ = [
     "JOIN_LIKELY_FLOOR",
     "EngineerService",
     "OperatorPreview",
+    "TypedRelationshipResult",
 ]
+
+
+@dataclass(slots=True)
+class TypedRelationshipResult:
+    """The execution-grounded typed-relationship evidence for a committed link
+    (v2.1 §1.2 / §1.3 / §1.4). Bundles the closed-core engine's verdict so the
+    apply path can record 'WHY this typed relationship was committed':
+
+    * ``candidate`` — the :class:`~ontoforge.contracts.RelationshipCandidate`
+      with its full ``EvidenceArtifact`` trail (which signals fired / conflicted);
+    * ``validation`` — the :class:`~ontoforge.contracts.JoinValidation` from the
+      SQL-synthesize-and-EXECUTE backward validator (match / orphan / fan-out /
+      null-key over real cells);
+    * ``verdict`` — the :class:`~ontoforge.contracts.RelationshipVerdict` the
+      ensemble :class:`~ontoforge.ensemble.RelationshipGate` returned (plurality
+      reasoning-path vote, with the executed validation as booster / veto).
+
+    ``contradicted`` is True when the executed data refused the inferred join
+    type (verdict UNRELATED, or a join-implying type whose backward validation is
+    not ``ok``) — a strong route-to-review signal that NEVER weakens the existing
+    coverage floor; it only ADDS a veto on top of it."""
+
+    candidate: Any
+    validation: Any
+    verdict: Any
+    contradicted: bool = False
+
+    def to_provenance(self) -> dict[str, Any]:
+        from ontoforge.ensemble import RelationshipGate
+
+        prov = RelationshipGate.to_provenance(self.verdict)
+        prov["evidence"] = [
+            {"kind": ev.kind.value, "value": round(ev.value, 6),
+             "fired": ev.fired, "conflicts": ev.conflicts, "detail": ev.detail}
+            for ev in self.candidate.evidence
+        ]
+        prov["proxy_confidence"] = round(self.candidate.confidence, 6)
+        prov["contradicted"] = self.contradicted
+        return prov
 
 #: a link at or above this coverage is "confirmed-safe" to apply (reuses the
 #: engine's discover_inds admission floor 0.95)
@@ -123,6 +163,12 @@ class EngineerService:
         self.last_gate_provenance: Optional[dict[str, Any]] = None
         #: (artifact_id, json_payload) of the last recorded gate provenance.
         self._last_gate_artifact: Optional[tuple[str, str]] = None
+        #: the typed-relationship evidence (proxy + EvidenceArtifacts +
+        #: JoinValidation + RelationshipVerdict) of the most recent link apply,
+        #: surfaced on the apply result and recorded as ledger provenance.
+        self.last_typed_relationship: Optional[TypedRelationshipResult] = None
+        #: (artifact_id, json_payload) of the last recorded typed-relationship.
+        self._last_typed_artifact: Optional[tuple[str, str]] = None
 
     # ------------------------------------------------------------- extents
 
@@ -473,6 +519,123 @@ class EngineerService:
                     best = cov
         return best
 
+    def _best_key_pair(
+        self, op: AddProperty
+    ) -> Optional[tuple[str, str, list[str], list[str]]]:
+        """The (subject_prop, target_prop, left_values, right_values) of the
+        BEST-coverage candidate join key — the same best-key measurement
+        :meth:`_link_coverage` admits, but returning the actual value LISTS (not
+        deduped) so the SQL backward validator can measure real match / orphan /
+        fan-out / null-key. ``None`` when no world / nothing to measure."""
+        subj, tgt = op.class_uri, op.range_class
+        if not tgt:
+            return None
+        sc, tc = self.ontology.get(subj), self.ontology.get(tgt)
+        if sc is None or tc is None:
+            return None
+        best: Optional[tuple[float, str, str, list[str], list[str]]] = None
+        for sp in sc.properties:
+            if sp.is_link:
+                continue
+            left_vals = self._prop_values(subj, sp.name)
+            left_set = self._distinct(left_vals)
+            if not left_set:
+                continue
+            for tp in tc.properties:
+                if tp.is_link:
+                    continue
+                right_vals = self._prop_values(tgt, tp.name)
+                right_set = self._distinct(right_vals)
+                if not right_set:
+                    continue
+                cov = len(left_set & right_set) / len(left_set)
+                cand = (cov, sp.name, tp.name, left_vals, right_vals)
+                if best is None or cov > best[0]:
+                    best = cand
+        if best is None:
+            return None
+        return best[1], best[2], best[3], best[4]
+
+    def _typed_relationship(
+        self, op: AddProperty, coverage: Optional[float]
+    ) -> Optional[TypedRelationshipResult]:
+        """Run the CLOSED-CORE relationships engine + SQL-execute backward
+        validation + reasoning-path gate for a link op, producing the typed
+        evidence recorded as provenance (§1.2 / §1.3 / §1.4).
+
+        Pure / keyless / zero-network: profiles the two best-key columns through
+        the real M3 profiler, computes the distribution-aware confidence proxy
+        and EvidenceArtifacts, EXECUTES the join in DuckDB to measure real
+        match / orphan / fan-out, and lets the ensemble gate type it (with the
+        executed validation as booster / veto). Best-effort: any failure returns
+        ``None`` — typed evidence is auditing, it NEVER breaks an apply or
+        weakens the coverage floor."""
+        try:
+            from ontoforge.contracts import ColumnRef
+            from ontoforge.ensemble import RelationshipGate
+            from ontoforge.profiling import profile_column
+            from ontoforge.relationships import (
+                SampledColumn,
+                classify_relationship,
+                compute_signals,
+                score_pair,
+            )
+            from ontoforge.validation import validate_join
+
+            pair = self._best_key_pair(op)
+            if pair is None:
+                return None
+            sp_name, tp_name, left_vals, right_vals = pair
+            subj, tgt = op.class_uri, op.range_class
+
+            # profile both key columns through the REAL M3 profiler (deterministic).
+            lcp, _ = profile_column(subj, _slug(subj), sp_name, list(left_vals))
+            rcp, _ = profile_column(tgt, _slug(tgt), tp_name, list(right_vals))
+            left = SampledColumn(profile=lcp, values=lcp.sample_values)
+            right = SampledColumn(profile=rcp, values=rcp.sample_values)
+
+            sigs = compute_signals(left, right)
+            classified = classify_relationship(left, right, sigs)
+            cand = score_pair(
+                left, right, rel_type=classified.rel_type,
+                rationale=classified.rationale, signals=sigs,
+            )
+
+            # SQL synthesize-and-EXECUTE the join over the real cells (§1.4).
+            left_rows = [{sp_name: v} for v in left_vals]
+            right_rows = [{tp_name: v} for v in right_vals]
+            validation = validate_join(left_rows, right_rows, sp_name, tp_name)
+
+            # the ensemble reasoning-path gate types it, validation as booster/veto.
+            gate = RelationshipGate()
+            verdict = gate.decide(cand, validation)
+            from ontoforge.contracts import RelationshipType
+
+            contradicted = (
+                validation.verdict is RelationshipType.UNRELATED
+                or (
+                    verdict.rel_type
+                    in (
+                        RelationshipType.FK_JOIN,
+                        RelationshipType.LOOKUP_DIMENSION,
+                        RelationshipType.M2M_BRIDGE,
+                    )
+                    and not validation.ok
+                )
+            )
+            # attach honest endpoints to the verdict for provenance readability
+            verdict = _with_refs(
+                verdict,
+                ColumnRef(subj, _slug(subj), sp_name),
+                ColumnRef(tgt, _slug(tgt), tp_name),
+            )
+            return TypedRelationshipResult(
+                candidate=cand, validation=validation,
+                verdict=verdict, contradicted=contradicted,
+            )
+        except Exception:
+            return None
+
     def _gate_link(self, op: AddProperty, coverage: Optional[float]):
         """Run the ensemble DE-decision gate for a link op, building an
         :class:`ActionContext` from REAL measurements and using the coverage
@@ -532,6 +695,29 @@ class EngineerService:
             # provenance is auditing, not correctness — never fail an apply on it
             self._last_gate_artifact = None
 
+    def _record_typed_relationship(
+        self, op: Operator, tr: "TypedRelationshipResult", fired: bool
+    ) -> None:
+        """Record the typed-relationship verdict (proxy + EvidenceArtifacts +
+        JoinValidation + RelationshipVerdict) as ledger provenance — the
+        execution-grounded 'why this typed relationship was committed' (or was
+        routed to review). Best-effort via the always-safe ``record_cost``
+        channel (no constraint-H), so provenance never breaks an apply."""
+        if self.ledger is None:
+            return
+        try:
+            import json as _json
+
+            payload = {"op": op_to_dict(op), "committed": fired,
+                       "typed_relationship": tr.to_provenance()}
+            self.ledger.record_cost(f"engineer.relationship.{op.op_type}", 0)
+            self._last_typed_artifact = (
+                f"relationship:{op.op_type}:{self.engine.ontology.version}:{int(fired)}",
+                _json.dumps(payload, sort_keys=True),
+            )
+        except Exception:
+            self._last_typed_artifact = None
+
     def apply(self, op_dict: dict[str, Any]) -> dict[str, Any]:
         """Apply a previously-previewed operator via the real TEMPER engine.
 
@@ -546,6 +732,7 @@ class EngineerService:
         skipped ``interpret`` cannot assert a sub-floor join."""
         op = op_from_dict(op_dict)
         self.last_gate_provenance = None
+        self.last_typed_relationship = None
         if isinstance(op, AddProperty) and op.range_class:
             cov = self._link_coverage(op)
             if cov is not None and cov < JOIN_LIKELY_FLOOR:
@@ -581,6 +768,31 @@ class EngineerService:
                     "atlas_delta": {"added_links": [], "removed": [], "renamed": []},
                     "undo_token": None, "new_stats": self.stats(),
                 }
+            # The coverage floor + ensemble gate both fired. NOW the typed
+            # relationship engine (§1.2/§1.3/§1.4): distribution-aware proxy +
+            # EvidenceArtifacts, the SQL synthesize-and-EXECUTE backward join
+            # validation, and the reasoning-path gate's typed verdict. This is
+            # the execution-grounded "why this typed relationship was committed"
+            # evidence — and it ADDS one more veto: if the EXECUTED data refuses
+            # the inferred type (UNRELATED, or a join type that did not validate
+            # ok), route to review. It never weakens the coverage floor.
+            self.last_typed_relationship = self._typed_relationship(op, cov)
+            tr = self.last_typed_relationship
+            if tr is not None and tr.contradicted:
+                self._record_typed_relationship(op, tr, fired=False)
+                return {
+                    "ok": False, "deferred": True, "blocked": True,
+                    "human_summary": (
+                        "held for review: the executed backward join "
+                        f"({tr.validation.match_rate*100:.0f}% match, "
+                        f"verdict {tr.validation.verdict.value}) refuses the inferred "
+                        f"relationship type — looks-related-by-name, isn't-by-data"
+                    ),
+                    "gate": self.last_gate_provenance,
+                    "typed_relationship": tr.to_provenance(),
+                    "atlas_delta": {"added_links": [], "removed": [], "renamed": []},
+                    "undo_token": None, "new_stats": self.stats(),
+                }
         try:
             report = self.engine.apply(op)
         except OperatorDeferred as exc:
@@ -611,6 +823,9 @@ class EngineerService:
         if self.last_gate_provenance is not None:
             result["gate"] = self.last_gate_provenance
             self._record_gate_provenance(op, None, fired=True)
+        if self.last_typed_relationship is not None:
+            result["typed_relationship"] = self.last_typed_relationship.to_provenance()
+            self._record_typed_relationship(op, self.last_typed_relationship, fired=True)
         return result
 
     def undo(self, undo_token: dict[str, Any]) -> dict[str, Any]:
@@ -720,6 +935,12 @@ class EngineerService:
             return None, "", None, rate, samples
 
         return None, "", None, 0.0, []
+
+
+def _with_refs(verdict: Any, left: Any, right: Any) -> Any:
+    """Return ``verdict`` with its endpoint ColumnRefs replaced (frozen-safe)."""
+    import dataclasses
+    return dataclasses.replace(verdict, left=left, right=right)
 
 
 def _entity_layer():

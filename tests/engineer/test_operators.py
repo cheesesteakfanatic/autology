@@ -168,3 +168,43 @@ def test_apply_refuses_hand_crafted_sub_floor_join(tmp_path_factory) -> None:
         assert svc.stats()["links"] == before_links  # the join was never asserted
     finally:
         ledger.close()
+
+
+# --------------------------- typed-relationship evidence (v2.1 §1.2/§1.3/§1.4)
+
+
+def test_committed_link_records_typed_relationship_evidence(make_service, schema) -> None:
+    """A committed link carries execution-grounded typed-relationship
+    provenance: the distribution-aware confidence PROXY + the EvidenceArtifacts
+    (which signals fired) + the SQL synthesize-and-EXECUTE JoinValidation
+    (match/orphan/fan-out over real cells) + the reasoning-path RelationshipVerdict.
+    salelines.sku ⊆ catalog.sku is a clean FK, so the executed validation
+    matches and the verdict is a join type."""
+    svc = make_service()
+    prev = svc.preview(_parse("link salelines to catalog on sku", schema))
+    applied = svc.apply(prev.op_dict)
+    assert applied["ok"]
+    tr = applied.get("typed_relationship")
+    assert tr is not None, "a committed link must record typed-relationship provenance"
+    # the EvidenceArtifact trail is present (which signals fired/conflicted)
+    assert tr["evidence"] and any(ev["fired"] for ev in tr["evidence"])
+    assert 0.0 <= tr["proxy_confidence"] <= 1.0
+    # the SQL backward validation actually executed over the real join
+    assert tr["validation"] is not None
+    assert tr["validation"]["match_rate"] >= 0.9          # clean FK matches
+    assert tr["validation"]["verdict"] in {"fk_join", "lookup_dimension"}
+    # the reasoning-path verdict typed it (a join type) and did NOT contradict
+    assert tr["rel_type"] in {"fk_join", "lookup_dimension"}
+    assert tr["contradicted"] is False
+    assert tr["votes"], "the reasoning-path votes are recorded for provenance"
+
+
+def test_typed_relationship_evidence_is_deterministic(make_service, schema) -> None:
+    """Keyless + deterministic: applying the same link over a fresh service
+    yields byte-identical typed-relationship provenance (proxy, evidence,
+    validation metrics, verdict) — a fixed world is a fixed verdict."""
+    a = make_service()
+    out_a = a.apply(a.preview(_parse("link salelines to catalog on sku", schema)).op_dict)
+    b = make_service()
+    out_b = b.apply(b.preview(_parse("link salelines to catalog on sku", schema)).op_dict)
+    assert out_a["typed_relationship"] == out_b["typed_relationship"]

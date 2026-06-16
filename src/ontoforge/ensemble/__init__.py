@@ -13,6 +13,20 @@ data-engineering action (join / merge / retype) should FIRE:
   Soft-Self-Consistency continuous scoring gated on a calibrated threshold; and an
   execution-grounded verifier VETO that overrides any vote (the confidently-wrong
   guard for the gate).
+
+Typed-relationship voting (v2.1 §1.3 — CLOSED-CORE IP, OntoForge_Build_Instructions
+.md §18) layers a SECOND gate on top, without touching the fire/hold one:
+
+* :mod:`paths`   — three DISTINCT reasoning-path experts (schema-centric /
+  value-centric / business-logic-centric) that each cast a typed
+  :class:`~ontoforge.contracts.PathVote` from a
+  :class:`~ontoforge.contracts.RelationshipCandidate` + its evidence + an optional
+  :class:`~ontoforge.contracts.JoinValidation`. Distinct reasoning, not temperature
+  noise; each path is a seam for a per-path LLM call later.
+* :mod:`relgate` — :class:`~relgate.RelationshipGate`: PLURALITY vote on the
+  relationship TYPE, MEDIAN-of-path confidence, SQL backward-validation as a strong
+  booster/veto, commit only on consensus else route to a human. :func:`~relgate.
+  should_vote` is the scalpel — vote only on ambiguous/borderline candidates.
 """
 
 from .experts import (
@@ -32,19 +46,43 @@ from .gate import (
     soft_self_consistency,
     turn_temperature,
 )
+from .paths import (
+    BusinessLogicPath,
+    PathExpert,
+    ReasoningPathExpert,
+    SchemaPath,
+    ValuePath,
+    default_paths,
+)
+from .relgate import (
+    AMBIGUOUS_BAND,
+    CONSENSUS_THRESHOLD,
+    RelationshipGate,
+    should_vote,
+)
 
 __all__ = [
     "ActionContext",
+    "AMBIGUOUS_BAND",
+    "BusinessLogicPath",
+    "CONSENSUS_THRESHOLD",
     "CoverageExpert",
     "DEFAULT_THRESHOLD",
     "Expert",
     "Gate",
     "GateDecision",
     "NameSimilarityExpert",
+    "PathExpert",
+    "ReasoningPathExpert",
+    "RelationshipGate",
+    "SchemaPath",
     "TypeCompatExpert",
     "ValueOverlapExpert",
+    "ValuePath",
     "Vote",
     "default_experts",
+    "default_paths",
+    "should_vote",
     "soft_self_consistency",
     "turn_temperature",
 ]
