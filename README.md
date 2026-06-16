@@ -227,3 +227,19 @@ Python 3.12, `uv`-managed. The spec is the contract; module ownership boundaries
 amendment ledger follow whitepaper §18. T2/T3 model tiers run through a `ModelClient`
 abstraction with deterministic heuristic/cassette adapters (live Anthropic adapter activates
 when `ANTHROPIC_API_KEY` is set). License: Apache-2.0.
+
+## Company & go-to-market
+
+- **Marketing site** under [`site/`](site/) — an offline, no-build static landing page
+  (`index.html`), a canned deterministic product demo (`demo.html` + `demo.js`), and an
+  interactive compute-ledger pricing calculator (`pricing.html`). See [`site/README.md`](site/README.md)
+  for local run + Cloudflare Pages deploy. Founder-ready collateral lives in
+  [`docs/PITCH_ONEPAGER.md`](docs/PITCH_ONEPAGER.md), [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md),
+  and [`docs/COMPETITIVE_BATTLECARD.md`](docs/COMPETITIVE_BATTLECARD.md).
+- **Reusable agent roster** under [`.claude/agents/`](.claude/agents/) — 12 Claude Code subagents
+  (7 dev: orchestrator-planner, implementer, adversarial-tester, reviewer, integrator,
+  research-agent, ip-security-warden; 5 business: competitive-monitor, gtm-strategist, pitch-writer,
+  pricing-analyst, support-success) that operationalize the solo-founder-plus-AI team with built-in
+  anti-reward-hacking discipline (implementer never sees the holdout; the adversarial-tester is a
+  separate identity; editing a test to pass is a hard failure). The per-task build loop is in
+  [`docs/AGENTIC_BUILD_RUNBOOK.md`](docs/AGENTIC_BUILD_RUNBOOK.md).

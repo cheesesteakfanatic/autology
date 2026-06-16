@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>See the magic — OntoForge autonomous join discovery</title>
+<meta name="description" content="A deterministic, offline walk-through: a few messy tables go in, the engine finds a real join, flags an unrelated look-alike, types the relationship with evidence, and answers a question with a value-level citation.">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%23D09735'/%3E%3C/svg%3E">
+</head>
+<body>
+
+<nav class="nav">
+  <a class="wordmark" href="index.html"><span class="wm-mark"></span>OntoForge</a>
+  <div class="nav-links">
+    <a href="index.html#how">How it works</a>
+    <a href="index.html#trust">Trust</a>
+    <a href="pricing.html">Pricing</a>
+    <a href="demo.html" class="active">See the magic</a>
+    <a class="cta-nav" href="index.html#signup">Request access</a>
+  </div>
+</nav>
+
+<header class="demo-hero">
+  <div class="wrap">
+    <span class="eyebrow">See the magic &middot; no signup, no backend</span>
+    <h1>Watch it find the join &mdash; and refuse the look-alike.</h1>
+    <p>Three messy tables go in. The engine scores them, rejects a similar-but-unrelated pair, validates the real join by <em>running it</em>, types the relationship, and answers a question with a citation down to the value.</p>
+  </div>
+</header>
+
+<main class="demo-stage">
+  <div class="wrap" style="max-width: 920px;">
+    <div class="demo-board">
+      <div class="demo-bar">
+        <span class="step-name" id="step-name">Three raw sources</span>
+        <div class="step-dots" id="step-dots" aria-hidden="true"></div>
+      </div>
+      <div class="demo-canvas-wrap">
+        <svg class="demo-svg" id="demo-svg" viewBox="0 0 920 420" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+        <div id="demo-tables"></div>
+      </div>
+      <div class="demo-rail">
+        <p class="demo-narr" id="demo-narr">Three independent sources, no shared schema, no foreign keys declared. Press <b>Run discovery</b> to watch OntoForge work.</p>
+        <div id="demo-detail"></div>
+      </div>
+    </div>
+
+    <div class="demo-controls">
+      <button class="btn" id="btn-prev" disabled>&larr; Back</button>
+      <button class="btn btn-forge" id="btn-next">Run discovery &rarr;</button>
+      <button class="btn" id="btn-replay" style="display:none">Replay</button>
+      <p class="hint">Fully deterministic and offline &mdash; the same result every time. This is exactly what the product does, on canned data.</p>
+    </div>
+
+    <div style="text-align:center;margin-top:2.5rem">
+      <a class="btn btn-forge btn-lg" href="index.html#signup">This is the pre-signup hook &mdash; request access &rarr;</a>
+    </div>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span class="fmark"><span class="wm-mark" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--marigold);margin-right:.5em"></span>OntoForge</span>
+    <div class="flinks">
+      <a href="index.html#how">How it works</a>
+      <a href="index.html#trust">Trust</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="index.html#signup">Request access</a>
+    </div>
+    <p class="fnote">Canned, deterministic demo over fake tables &mdash; no data leaves your browser. The real engine runs the same heuristics-first &rarr; selective adjudication &rarr; execute-the-join validation loop.</p>
+  </div>
+</footer>
+
+<script src="demo.js"></script>
+</body>
+</html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OntoForge — the operating system for autonomous data engineering</title>
+<meta name="description" content="Point it at messy raw sources. It induces a validated ontology, resolves entities, answers with value-level citations or calibrated abstention, and exports the whole estate for free. The data platform that is never confidently wrong — and that you can leave for nothing.">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%23D09735'/%3E%3C/svg%3E">
+</head>
+<body>
+
+<nav class="nav">
+  <a class="wordmark" href="index.html"><span class="wm-mark"></span>OntoForge</a>
+  <div class="nav-links">
+    <a href="index.html#how">How it works</a>
+    <a href="index.html#trust">Trust</a>
+    <a href="pricing.html">Pricing</a>
+    <a href="demo.html">See the magic</a>
+    <a class="cta-nav" href="index.html#signup">Request access</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Autonomous semantic data platform</span>
+    <h1>The operating system for <em>autonomous data engineering</em>.</h1>
+    <p class="lede">
+      Point it at your messiest raw sources. OntoForge induces a <b>validated</b> ontology,
+      resolves entities, and answers questions with citations down to the <b>individual value</b>
+      &mdash; or honestly abstains. Never confidently wrong. And you can take the whole estate
+      and leave, for free.
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-forge btn-lg" href="demo.html">See it find a join &rarr;</a>
+      <a class="btn btn-lg" href="#signup">Request access</a>
+    </div>
+    <p class="micro">
+      Deterministic &middot; keyless &middot; ships offline &middot;
+      <b>1,400 tests green</b> &middot; <b>0</b> confidently-wrong answers on the competency suite
+    </p>
+
+    <div class="diffs">
+      <div class="diff">
+        <p class="dk">The lead</p>
+        <h3>Value-level granularity</h3>
+        <p>Drill from an answer to the exact source value, its temporal version, and its transform lineage. Catalogs stop at the column. We don't.</p>
+      </div>
+      <div class="diff">
+        <p class="dk">The closer</p>
+        <h3>Never confidently wrong</h3>
+        <p>Calibrated abstention, not a guess that reads plausible. It answers, asks one clarifying question, or steps back &mdash; and tells you which.</p>
+      </div>
+      <div class="diff">
+        <p class="dk">The de-risker</p>
+        <h3>$0 exit, guaranteed</h3>
+        <p>The whole estate &mdash; data, ontology, provenance, transforms &mdash; exports as an open bundle that replays with no OntoForge in the loop.</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- THREE MODES -->
+  <section class="section" id="modes">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Three modes, one workspace</span>
+        <h2>Plan what you pull. Build what you measure. Ask in plain language.</h2>
+        <p>The same engine, three jobs &mdash; switched in place, never a page reload.</p>
+      </div>
+      <div class="modes">
+        <div class="mode-card" style="--accent: var(--ocean)">
+          <div class="mk"><span class="n">01</span><h3>Plan</h3></div>
+          <p class="role">decide what data even leaves your walls</p>
+          <p>Pull a governed, stratified <em>subset</em> around candidate keys and distribution edges &mdash; enough to induce the model, not your whole database. First value without first exposure. It keeps the compute-at-cost number small and honest by design.</p>
+        </div>
+        <div class="mode-card" style="--accent: var(--avocado)">
+          <div class="mk"><span class="n">02</span><h3>Build</h3></div>
+          <p class="role">measure something, or pull data out</p>
+          <p>Pick a measure and break it down in plain terms; get ranked dashboard proposals. Then two clearly separated outputs: <em>Extract</em> a filtered slice as CSV, or <em>Export</em> the entire portable estate bundle.</p>
+        </div>
+        <div class="mode-card" style="--accent: var(--teal)">
+          <div class="mk"><span class="n">03</span><h3>Ask</h3></div>
+          <p class="role">the questioner</p>
+          <p>One centered question box. Answers arrive as a cited card with inline &ldquo;where this came from&rdquo; dots &mdash; or a dignified abstention. It <em>refuses a confidently-wrong join</em> rather than asserting one.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section alt" id="how">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">How it works</span>
+        <h2>Heuristics first. The model only where it earns its keep. Then prove it on real data.</h2>
+        <p>Most of the work is cheap, deterministic, and offline. The expensive judgment is reserved for the genuinely ambiguous cases &mdash; and even then, nothing commits until the join actually executes.</p>
+      </div>
+      <div class="pipeline">
+        <div class="step">
+          <span class="num">1</span>
+          <div>
+            <h3>Heuristics-first confidence proxy</h3>
+            <p>Value overlap, <span class="kicker">distribution alignment</span>, entropy, cardinality and key-uniqueness fuse into a <span class="mono">[0,1]</span> proxy with an evidence trail. The distribution-divergence check is the discriminator that kills &ldquo;looks-similar, isn't-related.&rdquo;</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="num">2</span>
+          <div>
+            <h3>Selective LLM adjudication</h3>
+            <p>Confident relationships skip the vote. Only genuinely ambiguous ones go to a diverse ensemble of reasoning paths &mdash; <span class="kicker">schema, value, business-logic</span> &mdash; that votes on the relationship <em>type</em> by plurality. Consensus commits; conflict routes to a human.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="num">3</span>
+          <div>
+            <h3>Execute-the-join validation</h3>
+            <p>Before anything is asserted, the candidate join is <em>synthesized and run</em> against the real data: match rate, orphans, fan-out, null keys. An execution that contradicts the inferred type <span class="kicker">vetoes</span> it &mdash; even a unanimous vote can't override the data.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="num">4</span>
+          <div>
+            <h3>Typed relationships, not binary joins</h3>
+            <p>What survives is a <em>typed</em> edge &mdash; FK-join, lookup, many-to-many bridge, derived field, or <span class="kicker">unrelated-despite-similarity</span> &mdash; carrying its evidence, its calibrated confidence, and a per-value provenance ledger you can audit.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST ARCHITECTURE -->
+  <section class="section" id="trust">
+    <div class="wrap">
+      <div class="trust-grid">
+        <div class="trust-copy">
+          <span class="eyebrow">Trust architecture</span>
+          <h2>We never see your raw data.</h2>
+          <p>
+            A solo company can't out-<em>attest</em> a hyperscaler. So we out-<em>architect</em> them.
+            With client-side anonymization, the <b>customer holds the traceable-ID key</b> and the
+            cloud computes only on anonymized input.
+          </p>
+          <p class="lead-line">The question stops being &ldquo;do I trust their SOC&nbsp;2?&rdquo; and becomes &ldquo;they <em>cannot</em> see my identifiable data.&rdquo;</p>
+          <p>
+            That's a mathematical answer to a procurement question &mdash; one a bundle-everything
+            incumbent structurally can't match. It collapses much of the data-processing-agreement and
+            DPIA burden for an EU-exposed buyer, and caps the blast radius of any breach to anonymized data.
+          </p>
+          <ul class="trust-list">
+            <li>Per-tenant learning stays isolated &mdash; one customer's join patterns never leak into another's.</li>
+            <li>Keyless and deterministic core: no API key required, no network at runtime.</li>
+            <li>Maps one-to-one to EU&nbsp;AI&nbsp;Act Article&nbsp;10 data-provenance and as-of reconstruction.</li>
+          </ul>
+        </div>
+        <aside class="boundary" aria-label="Trust boundary diagram">
+          <div class="zone you">
+            <div class="zlabel">Your environment</div>
+            <div class="zline">raw records &rarr; anonymize(<span class="zkey">key</span>)</div>
+            <div class="zline" style="margin-top:.4rem;color:var(--walnut)">the <span class="zkey">key</span> never leaves this box</div>
+          </div>
+          <div class="barrier">&darr; anonymized input only &darr;</div>
+          <div class="zone cloud">
+            <div class="zlabel">OntoForge compute</div>
+            <div class="zline">induce &middot; resolve &middot; validate &middot; answer</div>
+            <div class="zline" style="margin-top:.4rem;color:var(--walnut)">sees no identifiable values, ever</div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ECONOMICS -->
+  <section class="section alt" id="economics">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Compute-at-cost economics</span>
+        <h2>Your ontology is not a meter.</h2>
+        <p>The #1 complaint about the incumbents is opaque, three-metered billing. So we make pricing a calculator &mdash; and make the zero-margin part a feature.</p>
+      </div>
+      <div class="econ">
+        <div class="econ-card">
+          <p class="ek">Flat subscription</p>
+          <h3>Estate-size banded</h3>
+          <p>One predictable number. <b>No per-question meter, no ontology-storage meter, no reindexing charges.</b> It consolidates catalog, quality, and semantic-layer spend into a single line.</p>
+        </div>
+        <div class="econ-card">
+          <p class="ek">Service / skill fee</p>
+          <h3>Onboarding &amp; bespoke</h3>
+          <p>The human and agent work that produces first value &mdash; connector setup, Plan-mode subset design, domain-specific skills. Plug-and-play domains cost less; bespoke costs more.</p>
+        </div>
+        <div class="econ-card feature">
+          <p class="ek">Raw compute &amp; egress</p>
+          <h3>At cost &mdash; $0 margin</h3>
+          <p class="amt zero">+0%</p>
+          <p>Passed through, fully itemized, every cent. We make nothing on it. Plan mode keeps it small by inducing on a representative subset, not the petabyte.</p>
+        </div>
+      </div>
+      <div style="margin-top:2.5rem;text-align:center">
+        <a class="btn btn-forge" href="pricing.html">Open the compute-ledger calculator &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROOF -->
+  <section class="section" id="proof">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Measured, not marketed</span>
+        <h2>The numbers we'd put in front of an auditor.</h2>
+        <p>From the repo's gate suite &mdash; fixture scale, deterministic, zero-network. We publish the failure mode, not a self-reported accuracy headline.</p>
+      </div>
+      <div class="proof">
+        <div class="pn"><div class="v teal">0</div><div class="l">confidently-wrong<br>answers</div></div>
+        <div class="pn"><div class="v">100%</div><div class="l">citation coverage<br>on answers</div></div>
+        <div class="pn"><div class="v">&le;&nbsp;0.05</div><div class="l">spine calibration<br>error (ECE)</div></div>
+        <div class="pn"><div class="v teal">100%</div><div class="l">AMBER bundle-only<br>replay equality</div></div>
+      </div>
+      <p class="proof-note">
+        Conformal coverage within 1.45% of nominal &middot; ER pairwise F1 0.997 vs held-out gold &middot;
+        TEMPER snapshot-queryability 100% over 300 random op sequences.
+      </p>
+    </div>
+  </section>
+
+  <!-- SIGNUP -->
+  <section class="section alt" id="signup">
+    <div class="wrap">
+      <div class="capture">
+        <h2>Request design-partner access.</h2>
+        <p>EU&nbsp;AI&nbsp;Act Article&nbsp;10 lands August&nbsp;2nd. If your ledger has to prove data provenance and as-of reconstruction, let's talk before the deadline.</p>
+        <form id="signup-form" novalidate>
+          <input type="email" id="signup-email" name="email" placeholder="you@company.com" autocomplete="email" aria-label="Work email">
+          <button type="submit" class="btn btn-forge">Request access</button>
+        </form>
+        <div class="form-msg" id="signup-msg" role="status" aria-live="polite"></div>
+        <p class="backend-note">
+          <!-- BACKEND HOOK: this stub only validates + acknowledges client-side.
+               Wire submit() to a Cloudflare Pages Function (POST /api/signup) or
+               a Worker that writes to KV/D1/Resend. See site/README.md. -->
+          Stub form &mdash; validates locally. Hook a Pages Function at <span style="color:var(--walnut)">/api/signup</span> for real capture.
+        </p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span class="fmark"><span class="wm-mark" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--marigold);margin-right:.5em"></span>OntoForge</span>
+    <div class="flinks">
+      <a href="index.html#how">How it works</a>
+      <a href="index.html#trust">Trust</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="demo.html">Demo</a>
+      <a href="index.html#signup">Request access</a>
+    </div>
+    <p class="fnote">
+      The autonomous semantic data platform that is never confidently wrong &mdash; and that you can leave for free.
+      Measured results are at fixture scale, deterministic and zero-network; not yet deployed at customers.
+    </p>
+  </div>
+</footer>
+
+<script>
+// Email-capture stub: validate + acknowledge. No backend. See README for the hook.
+(function () {
+  var form = document.getElementById('signup-form');
+  var input = document.getElementById('signup-email');
+  var msg = document.getElementById('signup-msg');
+  if (!form) return;
+  var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var v = (input.value || '').trim();
+    msg.className = 'form-msg';
+    if (!EMAIL.test(v)) {
+      msg.classList.add('err');
+      msg.textContent = 'Please enter a valid work email.';
+      input.focus();
+      return;
+    }
+    // A real backend POST would go here (Cloudflare Pages Function / Worker).
+    msg.classList.add('ok');
+    msg.textContent = 'Thank you — we’ll be in touch. (Demo: nothing was sent.)';
+    form.reset();
+  });
+})();
+
+// Active-nav highlight by page.
+(function () {
+  var path = location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-links a').forEach(function (a) {
+    var href = a.getAttribute('href') || '';
+    if (href === path || (path === 'index.html' && href.indexOf('index.html#') === 0 && false)) a.classList.add('active');
+    if ((path === 'pricing.html' && href === 'pricing.html') ||
+        (path === 'demo.html' && href === 'demo.html')) a.classList.add('active');
+  });
+})();
+</script>
+</body>
+</html>

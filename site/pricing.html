@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pricing — OntoForge compute-ledger calculator</title>
+<meta name="description" content="Transparent pricing: a flat estate-banded subscription, a service fee for onboarding and bespoke skills, and raw compute passed through at cost — zero margin. See exactly what you'd pay, and why, before you sign.">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%23D09735'/%3E%3C/svg%3E">
+</head>
+<body>
+
+<nav class="nav">
+  <a class="wordmark" href="index.html"><span class="wm-mark"></span>OntoForge</a>
+  <div class="nav-links">
+    <a href="index.html#how">How it works</a>
+    <a href="index.html#trust">Trust</a>
+    <a href="pricing.html" class="active">Pricing</a>
+    <a href="demo.html">See the magic</a>
+    <a class="cta-nav" href="index.html#signup">Request access</a>
+  </div>
+</nav>
+
+<header class="pricing-hero">
+  <div class="wrap">
+    <span class="eyebrow">Compute-ledger calculator</span>
+    <h1>See exactly what you'd pay &mdash; and why &mdash; before you sign.</h1>
+    <p>The opposite of three opaque meters. A flat subscription, an honest service fee, and raw compute passed through <b>at cost, zero margin</b>. Your ontology is not a meter.</p>
+  </div>
+</header>
+
+<main class="section" style="border-top:none;padding-top:2.5rem">
+  <div class="wrap">
+    <div class="calc">
+
+      <!-- INPUTS -->
+      <section class="calc-inputs" aria-label="Pricing inputs">
+        <h2>Your estate</h2>
+
+        <div class="field">
+          <div class="flabel">
+            <span class="name">Data volume</span>
+            <span class="val" id="vol-val">25 GB</span>
+          </div>
+          <input type="range" id="vol" min="0" max="60" value="20" step="1" aria-label="Data volume">
+          <p class="fhint">GB to PB, log scale. Plan mode induces on a representative subset &mdash; so at-cost compute scales gently, not linearly with your whole estate.</p>
+        </div>
+
+        <div class="field">
+          <div class="flabel"><span class="name">Domain complexity</span></div>
+          <div class="seg" id="complexity" role="radiogroup" aria-label="Domain complexity">
+            <button type="button" data-v="1" class="sel" role="radio" aria-checked="true">Simple</button>
+            <button type="button" data-v="2" role="radio" aria-checked="false">Moderate</button>
+            <button type="button" data-v="3" role="radio" aria-checked="false">Complex / regulated</button>
+          </div>
+          <p class="fhint">How tangled the sources are &mdash; number of systems, entity-resolution difficulty, regulatory traceability depth.</p>
+        </div>
+
+        <div class="field">
+          <div class="flabel"><span class="name">Onboarding</span></div>
+          <div class="seg" id="setup" role="radiogroup" aria-label="Onboarding type">
+            <button type="button" data-v="plug" class="sel" role="radio" aria-checked="true">Plug-and-play domain</button>
+            <button type="button" data-v="bespoke" role="radio" aria-checked="false">Bespoke build</button>
+          </div>
+          <p class="fhint">Plug-and-play reuses an existing domain template (e.g. aviation MRO, lending). Bespoke designs new connectors, Plan-mode subsets, and skills for your stack.</p>
+        </div>
+      </section>
+
+      <!-- LEDGER OUTPUT -->
+      <section class="ledger" aria-label="Cost ledger" aria-live="polite">
+        <h2>Your transparent ledger</h2>
+        <p class="lsub">Illustrative annual estimate. Final numbers are itemized in the live compute ledger before any invoice.</p>
+
+        <div class="lrow">
+          <div>
+            <div class="lr-name">Flat subscription</div>
+            <div class="lr-desc" id="sub-desc">Estate-size banded &middot; no per-question, storage, or reindex meters</div>
+          </div>
+          <div class="lr-amt" id="sub-amt">$120k</div>
+        </div>
+
+        <div class="lrow">
+          <div>
+            <div class="lr-name">Service / skill fee</div>
+            <div class="lr-desc" id="svc-desc">One-time onboarding &amp; domain skills</div>
+          </div>
+          <div class="lr-amt" id="svc-amt">$12k</div>
+        </div>
+
+        <div class="lrow compute">
+          <div>
+            <div class="lr-name">Raw compute &amp; egress <span class="tag">at cost &middot; $0 margin</span></div>
+            <div class="lr-desc" id="cmp-desc">Passed through, fully itemized &mdash; we make nothing on it</div>
+          </div>
+          <div class="lr-amt" id="cmp-amt">$7.5k</div>
+        </div>
+
+        <div class="lrow total">
+          <div>
+            <div class="lr-name">Year one, estimated</div>
+            <div class="lr-desc">Subscription recurs; service fee is one-time. Year two drops accordingly.</div>
+          </div>
+          <div class="lr-amt" id="total-amt">$140k</div>
+        </div>
+
+        <div class="transparency">
+          <p><b>Why zero margin on compute is a feature.</b> The #1 complaint about the incumbents is billing you can't predict or audit. We pass raw compute through at cost and itemize every cent, so the calculator <i>is</i> the contract. The margin lives in the subscription &mdash; never hidden in a metered surprise.</p>
+        </div>
+      </section>
+
+    </div>
+
+    <p class="pricing-foot-note">
+      These figures are illustrative ranges to show the <i>shape</i> of the model, not a quote. The flat band is designed to sit inside existing catalog/quality/semantic-layer spend while replacing those tools. Compute is shown at cost because that's how it's billed; Plan mode keeps it small by inducing on a stratified subset rather than your whole estate.
+    </p>
+
+    <div style="text-align:center;margin-top:2.5rem">
+      <a class="btn btn-forge btn-lg" href="index.html#signup">Get a real itemized quote &rarr;</a>
+    </div>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span class="fmark"><span class="wm-mark" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--marigold);margin-right:.5em"></span>OntoForge</span>
+    <div class="flinks">
+      <a href="index.html#how">How it works</a>
+      <a href="index.html#trust">Trust</a>
+      <a href="demo.html">Demo</a>
+      <a href="index.html#signup">Request access</a>
+    </div>
+    <p class="fnote">Compute-at-cost means we make $0 margin on raw compute and egress &mdash; passed through and itemized. The subscription is flat and estate-banded: no per-question meter, no ontology-storage meter, no reindexing charges.</p>
+  </div>
+</footer>
+
+<script>
+// ── deterministic, offline pricing calculator ──────────────────────────────
+(function () {
+  "use strict";
+  var state = { vol: 20, complexity: 1, setup: "plug" };
+
+  // log-scale slider 0..60 -> human GB/TB/PB label + a volume factor
+  function volLabel(v) {
+    // 0 => 1 GB, 30 => ~1 TB, 60 => ~1 PB (log10 spread over ~6 decades)
+    var gb = Math.pow(10, v / 10); // 0->1, 60->1e6 GB = 1 PB
+    if (gb >= 1e6) return (gb / 1e6).toFixed(gb / 1e6 >= 10 ? 0 : 1) + " PB";
+    if (gb >= 1000) return (gb / 1000).toFixed(gb / 1000 >= 10 ? 0 : 1) + " TB";
+    return Math.round(gb) + " GB";
+  }
+  function volGB(v) { return Math.pow(10, v / 10); }
+
+  function fmt(n) {
+    if (n >= 1000) return "$" + (n / 1000).toFixed(n / 1000 >= 100 ? 0 : (n % 1000 === 0 ? 0 : 1)) + "k";
+    return "$" + Math.round(n).toLocaleString();
+  }
+
+  function compute() {
+    var gb = volGB(state.vol);
+    var cx = state.complexity; // 1..3
+
+    // Flat subscription: estate-banded (step function on volume) + complexity bump.
+    // Bands sit inside catalog-spend expectations ($100-250k ACV).
+    var band;
+    if (gb < 100) band = 90000;
+    else if (gb < 1000) band = 120000;        // < 1 TB
+    else if (gb < 50000) band = 160000;       // < 50 TB
+    else if (gb < 1e6) band = 210000;         // < 1 PB
+    else band = 260000;                       // PB+
+    var sub = band + (cx - 1) * 18000;
+
+    // Service / skill fee: plug-and-play is light; bespoke scales with complexity.
+    var svc = state.setup === "plug" ? (12000 + (cx - 1) * 9000)
+                                      : (40000 + (cx - 1) * 30000);
+
+    // Raw compute at cost: induction is mostly offline + Plan-mode subset, so it
+    // grows sub-linearly (log) with volume — honest small numbers, not metered fear.
+    var cmp = Math.round((2500 + Math.log10(gb + 1) * 2600 * cx) / 500) * 500;
+
+    return { sub: sub, svc: svc, cmp: cmp, total: sub + svc + cmp };
+  }
+
+  function render() {
+    document.getElementById("vol-val").textContent = volLabel(state.vol);
+    var c = compute();
+    document.getElementById("sub-amt").textContent = fmt(c.sub);
+    document.getElementById("svc-amt").textContent = fmt(c.svc);
+    document.getElementById("cmp-amt").textContent = fmt(c.cmp);
+    document.getElementById("total-amt").textContent = fmt(c.total);
+
+    var gb = volGB(state.vol);
+    var bandTxt = gb < 100 ? "Starter band" : gb < 1000 ? "Sub-TB band" : gb < 50000 ? "Mid band (< 50 TB)" : gb < 1e6 ? "Large band (< 1 PB)" : "Petabyte band";
+    document.getElementById("sub-desc").textContent = bandTxt + " · no per-question, storage, or reindex meters";
+    document.getElementById("svc-desc").textContent = (state.setup === "plug" ? "Plug-and-play domain template" : "Bespoke connectors, Plan-mode subsets & skills") + " · one-time";
+    document.getElementById("cmp-desc").textContent = "Plan-mode subset keeps it small at " + volLabel(state.vol) + " · itemized to the cent";
+  }
+
+  // wire the slider
+  var vol = document.getElementById("vol");
+  vol.addEventListener("input", function () { state.vol = parseInt(vol.value, 10); render(); });
+
+  // wire segmented controls
+  function wireSeg(id, key, parse) {
+    var host = document.getElementById(id);
+    host.addEventListener("click", function (e) {
+      var b = e.target.closest("button");
+      if (!b) return;
+      Array.prototype.forEach.call(host.children, function (x) {
+        var on = x === b;
+        x.classList.toggle("sel", on);
+        x.setAttribute("aria-checked", on ? "true" : "false");
+      });
+      state[key] = parse(b.getAttribute("data-v"));
+      render();
+    });
+  }
+  wireSeg("complexity", "complexity", function (v) { return parseInt(v, 10); });
+  wireSeg("setup", "setup", function (v) { return v; });
+
+  render();
+})();
+</script>
+</body>
+</html>
