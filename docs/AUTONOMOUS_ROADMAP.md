@@ -59,6 +59,21 @@ landed. The platform is keyless, deterministic, offline, full suite green (1761)
      `ontoforge criticality -p PROJECT [--top N]` CLI command. See
      `docs/CRITICALITY.md`.
 
+**W7 — Speed wave (autonomous, evidence-gated).** A scout profiled the real hot paths
+before any code changed (the roadmap's "profile first" rule). The headline win: the
+profile stage was dominated by `infer_datatype`'s `strptime` date cascade (~11.5s of
+17.5s on Meridian; 837k `strptime` calls). Fix: two compiled-regex lexical PRE-GATES in
+`profiling/semantic_types.py` that are a strict SUPERSET of each `strptime` format's
+accepting language — `strptime` stays the source of truth, so every datatype verdict is
+**byte-identical by construction** (proved exhaustively + Hypothesis property tests).
+Measured **4.3x** on a Meridian-like column mix (5693ms→1325ms), 65.7x on pure non-date
+string columns. The scout also found the canvas force-sim is NOT a bottleneck at realistic
+N (largest Meridian island = 11 nodes; layout runs once and settles to static SVG/canvas),
+so the client accel was correctly SKIPPED — no payload spend against the ~3.2KB headroom.
+WASM for the canvas remains Glenn's call (it'd add a build step, breaking the no-build SPA
+invariant). The P1/P2/P3 vectorized kernels (FDs 2.3x, MinHash 7.1x, INDs prefilter) are
+done and byte-identical-tested — not re-touched.
+
 ## Honest guardrails
 - **Testing:** build the deterministic suite as we go (per Glenn, don't gate on LLM-live tests until keys arrive). Never weaken an existing gate.
 - **C++/UI:** a full C++ rewrite of a *web* UI is wrong (browsers run JS/WASM). The right read of "lower-level for speed" = WASM for heavy client compute + compiled/vectorized hot paths in the Python engine. Documented, not silently reinterpreted.

@@ -58,8 +58,39 @@ _DT_FORMATS = (
     "%Y-%m-%d %H:%M", "%m/%d/%Y %H:%M",
 )
 
+# Cheap, ZERO-FALSE-NEGATIVE lexical pre-gates. strptime() remains the source of
+# truth; these only let us SKIP the (expensive) strptime cascade for values whose
+# character shape provably cannot match any of the formats above. Every value that
+# passes a gate still runs the identical strptime cascade, so the boolean result is
+# byte-identical to the pre-gate code path by construction (proved exhaustively in
+# tests/profiling/test_perf_dates.py).
+#
+# The strptime cascade is the single largest leaf cost in profile_column (~11.5s of
+# 17.5s cumtime, 837k strptime calls on Meridian). The gates reject the 118/151
+# non-date STRING columns on the first sample without ever calling strptime — alpha
+# codes, ICAO, narrative text, and most numerics fail the separator-shape test
+# instantly, eliminating the bulk of the cascade.
+#
+# Shape derivation (every value strptime can ACCEPT must match one alternative):
+#   %Y-%m-%d, %Y/%m/%d, %m/%d/%Y -> digits (sep digits){0,2}, sep in {-, /}
+#   %Y%m%d                       -> a bare digit run (the (...){0,2} permits zero seps)
+#   %d-%b-%Y                     -> digits '-' letters '-' digits
+# strptime accepts variable-width numeric fields but rejects a leading sign or
+# whitespace, so a leading digit is mandatory; each pattern is a strict SUPERSET of
+# the accepting language of the corresponding format(s).
+_DATE_GATE = re.compile(r"\d+(?:[-/]\d+){0,2}|\d+-[A-Za-z]+-\d+")
+#   a date-shaped prefix, a [ T] separator, HH:MM, optional :SS, optional tz
+#   (+HH:MM / +HHMM / Z — the three shapes strptime's %z accepts).
+_DT_GATE = re.compile(
+    r"\d+[-/]\d+[-/]\d+[ T]\d+:\d+(?::\d+)?(?:[+\-]\d{2}:?\d{2}|[+\-]\d{4}|Z)?"
+)
+_date_gate_match = _DATE_GATE.fullmatch
+_dt_gate_match = _DT_GATE.fullmatch
+
 
 def _parses_date(s: str) -> bool:
+    if _date_gate_match(s) is None:  # cheap shape reject -> strptime would also fail
+        return False
     for fmt in _DATE_FORMATS:
         try:
             _dt.datetime.strptime(s, fmt)
@@ -70,6 +101,8 @@ def _parses_date(s: str) -> bool:
 
 
 def _parses_datetime(s: str) -> bool:
+    if _dt_gate_match(s) is None:  # cheap shape reject -> strptime would also fail
+        return False
     for fmt in _DT_FORMATS:
         try:
             _dt.datetime.strptime(s, fmt)
