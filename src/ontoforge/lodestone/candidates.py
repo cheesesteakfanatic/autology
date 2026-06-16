@@ -51,6 +51,26 @@ from .typecheck import typecheck
 GENERATE_TASK = "lodestone.generate"
 MAX_CANDIDATES = 8
 
+#: JSON schema for the ``lodestone.generate`` structured output: an array of
+#: candidate specs, each carrying at least an OQIR ``term`` object. This gives the
+#: live path a contract for ``ValidatingModelClient`` to enforce (a malformed live
+#: generation degrades to the deterministic fallback). The deterministic
+#: HeuristicAdapter handler already emits this shape, so attaching the schema is a
+#: no-op on the keyless path (the parsed array is byte-identical to ``json.loads``
+#: of the same text). Serialized once (sorted) to keep the cassette key stable.
+GENERATE_SCHEMA = json.dumps(
+    {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {"term": {"type": "object"}},
+            "required": ["term"],
+        },
+    },
+    sort_keys=True,
+    separators=(",", ":"),
+)
+
 NUMERIC = (Datatype.INTEGER, Datatype.FLOAT)
 DATELIKE = (Datatype.DATE, Datatype.DATETIME)
 
@@ -842,7 +862,9 @@ def generate_candidates(
         },
         sort_keys=True,
     )
-    resp = client.propose(ModelRequest(task=GENERATE_TASK, prompt=prompt, temperature=0.0))
+    resp = client.propose(
+        ModelRequest(task=GENERATE_TASK, prompt=prompt, schema=GENERATE_SCHEMA, temperature=0.0)
+    )
     specs = resp.parsed if resp.parsed is not None else json.loads(resp.text)
 
     cands: list[Candidate] = []

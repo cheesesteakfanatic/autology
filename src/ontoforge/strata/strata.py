@@ -67,7 +67,20 @@ class Strata:
         ledger: Any = None,
         sigma: int = 1,
     ) -> None:
-        self.client: ModelClient = model_client if model_client is not None else build_strata_client()
+        # LLM-readiness seam (keyless-default, byte-identical):
+        # resolve_client returns the deterministic fallback UNCHANGED when no
+        # provider env is set, so the keyless path is the same object the
+        # call-site built today; with a provider + key it wraps a live adapter in
+        # the secure + validating + fallback chain. An EXPLICIT model_client is
+        # honored as-is (never re-wrapped) so test/handler injection stays exact.
+        if model_client is not None:
+            self.client: ModelClient = model_client
+        else:
+            from ontoforge.aimodels import resolve_client
+
+            self.client = resolve_client(
+                "strata.name_concept", fallback=build_strata_client()
+            )
         self.spine = spine if spine is not None else DecisionSpine(
             SpineProfile(), self.client, ledger
         )

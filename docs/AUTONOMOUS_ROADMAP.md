@@ -39,9 +39,28 @@ landed. The platform is keyless, deterministic, offline, full suite green (1761)
 3. **Auth / multi-tenancy enforcement (human checkpoint #3).** The cache/flywheel
    tenant-namespacing substrate exists; binding a verified principal needs a real
    identity provider (OIDC/SSO) and a hosting decision.
-4. **LLM-live layer (key-gated).** The deterministic suite is the foundation per
-   Glenn; the model router/ensemble adjudication and live competency gates light up
-   when API keys arrive — built behind the existing keyless interfaces.
+4. **LLM-live layer (key-gated) — SEAM CLOSED & PROVEN.** Setting
+   `ONTOFORGE_MODEL_PROVIDER` + the matching key (`MOONSHOT_API_KEY` for Kimi,
+   `QWEN_API_KEY`, `OPENAI_API_KEY`, or `ANTHROPIC_API_KEY`) is now the **only**
+   change needed to put a live model behind the engine — no code edit. The single
+   seam (`aimodels.activation.resolve_client`) is threaded **inside** the
+   STRATA/ER/LODESTONE module constructors, so the CLI, pipeline, and server all
+   activate with one env change. **Keyless it returns the deterministic fallback by
+   object identity (byte-identical parity)**; with a key it wraps the live adapter
+   (`OpenAICompatAdapter` for Kimi/Qwen/OpenAI, `AnthropicAdapter` for Claude) in
+   `ValidatingModelClient(SecureModelClient(live), fallback=…)` behind a router whose
+   priority-1 tail is the deterministic fallback — PII redaction + prompt-injection
+   refusal + structured-output validation + deterministic retry + fall-through to
+   byte-identical keyless behavior on any live failure. Cost scales with ambiguity
+   (the spine only escalates in the confidence band), metered through the
+   CostMeter/ledger. **Proven with ZERO network** in
+   `tests/integration/test_llm_dryrun.py` (a recorded `CassetteAdapter` stands in for
+   the frontier model; the pipeline answers with citations, the confidently-wrong +
+   abstention + type-checker gates all hold, safety redaction/refusal fires, and the
+   validating client degrades to the deterministic fallback on malformed output).
+   Full operator guide: [docs/LLM_READINESS.md](LLM_READINESS.md). Live competency
+   gates against real provider endpoints light up when actual keys arrive. The
+   deterministic suite remains the keyless foundation per Glenn.
 5. **Engine §3/§6 remainders — CLOSED.** Both shipped, keyless/offline/deterministic:
    - **§3 living prompt library + observation loop** — `src/ontoforge/aimodels/`
      gained `library.py` (`PromptLibrary`: per-task versions + a champion,

@@ -132,6 +132,20 @@ the class uris an answer's OQIR touched, `world.engineer_apply` records a `join`
 relationship's endpoints. CLI: `ontoforge criticality -p PROJECT [--top N]`. Full design in
 [docs/CRITICALITY.md](docs/CRITICALITY.md).
 
+**LLM-ready (key-gated, parity-sacred).** Setting `ONTOFORGE_MODEL_PROVIDER` + the matching key
+(`MOONSHOT_API_KEY` for Kimi, `QWEN_API_KEY`, `OPENAI_API_KEY`, or `ANTHROPIC_API_KEY`) is the **only**
+change needed to put a live model behind the engine — no code edit. The single seam is
+`aimodels.activation.resolve_client(task, fallback=…)`, threaded **inside** the STRATA/ER/LODESTONE
+module constructors so every call-site (CLI, pipeline, server) activates with one env change. **Keyless
+it returns the `fallback` object by identity** (byte-identical, no wrapper runs); with a key it wraps the
+live adapter in `ValidatingModelClient(SecureModelClient(live), fallback=…)` behind a router whose
+priority-1 tail is the deterministic fallback (PII redaction + injection refusal + schema-validate +
+deterministic retry + fall-through to keyless on any failure). The spine only escalates to the live model
+in the ambiguous confidence band (cost scales with ambiguity, not data volume). Proven with **zero
+network** in `tests/integration/test_llm_dryrun.py` (cassette stands in for the frontier model; gates +
+parity hold). Full operator guide: [docs/LLM_READINESS.md](docs/LLM_READINESS.md). Adapters live in
+`ledger/models.py` and the safety/router seam in `aimodels/` (do not change keyless output).
+
 ## Key gotchas
 
 - **Keyless and deterministic.** No API key is ever needed; the spine runs

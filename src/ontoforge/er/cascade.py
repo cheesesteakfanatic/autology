@@ -94,9 +94,27 @@ class ERCascade:
     """Batch resolver; also the shared engine for the incremental path
     (frozen FS models + fitted spine calibrator are reused by add_mentions)."""
 
-    def __init__(self, config: Optional[CascadeConfig] = None, ledger: Any = None) -> None:
+    def __init__(
+        self,
+        config: Optional[CascadeConfig] = None,
+        ledger: Any = None,
+        model_client: Optional[Any] = None,
+    ) -> None:
         self.config = config or CascadeConfig()
-        self.model_client = HeuristicAdapter({t: er_adjudicate_handler for t in ER_HEURISTIC_TASKS})
+        # the deterministic ER adjudicator (temporal-reuse guard) is the keyless
+        # fallback; an explicit model_client (e.g. a cassette in tests) is honored
+        # as-is. With no provider env resolve_client returns this SAME object, so
+        # the keyless path is byte-identical; with a provider + key it wraps a
+        # live adapter behind the secure + validating + deterministic-fallback chain.
+        deterministic = HeuristicAdapter({t: er_adjudicate_handler for t in ER_HEURISTIC_TASKS})
+        if model_client is not None:
+            self.model_client = model_client
+        else:
+            from ontoforge.aimodels import resolve_client
+
+            self.model_client = resolve_client(
+                "spine.adjudicate.er", fallback=deterministic
+            )
         self.spine = DecisionSpine(self.config.spine_profile, model_client=self.model_client, ledger=ledger)
         self.fs_models: dict[str, FellegiSunter] = {}
         self.blockers: dict[str, Blocker] = {}

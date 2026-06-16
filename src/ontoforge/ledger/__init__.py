@@ -4,16 +4,23 @@ Public surface:
 - SqliteLedger     — the Ledger protocol implementation (atoms, interned provenance,
                      append-only artifact/decision/cost ledgers, exact invalidation).
 - LedgerCostMeter  — CostMeter that writes through to the COST table.
-- HeuristicAdapter / CassetteAdapter / AnthropicAdapter — ModelClient adapters.
+- HeuristicAdapter / CassetteAdapter / AnthropicAdapter / OpenAICompatAdapter
+  — ModelClient adapters.
 """
 
-from .models import AnthropicAdapter, CassetteAdapter, HeuristicAdapter
+from .models import (
+    AnthropicAdapter,
+    CassetteAdapter,
+    HeuristicAdapter,
+    OpenAICompatAdapter,
+)
 from .sqlite_ledger import LedgerCostMeter, SqliteLedger
 
 __all__ = [
     "AnthropicAdapter",
     "CassetteAdapter",
     "HeuristicAdapter",
+    "OpenAICompatAdapter",
     "LedgerCostMeter",
     "SqliteLedger",
 ]

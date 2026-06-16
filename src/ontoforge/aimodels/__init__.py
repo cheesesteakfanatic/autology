@@ -15,9 +15,11 @@ import or run:
   and injection scanning (defend architecturally; injection is unsolved).
 """
 
+from .activation import ActiveModel, model_status, resolve_client
 from .context import LinkedSchema, SchemaElement, link_schema, render_grounding
 from .library import PromptLibrary
 from .observation import Observation, ObservationLog
+from .openai_compat import OpenAICompatAdapter
 from .prompts import PROMPTS, FewShot, PromptTemplate, get_prompt, render
 from .router import (
     ModelRouter,
@@ -33,28 +35,37 @@ from .secure import (
     scan_injection,
     wrap_untrusted,
 )
+from .secure_client import SecureModelClient
+from .validate import ValidatingModelClient, validate_against_schema
 
 __all__ = [
     "INJECTION_RISK_THRESHOLD",
+    "ActiveModel",
     "FewShot",
     "LinkedSchema",
     "ModelRouter",
     "ModelSpec",
     "Observation",
     "ObservationLog",
+    "OpenAICompatAdapter",
     "PROMPTS",
     "PromptLibrary",
     "PromptTemplate",
     "RouterExhausted",
     "SchemaElement",
+    "SecureModelClient",
+    "ValidatingModelClient",
     "default_router",
     "get_prompt",
     "link_schema",
     "make_observer",
+    "model_status",
     "redact_pii",
     "render",
     "render_grounding",
+    "resolve_client",
     "sample_rows",
     "scan_injection",
+    "validate_against_schema",
     "wrap_untrusted",
 ]

@@ -23,7 +23,13 @@ from ontoforge.contracts import (
 from ontoforge.contracts.ontology import Ontology
 from ontoforge.ledger.models import HeuristicAdapter
 
-from .candidates import GENERATE_TASK, CandidateSet, generate_candidates, make_generate_handler
+from .candidates import (
+    GENERATE_SCHEMA,
+    GENERATE_TASK,
+    CandidateSet,
+    generate_candidates,
+    make_generate_handler,
+)
 from .citations import assemble_citations
 from .clarify import Clarification, resolve_choice, structural_diff
 from .execute import EmptyResult, ExecOutcome, execute_candidate
@@ -43,6 +49,7 @@ __all__ = [
     "generate_candidates",
     "make_generate_handler",
     "GENERATE_TASK",
+    "GENERATE_SCHEMA",
     "AskFlywheel",
     "answer_fingerprint",
     "requires_live_composition",
@@ -76,9 +83,21 @@ class Lodestone:
         self.hearth = hearth
         self.ledger = ledger
         self.spine = spine
-        self.client: ModelClient = model_client or HeuristicAdapter(
-            {GENERATE_TASK: make_generate_handler(ontology)}
-        )
+        # LLM-readiness seam (keyless-default, byte-identical): the deterministic
+        # generate handler is the keyless fallback. resolve_client returns it
+        # UNCHANGED with no provider env (so the keyless path is the same object
+        # built today and no decorator/router ever runs); with a provider + key it
+        # wraps a live adapter behind secure + schema-validate + fallback. An
+        # explicit model_client is honored as-is (test/handler injection stays exact).
+        if model_client is not None:
+            self.client: ModelClient = model_client
+        else:
+            from ontoforge.aimodels import resolve_client
+
+            self.client = resolve_client(
+                GENERATE_TASK,
+                fallback=HeuristicAdapter({GENERATE_TASK: make_generate_handler(ontology)}),
+            )
         self._value_index: Optional[ValueIndex] = None
         self._pending: Optional[tuple[str, Clarification, float]] = None
         # the Ask flywheel (v2.1 §4): a per-engine CachedWorkStore, created lazily
