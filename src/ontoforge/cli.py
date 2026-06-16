@@ -1194,6 +1194,145 @@ def status(project: Path = _PROJECT_OPT) -> None:
     console.print(out)
 
 
+class _CliWorld:
+    """A minimal world-shaped adapter so the CLI can reuse ``server.usage``'s
+    graph builder/bridge (the SAME criticality graph the server induces). Reads
+    the answering ontology and the persisted atlas straight off disk; no server,
+    no ledger handle held open."""
+
+    def __init__(self, project: Path, ontology: Any) -> None:
+        self.active_project = project
+        self.active_world = "cli"
+        self._ontology = ontology
+        self._atlas = None
+        atlas_path = project / "atlas.json"
+        if atlas_path.is_file():
+            try:
+                self._atlas = json.loads(atlas_path.read_text(encoding="utf-8"))
+            except (ValueError, OSError):
+                self._atlas = None
+
+    @property
+    def ontology(self) -> Any:
+        return self._ontology
+
+    def read_atlas(self) -> Optional[dict[str, Any]]:
+        return self._atlas
+
+
+@app.command()
+def criticality(
+    project: Path = _PROJECT_OPT,
+    top: int = typer.Option(10, "--top", "-n", help="How many critical elements to show."),
+) -> None:
+    """Top-N most CRITICAL ontology elements of the active world (§6).
+
+    Builds the criticality graph (class nodes + typed-relationship edges) from
+    the answering ontology and the connection atlas, replays any recorded usage
+    (saved questions in the ledger, as 'query' events) into the LAZY criticality
+    model, and prints the score-ranked elements. Keyless, offline, deterministic
+    over the usage seq — no wall-clock."""
+    from ontoforge.server import usage as criticality_usage
+
+    cfg = _load_config(project)
+    state = _read_state(project)
+    try:
+        onto = _answering_ontology(project, cfg, state)
+    except Exception as exc:  # no ontology yet -> nothing to rank
+        console.print(f"[yellow]no ontology available for {project}: {escape(str(exc))}[/]")
+        raise typer.Exit(code=0)
+
+    # Fresh process-local model for this world (drop any prior cached one).
+    criticality_usage.reset()
+    cli_world = _CliWorld(project, onto)
+
+    # Replay recorded usage if present: each saved question, answered through
+    # LODESTONE, contributes a 'query' event for the class uris its plan touched.
+    replayed = _replay_recorded_usage(project, cfg, state, cli_world, criticality_usage)
+
+    elements = criticality_usage.top_criticality(cli_world, top)
+    criticality_usage.reset()
+
+    if not elements:
+        console.print(
+            "[yellow]no critical elements yet[/] — the ontology has no classes, or no "
+            "usage has been recorded (ask some questions first, then re-run)."
+        )
+        raise typer.Exit(code=0)
+
+    out = Table(title=f"criticality (top {len(elements)}, replayed {replayed} usage events)")
+    out.add_column("#", justify="right")
+    out.add_column("element")
+    out.add_column("uri")
+    out.add_column("score", justify="right")
+    for i, e in enumerate(elements, start=1):
+        out.add_row(str(i), escape(str(e["label"])), escape(str(e["uri"])), f"{e['score']:.4f}")
+    console.print(out)
+
+
+def _replay_recorded_usage(
+    project: Path,
+    cfg: dict[str, Any],
+    state: dict[str, Any],
+    cli_world: "_CliWorld",
+    criticality_usage: Any,
+) -> int:
+    """Replay saved questions (the ledger's 'question' artifacts) as 'query'
+    usage events, deterministically and offline. Returns the number of events
+    recorded. Best-effort: a project without a ledger/LODESTONE contributes 0."""
+    ledger_path = project / cfg["ledger"]
+    if not ledger_path.is_file():
+        return 0
+    try:
+        questions = _recorded_questions(ledger_path)
+    except Exception:
+        return 0
+    if not questions:
+        return 0
+
+    try:
+        lodestone_mod = importlib.import_module("ontoforge.lodestone")
+    except Exception:
+        return 0
+
+    recorded = 0
+    for q in questions:
+        try:
+            answer = _drive_lodestone(lodestone_mod, q, project, cfg)
+        except Exception:
+            continue
+        uris = criticality_usage.class_uris_from_answer(answer)
+        if uris:
+            before = recorded
+            criticality_usage.record_usage(cli_world, uris, "query")
+            # count only events that landed on KNOWN nodes
+            recorded = before + sum(1 for u in uris if u in cli_world.ontology.classes)
+    return recorded
+
+
+def _recorded_questions(ledger_path: Path) -> list[str]:
+    """Saved questions newest-first from the ledger 'question' artifacts. Read
+    on a throwaway connection so the CLI never holds the ledger open."""
+    import sqlite3
+
+    conn = sqlite3.connect(str(ledger_path))
+    try:
+        rows = conn.execute(
+            "SELECT payload FROM artifact WHERE kind = 'question' ORDER BY seq DESC LIMIT 500"
+        ).fetchall()
+    finally:
+        conn.close()
+    out: list[str] = []
+    for (payload,) in rows:
+        try:
+            text = json.loads(payload).get("question")
+        except (TypeError, ValueError):
+            continue
+        if text and text not in out:
+            out.append(str(text))
+    return out
+
+
 @app.command()
 def demo(
     estate: str = typer.Argument(

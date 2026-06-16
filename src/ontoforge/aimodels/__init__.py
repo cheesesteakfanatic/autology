@@ -16,8 +16,16 @@ import or run:
 """
 
 from .context import LinkedSchema, SchemaElement, link_schema, render_grounding
+from .library import PromptLibrary
+from .observation import Observation, ObservationLog
 from .prompts import PROMPTS, FewShot, PromptTemplate, get_prompt, render
-from .router import ModelRouter, ModelSpec, RouterExhausted, default_router
+from .router import (
+    ModelRouter,
+    ModelSpec,
+    RouterExhausted,
+    default_router,
+    make_observer,
+)
 from .secure import (
     INJECTION_RISK_THRESHOLD,
     redact_pii,
@@ -32,13 +40,17 @@ __all__ = [
     "LinkedSchema",
     "ModelRouter",
     "ModelSpec",
+    "Observation",
+    "ObservationLog",
     "PROMPTS",
+    "PromptLibrary",
     "PromptTemplate",
     "RouterExhausted",
     "SchemaElement",
     "default_router",
     "get_prompt",
     "link_schema",
+    "make_observer",
     "redact_pii",
     "render",
     "render_grounding",

@@ -1219,6 +1219,32 @@ def create_app(project: Path | str) -> FastAPI:
             estate=cfg_estate,
         )
 
+    # ----------------------------------------------------------- criticality
+
+    @app.get("/api/criticality", response_model=S.CriticalityOut)
+    async def api_criticality(top: int = 10) -> S.CriticalityOut:
+        """The top-``top`` most CRITICAL ontology elements of the active world,
+        score-sorted (§6). Read-only: the criticality model is fed ADDITIVELY by
+        the existing ask/engineer-apply handlers (a 'query' event for the classes
+        an answer touched, a 'join' event when a typed relationship is applied);
+        this endpoint only READS the lazily-recomputed scores.
+
+        Returns an empty list for an unbuilt world (no ontology yet) and never
+        raises — keyless, offline, deterministic over an integer usage seq."""
+        from . import usage as criticality_usage
+
+        with world.lock:
+            elements = criticality_usage.top_criticality(world, top)
+        return S.CriticalityOut(
+            elements=[
+                S.CriticalityElement(
+                    uri=e["uri"], label=e["label"], score=e["score"], kind="class"
+                )
+                for e in elements
+            ],
+            total=len(elements),
+        )
+
     # ----------------------------------------------------------- the SPA
 
     app.mount("/static", _NoCacheStatic(directory=STATIC_DIR), name="static")

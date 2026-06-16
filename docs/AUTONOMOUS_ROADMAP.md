@@ -42,8 +42,22 @@ landed. The platform is keyless, deterministic, offline, full suite green (1761)
 4. **LLM-live layer (key-gated).** The deterministic suite is the foundation per
    Glenn; the model router/ensemble adjudication and live competency gates light up
    when API keys arrive — built behind the existing keyless interfaces.
-5. **Engine §3/§6 remainders.** The living prompt library/router/observation loop
-   (§3) and usage/criticality-driven lazy recompute (§6) are the last engine items.
+5. **Engine §3/§6 remainders — CLOSED.** Both shipped, keyless/offline/deterministic:
+   - **§3 living prompt library + observation loop** — `src/ontoforge/aimodels/`
+     gained `library.py` (`PromptLibrary`: per-task versions + a champion,
+     seeded from the static prompts for zero regression, `select_by_observations`
+     promotes the best version by mean confidence with deterministic tie-break)
+     and `observation.py` (frozen `Observation` + append-only `ObservationLog`
+     with integer-seq ordering and stable prompt fingerprints). The
+     `ModelRouter` gained an optional `observer` (default `None` = byte-identical
+     legacy path) that records exactly one observation per successful propose.
+   - **§6 lazy usage/criticality recompute** — `src/ontoforge/criticality/`
+     (append-only `UsageLog`, dirty-set/watermark `CriticalityModel`, byte-stable
+     snapshot store) exposed through the backend: `GET /api/criticality?top=N`,
+     additive `query`/`join` usage emission from the existing `/api/ask` and
+     `/api/engineer/apply` handlers (no contract change), and the
+     `ontoforge criticality -p PROJECT [--top N]` CLI command. See
+     `docs/CRITICALITY.md`.
 
 ## Honest guardrails
 - **Testing:** build the deterministic suite as we go (per Glenn, don't gate on LLM-live tests until keys arrive). Never weaken an existing gate.

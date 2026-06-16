@@ -113,6 +113,24 @@ ids/URIs/verdicts keep their names. Static-UI tests live in `tests/server/test_s
 - `POST /api/engineer/apply {op}` → `{ok,deferred,blocked,human_summary,new_stats,atlas_delta,undo_token}`.
 - `POST /api/engineer/undo {undo_token}` → `{ok,new_stats}` (exact TEMPER inverse).
 - `POST /api/extract {type_uri,filters,columns,limit}` → `{columns,rows,citations}` (+ `?format=csv`).
+- `GET /api/criticality?top=N` → `{elements:[{uri,label,score,kind}], total}` — the top-N most
+  CRITICAL ontology elements of the active world, score-sorted (read-only; empty on an unbuilt
+  world, never raises).
+
+**Engine §3/§6 (living prompt library + lazy criticality).** Two keyless/offline/deterministic
+engine items, both CLOSED. **§3 living prompt library + observation loop** (`aimodels/library.py`
++ `aimodels/observation.py`): `PromptLibrary` seeds from the static prompts (zero regression), keeps
+per-task versions + a champion, and `select_by_observations` promotes the best-observed version; the
+`ModelRouter` gained an optional `observer` (default `None` = byte-identical legacy path) recording one
+`Observation` per successful propose into an integer-seq `ObservationLog`. **§6 lazy usage/criticality
+recompute** (`src/ontoforge/criticality/`): an append-only `UsageLog` drives a dirty-set/watermark
+`CriticalityModel` that re-scores only what recent usage touched (never the whole graph). It is wired
+through the **backend only** — `server/usage.py` induces the criticality graph from the active world's
+ontology + atlas (nodes = class uris, edges = typed relationships), `GET /api/criticality` reads it,
+and usage is emitted **additively** with no contract change: `world.ask` records a `query` event for
+the class uris an answer's OQIR touched, `world.engineer_apply` records a `join` event for a confirmed
+relationship's endpoints. CLI: `ontoforge criticality -p PROJECT [--top N]`. Full design in
+[docs/CRITICALITY.md](docs/CRITICALITY.md).
 
 ## Key gotchas
 

@@ -685,3 +685,29 @@ class ComputeLedgerOut(BaseModel):
     total_calls: int = 0
     decision_tokens: int = 0    # tokens attributed to spine decisions (by tier)
     estate: str = ""
+
+
+# ---------------------------------------------------------------- criticality
+
+
+class CriticalityElement(BaseModel):
+    """One ranked ontology element on GET /api/criticality.
+
+    ``uri`` is a class uri (a node of the induced criticality graph), ``label``
+    its human display name, ``score`` the lazy criticality blend (0..1, usage +
+    centrality + recency + dependents), and ``kind`` the element kind (always
+    ``class`` in v0 — the graph nodes are ontology classes)."""
+
+    uri: str
+    label: str
+    score: float
+    kind: str = "class"
+
+
+class CriticalityOut(BaseModel):
+    """GET /api/criticality?top=N — the top-N critical ontology elements,
+    score-sorted. ``total`` is how many elements have a non-default score. An
+    unbuilt world (no ontology yet) returns an empty list, never an error."""
+
+    elements: list[CriticalityElement] = Field(default_factory=list)
+    total: int = 0

@@ -250,10 +250,24 @@ class ProjectWorld:
                 return self.answer_cache[key], True
             answer = self.engine.ask(key)
             self.record_question(key)
+            self._record_query_usage(answer)
             payload = serialize_answer(key, answer)
             if answer.clarification is None:
                 self.answer_cache[key] = payload
             return payload, False
+
+    def _record_query_usage(self, answer: Any) -> None:
+        """ADDITIVELY feed criticality: record a 'query' usage event for the
+        class uris this answer's OQIR plan touched. Pure side effect — never
+        raises into the ask path, and leaves the returned answer untouched."""
+        try:
+            from . import usage as _usage
+
+            uris = _usage.class_uris_from_answer(answer)
+            if uris:
+                _usage.record_usage(self, uris, "query")
+        except Exception:
+            return
 
     def record_question(self, question: str) -> None:
         """Idempotently persist one asked question as a ledger artifact."""
@@ -652,7 +666,29 @@ class ProjectWorld:
             out = svc.apply(op_token)
             if out.get("ok"):
                 self._persist_engineered(svc)
+                self._record_join_usage(op_token)
             return out
+
+    def _record_join_usage(self, op_token: dict[str, Any]) -> None:
+        """ADDITIVELY feed criticality: when a CONFIRMED link op applies (an
+        ``AddProperty`` carrying a ``range_class``), record a 'join' usage event
+        for the relationship's two endpoint class uris. Pure side effect — never
+        raises, never alters the apply result."""
+        try:
+            if not isinstance(op_token, dict):
+                return
+            # op_to_dict flattens the operator: class_uri/range_class are top
+            # level. A nested {params:{...}} shape is also tolerated defensively.
+            params = op_token.get("params") if isinstance(op_token.get("params"), dict) else op_token
+            src = params.get("class_uri") or params.get("source")
+            dst = params.get("range_class") or params.get("target")
+            endpoints = [u for u in (src, dst) if u]
+            if endpoints:
+                from . import usage as _usage
+
+                _usage.record_usage(self, endpoints, "join")
+        except Exception:
+            return
 
     def engineer_undo(self, undo_token: dict[str, Any]) -> dict[str, Any]:
         with self.lock:
@@ -674,6 +710,15 @@ class ProjectWorld:
         self._atlas_cache = None
         self._engine = None
         self._search_index = None
+        # the criticality graph is induced from this ontology/atlas — drop its
+        # cache so the next usage/criticality call re-induces over the edited
+        # world (the new link must be a known node).
+        try:
+            from . import usage as _usage
+
+            _usage.reset()
+        except Exception:
+            pass
 
     # ------------------------------------------------------------- extract
 
@@ -785,6 +830,14 @@ class ProjectWorld:
         self._search_index = None
         self._atlas_cache = None
         self.answer_cache.clear()
+        # the process-local criticality graph is bound to the active world; a
+        # world switch / reload re-induces it on the next call.
+        try:
+            from . import usage as _usage
+
+            _usage.reset()
+        except Exception:
+            pass
 
     def reload(self) -> None:
         """Drop every open handle and cache; the next request re-opens the
