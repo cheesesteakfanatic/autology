@@ -1337,6 +1337,315 @@ def _run_demo(estate: str, project_dir: Path) -> None:
     console.print(f"\nweb app:\n  ontoforge serve -p {project_dir}")
 
 
+# ----------------------------------------------------------- anonymizer (§7)
+#
+# The CLIENT-SIDE anonymization toolkit (docs/ANONYMIZATION.md). OPEN-SHELL: it
+# runs entirely on the CUSTOMER machine, the customer holds the key, and we never
+# see a raw value. `anonymize` tokenizes every CSV/Parquet in a directory
+# (join/structure-preserving) and seals the reverse map under the key; `decipher`
+# decodes an engine answer/extract back to raw locally. Both lazy-import the
+# anonymizer package so the rest of the CLI never pays for it.
+
+ANON_SOURCE_SUFFIXES = (".csv", ".parquet")
+KEYMAP_FILENAME = "keymap.ofx"
+
+
+def _read_key(
+    key_file: Optional[Path], passphrase: Optional[str], *, what: str = "key"
+) -> bytes:
+    """Resolve the customer secret from EITHER --key-file or --passphrase.
+
+    ``--key-file -`` reads the key from stdin. A passphrase is taken verbatim
+    (UTF-8). Exactly one of the two must be given; the secret never leaves the
+    machine and is used only to derive subkeys + seal/open the keymap."""
+    if key_file is not None and passphrase is not None:
+        console.print("[red]give --key-file OR --passphrase, not both[/]")
+        raise typer.Exit(code=1)
+    if passphrase is not None:
+        if not passphrase:
+            console.print("[red]--passphrase is empty[/]")
+            raise typer.Exit(code=1)
+        return passphrase.encode("utf-8")
+    if key_file is None:
+        console.print(
+            f"[red]no {what} — pass --key-file <path|-> or --passphrase <secret>[/]"
+        )
+        raise typer.Exit(code=1)
+    if str(key_file) == "-":
+        import sys
+
+        data = sys.stdin.buffer.read()
+    else:
+        if not key_file.is_file():
+            console.print(f"[red]--key-file {key_file} not found[/]")
+            raise typer.Exit(code=1)
+        data = key_file.read_bytes()
+    if not data.strip():
+        console.print(f"[red]{what} file {key_file} is empty[/]")
+        raise typer.Exit(code=1)
+    # a key file is taken as raw bytes (trailing newline stripped so a one-line
+    # passphrase-in-a-file behaves like the passphrase typed on the command line)
+    return data.rstrip(b"\r\n")
+
+
+def _load_anon_source_dir(source: Path) -> dict[str, tuple[Path, str, Any]]:
+    """Load every *.csv / *.parquet directly under ``source`` as a wart-preserving
+    table — the SAME read the generic engine uses (``dtype=str,
+    keep_default_na=False`` for CSV), so anonymize→re-ingest round-trips faithfully
+    and joins survive. Returns ``{table: (path, suffix, DataFrame)}``."""
+    import pandas as pd
+
+    if not source.is_dir():
+        console.print(f"[red]--source {source} is not a directory[/]")
+        raise typer.Exit(code=1)
+    files = sorted(
+        p for p in source.iterdir()
+        if p.is_file() and p.suffix.lower() in ANON_SOURCE_SUFFIXES
+    )
+    if not files:
+        console.print(f"[red]no *.csv / *.parquet files found in {source}[/]")
+        raise typer.Exit(code=1)
+    loaded: dict[str, tuple[Path, str, Any]] = {}
+    for p in files:
+        suffix = p.suffix.lower()
+        if suffix == ".csv":
+            df = pd.read_csv(p, dtype=str, keep_default_na=False, encoding="utf-8")
+        else:
+            df = pd.read_parquet(p)
+        loaded[p.stem] = (p, suffix, df)
+    return loaded
+
+
+def _build_policy(
+    policy_file: Optional[Path],
+    allow: Optional[list[str]],
+    deny: Optional[list[str]],
+    no_auto: bool,
+    no_format_preserving: bool,
+):
+    """Assemble a Policy from --policy JSON and/or --allow/--deny/--no-auto flags.
+
+    A --policy file provides the base (allow/deny/auto/format_preserving);
+    --allow/--deny add to it and the --no-* flags override. Flags win."""
+    from ontoforge.anonymizer import Policy
+
+    base: dict[str, Any] = {}
+    if policy_file is not None:
+        if not policy_file.is_file():
+            console.print(f"[red]--policy {policy_file} not found[/]")
+            raise typer.Exit(code=1)
+        try:
+            base = json.loads(policy_file.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            console.print(f"[red]--policy {policy_file} is not valid JSON: {exc}[/]")
+            raise typer.Exit(code=1)
+        if not isinstance(base, dict):
+            console.print("[red]--policy JSON must be an object[/]")
+            raise typer.Exit(code=1)
+    allow_set = set(base.get("allow", [])) | set(allow or [])
+    deny_set = set(base.get("deny", [])) | set(deny or [])
+    auto = bool(base.get("auto", True)) and not no_auto
+    fmt = bool(base.get("format_preserving", True)) and not no_format_preserving
+    return Policy(
+        allow=frozenset(allow_set),
+        deny=frozenset(deny_set),
+        auto=auto,
+        format_preserving=fmt,
+        pii_fraction=float(base.get("pii_fraction", 0.3)),
+    )
+
+
+@app.command()
+def anonymize(
+    source: Path = typer.Argument(..., help="Directory of *.csv / *.parquet files to anonymize."),
+    out: Optional[Path] = typer.Option(
+        None, "--out", help="Output directory for anonymized files + keymap (default <source>_anon)."
+    ),
+    key_file: Optional[Path] = typer.Option(
+        None, "--key-file", "--key", help="Customer key file (or '-' for stdin). The key never leaves this machine."
+    ),
+    passphrase: Optional[str] = typer.Option(
+        None, "--passphrase", help="Customer passphrase (alternative to --key-file)."
+    ),
+    policy: Optional[Path] = typer.Option(
+        None, "--policy", help='Policy JSON: {"allow":[...],"deny":[...],"auto":true,"format_preserving":true}.'
+    ),
+    allow: Optional[list[str]] = typer.Option(
+        None, "--allow", help="Always tokenize this column (repeatable; bare name or table.column)."
+    ),
+    deny: Optional[list[str]] = typer.Option(
+        None, "--deny", help="Never tokenize this column (repeatable; pass-through even if PII)."
+    ),
+    no_auto: bool = typer.Option(
+        False, "--no-auto", help="Disable PII auto-detection — tokenize ONLY the --allow set."
+    ),
+    no_format_preserving: bool = typer.Option(
+        False, "--no-format-preserving", help="Do not keep string-token length/char-class."
+    ),
+) -> None:
+    """CLIENT-SIDE anonymize: tokenize every CSV/Parquet in a directory, write
+    anonymized copies + an ENCRYPTED keymap, and print WHAT was hidden and WHY.
+
+    Runs entirely on YOUR machine. Tokenization is join- and structure-preserving,
+    so the engine discovers the SAME relationships on the tokens as on the raw
+    data — but the raw values are sealed in ``<out>/keymap.ofx``, encrypted with
+    YOUR key (which never leaves the machine). The anonymized output never contains
+    a raw value of any tokenized column.
+    """
+    allow = _opt(allow)
+    deny = _opt(deny)
+    key_file = _opt(key_file)
+    passphrase = _opt(passphrase)
+    policy = _opt(policy)
+
+    from ontoforge.anonymizer import DecipherError, anonymize_with_audit
+
+    key = _read_key(key_file, passphrase)
+    pol = _build_policy(policy, allow, deny, bool(no_auto), bool(no_format_preserving))
+    loaded = _load_anon_source_dir(source)
+
+    out_dir = out if out is not None else source.parent / f"{source.name}_anon"
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    tables = {name: df for name, (_p, _s, df) in loaded.items()}
+    result = anonymize_with_audit(tables, key, pol)
+
+    # write each anonymized table back in its source format
+    import pandas as pd
+
+    written: list[tuple[str, Path]] = []
+    for name, (src_path, suffix, _df) in loaded.items():
+        cols = result.tables[name]
+        anon_df = pd.DataFrame(cols)
+        dst = out_dir / src_path.name
+        if suffix == ".csv":
+            anon_df.to_csv(dst, index=False, encoding="utf-8")
+        else:
+            anon_df.to_parquet(dst, index=False)
+        written.append((name, dst))
+
+    # seal the reverse map (the ONLY path back to raw) under the customer key
+    keymap_path = out_dir / KEYMAP_FILENAME
+    keymap_path.write_bytes(result.keymap.to_bytes())
+
+    # audit: WHAT was tokenized and WHY
+    audit = Table(title="anonymized — what was hidden and why")
+    for col in ("table", "column", "why"):
+        audit.add_column(col)
+    n_tokenized = 0
+    for name in sorted(result.selected):
+        for column, why in result.selected[name]:
+            audit.add_row(name, column, why.value)
+            n_tokenized += 1
+    if n_tokenized:
+        console.print(audit)
+    else:
+        console.print(
+            "[yellow]no columns matched the policy — nothing was tokenized "
+            "(use --allow col / --policy to select join keys or quasi-identifiers)[/]"
+        )
+    for name, dst in written:
+        console.print(f"[green]anonymized[/] {name} -> {dst}")
+    console.print(
+        f"[green]keymap (encrypted, demo-grade stdlib cipher) -> {keymap_path}[/] "
+        f"({len(result.keymap)} bytes)"
+    )
+    console.print(
+        f"tokenized {n_tokenized} column(s) across {len(written)} table(s); "
+        "the raw values live ONLY inside the encrypted keymap. "
+        "Compute on the anonymized dir, then `ontoforge decipher` the result with the same key.",
+        soft_wrap=True,
+    )
+    # belt-and-suspenders: the keymap must decrypt with the key that sealed it
+    try:
+        from ontoforge.anonymizer import decrypt_keymap
+
+        decrypt_keymap(result.keymap, key)
+    except DecipherError as exc:  # pragma: no cover — never expected
+        console.print(f"[red]internal error: sealed keymap did not round-trip: {exc}[/]")
+        raise typer.Exit(code=1)
+
+
+@app.command()
+def decipher(
+    results_file: Path = typer.Argument(..., help="Engine output to decode: a JSON answer/extract or a CSV."),
+    keymap: Optional[Path] = typer.Option(
+        None, "--keymap", help=f"The encrypted keymap from `anonymize` (default <dir>/{KEYMAP_FILENAME})."
+    ),
+    key_file: Optional[Path] = typer.Option(
+        None, "--key-file", "--key", help="Customer key file (or '-' for stdin)."
+    ),
+    passphrase: Optional[str] = typer.Option(
+        None, "--passphrase", help="Customer passphrase (alternative to --key-file)."
+    ),
+    out: Optional[Path] = typer.Option(
+        None, "--out", help="Write the decoded result here (default: alongside the input, *.decoded.*)."
+    ),
+) -> None:
+    """CLIENT-SIDE decipher: substitute every token in an engine result back to its
+    raw value, locally, using the encrypted keymap + YOUR key.
+
+    Accepts a JSON file (an OQIR answer, a list/dict tree, or a tabular extract) or
+    a CSV. A wrong key or tampered keymap raises an error and writes nothing —
+    never partial/garbage output. This is the ONLY component that reconstructs raw
+    values, and only the customer (holding both keymap and key) can run it.
+    """
+    key_file = _opt(key_file)
+    passphrase = _opt(passphrase)
+    keymap = _opt(keymap)
+
+    from ontoforge.anonymizer import DecipherError, EncryptedKeyMap
+    from ontoforge.anonymizer import decipher as _decipher
+
+    if not results_file.is_file():
+        console.print(f"[red]results file {results_file} not found[/]")
+        raise typer.Exit(code=1)
+
+    keymap_path = keymap if keymap is not None else results_file.parent / KEYMAP_FILENAME
+    if not keymap_path.is_file():
+        console.print(
+            f"[red]keymap {keymap_path} not found — pass --keymap <path> "
+            f"(the {KEYMAP_FILENAME} written by `ontoforge anonymize`)[/]"
+        )
+        raise typer.Exit(code=1)
+    key = _read_key(key_file, passphrase)
+    enc = EncryptedKeyMap.from_bytes(keymap_path.read_bytes())
+
+    suffix = results_file.suffix.lower()
+    is_csv = suffix == ".csv"
+    try:
+        if is_csv:
+            import csv
+
+            with results_file.open(newline="", encoding="utf-8") as fh:
+                rows = list(csv.reader(fh))
+            decoded = _decipher(rows, enc, key)
+        else:
+            obj = json.loads(results_file.read_text(encoding="utf-8"))
+            decoded = _decipher(obj, enc, key)
+    except DecipherError as exc:
+        console.print(
+            f"[red]decipher failed: {exc}[/] — wrong key or tampered keymap; nothing was written"
+        )
+        raise typer.Exit(code=1)
+    except json.JSONDecodeError as exc:
+        console.print(f"[red]{results_file} is not valid JSON: {exc}[/]")
+        raise typer.Exit(code=1)
+
+    if out is not None:
+        out_path = out
+    else:
+        out_path = results_file.with_suffix(f".decoded{suffix}")
+    if is_csv:
+        import csv
+
+        with out_path.open("w", newline="", encoding="utf-8") as fh:
+            csv.writer(fh).writerows(decoded)
+    else:
+        out_path.write_text(json.dumps(decoded, indent=1, ensure_ascii=False), encoding="utf-8")
+    console.print(f"[green]deciphered -> {out_path}[/] (every token substituted back to raw, locally)")
+
+
 @app.command()
 def serve(
     project: Path = _PROJECT_OPT,

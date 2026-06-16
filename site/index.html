@@ -14,7 +14,7 @@
   <a class="wordmark" href="index.html"><span class="wm-mark"></span>OntoForge</a>
   <div class="nav-links">
     <a href="index.html#how">How it works</a>
-    <a href="index.html#trust">Trust</a>
+    <a href="trust.html">Trust</a>
     <a href="pricing.html">Pricing</a>
     <a href="demo.html">See the magic</a>
     <a class="cta-nav" href="index.html#signup">Request access</a>
@@ -154,6 +154,9 @@
             <li>Keyless and deterministic core: no API key required, no network at runtime.</li>
             <li>Maps one-to-one to EU&nbsp;AI&nbsp;Act Article&nbsp;10 data-provenance and as-of reconstruction.</li>
           </ul>
+          <p style="margin-top:1.4rem">
+            <a class="btn btn-forge" href="trust.html">See the full trust architecture &rarr;</a>
+          </p>
         </div>
         <aside class="boundary" aria-label="Trust boundary diagram">
           <div class="zone you">
@@ -167,8 +170,38 @@
             <div class="zline">induce &middot; resolve &middot; validate &middot; answer</div>
             <div class="zline" style="margin-top:.4rem;color:var(--walnut)">sees no identifiable values, ever</div>
           </div>
+          <div class="barrier">&uarr; token-bearing results &uarr;</div>
+          <div class="zone you">
+            <div class="zlabel">Your environment</div>
+            <div class="zline">token answer &rarr; decipher(<span class="zkey">key</span>)</div>
+            <div class="zline" style="margin-top:.4rem;color:var(--walnut)">you read real values; we never did</div>
+          </div>
         </aside>
       </div>
+
+      <!-- one-click flow + auditability, abbreviated; full detail on trust.html -->
+      <div class="flow" style="margin-top:3rem">
+        <div class="fstage home">
+          <p class="fzone">Your environment</p>
+          <h3>1 &middot; Anonymize</h3>
+          <p>The local toolkit tokenizes your records and keeps the key on your machine. The key never touches the wire.</p>
+        </div>
+        <div class="farrow" aria-hidden="true">&rarr;</div>
+        <div class="fstage cloud">
+          <p class="fzone">OntoForge compute</p>
+          <h3>2 &middot; Compute</h3>
+          <p>The engine induces, resolves, and answers over the anonymized input &mdash; and returns token-bearing results.</p>
+        </div>
+        <div class="farrow" aria-hidden="true">&rarr;</div>
+        <div class="fstage home">
+          <p class="fzone">Your environment</p>
+          <h3>3 &middot; Decipher</h3>
+          <p>The toolkit reverses the tokens against your local key. You read real, cited answers; we never saw them.</p>
+        </div>
+      </div>
+      <p class="flow-note">
+        and the toolkit is <span class="key">open-source</span>, so your security team can audit the boundary &mdash; not take it on faith.
+      </p>
     </div>
   </section>
 
@@ -253,7 +286,7 @@
     <span class="fmark"><span class="wm-mark" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--marigold);margin-right:.5em"></span>OntoForge</span>
     <div class="flinks">
       <a href="index.html#how">How it works</a>
-      <a href="index.html#trust">Trust</a>
+      <a href="trust.html">Trust</a>
       <a href="pricing.html">Pricing</a>
       <a href="demo.html">Demo</a>
       <a href="index.html#signup">Request access</a>

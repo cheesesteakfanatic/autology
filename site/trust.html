@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trust — OntoForge never sees your raw data</title>
+<meta name="description" content="Client-side anonymization where you hold the key. Raw records stay on your machine; only tokens cross to the cloud. The engine computes on anonymized input and returns token-bearing answers you decipher locally. The toolkit is open-source so you can audit the boundary yourself — a compliance wedge for regulated buyers.">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%23D09735'/%3E%3C/svg%3E">
+</head>
+<body>
+
+<nav class="nav">
+  <a class="wordmark" href="index.html"><span class="wm-mark"></span>OntoForge</a>
+  <div class="nav-links">
+    <a href="index.html#how">How it works</a>
+    <a href="trust.html" class="active">Trust</a>
+    <a href="pricing.html">Pricing</a>
+    <a href="demo.html">See the magic</a>
+    <a class="cta-nav" href="index.html#signup">Request access</a>
+  </div>
+</nav>
+
+<header class="trust-hero">
+  <div class="wrap">
+    <span class="eyebrow">Trust architecture &middot; customer holds the key</span>
+    <h1>We never see your <em>raw data</em>.</h1>
+    <p class="claim">The question stops being &ldquo;do I trust their SOC&nbsp;2?&rdquo; and becomes &ldquo;they <em>cannot</em> see my identifiable data.&rdquo;</p>
+    <p class="lede">
+      You run a local toolkit that anonymizes records on your own machine. You hold the only key
+      that turns a token back into a real value. The engine computes on the anonymized input and
+      returns token-bearing answers &mdash; which the toolkit deciphers locally, against your key,
+      after the result has crossed back. That is a <b>mathematical</b> answer to a procurement
+      question, not a promise.
+    </p>
+    <div class="cta-row" style="display:flex;gap:.9rem;flex-wrap:wrap">
+      <a class="btn btn-forge btn-lg" href="index.html#signup">Talk to us before August 2nd &rarr;</a>
+      <a class="btn btn-lg" href="#audit">How an auditor verifies it</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- THE BOUNDARY -->
+  <section class="section" id="boundary">
+    <div class="wrap">
+      <div class="trust-grid">
+        <div class="trust-copy">
+          <span class="eyebrow">The boundary</span>
+          <h2>Raw stays on your machine. Only tokens cross.</h2>
+          <p>
+            A solo company can't out-<em>attest</em> a hyperscaler &mdash; there's no SOC&nbsp;2 that
+            beats Microsoft's. So we don't run the attestation race. We <em>remove the question</em>
+            the attestation was meant to answer.
+          </p>
+          <p>
+            The only thing that ever crosses toward OntoForge is anonymized input. The only thing
+            that crosses back is a token-bearing result. The key that maps tokens to identities is
+            generated, stored, and used <b>exclusively inside your environment</b>. We hold no copy
+            and have no way to request one.
+          </p>
+          <ul class="trust-list">
+            <li>A breach of the cloud exposes anonymized data, not PII &mdash; the blast radius is capped by construction.</li>
+            <li>A subpoena served on us returns tokens, not identities.</li>
+            <li>Per-tenant learning stays isolated &mdash; one customer's patterns never leak into another's.</li>
+          </ul>
+        </div>
+        <aside class="boundary" aria-label="Trust boundary diagram">
+          <div class="zone you">
+            <div class="zlabel">Your environment</div>
+            <div class="zline">raw records &rarr; anonymize(<span class="zkey">key</span>)</div>
+            <div class="zline" style="margin-top:.4rem;color:var(--walnut)">the <span class="zkey">key</span> never leaves this box</div>
+          </div>
+          <div class="barrier">&darr; anonymized input only &darr;</div>
+          <div class="zone cloud">
+            <div class="zlabel">OntoForge compute</div>
+            <div class="zline">induce &middot; resolve &middot; validate &middot; answer</div>
+            <div class="zline" style="margin-top:.4rem;color:var(--walnut)">sees no identifiable values, ever</div>
+          </div>
+          <div class="barrier">&uarr; token-bearing results &uarr;</div>
+          <div class="zone you">
+            <div class="zlabel">Your environment</div>
+            <div class="zline">token answer &rarr; decipher(<span class="zkey">key</span>)</div>
+            <div class="zline" style="margin-top:.4rem;color:var(--walnut)">you read real values; we never did</div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE ONE-CLICK FLOW -->
+  <section class="section alt" id="flow">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">The one-click flow</span>
+        <h2>Anonymize on the way in. Decipher on the way out.</h2>
+        <p>To you it's two clicks bracketing the normal workflow. The key is the hinge &mdash; and it stays home.</p>
+      </div>
+      <div class="flow">
+        <div class="fstage home">
+          <p class="fzone">Your environment</p>
+          <h3>1 &middot; Anonymize</h3>
+          <p>Point the local toolkit at your sources. It generates a key on first run, stores it in your environment, and emits an anonymized copy the engine can consume.</p>
+          <p class="fmono">the <span class="key">key</span> never touches the wire</p>
+        </div>
+        <div class="farrow" aria-hidden="true">&rarr;</div>
+        <div class="fstage cloud">
+          <p class="fzone">OntoForge compute</p>
+          <h3>2 &middot; Compute</h3>
+          <p>The engine runs the full pipeline &mdash; induce, resolve, materialize, ask &mdash; over the anonymized input. Everything it returns is token-bearing.</p>
+          <p class="fmono">operates on tokens, returns tokens</p>
+        </div>
+        <div class="farrow" aria-hidden="true">&rarr;</div>
+        <div class="fstage home">
+          <p class="fzone">Your environment</p>
+          <h3>3 &middot; Decipher</h3>
+          <p>The toolkit reverses each token against your local key &mdash; locally. You read a normal, fully-identified answer with value-level citations.</p>
+          <p class="fmono">you see real values; we never did</p>
+        </div>
+      </div>
+      <p class="flow-note">the <span class="key">key</span> is generated, stored, and used only inside your environment &middot; OntoForge holds no copy</p>
+    </div>
+  </section>
+
+  <!-- WHY THE ENGINE STILL WORKS -->
+  <section class="section" id="works">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Join-preserving by design</span>
+        <h2>&ldquo;If you scramble my data, how does the engine still find the join?&rdquo;</h2>
+        <p>Because the anonymization is structure-preserving, not destructive. The engine works on relationships <i>between</i> values &mdash; never on the literal values themselves.</p>
+      </div>
+      <div class="props">
+        <div class="prop-card">
+          <p class="pk">same value &rarr; same token</p>
+          <h3>Equality is preserved</h3>
+          <p>A tail number in a registry table and in a maintenance table become the <i>same</i> token, so join discovery sees the value overlap exactly as it would on raw data &mdash; and the look-alike killer still fires.</p>
+        </div>
+        <div class="prop-card">
+          <p class="pk">cardinality &middot; nulls &middot; overlap</p>
+          <h3>Distribution shape is preserved</h3>
+          <p>Tokenization is a bijection on the value domain, so cardinality, null rate, value-set overlap, and key-uniqueness are identical over tokens. The confidence proxy is unchanged.</p>
+        </div>
+        <div class="prop-card">
+          <p class="pk">you choose, per column</p>
+          <h3>Only the needed shape survives</h3>
+          <p>You declare per column what semantic shape must cross &mdash; numeric measures stay rangeable, identifiers become opaque tokens. The toolkit guarantees that shape and nothing more.</p>
+        </div>
+      </div>
+      <p style="margin-top:1.8rem;max-width:46rem;color:var(--walnut);font-size:var(--fs-2);line-height:1.6">
+        The induced ontology, the resolved entities, the typed relationships, and the per-value
+        provenance ledger are all computed correctly on tokens &mdash; and every citation points at
+        a token. <b>Provenance survives the round trip:</b> exported AMBER estates reference tokens
+        too, so the bundle is anonymized at rest. Hold the key and you can replay and decipher it;
+        without the key, it's just tokens.
+      </p>
+    </div>
+  </section>
+
+  <!-- AUDITABILITY / OPEN SOURCE -->
+  <section class="section alt" id="audit">
+    <div class="wrap">
+      <div class="trust-grid">
+        <div class="trust-copy">
+          <span class="eyebrow">Auditability</span>
+          <h2>We open-source the toolkit so you can audit the boundary yourself.</h2>
+          <p>
+            The whole claim is &ldquo;we never see your raw data.&rdquo; The only way to make that
+            <em>verifiable</em> rather than asserted is to let your security team read the exact code
+            that runs in your environment, against your key.
+          </p>
+          <p>
+            And the moat doesn't live in the toolkit. Our proprietary inventions &mdash; the
+            distribution-aware confidence proxy, the execute-the-join validator, the typed-relationship
+            ensemble, the bitemporal provenance store &mdash; are the closed core. The anonymizer is a
+            client-side boundary tool. <b>Opening it costs no moat and buys maximal trust.</b>
+          </p>
+        </div>
+        <ol class="audit" aria-label="What an auditor verifies">
+          <li><div><span class="ai-t">The key never leaves.</span><div class="ai-d">Read the open-source toolkit; capture egress during anonymize and confirm no code path transmits the key.</div></div></li>
+          <li><div><span class="ai-t">Only tokens cross.</span><div class="ai-d">Capture egress during a full run; confirm the payload is tokens, and a known sensitive value never appears on the wire.</div></div></li>
+          <li><div><span class="ai-t">Equality is the only default.</span><div class="ai-d">Confirm tokenization is a deterministic bijection per field-class &mdash; the explicit knob trading join utility against residual risk.</div></div></li>
+          <li><div><span class="ai-t">The result deciphers locally.</span><div class="ai-d">Confirm the decipher step runs in your environment against the local key, and the returned payload is token-bearing.</div></div></li>
+          <li><div><span class="ai-t">Export stays anonymized.</span><div class="ai-d">Confirm AMBER bundles and the provenance ledger reference tokens &mdash; the estate is anonymized at rest and needs the local key.</div></div></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPLIANCE WEDGE -->
+  <section class="section" id="compliance">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">For the regulated buyer</span>
+        <h2>One architecture, several obligations answered at once.</h2>
+        <p>For an EU-exposed or FAA/DoD-adjacent buyer, customer-holds-the-key is the cleanest answer to overlapping requirements &mdash; because the vendor never <i>receives</i> identifiable data in the first place.</p>
+      </div>
+      <div class="comply">
+        <div class="cw">
+          <p class="cwk">Data minimization &middot; GDPR</p>
+          <h3>No vendor-side PII to assess</h3>
+          <p>The vendor never holds identifiable data, so a large part of the data-processing-agreement and DPIA burden collapses &mdash; there's no vendor-side PII processing to audit.</p>
+        </div>
+        <div class="cw">
+          <p class="cwk">EU AI Act &middot; Article 10</p>
+          <h3>Provenance &amp; as-of reconstruction</h3>
+          <p>The boundary composes with per-value provenance: the ledger records which token produced which answer, and you reconstruct the identified lineage locally.</p>
+        </div>
+        <div class="cw">
+          <p class="cwk">Sovereignty &middot; DORA</p>
+          <h3>Identifiable values never transit</h3>
+          <p>Raw values never leave your jurisdiction or environment &mdash; only tokens cross. Residency follows from the architecture, not a contractual promise.</p>
+        </div>
+        <div class="cw">
+          <p class="cwk">Breach blast radius</p>
+          <h3>A structural cap, not a mitigation</h3>
+          <p>A vendor-side incident exposes anonymized data, not identities. The cap on exposure is built in &mdash; it isn't a procedure that can be skipped under pressure.</p>
+        </div>
+      </div>
+      <p style="margin-top:1.8rem;max-width:46rem;color:var(--walnut);font-size:var(--fs-2);line-height:1.6">
+        Your security review changes shape: instead of auditing whether we <i>handle</i> PII
+        correctly, you confirm &mdash; by reading open-source code and capturing the egress &mdash;
+        that we never <i>receive</i> it. For a first design partner, that's frequently a shorter path
+        to &ldquo;yes&rdquo; than a certification, because it removes the data-exposure question
+        rather than auditing it.
+      </p>
+    </div>
+  </section>
+
+  <!-- HONESTY NOTE -->
+  <section class="section alt" id="honesty">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">No overselling</span>
+        <h2>Demo-grade cipher today; a real KMS in production.</h2>
+        <p>A trust product that hides its own limitations is not a trust product. So we state the distinction in writing.</p>
+      </div>
+      <div class="honesty">
+        <h3>What's true today, and what production adds</h3>
+        <p>
+          The reference toolkit uses a <b>demo-grade, deterministic tokenization cipher</b>. It is
+          correct about the property that matters &mdash; same value to the same token, structure
+          preserved, key held locally &mdash; and is sufficient to demonstrate and audit the whole
+          boundary end to end. It is <b>not</b> a hardened cryptographic deployment.
+        </p>
+        <p>
+          A production deployment wants a <b>real key-management system</b>: keys generated and
+          rotated in a customer-controlled KMS or HSM, per-field key derivation, authenticated
+          tokenization, and an explicit threat model for the residual inference risks any
+          deterministic scheme carries (frequency analysis on low-cardinality fields; correlation
+          across joins). The field-class policy is where you trade join utility against those risks.
+        </p>
+        <p>
+          <b>What does not change between the two</b> is the architecture: the key lives in your
+          environment, OntoForge computes on tokens, and the result is deciphered locally. The cipher
+          is an implementation detail behind a boundary that is the actual product.
+        </p>
+      </div>
+      <p style="margin-top:1.6rem;font-size:var(--fs-2);color:var(--walnut)">
+        The full architecture &mdash; for a buyer and for an auditor &mdash; is written up in
+        <span class="mono" style="color:var(--walnut)">docs/ANONYMIZATION.md</span> in the repository.
+      </p>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section" id="signup-cta">
+    <div class="wrap">
+      <div class="capture">
+        <h2>Make &ldquo;they can't see our data&rdquo; your procurement answer.</h2>
+        <p>EU&nbsp;AI&nbsp;Act Article&nbsp;10 lands August&nbsp;2nd. If your review hinges on data exposure, the cleanest answer is that there is none. Let's talk before the deadline.</p>
+        <div style="display:flex;gap:.9rem;justify-content:center;flex-wrap:wrap;margin-top:.4rem">
+          <a class="btn btn-forge btn-lg" href="index.html#signup">Request design-partner access &rarr;</a>
+          <a class="btn btn-lg" href="demo.html">See the engine work</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span class="fmark"><span class="wm-mark" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--marigold);margin-right:.5em"></span>OntoForge</span>
+    <div class="flinks">
+      <a href="index.html#how">How it works</a>
+      <a href="trust.html">Trust</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="demo.html">Demo</a>
+      <a href="index.html#signup">Request access</a>
+    </div>
+    <p class="fnote">
+      Client-side anonymization means a breach exposes anonymized data, not PII; the customer holds the
+      traceable-ID key, and OntoForge computes only on anonymized input. The toolkit is open-shell and
+      open-sourceable so the boundary can be audited. Architected now, built after connectors and auth;
+      the runtime engine remains keyless and offline.
+    </p>
+  </div>
+</footer>
+
+<script>
+// Active-nav highlight by page (shared pattern with the other pages).
+(function () {
+  var path = location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-links a').forEach(function (a) {
+    if ((a.getAttribute('href') || '') === path) a.classList.add('active');
+  });
+})();
+</script>
+</body>
+</html>

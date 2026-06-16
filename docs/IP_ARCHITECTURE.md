@@ -54,12 +54,30 @@ through its published entrypoints** (the package `__init__` and the shared
 | `server` | FastAPI REST API + the web UI (the product surface) |
 | `pipeline` | stage orchestration / scaffolding (`atlas`, `discover`, `mapping`, `playground`) |
 | `engineer` | the common-language DE layer that *composes* closed-core ops |
-| anonymizer | the future client-side anonymization toolkit (§7) — not yet built |
+| `anonymizer` | the client-side anonymization toolkit (§7) — **built (W5-TRUST)**, open-shell |
 
 `pipeline` and `engineer` are scaffolding that **orchestrate** the closed core:
 they import its published entrypoints (`relationships.discover_relationships`,
 `validation.validate_join`, `ensemble.RelationshipGate`) and the shared
 `contracts`, but they are not themselves the inventions.
+
+`anonymizer` (W5-TRUST, §7) is the **flagship open-shell deliverable** — the part
+we *want* customers to audit, because open-sourcing it is the trust play: anyone
+can read it and confirm the raw never leaves the building. It runs entirely on the
+**customer machine** (one-click anonymize on the way in, decipher on the way out),
+the customer holds the key, and the engine computes only on tokens. It is itself
+open-sourceable: it imports the engine **only** via published entrypoints
+(`ontoforge.relationships`, `ontoforge.profiling`) and `ontoforge.contracts`, plus
+the established `aimodels.secure` PII patterns; it keeps its own table-normalization
+(`anonymizer/_values_local.py`) LOCAL rather than reaching into `profiling._values`,
+so it touches **no** closed-core internal submodule. Stdlib-only crypto, keyless,
+zero-network. (The keymap cipher is documented demo-grade, not an audited KMS — see
+`docs/ANONYMIZATION.md` §5.)
+
+> **Boundary-guard note.** `tests/test_ip_boundary.py` currently scans `server` and
+> `cdc`. `anonymizer` already complies with the open-shell discipline (entrypoint-
+> only engine imports); adding it to the guard's `OPEN_SHELL` scan list is a safe
+> future tightening, not a fix — there is nothing for it to find today.
 
 ## What the import guard enforces (`tests/test_ip_boundary.py`)
 

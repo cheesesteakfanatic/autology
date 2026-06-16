@@ -14,7 +14,7 @@ typed amendments in [docs/DEVIATIONS.md](docs/DEVIATIONS.md).
 
 ```bash
 uv sync --all-extras
-uv run pytest tests/ -q          # full suite (1720 tests)
+uv run pytest tests/ -q          # full suite (1761 tests)
 
 # One line, zero setup — the Meridian enterprise estate (10 tables, ~9,000 rows
 # of supply-chain/retail/quality data, regenerated from code, full pipeline):
@@ -37,6 +37,14 @@ uv run ontoforge ingest -p mydb            # snapshot-diff pull into the ledger 
 
 # Decide a SMART subset before pulling everything — Plan mode (governed, joinability-preserving):
 uv run ontoforge plan -p myproject --budget 500   # → plan_subset.json + a PlanReport
+
+# NEVER SEND US RAW DATA — anonymize on YOUR machine, we compute on the tokens (open-shell, §7):
+uv run ontoforge anonymize /path/to/your/data --out data_anon --key-file customer.key
+#   → tokenized *.csv/*.parquet + an ENCRYPTED keymap (keymap.ofx); join/structure-preserving,
+#     so the engine finds the SAME relationships on tokens as on raw. The key never leaves you.
+uv run ontoforge init myproject --source data_anon && uv run ontoforge profile -p myproject  # compute on tokens
+uv run ontoforge decipher engine_answer.json --keymap data_anon/keymap.ofx --key-file customer.key
+#   → decode the result back to raw, locally (wrong key → error, never garbage)
 
 # Or the bundled aviation demo estate:
 uv run ontoforge init demo
@@ -215,6 +223,34 @@ CostMeter substrate (it recomputes nothing); the Ask flywheel is closed-core.
   fingerprint — any drift (a cited cell was edited or recommitted) is a miss that recomputes, so a
   **stale or confidently-wrong cached answer is never served**; abstentions, clarifications, empty and
   cheap single-type answers are never cached at all. Tenant-namespaced.
+
+## We never see your raw data (client-side anonymization, §7)
+
+The trust architecture: **the customer holds the key, anonymizes on their own machine, and only
+tokens ever cross the boundary** — OntoForge runs all compute on the anonymized input and never sees
+a raw value. The toolkit (`ontoforge.anonymizer`, **open shell** — we *want* you to audit it) is
+keyless, zero-network, stdlib-crypto only.
+
+- **One-click round trip.** `ontoforge anonymize <dir> --key-file <k> --out <dir>` tokenizes every
+  CSV/Parquet and writes the anonymized copies plus an **encrypted keymap** (`keymap.ofx`); compute on
+  the anonymized dir; `ontoforge decipher <result> --keymap <k.ofx> --key-file <k>` decodes the engine's
+  answer back to raw, locally. The key never leaves your machine; a wrong key raises an error and writes
+  nothing (never partial/garbage output).
+- **Join- and structure-preserving tokenization — so the engine still works.** Equal raw value → equal
+  token (HMAC-SHA256, optional format-preserving), so a value that joins across tables **still joins**
+  after anonymization. Numerics go through a keyed strictly-monotone affine map (integer columns use an
+  **injective** integer map so distinct keys never collapse — order, decile shape, key-uniqueness AND
+  numeric joins all survive); dates through a keyed, order-preserving map that always renders a **valid**
+  date (the `9999-12-31` ERP sentinel wraps safely instead of overflowing). What's tokenized is a
+  `Policy`: a PII classifier (email/phone/SSN/card/name) plus explicit per-column allow/deny.
+- **THE PROOF** (`tests/anonymizer/test_proof.py`): `relationships.discover_relationships` returns the
+  **IDENTICAL** typed-relationship set over the RAW tables and the ANONYMIZED tables — the FK is typed
+  `FK_JOIN` with the same proxy confidences in both, a disjoint pair stays `UNRELATED` — so joinability
+  **and** the distribution-divergence false-positive killer both survive tokenization.
+- **Honest about the cipher.** The keymap is sealed with a documented, **demo-grade** stdlib cipher
+  (SHA256-CTR XOR + encrypt-then-MAC, versioned, tamper-evident) — **not** an audited KMS. The
+  architecture is what matters; swapping in a production KMS/AEAD is a clean drop-in. Full trust story:
+  [docs/ANONYMIZATION.md](docs/ANONYMIZATION.md) (buyer + auditor) and `site/trust.html`.
 
 ## Architecture
 
