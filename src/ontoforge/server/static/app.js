@@ -3,25 +3,10 @@
    SECURITY INVARIANT: every piece of API data enters the DOM through el()/
    document.createTextNode — nothing interpolated is ever assigned to innerHTML.
 
-   THREE MODES, one always-visible segmented switcher in the top bar:
-     ASK    — the questioner: a centered question box + cited answers.
-     BUILD  — the dashboard/data builder: measure + dimensions → proposals,
-              Extract (CSV slice) + Export (the whole portable dataset).
-     STUDIO — the data-engineer's playground: Catalog, Data Map (live joins),
-              the plain-English Console, Confirm suggestions, Activity —
-              powered by the window manager + dock (Studio's substrate only).
+   THREE MODES (one always-visible switcher): ASK the questioner, BUILD the
+   dashboard/data builder, STUDIO the windowed data-engineering desktop. */
 
-   Layers:
-     js/core.js       shared kernel helpers (el/api/store/ontology cache)
-     js/bus.js        the inter-app bus (namespaced intents)
-     js/modes.js      the three-mode shell controller
-     js/surfaces/*    the ASK and BUILD single-surface modes
-     js/wm.js         the window manager (Studio power tools)
-     js/dock.js       the Studio dock
-     js/spotlight.js  the front door (⌘K / just type; /api/search)
-     js/apps/*        the Studio micro-apps, registered in js/apps/registry.js */
-
-import { $, api, fmt, loadOntology, store, workspaceState } from "./js/core.js";
+import { $, api, fmt, loadOntology, store, workspaceState, svgEl, clear } from "./js/core.js";
 import { createBus } from "./js/bus.js";
 import { createModeShell, MODES } from "./js/modes.js";
 import { createAskSurface } from "./js/surfaces/ask.js";
@@ -246,11 +231,27 @@ $("#spotlight-hint").addEventListener("click", () => spotlight.toggle());
 
 /* ───────────────────────────────────────────────── theme (warm default) */
 const THEME_KEY = "ontoforge.theme";
+/* sun (shown in Observatory/dark → tap to go warm) vs crescent moon
+   (shown in Atelier/warm → tap to go dark), built XSS-safe via svgEl. */
+function themeIcon(theme) {
+  const ic = svgEl("svg", {
+    viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",
+    "stroke-width": "1.6", "stroke-linecap": "round", "stroke-linejoin": "round",
+    "aria-hidden": "true",
+  });
+  if (theme === "dark") {
+    ic.append(svgEl("circle", { cx: "12", cy: "12", r: "4.2" }));
+    ic.append(svgEl("path", { d: "M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4" }));
+  } else {
+    ic.append(svgEl("path", { d: "M20 14.5A8 8 0 1 1 9.5 4a6.3 6.3 0 0 0 10.5 10.5z" }));
+  }
+  return ic;
+}
 function applyTheme(theme) {
   if (theme === "dark") document.documentElement.setAttribute("data-theme", "dark");
   else document.documentElement.removeAttribute("data-theme");
   const t = $("#theme-toggle");
-  if (t) t.textContent = theme === "dark" ? "☼" : "☽";
+  if (t) clear(t).append(themeIcon(theme));
 }
 applyTheme(store.get(THEME_KEY, "warm"));
 $("#theme-toggle").addEventListener("click", () => {

@@ -1,19 +1,35 @@
-/* ASK — the questioner. The default landing: a single large, centered
-   question box, a marigold Ask button, suggested questions generated from
-   the model, and recent questions. After you ask, a cited answer card
-   appears with inline "Where this came from" dots; tapping one opens the
-   read-only Sources panel beside the answer. No window chrome, no dock.
-   De-jargon (presentation only): atoms → "source records"; Evidence →
-   "Where this came from"; abstention → "won't guess". API routes
-   (/api/ask, /api/ask/clarify, /api/atoms) keep their internal names. */
+/* ASK — the questioner. A centered hero + question box + suggested/recent
+   questions; cited answers with inline "Where this came from" dots opening a
+   read-only Sources panel. De-jargon is presentation-only (atoms → source
+   records); API routes keep their internal names. SECURITY: data → el()/svgEl()
+   only, never innerHTML. */
 
 import {
-  el, clear, api, errorNote, confGauge, skeletonCard, store,
+  el, svgEl, clear, api, errorNote, confGauge, skeletonCard, store,
   loadOntology, ontologyNow, hueFor, workspaceState,
 } from "../core.js";
 
 const RECENT_KEY = "ontoforge.recent.questions";
 const ATOM_URI_RE = /^atom:\/\/([^/]+)\/([^/]+)\/(.+?)(?:#(.*))?$/;
+
+/* the leading sparkle that sits inside the ask field (XSS-safe svgEl) */
+function sparkIcon(size) {
+  return svgEl("svg", {
+    class: "ask-spark", width: String(size), height: String(size),
+    viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",
+    "stroke-width": "1.6", "stroke-linecap": "round", "stroke-linejoin": "round",
+    "aria-hidden": "true",
+  }, svgEl("path", { d: "M12 3l1.9 5.6L19.5 10l-5.6 1.4L12 17l-1.9-5.6L4.5 10l5.6-1.4z" }));
+}
+/* the arrow glyph on the Ask button */
+function arrowIcon() {
+  return svgEl("svg", {
+    class: "go-arrow", width: "16", height: "16",
+    viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",
+    "stroke-width": "2", "stroke-linecap": "round", "stroke-linejoin": "round",
+    "aria-hidden": "true",
+  }, svgEl("path", { d: "M5 12h14M13 6l6 6-6 6" }));
+}
 
 export function createAskSurface({ bus }) {
   let pane = null;
@@ -59,10 +75,15 @@ export function createAskSurface({ bus }) {
     suggestBox.append(el("span", { class: "ask-suggest-head" }, "Try one of these"));
     const chips = el("div", { class: "ask-suggest-chips" });
     for (const q of qs) {
+      const chevron = svgEl("svg", {
+        class: "chip-ic", width: "13", height: "13", viewBox: "0 0 24 24",
+        fill: "none", stroke: "currentColor", "stroke-width": "2",
+        "stroke-linecap": "round", "aria-hidden": "true",
+      }, svgEl("path", { d: "M9 6l6 6-6 6" }));
       chips.append(el("button", {
         class: "chip suggest-chip", type: "button", title: q,
         onclick: () => run(q),
-      }, q));
+      }, chevron, el("span", { class: "chip-txt" }, q)));
     }
     suggestBox.append(chips);
   }
@@ -281,9 +302,12 @@ export function createAskSurface({ bus }) {
       "aria-label": "ask a question about your data",
       placeholder: "Ask anything about your data",
     });
-    const button = el("button", { class: "btn btn-forge ask-go", type: "submit" }, "Ask");
+    const button = el("button", { class: "btn btn-forge ask-go", type: "submit" },
+      "Ask", arrowIcon());
     const form = el("form", { class: "ask-form-big", autocomplete: "off" },
-      el("div", { class: "ask-field-big" }, input, button));
+      el("div", { class: "ask-field-big" },
+        el("span", { class: "ask-field-ic", "aria-hidden": "true" }, sparkIcon(20)),
+        input, button));
 
     suggestBox = el("div", { class: "ask-suggest" });
     historyBox = el("div", { class: "ask-recent" });
@@ -291,6 +315,8 @@ export function createAskSurface({ bus }) {
     sourcesPanel = el("aside", { class: "sources-panel", "aria-label": "where this came from" });
 
     const stage = el("div", { class: "ask-stage" },
+      el("span", { class: "ask-eyebrow" }, "ask anything"),
+      el("h1", { class: "ask-headline" }, "What do you want to know?"),
       el("p", { class: "ask-tagline" },
         "Ask a plain-language question — every answer shows where it came from."),
       form, suggestBox, historyBox);

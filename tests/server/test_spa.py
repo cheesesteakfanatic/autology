@@ -29,13 +29,15 @@ STUDIO_APPS = (
 )
 #: the de-jargoned single-surface modes
 SURFACES = ("ask", "build")
-#: Non-vendor payload budget. Raised from 290 KB to 304 KB to seat the
-#: Observatory micro-app (lineage/audit/runs/compute) — the differentiator
-#: observability surface, ~13.6 KB including its own scoped CSS (kept inside the
-#: app module, NOT the shared stylesheet). Still a hard ceiling: it holds the
-#: shell, the eight Studio apps, and the canvas layer well under the limit, so
-#: any future decorative bloat still trips it.
-PAYLOAD_BUDGET = 304 * 1024
+#: Non-vendor payload budget. Raised from 304 KB to 340 KB to seat the approved
+#: Atelier (warm light :root) / Observatory (warm dark data-theme) redesign —
+#: the user explicitly chose beauty over bytes, accepting a heavier stylesheet
+#: for the dual-theme depth shadows, inset highlights, grain, serif/sans/mono
+#: type, the elevated mode pill, the crafted chips, the gradient-amber ask-card,
+#: and the inline-SVG dock icons. Still a hard ceiling: it holds the shell, the
+#: eight Studio apps, the canvas layer, and BOTH themes under the limit, so any
+#: future decorative bloat beyond the deliberate redesign still trips it.
+PAYLOAD_BUDGET = 340 * 1024
 
 
 def all_js_files():

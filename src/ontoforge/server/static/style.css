@@ -1,13 +1,8 @@
-/* ══════
-   OntoForge OS — WARM, EDITORIAL, GROWN-UP.
-   Warm oatmeal paper, quiet ~2.5% grain; calm window shells (10px radii)
-   capped by a NEUTRAL hairline title strip + a tiny accent (no colored bezel).
-   Espresso ink (never black); small warm-amber shadows (no plastic inset).
-   ONE marigold primary action per view; teal = confirmed/cited. The eight
-   categorical hues are MUTED (25-40% S) and carry INFORMATION only (islands,
-   chips, cite-dots), never decoration. Humanist-sans chrome, a system serif
-   for hero headlines, mono data; small-caps only for tiny eyebrow kickers;
-   270° confidence arc; abstention is dignified taupe, never red.
+/* ══════ OntoForge OS — ATELIER (warm light) + OBSERVATORY (warm dark).
+   Layered cream/white surfaces on a warm-ivory ground, paper grain, espresso
+   ink, soft layered depth + a paper inset edge; ONE burnt-amber primary action
+   per view; teal = confirmed. The eight categorical hues stay MUTED and carry
+   INFORMATION only. System serif for hero, humanist sans chrome, mono data.
    WCAG: espresso/cream 14.7:1, walnut/cream 6:1, teal/cream 7.2:1. ══════ */
 
 :root {
@@ -41,27 +36,18 @@
   --chrome-ink:   #4A3B29;   /* recessed primary chrome */
   --chrome-dim:   #806D56;   /* recessed secondary chrome — AA on cream */
 
-  /* ── marigold: THE one primary-action fill + 'likely' accent ──
-     Muted #E0A126 (75% S) → #D09735 (~62% S). Stays warmer than the wheel: it
-     is the single primary FILL, ink-on-marigold must read (6.26:1). */
   --marigold:     #D09735;
   --marigold-press: #BE892D; /* −6% L on hover/press                      */
   --marigold-wash: rgba(208, 151, 53, 0.13);
   --marigold-line: rgba(208, 151, 53, 0.48);
   --marigold-glow: rgba(208, 151, 53, 0.26);  /* the focus ring halo      */
 
-  /* legacy 'amber' aliases (kept so old hooks still resolve to marigold) */
   --amber:        #D09735;
   --amber-dim:    #86663C;    /* mustard — marigold's text-safe kin */
   --amber-wash:   rgba(208, 151, 53, 0.13);
   --amber-line:   rgba(208, 151, 53, 0.48);
   --amber-glow:   rgba(208, 151, 53, 0.26);
 
-  /* ── the locked 8-hue wheel — MUTED into a 25-40% S band (chroma discipline)
-     Same angle + order (ATLAS_HUES contract, mirrored in js/core.js); color =
-     information (islands/chips/cite-dots), never decoration. Text uses clear
-     AA 4.5:1 on cream (teal 7.2 · terracotta 5.3 · avocado 4.6 · ocean 6.4 ·
-     plum 7.5 · mustard 4.8); dusty-rose decorative only. */
   --teal:         #2C5956;   /* anchor / confirmed */
   --terracotta:   #945442;
   --avocado:      #6C733A;
@@ -82,15 +68,18 @@
   --hairline:        rgba(42, 31, 20, 0.14);
   --hairline-strong: rgba(42, 31, 20, 0.26);
 
-  /* ── warm-amber shadows, never black — SMALLER, no plastic inset highlight
-     (warm cast kept; the bright rgba(255,253,247,0.6) inset is removed) ── */
   --shadow-1: 0 1px 2px rgba(90, 55, 20, 0.09);
-  --shadow-2: 0 4px 14px rgba(90, 55, 20, 0.12);
-  --shadow-3: 0 12px 36px rgba(90, 55, 20, 0.18);
+  --shadow-2: 0 2px 4px rgba(90, 55, 20, 0.06), 0 10px 24px -14px rgba(90, 55, 20, 0.42);
+  --shadow-3: 0 2px 6px rgba(90, 55, 20, 0.07), 0 32px 64px -30px rgba(90, 55, 20, 0.55);
   --recess:   inset 0 1px 2px rgba(90, 55, 20, 0.12);
+  /* the paper-white top edge that lifts a surface off the canvas */
+  --edge-hi:  inset 0 1px 0 rgba(255, 253, 247, 0.9);
+  
+  --burnt:        #B9651B;   /* Atelier primary-action amber              */
+  --burnt-2:      #D27F29;   /* its lighter gradient stop                 */
+  --live:         #1F8A5B;   /* the calm 'live' green                     */
+  --live-glow:    rgba(31, 138, 91, 0.16);
 
-  /* ── type: humanist sans chrome, a SYSTEM serif (no webfont) for hero
-     headlines only, mono data; small-caps reserved for tiny eyebrow kickers ── */
   --sans:  -apple-system, "Inter", "Segoe UI", system-ui, "Helvetica Neue", Arial, sans-serif;
   --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, ui-serif, serif;
   --mono:  ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
@@ -109,19 +98,15 @@
   --ease-std: 180ms cubic-bezier(0.2, 0.8, 0.2, 1); /* open/settle        */
   --ease-out: 160ms cubic-bezier(0.4, 0, 0.6, 1);   /* exit               */
 
-  --menubar-h: 40px;
+  --menubar-h: 58px;
   --dock-h: 64px;
-  /* FORM RESTRAINT: tighter radii read pro; >20px + pills read toy/candy */
+  
   --radius: 8px;
   --radius-win: 10px;
   --radius-pill: 6px;   /* former 999px pills become quiet rounded-rects */
 
-  /* per-window accent: the WM writes --accent on each .window inline.
-     A neutral walnut default keeps unowned chrome warm. */
   --accent: #6B5A45;
 
-  /* z bands: desktop(0) < windows(10–990) < dock(1000) < spotlight(2000)
-     < toasts(3000) */
 }
 
 * { box-sizing: border-box; }
@@ -136,12 +121,12 @@ body {
   font-family: var(--sans);
   font-size: var(--fs-2);
   line-height: 1.55;
-  background: var(--canvas);
+  
+  background:
+    radial-gradient(125% 80% at 50% -12%, #F7EFDD 0%, var(--canvas) 52%, #E3D6BB 100%);
   -webkit-font-smoothing: antialiased;
 }
 
-/* the shared paper-grain tooth: one tiled fractal-noise layer (~2.5%),
-   pinned behind everything; a data-URI, no network at runtime. */
 body::before {
   content: "";
   position: fixed;
@@ -149,6 +134,7 @@ body::before {
   z-index: 0;
   pointer-events: none;
   opacity: 0.025;
+  mix-blend-mode: multiply;    /* paper tooth reads warm against the ground */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
@@ -201,31 +187,39 @@ body.wm-gesture { cursor: inherit; }
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 0 1rem;
-  background: rgba(251, 244, 230, 0.9);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--hairline);
-  box-shadow: var(--shadow-1);
+  padding: 0 1.5rem;
+  background: rgba(251, 244, 230, 0.82);
+  backdrop-filter: blur(12px) saturate(1.1);
+  -webkit-backdrop-filter: blur(12px) saturate(1.1);
+  border-bottom: 0;
   z-index: 1500;
   user-select: none;
 }
 
-/* the wordmark — humanist, quiet; the spark dot is now a small neutral mark */
+.menubar::after {
+  content: "";
+  position: absolute;
+  left: 1.5rem; right: 1.5rem; bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--hairline) 12%, var(--hairline) 88%, transparent);
+}
+html[data-theme="dark"] .menubar { background: rgba(31, 24, 16, 0.72); }
+
 .wordmark {
-  font-family: var(--sans);
-  font-size: 1.0625rem;
+  font-family: var(--serif);
+  font-size: 1.3125rem;
   font-weight: 600;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.012em;
   color: var(--chrome-ink);     /* orientation chrome recedes */
   white-space: nowrap;
 }
+.wm-onto, .wm-forge { color: var(--chrome-ink); }
 .wm-spark {
   display: inline-block;
-  color: var(--marigold);
-  font-size: 0.5em;
-  vertical-align: 0.28em;
-  padding: 0 0.12em;
+  color: var(--burnt);
+  font-size: 0.52em;
+  vertical-align: 0.34em;
+  padding: 0 0.14em;
 }
 
 .mb-meta {
@@ -237,8 +231,17 @@ body.wm-gesture { cursor: inherit; }
   color: var(--chrome-dim);     /* meta header recedes — it's orientation, not the work */
   white-space: nowrap;
 }
-.meta-cell b { color: var(--chrome-ink); font-weight: 500; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.meta-cell b { color: var(--chrome-ink); font-weight: 500; font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
 .meta-cell i { font-style: normal; color: var(--ink-faint); }
+
+.mb-live { display: inline-flex; align-items: center; gap: 0.4em; color: var(--chrome-dim); }
+.mb-live::before {
+  content: "";
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--live);
+  box-shadow: 0 0 0 3px var(--live-glow);
+}
+html[data-theme="dark"] .mb-live::before { box-shadow: 0 0 10px 1px var(--live-glow); }
 
 .spotlight-hint {
   display: inline-flex;
@@ -260,16 +263,16 @@ body.wm-gesture { cursor: inherit; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px; height: 26px;
+  width: 30px; height: 28px;
   background: none;
   border: 1px solid var(--hairline);
   border-radius: 8px;
   color: var(--walnut);
-  font-size: 0.9rem;
   cursor: pointer;
   transition: color var(--ease), border-color var(--ease);
 }
-.theme-toggle:hover { color: var(--ink); border-color: var(--hairline-strong); }
+.theme-toggle:hover { color: var(--burnt); border-color: var(--hairline-strong); }
+.theme-toggle svg { width: 16px; height: 16px; display: block; }
 
 /* ══════ the workspace ground */
 
@@ -284,7 +287,6 @@ body.wm-gesture { cursor: inherit; }
     var(--canvas);
 }
 
-/* the snap preview ghost — a marigold-tinted island, committed on release */
 .snap-preview {
   position: absolute;
   top: 0; left: 0;
@@ -301,8 +303,7 @@ body.wm-gesture { cursor: inherit; }
 }
 .snap-preview.visible { opacity: 1; }
 
-/* ══════ window chrome — a calm cream shell + a hairline title strip
-   carrying a thin accent underline (no colored bezel). */
+/* ══════ window chrome — a calm cream shell + a hairline title strip */
 
 .window {
   position: absolute;
@@ -328,7 +329,6 @@ body.wm-gesture { cursor: inherit; }
 .window:focus-within.focused { box-shadow: var(--shadow-2), 0 0 0 2px var(--marigold-glow); }
 .window.minimized { display: none; }
 
-/* transitions are for programmatic moves ONLY — never during a drag */
 .window.win-animate {
   transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
               width 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
@@ -341,9 +341,6 @@ body.wm-gesture { cursor: inherit; }
 }
 .window.win-gesture, .window.win-gesture * { transition: none !important; }
 
-/* NEUTRAL title strip: a calm cream cap with a hairline border and a thin
-   2px accent underline carrying var(--accent) — color is a quiet marker, not
-   a painted bezel. The work surface, not the chrome, owns the color budget. */
 .titlebar {
   display: flex;
   align-items: center;
@@ -358,8 +355,7 @@ body.wm-gesture { cursor: inherit; }
   flex: none;
   border-radius: calc(var(--radius-win) - 1px) calc(var(--radius-win) - 1px) 0 0;
 }
-/* inactive windows recede: the accent underline quiets so the one focused
-   window's title is unambiguously primary */
+
 .window:not(.focused) .titlebar { border-bottom-color: var(--hairline-strong); }
 .window:not(.focused) .win-title { color: var(--ink-faint); }
 
@@ -384,8 +380,6 @@ body.wm-gesture { cursor: inherit; }
 }
 .win-spacer { flex: 1; order: 4; }
 
-/* the two window controls: quiet neutral disks, glyph on hover — close gets a
-   single restrained terracotta tint, min stays neutral (no traffic-light row) */
 .win-btn {
   position: relative;
   width: 11px;
@@ -417,7 +411,6 @@ body.wm-gesture { cursor: inherit; }
   border-radius: 0 0 calc(var(--radius-win) - 1px) calc(var(--radius-win) - 1px);
 }
 
-/* 8 resize handles; 12px hit areas reach OUTSIDE the visible border */
 .rs { position: absolute; z-index: 3; touch-action: none; }
 .rs-n  { top: -6px; left: 12px; right: 12px; height: 12px; cursor: n-resize; }
 .rs-s  { bottom: -6px; left: 12px; right: 12px; height: 12px; cursor: s-resize; }
@@ -428,25 +421,27 @@ body.wm-gesture { cursor: inherit; }
 .rs-se { bottom: -6px; right: -6px; width: 16px; height: 16px; cursor: se-resize; }
 .rs-sw { bottom: -6px; left: -6px; width: 16px; height: 16px; cursor: sw-resize; }
 
-/* ══════ the dock — one cream bar; rounded-square tiles in their (muted)
-   atlas hue; a small flat marigold dot beneath running apps. */
+/* ══════ the dock — one cream bar; rounded-square tiles in their (muted) */
 
 .dock {
   position: fixed;
-  bottom: 12px;
+  bottom: 26px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 0.3rem;
-  padding: 0.4rem 0.55rem;
-  background: var(--cream);
+  gap: 0.32rem;
+  padding: 0.55rem;
+  background: rgba(252, 248, 239, 0.82);
+  backdrop-filter: blur(12px) saturate(1.1);
+  -webkit-backdrop-filter: blur(12px) saturate(1.1);
   border: 1px solid var(--hairline);
-  border-radius: 12px;
-  box-shadow: var(--shadow-2);
+  border-radius: 18px;
+  box-shadow: var(--edge-hi), var(--shadow-3);
   z-index: 1000;
   user-select: none;
 }
+html[data-theme="dark"] .dock { background: rgba(20, 15, 8, 0.7); }
 
 .dock-apps, .dock-min { display: flex; align-items: center; gap: 0.3rem; }
 
@@ -462,20 +457,32 @@ body.wm-gesture { cursor: inherit; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 0;
-  border-radius: 10px;
+  border: 1px solid transparent;
+  border-radius: 12px;
   cursor: pointer;
-  transition: transform var(--ease), box-shadow var(--ease), filter var(--ease);
+  transition: transform var(--ease), box-shadow var(--ease), color var(--ease), background var(--ease);
 }
-.dock-icon {
-  width: 42px; height: 42px;
-  background: var(--accent, var(--bisque));
-  box-shadow: var(--shadow-1);
-}
-.dock-icon:hover { transform: translateY(-6px); box-shadow: var(--shadow-2); }
-.dock-icon:not(.running) { filter: saturate(0.55) brightness(1.03); }
 
-.dock-icon .di-glyph { font-size: 1.125rem; line-height: 1; color: var(--ink); }
+.dock-icon {
+  width: 44px; height: 44px;
+  background: transparent;
+  color: var(--chrome-dim);
+}
+.dock-icon:hover { transform: translateY(-5px); color: var(--ink); }
+
+.dock-icon.running {
+  color: var(--burnt);
+  background: var(--cream);
+  border-color: var(--hairline);
+  box-shadow: var(--edge-hi);
+}
+html[data-theme="dark"] .dock-icon.running {
+  background: linear-gradient(180deg, var(--warm-white), var(--cream));
+  box-shadow: var(--edge-hi), 0 0 18px -4px rgba(231, 166, 52, 0.5);
+}
+
+.dock-icon .di-glyph { display: inline-flex; color: currentColor; }
+.dock-icon .di-svg { display: block; }
 
 /* small-caps label chip floats above the icon on hover */
 .di-label {
@@ -501,8 +508,6 @@ body.wm-gesture { cursor: inherit; }
   transform: translateX(-50%) translateY(0);
 }
 
-/* the running indicator: a small flat marigold dot beneath the tile
-   (the conic starburst + scale(2) bounce were the literal 'childish' tell) */
 .di-dot {
   position: absolute;
   bottom: -6px;
@@ -533,9 +538,7 @@ body.wm-gesture { cursor: inherit; }
 .dock-tile .di-label { font-variant: normal; text-transform: none; }
 .dock-tile span:not(.di-label) { letter-spacing: 0.01em; }
 
-/* ══════ spotlight
-   Elevation-3 modal on a 32% espresso scrim with blur. A single warm-white
-   card; the selected row carries a marigold left-edge bar + bisque fill. */
+/* ══════ spotlight */
 
 .spotlight {
   position: fixed;
@@ -615,7 +618,7 @@ body.wm-gesture { cursor: inherit; }
 }
 .spot-item .si-title.serif { font-style: italic; }
 .spot-item .si-title.mono { font-family: var(--mono); font-size: var(--fs-1); }
-/* a disambiguating uri/ref tail appended to non-unique entity labels */
+
 .si-disamb { color: var(--ink-faint); font-family: var(--mono); font-size: 0.85em; }
 .spot-item .si-sub {
   font-size: var(--fs-0);
@@ -679,7 +682,6 @@ body.wm-gesture { cursor: inherit; }
 .btn:active:not(:disabled) { transform: translateY(1px); }
 .btn:disabled { opacity: 0.45; cursor: default; }
 
-/* THE single marigold-filled primary action — espresso ink, never white */
 .btn-forge {
   color: var(--ink);
   background: var(--marigold);
@@ -752,7 +754,6 @@ input[type="text"]::placeholder { color: var(--ink-faint); }
 }
 @keyframes shimmer { 100% { transform: translateX(100%); } }
 
-/* SOFT category tag = hue tint + hue text + hue border (set inline by JS) */
 .chip {
   display: inline-flex;
   align-items: baseline;
@@ -783,13 +784,11 @@ input[type="text"]::placeholder { color: var(--ink-faint); }
   padding: 0.0625rem 0.5rem;
   white-space: nowrap;
 }
-/* the 'amber' badge → a soft teal-confirmed pill, text-safe on cream */
+
 .badge-amber { color: var(--teal); border-color: rgba(31, 111, 107, 0.45); background: rgba(31, 111, 107, 0.10); }
 .badge-btn { cursor: pointer; }
 .badge-btn:hover { border-color: var(--teal); }
 
-/* data tables: bisque sticky header, hairline horizontal rules ONLY,
-   mono numerics, no vertical grid, no zebra (airy, mid-century) */
 table.data {
   border-collapse: collapse;
   width: 100%;
@@ -832,7 +831,6 @@ table.data tbody tr:hover td { background: rgba(227, 214, 187, 0.4); }
 }
 .range-link:hover { border-bottom-color: var(--teal); }
 
-/* ── the confidence gauge: a 270° open arc (the signature instrument) ── */
 .conf-gauge {
   display: flex;
   flex-direction: column;
@@ -933,10 +931,15 @@ table.data tbody tr:hover td { background: rgba(227, 214, 187, 0.4); }
   gap: 0.5rem;
   margin: 0.5rem 0 1rem;
 }
-.history-chip { max-width: 20rem; font-style: italic; }
 
-/* the answer card of record — warm-white, teal left-edge for a cited answer */
-/* a cited answer wears the ONE confirmed-accent: a thin teal left-edge */
+.history-chip {
+  max-width: 20rem; font-style: italic; font-family: var(--serif);
+  font-size: var(--fs-2);
+  background: transparent; box-shadow: none;
+  border-style: dashed; color: var(--walnut);
+}
+.history-chip:hover { background: var(--cream); border-color: var(--marigold-line); color: var(--ink); }
+
 .answer-card {
   background: var(--warm-white);
   border: 1px solid var(--hairline);
@@ -983,7 +986,6 @@ table.data tbody tr:hover td { background: rgba(227, 214, 187, 0.4); }
 
 .answer-table-wrap { max-height: 22rem; overflow: auto; }
 
-/* cited cells — a colored cite-dot ties the value to its source island */
 td.cited { position: relative; }
 .cite-dot {
   display: inline-flex;
@@ -1088,8 +1090,7 @@ td.cited { position: relative; }
 .clarify-option:hover { border-color: var(--marigold-line); background: var(--marigold-wash); }
 .clarify-option kbd { color: var(--ink); background: var(--marigold-wash); border-color: var(--marigold-line); }
 
-/* ══════ app: evidence
-   Index-card tray: bisque troughs, mono source-id chip in source hue. */
+/* ══════ app: evidence */
 
 .evidence-context {
   font-size: var(--fs-0);
@@ -1163,9 +1164,7 @@ td.cited { position: relative; }
 
 .constellation { display: block; width: 100%; flex: 1; min-height: 0; cursor: grab; }
 .constellation:active { cursor: grabbing; }
-/* the canvas-acceleration layer sits BEHIND the svg, sharing its box; the svg
-   stays the interaction layer (labels + arc hit-twins + pan), so the canvas
-   takes no pointer events. Only present past CANVAS_THRESHOLD elements. */
+
 .constellation-canvas {
   position: absolute;
   inset: 0;
@@ -1180,7 +1179,6 @@ td.cited { position: relative; }
 .constellation .edge-link { stroke: var(--teal); stroke-opacity: 0.34; stroke-width: 1.5; fill: none; }
 .constellation .edge-link:hover { stroke-opacity: 0.8; }
 
-/* STAR-mode nodes: cream core, marigold halo ∝ confidence, teal stroke */
 .constellation .node-halo { fill: var(--marigold); pointer-events: none; }
 .constellation .node-core {
   fill: var(--cream);
@@ -1236,10 +1234,7 @@ td.cited { position: relative; }
 .node-card .nc-prop { font-family: var(--mono); font-size: var(--fs-1); color: var(--ink); }
 .node-card .nc-prop .dt { color: var(--walnut); }
 
-/* ══════ the Atlas — the grammar of certainty ═══════
-   Flat muted-hue island blobs on oatmeal. Link tiers: confirmed = solid
-   teal; likely = dashed marigold (opacity ∝ score); hint = dotted walnut,
-   off by default. Silos band as a quiet archipelago, never error-red. */
+/* ══════ the Atlas — the grammar of certainty ═══════ */
 
 .constellation .island-hull {
   fill: var(--teal);                /* default; the engine may tint per island */
@@ -1275,7 +1270,6 @@ td.cited { position: relative; }
   vector-effect: non-scaling-stroke;
 }
 
-/* a hovered/lit arc simply lifts to full opacity — no breathing pulse */
 .constellation path.lit.tier-confirmed { stroke-opacity: 0.95; }
 .constellation path.lit.tier-hint { stroke-opacity: 0.55; }
 .constellation path.lit.tier-likely { stroke-opacity: 0.9; }
@@ -1287,13 +1281,11 @@ td.cited { position: relative; }
 .constellation.hide-silos     .archipelago,
 .constellation.hide-silos     .touches-silo { display: none; }
 
-/* class labels yield below the zoom threshold; island labels never do */
 .constellation.labels-hidden .node-label { display: none; }
 .constellation.labels-hidden path.tier-likely { stroke-opacity: 0.15; }
 .constellation.labels-hidden path.tier-hint { stroke-opacity: 0.06; }
 .constellation.labels-hidden path.lit.tier-likely { stroke-opacity: 0.9; }
 
-/* the archipelago band: silos collect along the bottom — quiet, dignified */
 .constellation .archipelago { opacity: 0.9; }
 .constellation .archipelago .node-core { stroke: var(--walnut); fill: var(--bisque); }
 .constellation .archipelago .node-label { fill: var(--ink-faint); }
@@ -1417,7 +1409,6 @@ tr.prop-highlight td { background: var(--marigold-wash); }
 .entity-input { flex: 1; min-width: 0; font-size: var(--fs-2); padding: 0.625rem 1rem; font-family: var(--mono); }
 .entity-recent { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
 
-/* THE TIME SCRUBBER — drag the as-of instant, watch the card change */
 .time-scrubber {
   background: var(--warm-white);
   border: 1px solid var(--hairline);
@@ -1859,56 +1850,80 @@ tr.prop-highlight td { background: var(--marigold-wash); }
   .gauge-fill-arc.sweep { transition: none; }
 }
 
-/* ══════ dark mode (opt-in) — a quiet warm-dark; espresso-deep grounds
-   keep the warm cast, the muted hues carry through. data-theme="dark". */
+/* ══════ dark mode (opt-in) — a quiet warm-dark; espresso-deep grounds */
 
 html[data-theme="dark"] {
-  --canvas:     #1A140C;
+  --canvas:     #16110A;
   --cream:      #241C12;
-  --warm-white: #2E2417;
-  --bisque:     #15100A;
-  --bg0: #1A140C; --bg1: #15100A; --bg2: #241C12; --bg3: #2E2417;
-  --ink:        #F2E9D6;
-  --walnut:     #C2B295;
-  --ink-dim:    #C2B295;
-  --ink-faint:  #8E7E66;
-  /* the chrome tier inverts for night: recessed chrome dims DOWN from --ink */
+  --warm-white: #2B2116;
+  --bisque:     #1F1810;
+  --bg0: #16110A; --bg1: #1F1810; --bg2: #241C12; --bg3: #2B2116;
+  --ink:        #F1E8D8;
+  --walnut:     #B6A589;
+  --ink-dim:    #B6A589;
+  --ink-faint:  #867663;
+  
   --chrome-ink: #D8CBAF;
   --chrome-dim: #9E8F75;
-  --hairline:        rgba(242, 233, 214, 0.12);
-  --hairline-strong: rgba(242, 233, 214, 0.24);
+  --hairline:        rgba(240, 210, 150, 0.10);
+  --hairline-strong: rgba(240, 210, 150, 0.22);
   --abstain:    #2C2519;
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.38);
-  --shadow-2: 0 4px 14px rgba(0, 0, 0, 0.46);
-  --shadow-3: 0 12px 36px rgba(0, 0, 0, 0.5);
+  /* the warm-amber accent goes luminous at night */
+  --marigold:      #E7A634;
+  --marigold-press:#F0BF66;
+  --marigold-wash: rgba(231, 166, 52, 0.15);
+  --marigold-line: rgba(231, 166, 52, 0.40);
+  --marigold-glow: rgba(231, 166, 52, 0.40);
+  --amber:         #E7A634;
+  --amber-wash:    rgba(231, 166, 52, 0.15);
+  --amber-glow:    rgba(231, 166, 52, 0.40);
+  --burnt:         #E7A634;
+  --burnt-2:       #F0BF66;
+  --live:          #46C08A;
+  --live-glow:     rgba(70, 192, 138, 0.55);
+  
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.40);
+  --shadow-2: 0 2px 6px rgba(0, 0, 0, 0.45), 0 12px 28px -16px rgba(0, 0, 0, 0.7);
+  --shadow-3: 0 2px 8px rgba(0, 0, 0, 0.5), 0 30px 64px -30px rgba(0, 0, 0, 0.85);
+  --edge-hi:  inset 0 1px 0 rgba(255, 232, 180, 0.07);
   color-scheme: dark;
 }
-html[data-theme="dark"] body::before { opacity: 0.05; }
-html[data-theme="dark"] .btn-forge { color: #1A140C; }
-html[data-theme="dark"] .cite-dot { color: #1A140C; }
+/* the night ground carries a faint warm glow at the top edge */
+html[data-theme="dark"] body {
+  background:
+    radial-gradient(90% 60% at 50% -8%, #2A2012 0%, var(--bg1) 42%, var(--bg0) 100%);
+}
+html[data-theme="dark"] body::before { opacity: 0.05; mix-blend-mode: overlay; }
+html[data-theme="dark"] .btn-forge { color: #241804; }
+html[data-theme="dark"] .cite-dot { color: #16110A; }
 
-/* ══════ THE THREE-MODE SHELL — ASK | BUILD | STUDIO.
-   One always-visible switcher; each mode shows only its own surfaces. ══════ */
+html[data-theme="dark"] .ask-field-big { box-shadow: var(--edge-hi), var(--shadow-3), 0 0 0 1px rgba(231,166,52,0.07); }
+html[data-theme="dark"] .ask-go { box-shadow: var(--edge-hi), 0 0 22px -2px rgba(231,166,52,0.6); }
+/* the live count + dot luminesce */
+html[data-theme="dark"] .meta-cell b { text-shadow: 0 0 16px rgba(231,166,52,0.4); }
+
+/* ══════ THE THREE-MODE SHELL — ASK | BUILD | STUDIO. */
 
 /* ── the mode switcher: the clearest thing on screen ── */
 .mode-switcher {
   display: inline-flex;
-  gap: 2px;
-  padding: 3px;
+  gap: 3px;
+  padding: 4px;
   background: var(--bisque);
   border: 1px solid var(--hairline);
-  border-radius: var(--radius);
+  border-radius: 12px;
   box-shadow: var(--recess);
 }
+html[data-theme="dark"] .mode-switcher { background: rgba(0, 0, 0, 0.25); }
 .mode-seg {
   position: relative;
   display: flex; flex-direction: column; align-items: center;
-  gap: 0;
-  min-width: 78px;
-  padding: 0.25rem 0.85rem;
-  background: none; border: none; border-radius: 8px;
+  gap: 1px;
+  min-width: 80px;
+  padding: 0.3rem 0.95rem 0.34rem;
+  background: none; border: none; border-radius: 9px;
   color: var(--walnut); cursor: pointer;   /* inactive segments recede; the active one earns elevation */
-  transition: background var(--ease), color var(--ease);
+  transition: background var(--ease), color var(--ease), box-shadow var(--ease);
 }
 .mode-seg:hover { color: var(--ink); }
 .mode-seg .seg-name {
@@ -1919,14 +1934,18 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
   font-size: 0.625rem; letter-spacing: 0.04em; color: var(--ink-faint);
   white-space: nowrap;
 }
-/* the ACTIVE segment is clearly primary — full ink, full elevation */
+
 .mode-seg.active {
   background: var(--warm-white);
   color: var(--ink);
-  box-shadow: var(--shadow-1), 0 0 0 1px var(--marigold-line) inset;
+  box-shadow: var(--edge-hi), var(--shadow-2);
 }
 .mode-seg.active .seg-name { color: var(--ink); }
-.mode-seg.active .seg-sub { color: var(--marigold-press); }
+.mode-seg.active .seg-sub { color: var(--burnt); }
+html[data-theme="dark"] .mode-seg.active {
+  background: linear-gradient(180deg, var(--warm-white), var(--cream));
+}
+html[data-theme="dark"] .mode-seg.active .seg-sub { color: var(--marigold-press); }
 .seg-badge {
   position: absolute; top: 2px; right: 6px;
   min-width: 15px; height: 15px; padding: 0 3px;
@@ -1973,35 +1992,86 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
   max-width: 1120px; margin: 0 auto;
 }
 .ask-stage { width: 100%; max-width: 680px; text-align: center; }
-/* the Ask hero is the one place the system raises its voice — a calm serif line */
-.ask-tagline { font-family: var(--serif); font-size: var(--fs-6); line-height: 1.15; letter-spacing: 0.005em; color: var(--ink); margin: 0 0 1.5rem; }
+
+.ask-eyebrow {
+  display: flex; align-items: center; justify-content: center; gap: 0.7rem;
+  font-size: var(--fs-0); letter-spacing: 0.3em; text-transform: uppercase;
+  font-weight: 600; color: var(--burnt); margin-bottom: 1.1rem;
+}
+.ask-eyebrow::before, .ask-eyebrow::after {
+  content: ""; height: 1px; width: 42px;
+  background: linear-gradient(90deg, transparent, var(--burnt));
+}
+.ask-eyebrow::after { background: linear-gradient(90deg, var(--burnt), transparent); }
+
+.ask-headline {
+  font-family: var(--serif); font-weight: 600; font-size: var(--fs-6);
+  line-height: 1.06; letter-spacing: -0.012em; color: var(--ink);
+  max-width: 15ch; margin: 0 auto 0.5rem;
+}
+html[data-theme="dark"] .ask-headline { text-shadow: 0 1px 30px rgba(231, 166, 52, 0.12); }
+.ask-tagline {
+  font-family: var(--sans); font-size: var(--fs-3); line-height: 1.55;
+  color: var(--walnut); max-width: 48ch; margin: 0 auto 2.25rem;
+}
 .ask-form-big { width: 100%; }
 .ask-field-big {
-  display: flex; gap: 0.6rem;
+  display: flex; align-items: center; gap: 0.8rem;
   background: var(--warm-white);
-  border: 1.5px solid var(--marigold-line);
-  border-radius: 10px;
-  padding: 0.5rem 0.5rem 0.5rem 1.1rem;
-  box-shadow: var(--shadow-2);
+  border: 1px solid var(--hairline);
+  border-radius: 16px;
+  padding: 0.45rem 0.45rem 0.45rem 1.25rem;
+  box-shadow: var(--edge-hi), var(--shadow-3);
   transition: border-color var(--ease), box-shadow var(--ease);
 }
 .ask-field-big:focus-within {
-  border-color: var(--marigold);
-  box-shadow: var(--shadow-2), 0 0 0 4px var(--marigold-glow);
+  border-color: var(--marigold-line);
+  box-shadow: var(--edge-hi), var(--shadow-3), 0 0 0 4px var(--marigold-glow);
 }
+.ask-field-ic { display: inline-flex; color: var(--burnt); flex: 0 0 auto; }
+.ask-field-ic svg { display: block; }
 .ask-input {
   flex: 1; border: none; background: none; outline: none;
   font-family: var(--sans); font-size: var(--fs-4); color: var(--ink);
+  padding: 0.55rem 0;
 }
 .ask-input::placeholder { color: var(--ink-faint); }
-.ask-go { font-size: var(--fs-3); padding: 0.6rem 1.5rem; }
-.ask-suggest, .ask-recent { margin-top: 1.75rem; text-align: left; }
-.ask-suggest-head, .ask-recent-head {
-  display: block; font-size: var(--fs-0); letter-spacing: 0.12em;
-  text-transform: uppercase; color: var(--ink-faint); margin-bottom: 0.6rem;
+
+.ask-go {
+  display: inline-flex; align-items: center; gap: 0.45em;
+  font-size: var(--fs-3); padding: 0.65rem 1.4rem; border-radius: 12px;
+  color: #fff; border: none;
+  background: linear-gradient(180deg, var(--burnt-2), var(--burnt));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 9px 18px -8px rgba(185, 101, 27, 0.85);
 }
-.ask-suggest-chips, .ask-recent-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-.suggest-chip { font-size: var(--fs-1); max-width: 320px; text-align: left; }
+.ask-go:hover:not(:disabled) {
+  background: linear-gradient(180deg, var(--burnt-2), var(--burnt));
+  filter: brightness(1.04); transform: translateY(-1px);
+}
+.ask-go .go-arrow { display: block; }
+html[data-theme="dark"] .ask-go { color: #241804; }
+.ask-suggest, .ask-recent { margin-top: 1.9rem; text-align: left; }
+.ask-suggest-head, .ask-recent-head {
+  display: block; font-size: var(--fs-0); letter-spacing: 0.24em;
+  text-transform: uppercase; font-weight: 600; color: var(--ink-faint); margin-bottom: 0.8rem;
+}
+.ask-suggest-chips, .ask-recent-chips { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+
+.suggest-chip {
+  font-size: var(--fs-1); max-width: 340px; text-align: left;
+  align-items: center; gap: 0.5em;
+  border-radius: 11px; padding: 0.5rem 0.8rem;
+  background: var(--cream);
+  box-shadow: var(--edge-hi), 0 3px 6px -4px rgba(90, 55, 20, 0.45);
+  transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease);
+}
+.suggest-chip .chip-ic { color: var(--burnt); flex: 0 0 auto; opacity: 0.85; }
+.suggest-chip .chip-txt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.suggest-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--edge-hi), 0 6px 12px -5px rgba(90, 55, 20, 0.5);
+  border-color: var(--marigold-line);
+}
 .ask-result { width: 100%; max-width: 680px; margin-top: 1.5rem; }
 .surface-ask.sources-open .ask-result { max-width: none; }
 .answer-foot { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
@@ -2068,8 +2138,7 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
   background: var(--cream);
 }
 .build-outputs { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-/* NEUTRAL:ACCENT — both cards default to a hairline; only the primary action
-   inside (the marigold Build/Export button) carries color, not the container */
+
 .build-extract, .build-export {
   background: var(--cream); border: 1px solid var(--hairline);
   border-left: 1px solid var(--hairline);
@@ -2090,12 +2159,12 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
 .rail-item {
   position: relative; text-align: left;
   padding: 0.5rem 0.7rem; border: none; border-radius: 8px;
-  background: none; color: var(--walnut); cursor: pointer;  /* the rail is navigation — it recedes; the active section earns elevation */
+  background: none; color: var(--walnut); cursor: pointer;  
   font-family: var(--sans); font-size: var(--fs-2); font-weight: 500;
   transition: background var(--ease), color var(--ease);
 }
 .rail-item:hover { background: var(--warm-white); color: var(--ink); }
-/* the active section is where the work is — it comes forward to full ink */
+
 .rail-item.active { background: var(--warm-white); color: var(--ink); box-shadow: 0 0 0 1px var(--marigold-line) inset; }
 .rail-badge {
   position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%);
@@ -2159,8 +2228,7 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
 .scroll-undo { background: none; border: 1px solid var(--hairline); border-radius: 6px; padding: 0.1rem 0.5rem; cursor: pointer; color: var(--walnut); font-size: var(--fs-0); }
 .scroll-undone { font-size: var(--fs-0); color: var(--ink-faint); }
 .console-card { background: var(--warm-white); border: 1px solid var(--hairline); border-left: 1px solid var(--hairline); border-radius: var(--radius); padding: 0.9rem 1rem; box-shadow: var(--shadow-1); margin-bottom: 0.5rem; }
-/* SEMANTIC accents only: marigold = the previewed primary action; terracotta
-   warns the destructive one. Clarify/unsupported stay neutral hairline. */
+
 .preview-card { border-left: 2px solid var(--marigold); }
 .preview-card.destructive { border-left-color: var(--terracotta); }
 .console-card.unsupported { border-left: 1px solid var(--hairline); }
@@ -2183,9 +2251,7 @@ html[data-theme="dark"] .cite-dot { color: #1A140C; }
 
 /* ── the live build (watch it build) ── */
 .build-strip { display: flex; align-items: center; gap: 0.75rem; padding: 0.4rem 0.75rem; background: var(--cream); border-bottom: 1px solid var(--hairline); font-size: var(--fs-1); }
-/* the live-build layer hides via the `hidden` attribute; an explicit display
-   rule beats HTML's [hidden]{display:none}, so honor it — otherwise the
-   "Reading the data…" strip paints over a fully-rendered Data Map. */
+
 .build-strip[hidden], .build-narrative[hidden], .live-map[hidden] { display: none !important; }
 .build-stage { font-weight: 600; color: var(--ink); white-space: nowrap; }
 .build-bar { flex: 1; height: 5px; background: var(--bisque); border-radius: 3px; overflow: hidden; }
