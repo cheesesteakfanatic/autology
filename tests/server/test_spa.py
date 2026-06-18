@@ -1,11 +1,19 @@
-"""GET / serves the THREE-MODE shell — Ask | Build | Studio. The served
-markup carries the always-visible mode switcher and the three mode panes;
-every static reference resolves; the ES-module import graph is closed; data
-never enters the DOM through innerHTML; abstention keeps its dignified voice;
-the playground surfaces (Data Catalog, the live-build Data Map, the plain-
-English engineering Console) are present and wired to the frozen API
-contract; user-facing chrome speaks plain language (no internal engine
-jargon); and the whole non-vendor payload stays under budget."""
+"""GET / serves the CONVERSATION-FIRST agent shell — ONE thread where the user
+talks in a persistent bottom composer ("Ask, build, or wire up your data —") and
+the autonomous data-engineering agent responds with short narration + rich INLINE
+ARTIFACTS (cited answer, Vega chart, confirm-join cards, op-preview, data map).
+There are no Ask/Build/Studio modes: a slim thread-history rail, a calm
+conversation reading column, the composer. The agent loop speaks to POST
+/api/agent and opens proactively via GET /api/agent/opener.
+
+The served markup carries the rail / conversation column / composer; every
+static reference resolves; the ES-module import graph is closed; data never
+enters the DOM through innerHTML; abstention keeps its dignified voice (now
+adjudicated server-side and surfaced as a calm text turn); the REUSED renderers
+(the answer card, the Vega chart, the confirm card, the op preview, the data
+map) live on as inline artifact renderers wired to the frozen API contract;
+user-facing chrome speaks plain language (no internal engine jargon); and the
+whole non-vendor payload stays under budget."""
 
 from __future__ import annotations
 
@@ -16,32 +24,27 @@ from pathlib import Path
 STATIC_DIR = Path(__file__).resolve().parents[2] / "src" / "ontoforge" / "server" / "static"
 JS_DIR = STATIC_DIR / "js"
 APPS_DIR = JS_DIR / "apps"
-SURFACES_DIR = JS_DIR / "surfaces"
 ATLAS_FIXTURE = Path(__file__).parent / "fixtures" / "atlas_synthetic_250.json"
 
-#: the three modes
-MODES = ("ask", "build", "studio")
-#: STUDIO's power-tool apps (internal ids kept; labels de-jargoned). They are
-#: now mounted into the fixed COCKPIT regions (rail-selected center stage,
-#: Confirm queue, Console bar) rather than floating WM windows — but the app
-#: code and its endpoints are REUSED unchanged. ``observatory`` is the
-#: OBSERVABILITY surface (R0 P1): value-level lineage, the append-only audit
-#: log, run history, and the compute-at-cost ledger.
+#: The reused engine apps that survive as inline-artifact renderers / spotlight
+#: targets. The conversation shell no longer windows them, but the app code +
+#: its endpoints are REUSED unchanged: the Data Map (constellation engine), the
+#: Confirm queue (review), the engineering Console, plus the shared utilities.
+#: ``observatory`` is the OBSERVABILITY surface (value-level lineage, the
+#: append-only audit log, run history, the compute-at-cost ledger).
 STUDIO_APPS = (
     "catalog", "datamap", "console", "review", "pulse", "inspector", "evidence", "observatory",
 )
-#: the de-jargoned single-surface modes
-SURFACES = ("ask", "build")
-#: Non-vendor payload budget. Raised to 400 KB to seat the Tableau-grade BUILD
-#: rebuild — the NL view bar (POST /api/view), the editable Measure / Break down
-#: by / Filter / Chart type shelves, the faceted criticality-ranked field-search
-#: panel (GET /api/fields) that scales to thousands of datasets, and the real
-#: VENDORED-Vega charting all live in build.js. The user chose CAPABILITY over
-#: bytes here: that substantial builder pushes the non-vendor payload past the
-#: old 340 KB ceiling, so the budget rises to 400 KB. It still holds the shell,
-#: the eight Studio apps, the canvas layer, and BOTH cool themes (SLATE light
-#: :root + GRAPHITE dark data-theme) under one hard ceiling, so any future
-#: decorative bloat still trips it.
+#: The inline-artifact KINDS the agent emits — each maps to a reused renderer
+#: in js/artifacts.js (answer = ask.js card, chart = build.js Vega, confirm_joins
+#: = review.js card, op_preview = console.js preview, datamap = constellation.js).
+ARTIFACT_KINDS = ("answer", "chart", "confirm_joins", "op_preview", "datamap", "text")
+#: Non-vendor payload budget. Held at 400 KB to seat the conversation shell plus
+#: the reused Tableau-grade view/answer/chart/confirm/op/datamap renderers (now
+#: in js/artifacts.js) and the real VENDORED-Vega charting. The user chose
+#: CAPABILITY over bytes: those substantial renderers + the agent loop + the data
+#: map engine + BOTH cool themes (SLATE light :root + GRAPHITE dark data-theme)
+#: live under one hard ceiling, so any future decorative bloat still trips it.
 PAYLOAD_BUDGET = 400 * 1024
 
 
@@ -53,73 +56,184 @@ def _index() -> str:
     return (STATIC_DIR / "index.html").read_text(encoding="utf-8")
 
 
-# ════════════════════════════════════════════ the three-mode shell
+# ════════════════════════════════════════ the conversation-first shell
 
 
-def test_root_serves_the_three_mode_shell(client):
+def test_root_serves_the_conversation_shell(client):
     out = client.get("/")
     assert out.status_code == 200
     assert "text/html" in out.headers["content-type"]
     html = out.text
     assert "OntoForge" in html
-    # the always-visible mode switcher is the clearest thing on screen
-    assert 'id="mode-switcher"' in html, "the segmented mode switcher"
-    assert 'role="tablist"' in html, "the switcher is a real tablist"
-    for mode in MODES:
-        assert f'id="mode-{mode}"' in html, f"the {mode} segment"
-        assert f'data-mode="{mode}"' in html
-    # each mode gets exactly one pane, one visible at a time
-    for mode in MODES:
-        assert f'id="pane-{mode}"' in html, f"the {mode} pane"
-    # ASK lands lit by default; Build & Studio exist but start hidden
-    ask_seg = re.search(r'id="mode-ask"[^>]*>', html).group(0)
-    assert 'aria-selected="true"' in ask_seg, "ASK is the default landing"
-    # the switcher carries plain subtitles so a first-timer reads them at a glance
-    for sub in ("get answers", "measure", "data"):
-        assert sub in html, f"switcher subtitle hint '{sub}'"
-    # spotlight is pre-mounted so open is instant
+    # ONE conversation: a thread-history rail, the reading column, the composer.
+    # There is no mode switcher and no Ask/Build/Studio segments any more.
+    assert 'id="mode-switcher"' not in html, "the three-mode switcher is gone"
+    for seg in ('id="mode-ask"', 'id="mode-build"', 'id="mode-studio"',
+                'id="pane-ask"', 'id="pane-build"', 'id="pane-studio"'):
+        assert seg not in html, f"the three-mode chrome '{seg}' is gone"
+    # the slim left thread-history rail
+    assert 'id="rail"' in html and 'class="rail"' in html, "the thread-history rail"
+    # the calm conversation reading column + the live thread log
+    assert 'class="conv"' in html, "the conversation reading column"
+    assert 'id="thread-col"' in html, "the conversation thread"
+    assert 'role="log"' in html and 'aria-live="polite"' in html, "the thread is a live log"
+    # ONE persistent bottom composer with the approved prompt
+    assert 'class="composer"' in html, "the persistent bottom composer"
+    assert 'id="composer-form"' in html and 'id="composer-input"' in html
+    assert "Ask, build, or wire up your data" in html, "the approved composer prompt"
+    # the composer is a real combobox with grounded typeahead
+    inp = re.search(r'id="composer-input"[^>]*>', html).group(0)
+    assert 'role="combobox"' in inp and 'aria-controls="composer-suggest"' in inp
+    assert 'id="composer-suggest"' in html, "the grounded suggestion drop"
+    # spotlight survives (⌘K jump to a thread / entity / question)
     assert 'id="spotlight"' in html and 'id="spotlight-input"' in html
     assert 'role="combobox"' in html and 'aria-controls="spotlight-results"' in html
-    # STUDIO is now a coherent COCKPIT, not floating windows: the cockpit grid
-    # is the studio pane's frame (rail | center stage | confirm | console bar)
-    assert 'id="cockpit"' in html and "cockpit-grid" in html, "the studio cockpit grid frame"
-    # the dock survives (Studio-only chrome, starts hidden) — it now holds
-    # minimized transient Evidence overlays rather than every app
-    assert 'id="dock"' in html
-    # #desktop survives as the transient evidence-overlay layer over the stage
-    assert 'id="desktop"' in html
-    # first-run orientation coach
-    assert 'id="coach"' in html
 
 
-def test_studio_badge_and_help_affordances_present():
+def test_shell_has_no_cockpit_or_floating_window_chrome():
+    """The conversation shell replaced the Studio cockpit + the WM desktop +
+    the dock + the orientation coach — none of that chrome ships in the markup."""
     html = _index()
-    assert 'id="studio-badge"' in html, "the Confirm-suggestions count badge on the Studio segment"
-    assert 'id="help-toggle"' in html, "a '?' reopens the orientation card"
+    for gone in ('id="cockpit"', "cockpit-grid", 'id="dock"', 'id="desktop"',
+                 'id="coach"', 'id="studio-badge"', 'role="tablist"'):
+        assert gone not in html, f"the old shell chrome '{gone}' is gone"
 
 
-def test_mode_switcher_is_strong_persistent_chrome():
-    """The switcher must read as a major control, not a minor toggle — it
-    carries an always-visible active label and switching is instant (no
-    reload): the shell flips panes, not the document."""
-    modes = (JS_DIR / "modes.js").read_text(encoding="utf-8")
-    assert "createModeShell" in modes
-    assert "switchTo" in modes, "switching is a JS pane flip, never a navigation"
-    assert "active" in modes and "aria-selected" in modes, "the active segment is announced"
-    # the dock belongs to STUDIO alone — never floats over Ask/Build
-    assert 'mode !== "studio"' in modes or "dock.hidden" in modes
-    css = (STATIC_DIR / "style.css").read_text(encoding="utf-8")
-    assert ".mode-switcher" in css and ".mode-seg.active" in css, "the active segment has weight"
-
-
-def test_app_boots_into_ask_and_routes_modes():
+def test_app_boots_the_agent_shell_and_routes_intents():
+    """app.js boots ONE agent shell (no mode controller). Every external 'ask'
+    intent — spotlight free text, a recalled question, an entity/class jump —
+    becomes a turn in the one thread, classified by the agent."""
     app = (STATIC_DIR / "app.js").read_text(encoding="utf-8")
-    assert "createModeShell" in app and "createAskSurface" in app and "createBuildSurface" in app
-    assert 'modes.boot("ask"' in app, "ASK is the default landing for every session"
-    # ⌘1/⌘2/⌘3 jump straight to a mode — the shell claims these first
-    assert "modeForDigit" in app
-    # the cockpit apps live in STUDIO only; intents surface Studio first
-    assert "ensureStudio" in app
+    assert "createAgentShell" in app, "the conversation shell is the boot surface"
+    assert "agent.boot(" in app, "the agent shell boots the session"
+    # there is no mode controller / mode boot any more
+    assert "createModeShell" not in app and 'modes.boot(' not in app, "no mode controller"
+    # external intents fold into the one thread via agent.submit over the bus
+    assert "agent.submit" in app, "external intents become a turn in the thread"
+    for intent in ("ask:run", "entity:open", "class:focus"):
+        assert intent in app, f"the bus intent {intent} still routes into the thread"
+
+
+def test_agent_loop_module_speaks_the_agent_contract():
+    """js/agent.js is the conversation loop: it POSTs /api/agent for each turn,
+    opens proactively via GET /api/agent/opener, renders narration + INLINE
+    ARTIFACT cards through the reused renderers (artifacts.js), and persists the
+    thread history. Data enters the DOM only as text nodes — never innerHTML."""
+    agent = (JS_DIR / "agent.js").read_text(encoding="utf-8")
+    assert "createAgentShell" in agent
+    assert "/api/agent" in agent, "each turn POSTs the agent endpoint"
+    assert "/api/agent/opener" in agent, "the proactive opener is fetched on load"
+    # narration + artifacts: the reused renderers are invoked per artifact
+    assert "renderArtifact" in agent and "suggestionChips" in agent, "reused renderers drive the cards"
+    assert "narration" in agent and "artifacts" in agent, "a turn = narration + artifacts"
+    assert "clarification" in agent, "a clarify turn reads as a calm note, never a guess"
+    # the thread-history rail is localStorage-backed
+    assert "ontoforge.thread" in agent and "store" in agent, "thread history persists locally"
+    # the composer + grounded typeahead reuse /api/suggest with an AbortController
+    assert "/api/suggest" in agent and "AbortController" in agent, "grounded typeahead, cancellable"
+    # the security discipline: data → text nodes, never innerHTML
+    assert "createTextNode" in agent, "narration numbers are wrapped as text nodes"
+
+
+# ════════════════════════════════════ INLINE ARTIFACTS — the reused renderers
+# The signature reframe: the OLD surface render logic (ask.js answer card,
+# build.js Vega chart) and the OLD app render logic (review confirm card,
+# console op preview, constellation data map) live on UNCHANGED as inline
+# artifact renderers in js/artifacts.js, mounted into each agent turn. These
+# guard that the renderers are present and wired to the FROZEN API contract.
+
+
+def test_artifacts_module_is_the_inline_renderer_hub(client):
+    """js/artifacts.js exports one renderer per artifact kind and a dispatch
+    table. Each renderer reuses the existing engine contract; charts use the
+    VENDORED Vega only; provenance is one disclosure away."""
+    art = (JS_DIR / "artifacts.js").read_text(encoding="utf-8")
+    assert "export function renderArtifact" in art, "the dispatch entry point"
+    for kind in ARTIFACT_KINDS:
+        assert f'"{kind}"' in art, f"the dispatch table handles the '{kind}' artifact"
+    for fn in ("renderAnswerArtifact", "renderChartArtifact", "renderConfirmArtifact",
+               "renderOpPreviewArtifact", "renderDataMapArtifact", "renderTextArtifact"):
+        assert f"export function {fn}" in art, f"the reused renderer {fn} is exported"
+    # it is a real ES module on disk, served as javascript
+    assert (JS_DIR / "artifacts.js").is_file()
+    served = client.get("/static/js/artifacts.js")
+    assert served.status_code == 200 and "javascript" in served.headers["content-type"]
+
+
+def test_answer_artifact_reuses_the_ask_card_contract(client):
+    """The ANSWER artifact is the reused ask.js answer card: a cited value /
+    table with a confidence read and the lazy provenance disclosure (resolving
+    atoms via /api/atoms), de-jargoned to 'where this came from' / 'source
+    records'. The /api/ask call itself is dispatched server-side by the agent."""
+    art = (JS_DIR / "artifacts.js").read_text(encoding="utf-8")
+    assert "renderAnswerArtifact" in art
+    assert "citations" in art and "confidence" in art and "plain_english" in art, "the AskOut shape"
+    assert "/api/atoms/" in art, "provenance resolves atoms lazily"
+    assert "where this came from" in art, "atoms/citation jargon → 'where this came from'"
+    assert "source record" in art, "atoms → 'source records'"
+    css = client.get("/static/style.css").text
+    assert ".art" in css and ".arthead" in css, "the inline artifact card has a designed frame"
+
+
+def test_abstention_stays_first_class_and_dignified():
+    """Abstention/clarify is adjudicated by the engine (ask abstains below the
+    soft floor, clarifies in the band) and surfaced HONESTLY in the thread —
+    never a confident guess. The agent orchestrator routes an abstained answer
+    to a plain text turn and a clarify to a one-question note."""
+    agent_py = (STATIC_DIR.parent / "agent.py").read_text(encoding="utf-8")
+    assert "abstain" in agent_py, "the orchestrator honours the engine's abstention"
+    assert "clarification" in agent_py, "a band answer asks ONE question, never guesses"
+    # the front-end renders the clarify turn as a calm note (not an error style)
+    agent_js = (JS_DIR / "agent.js").read_text(encoding="utf-8")
+    assert "clarify-inline" in agent_js or "clarification" in agent_js
+
+
+def test_chart_artifact_reuses_the_vendored_vega(client):
+    """The CHART artifact is the reused build.js Vega render path: it renders the
+    executed view's rows through the VENDORED window.vegaEmbed with the cool
+    chart theme, falling back to a table; it offers Extract-CSV (/api/extract)."""
+    art = (JS_DIR / "artifacts.js").read_text(encoding="utf-8")
+    assert "renderChartArtifact" in art
+    assert "vegaEmbed" in art, "the chart uses the vendored vega-embed"
+    assert "/api/extract" in art, "the chart offers an Extract-CSV slice"
+    # the cool desaturated chart theme — teal anchor + the indigo data hue,
+    # never the warm marigold/tan palette
+    assert "#0E8C84" in art and "#4A56C7" in art, "the cool chart inks"
+    assert "#D09735" not in art and "#9b978e" not in art, "the warm/old chart inks are gone"
+
+
+def test_confirm_artifact_reuses_the_review_verdict(client):
+    """The CONFIRM-JOINS artifact is the reused review.js confirm card: likely-
+    join + flagged review items with Confirm / Not the same, posting the
+    unchanged verdict to /api/review/{decision_id} with the internal verdict
+    values preserved."""
+    art = (JS_DIR / "artifacts.js").read_text(encoding="utf-8")
+    assert "renderConfirmArtifact" in art
+    assert "/api/review/" in art and 'verdict("accept")' in art, "the verdict API is unchanged"
+    assert "Confirm" in art and "Not the same" in art, "accept/reject → Confirm / Not the same"
+
+
+def test_op_preview_artifact_reuses_the_console_discipline(client):
+    """The OP-PREVIEW artifact is the reused console.js discipline: interpret →
+    PREVIEW (never apply blind) → Apply with Undo. The op_token echo and the
+    'nothing has changed yet' voice are preserved verbatim; destructive ops
+    carry a consequence and need an explicit Apply tap."""
+    art = (JS_DIR / "artifacts.js").read_text(encoding="utf-8")
+    assert "renderOpPreviewArtifact" in art
+    assert "/api/engineer/apply" in art and "/api/engineer/undo" in art, "the frozen contract"
+    assert "op_token" in art and "undo_token" in art, "the op_token echo + Undo discipline"
+    assert "nothing has changed yet" in art, "the preview-before-acting voice survives"
+    assert "DESTRUCTIVE" in art, "destructive ops are flagged before acting"
+
+
+def test_datamap_artifact_reuses_the_constellation_engine(client):
+    """The DATA-MAP artifact is the reused constellation.js engine: the agent
+    hands it the atlas {components, links, stats} and it renders the real
+    interactive map via engine.renderAtlas."""
+    art = (JS_DIR / "artifacts.js").read_text(encoding="utf-8")
+    assert "renderDataMapArtifact" in art
+    assert "createConstellation" in art and "renderAtlas" in art, "the data map reuses the engine"
+    assert 'from "./constellation.js"' in art, "it imports the constellation engine, not a copy"
 
 
 # ════════════════════════════════════ de-jargon: plain language in chrome
@@ -132,9 +246,6 @@ def test_user_facing_chrome_is_plain_language():
     # the top bar speaks plain language
     assert "your data" in html, "estate → 'your data'"
     assert "source records" in html, "atoms → 'source records'"
-    # the segment names are the three plain modes
-    for word in ("Ask", "Build", "Studio"):
-        assert f">{word}<" in html, f"the {word} segment label"
     # internal engine codenames must NOT be visible in the shell chrome
     for jargon in ("STRATA", "HEARTH", "LODESTONE", "ANVIL", "TEMPER",
                    "WARDEN", "VISTA", "AMBER", "OQIR", "estate</",
@@ -143,7 +254,7 @@ def test_user_facing_chrome_is_plain_language():
 
 
 def test_naming_map_applied_across_apps():
-    """The de-jargon naming map is applied as LABELS in the surfaces/apps:
+    """The de-jargon naming map is applied as LABELS in the reused apps:
     Data Map, Activity, Confirm suggestions, Explore record, Where this came
     from — while ids/URIs/intents keep their internal names."""
     datamap = (APPS_DIR / "datamap.js").read_text(encoding="utf-8")
@@ -178,228 +289,13 @@ def test_internal_names_kept_in_code_not_shown():
     """De-jargon is presentation-only: the API routes, the bus intents and
     the app ids keep their internal names so routing/persistence still work."""
     app = (STATIC_DIR / "app.js").read_text(encoding="utf-8")
-    for intent in ("ask:run", "entity:open", "class:focus", "evidence:atoms", "evidence:prov"):
+    for intent in ("ask:run", "entity:open", "class:focus"):
         assert intent in app, f"the bus intent {intent} is unchanged"
     core = (JS_DIR / "core.js").read_text(encoding="utf-8")
     assert "/api/atlas" in core, "the atlas endpoint name is unchanged in code"
     review = (APPS_DIR / "review.js").read_text(encoding="utf-8")
     assert "/api/review" in review and "verdict: v" in review, "the verdict API is unchanged"
     assert 'verdict("accept")' in review, "the internal accept/reject verdict values are unchanged"
-
-
-# ════════════════════════════════════════════ ASK — the questioner
-
-
-def test_ask_surface_is_the_centered_questioner(client):
-    ask = (SURFACES_DIR / "ask.js").read_text(encoding="utf-8")
-    assert "createAskSurface" in ask
-    assert "/api/ask" in ask and "/api/ask/clarify" in ask, "Ask still speaks to the real API"
-    # suggested + recent questions, generated from the model
-    assert "suggestedQuestions" in ask and "renderSuggested" in ask
-    assert "Recent questions" in ask
-    # the big centered box with a soft prompt
-    assert "Ask anything about your data" in ask
-    # "Where this came from" replaces atom/citation jargon
-    assert "Where this came from" in ask
-    assert "source record" in ask, "atoms → 'source records'"
-    css = client.get("/static/style.css").text
-    assert ".surface-ask" in css and ".ask-field-big" in css, "the centered box has a designed treatment"
-    assert ".sources-panel" in css, "the Sources panel opens beside the answer"
-
-
-def test_ask_abstention_is_first_class_and_dignified(client):
-    """Abstention renders as a dignified state, never an error style; the
-    'won't guess' voice and 'what would make this answerable' chips survive."""
-    ask = (SURFACES_DIR / "ask.js").read_text(encoding="utf-8")
-    assert "state-abstained" in ask, "the abstention state class is applied"
-    assert "declines to guess" in ask, "abstention speaks the honest voice"
-    assert "what would make this answerable" in ask, "the recovery chips survive"
-    css = client.get("/static/style.css").text
-    assert ".state-abstained" in css, "abstention has its own designed treatment"
-
-
-def test_ask_guides_to_studio_when_no_model(client):
-    """If the model isn't built, ASK says so plainly and points to STUDIO —
-    never a dead box with no explanation."""
-    ask = (SURFACES_DIR / "ask.js").read_text(encoding="utf-8")
-    assert "isn't ready to answer questions yet" in ask
-    assert "Open Studio" in ask
-    assert "mode:goto" in ask, "the not-ready CTA jumps modes"
-
-
-# ════════════════════════════════════════════ BUILD — measure & pull data
-
-
-def test_build_surface_is_the_tableau_grade_builder(client):
-    """BUILD is a Tableau-grade view builder: a natural-language VIEW BAR
-    (POST /api/view) that parses an utterance into a structured ViewSpec and a
-    plain-English confirmation, editable shelves (Measure / Break down by /
-    Filter / Chart type), and a faceted criticality-ranked field panel
-    (GET /api/fields) that scales to thousands — search + facets + ranking, never
-    a flat list."""
-    build = (SURFACES_DIR / "build.js").read_text(encoding="utf-8")
-    assert "createBuildSurface" in build
-    # the NL view bar + the editable Tableau shelves
-    assert "/api/view" in build, "the view bar parses+executes a single view"
-    assert "Measure" in build and "Break down by" in build and "Chart type" in build
-    # the faceted, ranked field search that scales (not a flat chip list)
-    assert "/api/fields" in build, "the field panel is wired to the ranked search"
-    assert "renderFacets" in build and "fieldState" in build, "facet filters narrow the search"
-    assert "criticality" in build, "results are ranked by criticality"
-    # clarify-don't-guess: an ambiguous parse asks ONE question, never guesses
-    assert "clarification" in build and "renderClarification" in build
-    # cool chart theme: the COOL desaturated atlas wheel — teal anchor + the
-    # graphite-indigo data hue, never the warm marigold/tan palette
-    assert "ATLAS_RANGE" in build and "#0E8C84" in build and "#4A56C7" in build
-    assert "#D09735" not in build and "#9b978e" not in build, "the warm/old chart inks are gone"
-    css = client.get("/static/style.css").text
-    assert ".build-grid" in css and ".viewbar" in css and ".shelves" in css
-    assert ".panel" in css and ".results" in css and ".ftag" in css, "the faceted field panel is styled"
-
-
-def test_build_chart_and_pinnable_dashboard(client):
-    """The chart renders with the VENDORED Vega from the executed view rows; the
-    view can be pinned into an arrangeable, nameable dashboard grid, and every
-    panel carries its plain-English definition, a provenance line, and an
-    Extract-CSV action (/api/extract)."""
-    build = (SURFACES_DIR / "build.js").read_text(encoding="utf-8")
-    # the real chart uses the vendored vega-embed over the executed rows
-    assert "vegaEmbed" in build and "renderVega" in build
-    assert "view.vega" in build or "out.vega" in build, "the chart is built from the executed view"
-    # the dashboard grid: pin → an arrangeable, nameable, savable grid
-    assert "pinCurrent" in build and "Pin to dashboard" in build
-    assert "renderDashboard" in build and "dashname-input" in build, "the dashboard is nameable"
-    assert 'draggable: "true"' in build, "panels are arrangeable"
-    # Extract a CSV slice for the view + each panel (/api/extract)
-    assert "/api/extract" in build and "Extract CSV" in build
-    css = client.get("/static/style.css").text
-    assert ".chartcard" in css and ".dashgrid" in css and ".dpanel" in css
-
-
-# ════════════════════════════════════════════ STUDIO — the playground
-
-
-def test_studio_data_catalog_is_grouped_and_addable(client):
-    catalog = (APPS_DIR / "catalog.js").read_text(encoding="utf-8")
-    assert "createCatalogApp" in catalog and 'id: "catalog"' in catalog
-    # the frozen contract
-    assert "/api/catalog" in catalog
-    assert "/api/workspace/build" in catalog, "Build map posts the build"
-    assert "/api/workspace/state" in catalog
-    # grouped by domain, table-of-contents-first
-    assert "domain-group" in catalog and "domain-header" in catalog
-    # add a dataset (folder/file path or drop) + status pills
-    assert "Add data" in catalog
-    assert "status-pill" in catalog
-    for pill in ("Modeled", "Building", "Not yet modeled", "Needs attention"):
-        assert pill in catalog, f"the '{pill}' build-status pill"
-    # removal is guarded and emphasizes source files are not deleted
-    assert "source files are not deleted" in catalog
-    # build cap with a clear message
-    assert "25" in catalog
-    css = client.get("/static/style.css").text
-    assert ".catalog-row" in css and ".status-pill" in css
-
-
-def test_studio_data_map_animates_a_real_live_build(client):
-    """The signature STUDIO moment: the Data Map animates from REAL engine
-    events streamed by GET /api/workspace/build/{job_id} — never a timed
-    fake. Nodes pop and arcs draw as types/joins are genuinely classified,
-    batched on rAF so a burst never strobes."""
-    datamap = (APPS_DIR / "datamap.js").read_text(encoding="utf-8")
-    assert "/api/workspace/build/" in datamap, "it polls the real build job"
-    assert "type_found" in datamap and "join_found" in datamap, "it reacts to real events"
-    assert "studio:build-started" in datamap, "a build kicks the live layer"
-    # honest progress, not a spinner: stage label + determinate bar + live tally
-    assert "build-strip" in datamap and "build-bar-fill" in datamap
-    assert "Confirmed joins" in datamap and "Likely joins" in datamap, "the live tally"
-    # calm pacing: batched on rAF, ≤ a few per frame — never a synthetic delay
-    assert "requestAnimationFrame" in datamap
-    assert "REVEAL_PER_FRAME" in datamap, "reveals are batched, not strobed"
-    # motion is real or instant — the final map renders via the engine
-    assert "renderAtlas" in datamap, "the finished map is the real interactive atlas"
-    css = client.get("/static/style.css").text
-    assert ".build-strip" in css and ".live-arc" in css and ".live-node" in css
-    assert "prefers-reduced-motion" in css, "the live build respects reduced motion"
-
-
-def test_data_map_tiers_are_plainly_labeled(client):
-    """The map tiers read as confirmed join / likely join / standalone —
-    confirmed solid teal, likely dashed marigold."""
-    datamap = (APPS_DIR / "datamap.js").read_text(encoding="utf-8")
-    assert "confirmed join" in datamap and "likely join" in datamap
-    assert "standalone" in datamap, "silos → 'standalone' (no link found)"
-    css = (STATIC_DIR / "style.css").read_text(encoding="utf-8")
-    assert ".live-arc.tier-confirmed" in css, "confirmed joins are solid teal"
-    assert ".live-arc.tier-likely" in css and "dasharray" in css, "likely joins are dashed marigold"
-
-
-def test_studio_engineering_console_previews_then_applies(client):
-    """The plain-English Console: interpret → PREVIEW (never apply blind) →
-    Apply with Undo; unsupported commands fail to worked examples; nothing
-    destructive happens on Enter alone."""
-    console = (APPS_DIR / "console.js").read_text(encoding="utf-8")
-    assert "createConsoleApp" in console and 'id: "console"' in console
-    # the frozen contract
-    assert "/api/engineer/interpret" in console
-    assert "/api/engineer/apply" in console
-    assert "/api/engineer/undo" in console
-    # always preview before acting
-    assert "renderPreview" in console and "nothing has changed yet" in console
-    assert "doApply" in console and "undo_token" in console, "Apply offers Undo"
-    # unsupported never dead-ends — it falls to worked examples
-    assert "couldn't turn that into a data step" in console
-    assert "supported_examples" in console and "EXAMPLES" in console
-    # clarification asks ONE question, never guesses
-    assert "clarification" in console
-    # destructive ops carry a consequence and need an explicit Apply tap
-    assert "DESTRUCTIVE" in console and "consequence" in console
-    css = client.get("/static/style.css").text
-    assert ".console-card" in css and ".preview-card" in css
-
-
-def test_studio_left_rail_names_the_sections():
-    """STUDIO is a coherent COCKPIT, not floating windows: a named left RAIL
-    selects the high-contrast CENTER stage; the Confirm queue rides a fixed
-    right region; the plain-English Console is a persistent bottom command bar.
-    The rail names labeled sections — Data Catalog, Data Map, Console, Confirm
-    suggestions, Activity, Observatory — and clicking one shows that section."""
-    app = (STATIC_DIR / "app.js").read_text(encoding="utf-8")
-    assert "STUDIO_PANELS" in app and "studio-rail" in app
-    for label in ("Data Catalog", "Data Map", "Console", "Confirm suggestions",
-                  "Activity", "Observatory"):
-        assert label in app, f"the rail names the '{label}' section"
-    # the cockpit regions are fixed (not floating windows): a center stage host,
-    # a Confirm queue region, a Console command bar — the apps mount into them
-    assert "mountRegion" in app, "apps mount into fixed cockpit regions (reused, not rewritten)"
-    assert "cockpit-center" in app and "cockpit-confirm" in app and "cockpit-console" in app, \
-        "the center stage, the Confirm queue and the Console bar are fixed regions"
-    # the Data Map is the default centerpiece; the rail toggles the center stage
-    assert "showPanel" in app and "CENTER_APPS" in app
-    # the signature pairing is now structural (Data Map centre-stage, Console bar)
-    assert "tileStudioSignature" in app
-    css = (STATIC_DIR / "style.css").read_text(encoding="utf-8")
-    assert ".studio-rail" in css and ".rail-item" in css
-    assert ".cockpit-grid" in css and ".cockpit-center" in css, "the cockpit grid is styled"
-    assert ".cockpit-confirm" in css and ".cockpit-console" in css, \
-        "the Confirm queue and Console bar regions are styled"
-
-
-# ════════════════════════════════════════════ first-run onboarding
-
-
-def test_first_run_orientation_is_present_and_skippable():
-    html = _index()
-    assert 'id="coach"' in html and "three ways to work" in html
-    # the orientation names all three modes in plain language
-    for word in ("Ask", "Build", "Studio"):
-        assert word in html
-    modes = (JS_DIR / "modes.js").read_text(encoding="utf-8")
-    assert "maybeCoach" in modes and "COACH_KEY" in modes, "dismissal is persisted"
-    # adapts to data state: add-first when empty, try-a-question when modeled
-    assert "Add your first dataset" in modes and "Try a question" in modes
-    # first-visit per-mode flags are persisted (nudges show once)
-    assert "FIRSTVISIT_KEY" in modes or "isFirstVisit" in modes
 
 
 # ════════════════════════════════════════════ assets + module graph
@@ -417,30 +313,33 @@ def test_index_references_only_existing_static_files(client):
     assert {"vendor/vega.min.js", "vendor/vega-lite.min.js", "vendor/vega-embed.min.js"} <= names
 
 
-def test_os_layer_modules_exist_and_are_served(client):
-    """The shell is layered: kernel, bus, the mode controller, the WM, dock,
-    spotlight — each a real file, each fetchable as javascript."""
-    for mod in ("core.js", "bus.js", "modes.js", "wm.js", "dock.js", "spotlight.js", "constellation.js"):
-        assert (JS_DIR / mod).is_file(), f"missing OS layer: js/{mod}"
+def test_index_modulepreloads_the_agent_layer(client):
+    """The shell preloads the conversation layer: the kernel, the bus, the agent
+    loop, the inline-artifact renderers — each a real file, each fetchable as
+    javascript. (The reused data-map engine + app registry preload too.)"""
+    html = _index()
+    preloads = re.findall(r'modulepreload"\s+href="/static/([^"]+)"', html)
+    for must in ("app.js", "js/core.js", "js/bus.js", "js/agent.js", "js/artifacts.js"):
+        assert must in preloads, f"the shell preloads {must}"
+    for mod in ("core.js", "bus.js", "agent.js", "artifacts.js", "spotlight.js", "constellation.js"):
+        assert (JS_DIR / mod).is_file(), f"missing shell layer: js/{mod}"
         out = client.get(f"/static/js/{mod}")
         assert out.status_code == 200
         assert "javascript" in out.headers["content-type"]
-    for surf in SURFACES:
-        assert (SURFACES_DIR / f"{surf}.js").is_file(), f"missing surface: js/surfaces/{surf}.js"
-        assert client.get(f"/static/js/surfaces/{surf}.js").status_code == 200
 
 
-def test_every_studio_app_is_registered(client):
+def test_reused_engine_apps_exist_and_are_served(client):
+    """The reused engine apps stay on disk and served — their render logic
+    powers the inline artifacts (Data Map, Confirm, Console) and the spotlight
+    targets; each carries its unchanged registry id (datamap keeps
+    'constellation')."""
     registry = (APPS_DIR / "registry.js").read_text(encoding="utf-8")
     files = {p.stem for p in APPS_DIR.glob("*.js")}
     for app in STUDIO_APPS:
-        assert app in files, f"missing studio app: js/apps/{app}.js"
+        assert app in files, f"missing reused app: js/apps/{app}.js"
         assert client.get(f"/static/js/apps/{app}.js").status_code == 200
-    for imp in (
-        "catalog", "datamap", "console", "review", "pulse", "inspector", "evidence", "observatory",
-    ):
+    for imp in STUDIO_APPS:
         assert f"./{imp}.js" in registry, f"registry does not import {imp}"
-    # each app carries its registry id (datamap keeps the 'constellation' id)
     ids = {
         "catalog": "catalog", "datamap": "constellation", "console": "console",
         "review": "review", "pulse": "pulse", "inspector": "inspector", "evidence": "evidence",
@@ -469,7 +368,28 @@ def test_es_module_import_graph_is_closed(client):
         src = path.read_text(encoding="utf-8")
         for imp in re.findall(r'from\s+"(\.[^"]+)"', src):
             queue.append((path.parent / imp).resolve())
-    assert len(seen) >= 16, "the shell splits into kernel, modes, WM, surfaces, studio apps"
+    # the shell splits into kernel, agent loop, artifact renderers, the data-map
+    # engine + the reused apps reachable through the registry
+    assert len(seen) >= 14, "the shell splits into kernel, agent loop, renderers, reused apps"
+
+
+def test_agent_shell_module_is_reachable_from_app(client):
+    """The conversation loop + the inline renderers are reachable through the
+    import graph from app.js — the shell really is wired to the agent layer."""
+    seen: set[Path] = set()
+    queue = [STATIC_DIR / "app.js"]
+    while queue:
+        path = queue.pop()
+        if path in seen or not path.is_file():
+            continue
+        seen.add(path)
+        src = path.read_text(encoding="utf-8")
+        for imp in re.findall(r'from\s+"(\.[^"]+)"', src):
+            queue.append((path.parent / imp).resolve())
+    names = {p.name for p in seen}
+    assert "agent.js" in names, "app.js reaches the agent loop"
+    assert "artifacts.js" in names, "the agent loop reaches the inline renderers"
+    assert "constellation.js" in names, "the data-map engine is reachable for the datamap artifact"
 
 
 def test_no_studio_app_imports_another_app():
@@ -484,6 +404,24 @@ def test_no_studio_app_imports_another_app():
             assert target.parent != APPS_DIR, (
                 f"{path.name} imports a sibling app ({imp}) — intents go over the bus"
             )
+
+
+# ═══════════════════════════════ the agent API contract (POST /api/agent)
+
+
+def test_agent_endpoints_are_registered():
+    """The conversation shell stands on two new endpoints: POST /api/agent (one
+    turn → narration + typed inline artifacts) and GET /api/agent/opener (the
+    proactive 'I mapped N datasets into M entities…' opener). Both are wired."""
+    app_py = (STATIC_DIR.parent / "app.py").read_text(encoding="utf-8")
+    assert '@app.post("/api/agent"' in app_py, "POST /api/agent is registered"
+    assert '@app.get("/api/agent/opener"' in app_py, "GET /api/agent/opener is registered"
+    # the orchestrator reuses the SAME engine service functions — it never
+    # duplicates ask/view/interpret logic
+    assert "from . import agent as agent_loop" in app_py
+    schemas = (STATIC_DIR.parent / "schemas.py").read_text(encoding="utf-8")
+    for model in ("AgentIn", "AgentOut", "AgentArtifact", "AgentOpenerOut"):
+        assert f"class {model}" in schemas, f"the {model} schema exists"
 
 
 # ════════════════════════════════════ security + performance invariants
@@ -562,9 +500,6 @@ def test_attention_hierarchy_chrome_dim_tier_exists(client):
     # and it is actually applied to receding chrome, not merely declared
     assert "var(--chrome-dim)" in css, "the chrome-dim tier is applied to receding chrome"
     assert "var(--chrome-ink)" in css, "the chrome-ink tier is applied to receding chrome"
-    # the ACTIVE mode segment stays primary (full ink) — it must NOT recede
-    active = re.search(r"\.mode-seg\.active\s*\{([^}]*)\}", css)
-    assert active and "var(--ink)" in active.group(1), "the active segment keeps full contrast"
 
 
 def test_motion_is_fully_reduced_motion_gated(client):
@@ -627,32 +562,12 @@ def test_toast_notification_system_exists():
     assert ".toast-host" in css and ".toast" in css
 
 
-def test_windows_carry_a_per_app_accent_strip():
-    wm = (JS_DIR / "wm.js").read_text(encoding="utf-8")
-    assert "appHue" in wm and "--accent" in wm
-    core = (JS_DIR / "core.js").read_text(encoding="utf-8")
-    assert "export function appHue" in core and "APP_HUE" in core
-    css = (STATIC_DIR / "style.css").read_text(encoding="utf-8")
-    titlebar = re.search(r"\.titlebar\s*\{([^}]*)\}", css)
-    assert titlebar and "var(--accent)" in titlebar.group(1)
-
-
-def test_wm_interaction_discipline():
-    wm = (JS_DIR / "wm.js").read_text(encoding="utf-8")
-    assert "setPointerCapture" in wm and "pointercancel" in wm
-    assert "translate3d" in wm and "requestAnimationFrame" in wm
-    assert "document.addEventListener(\"mousemove\"" not in wm
-    assert "willChange" in wm
-    assert "/api/workspace" in wm, "layout persists through the workspace API"
-    assert "localStorage" in (JS_DIR / "core.js").read_text(encoding="utf-8")
-
-
 def test_spotlight_speaks_the_search_contract_and_falls_through():
     spot = (JS_DIR / "spotlight.js").read_text(encoding="utf-8")
     assert "/api/search" in spot
     assert "AbortController" in spot, "in-flight searches are cancelled, never reordered"
     assert "aria-activedescendant" in spot
-    # no query dead-ends — free text falls through to Ask
+    # no query dead-ends — free text falls through to Ask (now a thread turn)
     assert 'kind: "ask"' in spot
     assert "SERVER_APP_ALIAS" in spot, "legacy server app ids are aliased"
 
@@ -668,8 +583,8 @@ def test_inspector_scrubber_survived_and_clamps_off_epoch():
 
 
 # ═══════════════════════════════════ THE DATA MAP ENGINE (atlas, unchanged)
-# The constellation engine + its served atlas contract are unchanged; only
-# the app wrapper's labels are de-jargoned. These guard the engine contract.
+# The constellation engine + its served atlas contract are unchanged; it now
+# powers the datamap inline artifact. These guard the engine contract.
 
 
 def _engine_src() -> str:
@@ -840,23 +755,6 @@ def test_chroma_discipline_hues_are_cool_desaturated(client):
         "warm hues gone from the core.js wheel values"
 
 
-def test_neutral_accent_ratio_titlebar_is_not_a_colored_bezel(client):
-    """NEUTRAL:ACCENT — the window title strip is a neutral cream cap with a
-    thin accent (it keeps var(--accent), but as a hairline, not a hue fill).
-    The per-card colored left-edges collapse to a hairline default."""
-    css = client.get("/static/style.css").text
-    titlebar = re.search(r"\.titlebar\s*\{([^}]*)\}", css)
-    assert titlebar, "the title strip rule exists"
-    body = titlebar.group(1)
-    assert "var(--accent)" in body, "the accent survives as a quiet marker"
-    assert "background: var(--accent)" not in body, "the strip is NOT a full hue fill"
-    assert "background: var(--cream)" in body, "the strip is a neutral cream cap"
-    # the build outputs no longer wear persimmon/avocado bezel edges
-    assert "border-left: 3px solid var(--persimmon)" not in css
-    assert "border-left: 3px solid var(--avocado)" not in css
-    assert "border-left: 3px solid var(--ocean)" not in css, "console clarify edge neutralized"
-
-
 def test_type_is_tight_system_sans_no_serif_hero_no_smallcaps(client):
     """COOL TYPE TREATMENT: the hero/taglines are a tight system SANS (NO
     decorative serif hero); section labels are quiet 10-11px tracked uppercase
@@ -898,11 +796,9 @@ def test_form_restraint_radii_reduced_and_toy_motifs_removed(client):
         assert motif not in css, f"the toy motif '{motif}' is removed"
     # the plasticky bright inset highlight on shadow-2 is gone
     assert "rgba(255, 253, 247, 0.6) inset" not in css, "the plastic inset highlight is gone"
-    # the JS hooks for the removed motifs are gone too
+    # the JS hook for the removed launch-bounce motif is gone too
     dock = (JS_DIR / "dock.js").read_text(encoding="utf-8")
-    modes = (JS_DIR / "modes.js").read_text(encoding="utf-8")
     assert "pulse-once" not in dock, "the launch-bounce hook is removed"
-    assert "coach-lit" not in modes, "the switcher coach-halo hook is removed"
 
 
 def test_ground_is_flat_no_paper_grain(client):
@@ -941,9 +837,10 @@ def test_datamap_has_a_canvas_render_path_with_svg_fallback():
 
 
 def test_payload_under_budget_with_canvas_and_both_themes():
-    """The cool Slate/Graphite rewrite plus the Tableau-grade BUILD rebuild stay
-    under the 400 KB non-vendor budget, even carrying the additive canvas layer
-    and BOTH themes (Slate :root + Graphite data-theme) in one stylesheet."""
+    """The cool Slate/Graphite rewrite plus the conversation shell + the reused
+    inline-artifact renderers stay under the 400 KB non-vendor budget, even
+    carrying the additive canvas layer and BOTH themes (Slate :root + Graphite
+    data-theme) in one stylesheet."""
     total = sum(
         p.stat().st_size
         for p in STATIC_DIR.rglob("*")

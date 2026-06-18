@@ -9,9 +9,8 @@
 <link rel="modulepreload" href="/static/app.js">
 <link rel="modulepreload" href="/static/js/core.js">
 <link rel="modulepreload" href="/static/js/bus.js">
-<link rel="modulepreload" href="/static/js/modes.js">
-<link rel="modulepreload" href="/static/js/wm.js">
-<link rel="modulepreload" href="/static/js/dock.js">
+<link rel="modulepreload" href="/static/js/agent.js">
+<link rel="modulepreload" href="/static/js/artifacts.js">
 <link rel="modulepreload" href="/static/js/spotlight.js">
 <link rel="modulepreload" href="/static/js/constellation.js">
 <link rel="modulepreload" href="/static/js/apps/registry.js">
@@ -22,89 +21,71 @@
 <body>
 
 <!-- ══════════════════════════════════════════════════════ top bar -->
-<header id="menubar" class="menubar">
-  <span class="wordmark" title="OntoForge">
-    <span class="wm-onto">Onto</span><span class="wm-spark" aria-hidden="true">&#10038;</span><span class="wm-forge">Forge</span>
-  </span>
-
-  <!-- THE MODE SWITCHER — the clearest thing on screen; always-visible
-       active label so the user always knows which mode they're in. -->
-  <div id="mode-switcher" class="mode-switcher" role="tablist" aria-label="work mode">
-    <button id="mode-ask" class="mode-seg" type="button" role="tab" data-mode="ask"
-            aria-selected="true" aria-controls="mode-pane">
-      <span class="seg-name">Ask</span>
-      <span class="seg-sub">get answers</span>
-    </button>
-    <button id="mode-build" class="mode-seg" type="button" role="tab" data-mode="build"
-            aria-selected="false" aria-controls="mode-pane">
-      <span class="seg-name">Build</span>
-      <span class="seg-sub">measure &amp; pull data</span>
-    </button>
-    <button id="mode-studio" class="mode-seg" type="button" role="tab" data-mode="studio"
-            aria-selected="false" aria-controls="mode-pane">
-      <span class="seg-name">Studio</span>
-      <span class="seg-sub">add &amp; wire up data</span>
-      <span id="studio-badge" class="seg-badge" hidden aria-label="pending suggestions"></span>
-    </button>
+<header id="menubar" class="bar">
+  <div class="barL">
+    <span class="brand" title="OntoForge">
+      <span class="mark" aria-hidden="true">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg>
+      </span>
+      <span class="wm-onto">Onto</span><span class="dot" aria-hidden="true">&middot;</span><span class="wm-forge">Forge</span>
+    </span>
   </div>
-
-  <div class="mb-meta">
-    <span class="mb-live" title="connected to your live data">live</span>
+  <div class="status">
+    <span class="live" title="connected to your live data"><i aria-hidden="true"></i>live</span>
+    <span class="sep" aria-hidden="true"></span>
     <span class="meta-cell">your data <b id="meta-estate">&mdash;</b></span>
     <span class="meta-cell">source records <b id="meta-atoms">&mdash;</b></span>
-    <button class="spotlight-hint" id="spotlight-hint" type="button" title="Search — find anything, or just ask">
+    <span class="sep" aria-hidden="true"></span>
+    <button class="spotlight-hint iconquiet" id="spotlight-hint" type="button"
+            title="Search — jump to a thread or entity">
       <span class="sh-glass" aria-hidden="true">&#10038;</span><kbd>&#8984;K</kbd>
     </button>
-    <button class="help-toggle" id="help-toggle" type="button" title="three ways to work"
-            aria-label="what are the three modes">?</button>
-    <button class="theme-toggle" id="theme-toggle" type="button" title="toggle light / dark theme"
-            aria-label="toggle light or dark theme">&#9789;</button>
+    <button class="theme-toggle iconquiet" id="theme-toggle" type="button"
+            title="toggle light / dark theme" aria-label="toggle light or dark theme">&#9789;</button>
   </div>
 </header>
 
-<!-- ═══════════════════════════════════════ the mode pane (one at a time) -->
-<main id="mode-pane" class="mode-pane" aria-label="workspace">
+<!-- ══════════════════════════════════ the conversation-first shell -->
+<div class="shell">
 
-  <!-- ASK — a single centered surface, no window chrome -->
-  <section id="pane-ask" class="pane pane-ask" data-mode="ask" role="tabpanel"
-           aria-label="Ask — cited answers"></section>
+  <!-- ── left thread-history rail (localStorage-backed) ── -->
+  <aside id="rail" class="rail" aria-label="thread history"></aside>
 
-  <!-- BUILD — the two-pane dashboard / data builder -->
-  <section id="pane-build" class="pane pane-build" data-mode="build" role="tabpanel"
-           aria-label="Build — measure something, pull data out" hidden></section>
+  <!-- ── the conversation reading column ── -->
+  <main class="conv" aria-label="conversation">
+    <div id="scroll" class="scroll">
+      <div id="thread-col" class="col" role="log" aria-live="polite" aria-label="conversation thread"></div>
+    </div>
 
-  <!-- STUDIO — the coherent cockpit: a left rail selects the center stage;
-       a fixed Confirm queue rides the right; the plain-English Console is a
-       persistent bottom command bar. The named apps mount into fixed regions
-       (no floating windows). #desktop survives as the transient evidence
-       overlay layer; #dock survives (test-pinned, holds minimized evidence). -->
-  <section id="pane-studio" class="pane pane-studio" data-mode="studio" role="tabpanel"
-           aria-label="Studio — add and wire up data" hidden>
-    <div id="cockpit" class="cockpit-grid" aria-label="studio cockpit">
-      <!-- the studio-rail + cockpit regions are built in app.js -->
-      <div id="desktop" class="desktop" aria-label="studio overlays" aria-hidden="true">
-        <!-- transient evidence overlays are born here, over the stage -->
+    <!-- ── one persistent bottom composer ── -->
+    <div class="composer">
+      <div class="composer-inner">
+        <form id="composer-form" class="cbox" autocomplete="off">
+          <button class="cplus" id="composer-attach" type="button" title="Attach data" aria-label="attach data">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <input id="composer-input" class="cinput" type="text" spellcheck="false" autocomplete="off"
+                 role="combobox" aria-autocomplete="list" aria-expanded="false"
+                 aria-controls="composer-suggest"
+                 aria-label="ask, build, or wire up your data"
+                 placeholder="Ask, build, or wire up your data —">
+          <button class="csend" type="submit" title="Send" aria-label="send">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </form>
+        <div id="composer-suggest" class="cs-drop" role="listbox" aria-label="suggestions" hidden></div>
+        <div class="chint">
+          <span class="k">It understands <span class="kb">questions</span></span>
+          <span class="d" aria-hidden="true"></span>
+          <span class="k"><span class="kb">charts</span></span>
+          <span class="d" aria-hidden="true"></span>
+          <span class="k">and <span class="kb">data-engineering ops</span></span>
+          <span class="d" aria-hidden="true"></span>
+          <span class="k">every answer carries its provenance</span>
+        </div>
       </div>
     </div>
-  </section>
-
-</main>
-
-<!-- ═══════════════════════════════════════════════════ studio dock -->
-<nav id="dock" class="dock" aria-label="studio tools" hidden></nav>
-
-<!-- ══════════════════════════════════════════ first-run orientation -->
-<div id="coach" class="coach" hidden role="dialog" aria-label="three ways to work">
-  <div class="coach-card">
-    <button class="coach-x" id="coach-x" type="button" aria-label="dismiss">&times;</button>
-    <h2 class="coach-title">three ways to work</h2>
-    <ul class="coach-lines">
-      <li><b>Ask</b> — ask anything, see where every answer came from.</li>
-      <li><b>Build</b> — pick what to measure, get charts and downloads.</li>
-      <li><b>Studio</b> — add data and watch the model build.</li>
-    </ul>
-    <button class="btn btn-forge" id="coach-go" type="button">Got it</button>
-  </div>
+  </main>
 </div>
 
 <!-- ══════════════════════════════════════════════════════ spotlight -->
@@ -113,7 +94,7 @@
     <input id="spotlight-input" class="spot-input" type="text" spellcheck="false"
            role="combobox" aria-expanded="false" aria-autocomplete="list"
            aria-controls="spotlight-results"
-           placeholder="find anything, or just ask&hellip;">
+           placeholder="jump to a thread or entity, or just ask&hellip;">
     <div id="spotlight-results" class="spot-results" role="listbox" aria-label="results"></div>
     <div class="spot-foot">
       <span id="spotlight-count" aria-live="polite"></span>

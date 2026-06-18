@@ -901,3 +901,124 @@ class ViewOut(BaseModel):
     options: list[str] = Field(default_factory=list)
     abstained: bool = False
     abstain_reason: str = ""
+
+
+# ====================================================================== AGENT
+# POST /api/agent — the agent-loop turn for the conversation-first shell. One
+# utterance is deterministically classified into {question, chart, engineer-op,
+# confirm-joins, show-model, build} and DISPATCHED to the EXISTING engine path;
+# the result comes back as a short ``narration`` plus a list of typed, inline
+# ``artifacts`` the thread renders. Ambiguity surfaces as a ``clarification``
+# (one question, never a guess) because every downstream endpoint adjudicates it
+# itself. GET /api/agent/opener is the proactive first message. Keyless /
+# offline / deterministic — it reuses the engine, it never duplicates it.
+
+
+class AgentArtifact(BaseModel):
+    """One inline artifact in an agent turn — a discriminated card the thread
+    renders with the EXISTING render logic.
+
+    ``kind`` selects the renderer and which fields are populated:
+
+    * ``answer``       — a cited answer (ask.js answer card): ``value`` (the 1×1
+      scalar, or None), ``columns``/``rows``, ``confidence``, ``citations``,
+      ``plain_english``.
+    * ``chart``        — a Vega chart (build.js): ``spec``, ``vega``,
+      ``columns``/``rows``, ``citations``, ``plain_english``.
+    * ``confirm_joins``— the confirm cards (review.js): ``items`` (flagged
+      decisions), ``likely_joins`` (atlas likely-tier arcs + evidence),
+      ``threshold`` (when a 'confirm all above X' batch was requested).
+    * ``op_preview``   — an engineering op preview (console.js): ``op`` +
+      ``preview`` (carrying the ``op_token`` ``/api/engineer/apply`` echoes back).
+    * ``datamap``      — the data map (datamap.js / constellation.js):
+      ``components``, ``links``, ``stats``.
+    * ``text``         — plain narration / an honest abstention (no rich card).
+
+    Only the fields relevant to ``kind`` are set; the rest stay at their
+    defaults, so a renderer reads exactly what it needs."""
+
+    kind: Literal["answer", "chart", "confirm_joins", "op_preview", "datamap", "text"]
+
+    # text / shared
+    text: str = ""
+
+    # answer + chart
+    value: Any = None
+    columns: list[str] = Field(default_factory=list)
+    rows: list[list[Any]] = Field(default_factory=list)
+    confidence: Optional[float] = None
+    citations: list[dict[str, Any]] = Field(default_factory=list)
+    plain_english: str = ""
+    question: str = ""
+
+    # chart
+    spec: Optional[dict[str, Any]] = None
+    vega: dict[str, Any] = Field(default_factory=dict)
+
+    # op_preview
+    op: Optional[dict[str, Any]] = None
+    preview: Optional[dict[str, Any]] = None
+
+    # confirm_joins
+    items: list[dict[str, Any]] = Field(default_factory=list)
+    likely_joins: list[dict[str, Any]] = Field(default_factory=list)
+    threshold: Optional[float] = None
+
+    # datamap
+    components: list[dict[str, Any]] = Field(default_factory=list)
+    links: list[dict[str, Any]] = Field(default_factory=list)
+    stats: dict[str, Any] = Field(default_factory=dict)
+
+
+class AgentIn(BaseModel):
+    """POST /api/agent body. ``utterance`` is the user's chat message;
+    ``context`` is an optional opaque blob the shell may carry (e.g. a thread
+    id) — it does not affect the deterministic classification in v0."""
+
+    utterance: str = Field(min_length=1)
+    context: Optional[dict[str, Any]] = None
+    thread_id: Optional[str] = None
+
+
+class AgentOut(BaseModel):
+    """POST /api/agent result — the agent turn.
+
+    ``intent`` is the classified route (question | chart | engineer-op |
+    confirm-joins | show-model | build). ``narration`` is the short spoken line
+    the agent says. ``artifacts`` are the inline cards (often one). ``followups``
+    are suggestion chips (clarification options, supported examples, or next
+    actions). ``clarification`` is set ONLY when the engine asked one
+    disambiguating question instead of answering — never a guess."""
+
+    intent: str
+    narration: str
+    artifacts: list[AgentArtifact] = Field(default_factory=list)
+    followups: list[str] = Field(default_factory=list)
+    clarification: Optional[str] = None
+
+
+class AgentOpenerStats(BaseModel):
+    datasets: int = 0
+    entities: int = 0
+    confirmed: int = 0
+    likely: int = 0
+    standalone: int = 0
+
+
+class AgentCriticalElement(BaseModel):
+    uri: str
+    label: str
+    score: float
+
+
+class AgentOpenerOut(BaseModel):
+    """GET /api/agent/opener — the proactive first message: an "I mapped N
+    datasets into M entities…" summary of the active world (workspace state +
+    atlas + criticality), plus suggestion chips. ``built`` is False on an
+    unbuilt world (the opener then nudges the user to add data)."""
+
+    narration: str
+    built: bool = False
+    stats: AgentOpenerStats = Field(default_factory=AgentOpenerStats)
+    critical: list[AgentCriticalElement] = Field(default_factory=list)
+    followups: list[str] = Field(default_factory=list)

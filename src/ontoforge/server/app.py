@@ -1304,6 +1304,111 @@ def create_app(project: Path | str) -> FastAPI:
         with world.lock:
             return view_engine.run_view(world, body)
 
+    # ------------------------------------------------------------- agent
+    # The agent-loop turn for the conversation-first shell: ONE utterance is
+    # deterministically classified and DISPATCHED to the existing engine path
+    # above, returning a short narration + typed inline artifacts. A thin
+    # orchestrator (server/agent.py) over the SAME service functions — it never
+    # duplicates engine logic, and it is never confidently wrong because each
+    # downstream call (ask/view/interpret) adjudicates ambiguity itself.
+
+    def _collect_review_items() -> list[dict[str, Any]]:
+        """The flagged-decision review queue as plain dicts — the SAME query
+        /api/review builds, reused so the confirm-joins turn stays canonical.
+        Tolerant: an unbuilt world (no ledger) yields an empty list."""
+        try:
+            if not world.ledger_path.is_file():
+                return []
+        except ProjectError:
+            return []
+        with world.lock:
+            conn = world.ledger.connection
+            verdicts = _verdict_payloads(conn)
+            reviewed_ids = {v.get("decision_id") for v in verdicts}
+            out: list[dict[str, Any]] = []
+            seen: set[str] = set()
+            rows = conn.execute(
+                "SELECT decision_id, outcome, confidence, conformal_set, tier, "
+                "deferred_to_human, quarantined, rationale, prov_atoms, created_at "
+                "FROM decision ORDER BY seq DESC"
+            ).fetchall()
+            for did, outcome, conf, cset, tier, deferred, quarantined, rationale, patoms, ts in rows:
+                kind = _kind_of(str(did))
+                if kind not in REVIEW_KINDS or did in seen:
+                    continue
+                seen.add(did)
+                if did in reviewed_ids:
+                    continue
+                conf_set = list(json.loads(cset))
+                reason = _review_reason(
+                    bool(deferred), bool(quarantined), float(conf), int(tier), conf_set
+                )
+                if reason is None:
+                    continue
+                out.append(
+                    {
+                        "decision_id": str(did),
+                        "kind": kind,
+                        "outcome": str(outcome),
+                        "confidence": float(conf),
+                        "conformal_set": conf_set,
+                        "tier": int(tier),
+                        "deferred_to_human": bool(deferred),
+                        "quarantined": bool(quarantined),
+                        "review_reason": reason,
+                        "rationale": str(rationale),
+                        "prov_atoms": list(json.loads(patoms)),
+                        "created_at": str(ts),
+                    }
+                )
+        return out
+
+    @app.post("/api/agent", response_model=S.AgentOut)
+    async def api_agent(body: S.AgentIn) -> S.AgentOut:
+        """Classify ONE utterance and dispatch to the right existing engine
+        path, returning a narration + typed inline artifacts (answer | chart |
+        confirm_joins | op_preview | datamap | text). Ambiguity returns a
+        clarification (one question), never a guess. Keyless / deterministic."""
+        from . import agent as agent_loop
+        from . import views as view_engine
+
+        try:
+            env = agent_loop.run_agent(
+                world,
+                body.utterance,
+                views_module=view_engine,
+                review_fn=_collect_review_items,
+            )
+        except ProjectError as exc:
+            raise fail(exc) from exc
+        return S.AgentOut(
+            intent=env["intent"],
+            narration=env["narration"],
+            artifacts=[S.AgentArtifact(**a) for a in env["artifacts"]],
+            followups=list(env.get("followups", [])),
+            clarification=env.get("clarification"),
+        )
+
+    @app.get("/api/agent/opener", response_model=S.AgentOpenerOut)
+    async def api_agent_opener() -> S.AgentOpenerOut:
+        """The proactive opener: an "I mapped N datasets into M entities…"
+        summary of the active world (workspace state + atlas + criticality) plus
+        suggestion chips. The conversation's first message. Never raises — an
+        unbuilt world nudges the user to add data."""
+        from . import agent as agent_loop
+
+        try:
+            summary = agent_loop.build_opener(world)
+        except ProjectError as exc:
+            raise fail(exc) from exc
+        return S.AgentOpenerOut(
+            narration=summary["narration"],
+            built=bool(summary["built"]),
+            stats=S.AgentOpenerStats(**summary["stats"]),
+            critical=[S.AgentCriticalElement(**c) for c in summary.get("critical", [])],
+            followups=list(summary.get("followups", [])),
+        )
+
     # ----------------------------------------------------------- the SPA
 
     app.mount("/static", _NoCacheStatic(directory=STATIC_DIR), name="static")
