@@ -49,6 +49,7 @@ from ontoforge.vista import propose, render_with_data
 
 from . import schemas as S
 from .search import run_search
+from .suggest import build_suggestions
 from .world import REVIEW_RECALIBRATION_THRESHOLD, ProjectError, ProjectWorld, jsonable
 
 STATIC_DIR = Path(__file__).parent / "static"
@@ -546,6 +547,25 @@ def create_app(project: Path | str) -> FastAPI:
                 query, limit, ontology=ontology, index=index, questions=questions
             )
         return S.SearchOut(results=[S.SearchResult(**r) for r in results])
+
+    @app.get("/api/suggest", response_model=S.SuggestOut)
+    async def api_suggest(q: str = "", limit: int = 24) -> S.SuggestOut:
+        """Grounded typeahead for the Ask command bar: ontology MEASURES /
+        DIMENSIONS (numeric & scalar properties, each carrying a runnable NL
+        question and its owning class's criticality), ENTITIES (the induced
+        classes), and recalled QUESTIONS (the ledger's persisted asks), all
+        filtered by ``q`` with the keyless deterministic search scorer and
+        ranked by criticality.
+
+        Read-only: it never records usage (typeahead is not a query). Empty
+        query or an unbuilt world returns empty groups, never a 500."""
+        with world.lock:
+            groups = build_suggestions(world, q, limit)
+        return S.SuggestOut(
+            measures=[S.SuggestMeasure(**m) for m in groups["measures"]],
+            entities=[S.SuggestEntity(**e) for e in groups["entities"]],
+            questions=[S.SuggestQuestion(**qq) for qq in groups["questions"]],
+        )
 
     # ---------------------------------------------------------- workspace
 

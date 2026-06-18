@@ -261,6 +261,58 @@ class SearchOut(BaseModel):
     results: list[SearchResult]
 
 
+# -------------------------------------------------------------------- suggest
+
+
+class SuggestMeasure(BaseModel):
+    """One grounded measure/dimension typeahead row (kind=measure on the wire).
+
+    A MEASURE carries an aggregation (``sum``/``avg``); a group-by DIMENSION
+    carries ``agg="group"``. ``criticality`` is the owning class's lazy score
+    (0..1); ``question`` is the runnable NL string to feed ``/api/ask``."""
+
+    label: str
+    measure: str
+    agg: str = "sum"
+    unit: Optional[str] = None
+    on_class: str
+    on_class_uri: str
+    dataset: str = ""
+    rows: Optional[int] = None
+    criticality: float = 0.0
+    question: str
+
+
+class SuggestEntity(BaseModel):
+    """One grounded entity-type typeahead row (an induced ontology class)."""
+
+    cls: str
+    label: str
+    on_class_uri: str
+    dataset: str = ""
+    records: Optional[int] = None
+    fields: int = 0
+    criticality: float = 0.0
+    question: str
+
+
+class SuggestQuestion(BaseModel):
+    """One recalled question the ledger persisted (kind=question)."""
+
+    text: str
+    kind: str = "asked previously"
+
+
+class SuggestOut(BaseModel):
+    """GET /api/suggest?q=&limit= — ontology-grounded typeahead over the active
+    world, grouped by Measures / Entities / Questions. Empty groups for an empty
+    query or an unbuilt world; never an error (keyless, offline, deterministic)."""
+
+    measures: list[SuggestMeasure] = Field(default_factory=list)
+    entities: list[SuggestEntity] = Field(default_factory=list)
+    questions: list[SuggestQuestion] = Field(default_factory=list)
+
+
 # ------------------------------------------------------------------ neighbors
 
 
