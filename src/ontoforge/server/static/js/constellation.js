@@ -36,15 +36,17 @@ const BASE_W = 960, BASE_H = 600;
 /* over this many (nodes + arcs) the canvas paints; under it, SVG fallback */
 const CANVAS_THRESHOLD = 300;
 
-/* the muted categorical wheel — each ISLAND draws a distinct hue (kept in
+/* the COOL categorical wheel — each ISLAND draws a distinct hue (kept in
    sync with core.js ATLAS_HUES; the engine stays import-free). */
 const ISLAND_HUES = [
-  "#2C5956", "#D09735", "#945442", "#6C733A",
-  "#375E72", "#945942", "#713D68", "#86663C",
+  "#0E8C84", "#4A56C7", "#5B6B86", "#7D5BA6",
+  "#3E6FA3", "#9A6B86", "#4C5578", "#5E8C7A",
 ];
-/* literal warm tokens the canvas paints with (no CSS var() in 2d ctx) */
-const TEAL = "#2C5956", MARIGOLD = "#D09735", WALNUT = "#6B5A45",
-      CREAM = "#FBF4E6", BISQUE = "#E3D6BB";
+/* literal cool tokens the canvas paints with (no CSS var() in 2d ctx).
+   TEAL = confirmed/positive; MARIGOLD kept as the var name but is now the
+   one graphite-indigo accent; WALNUT/CREAM/BISQUE are the cool neutrals. */
+const TEAL = "#0E8C84", MARIGOLD = "#313ECF", WALNUT = "#525866",
+      CREAM = "#FFFFFF", BISQUE = "#FBFCFD";
 
 /* seeded PRNG (mulberry32) over a string hash — same input, same sky */
 function hash32(s) {

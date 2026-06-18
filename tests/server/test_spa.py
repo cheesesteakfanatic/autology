@@ -29,14 +29,14 @@ STUDIO_APPS = (
 )
 #: the de-jargoned single-surface modes
 SURFACES = ("ask", "build")
-#: Non-vendor payload budget. Raised from 304 KB to 340 KB to seat the approved
-#: Atelier (warm light :root) / Observatory (warm dark data-theme) redesign —
-#: the user explicitly chose beauty over bytes, accepting a heavier stylesheet
-#: for the dual-theme depth shadows, inset highlights, grain, serif/sans/mono
-#: type, the elevated mode pill, the crafted chips, the gradient-amber ask-card,
-#: and the inline-SVG dock icons. Still a hard ceiling: it holds the shell, the
-#: eight Studio apps, the canvas layer, and BOTH themes under the limit, so any
-#: future decorative bloat beyond the deliberate redesign still trips it.
+#: Non-vendor payload budget. Held at 340 KB to seat the approved COOL
+#: PROFESSIONAL redesign — SLATE (cool light :root, the default) / GRAPHITE
+#: (cool dark data-theme). The cool system is disciplined (flat panels, 1px
+#: hairlines instead of pillowy shadows, ONE accent per view, mono for every
+#: number) so it is LIGHTER than the warm system it replaced, but the budget
+#: stays a hard ceiling: it holds the shell, the eight Studio apps, the canvas
+#: layer, and BOTH themes under the limit, so any future decorative bloat still
+#: trips it.
 PAYLOAD_BUDGET = 340 * 1024
 
 
@@ -229,9 +229,10 @@ def test_build_surface_is_the_two_pane_builder(client):
     # the free-text box feeds the same synthesis
     assert "describe what you want to see" in build
     assert "/api/dashboards" in build, "proposals come from VISTA synthesis"
-    # warm chart theme (the MUTED atlas wheel, never the dark palette)
-    assert "ATLAS_RANGE" in build and "#2C5956" in build and "#D09735" in build
-    assert "#9b978e" not in build, "the old dark chart inks are gone"
+    # cool chart theme: the COOL desaturated atlas wheel — teal anchor + the
+    # graphite-indigo data hue, never the warm marigold/tan palette
+    assert "ATLAS_RANGE" in build and "#0E8C84" in build and "#4A56C7" in build
+    assert "#D09735" not in build and "#9b978e" not in build, "the warm/old chart inks are gone"
     css = client.get("/static/style.css").text
     assert ".build-layout" in css and ".build-left" in css and ".build-right" in css
 
@@ -474,29 +475,40 @@ def test_total_non_vendor_payload_under_budget():
     assert total < PAYLOAD_BUDGET, f"non-vendor static payload is {total} bytes (budget {PAYLOAD_BUDGET})"
 
 
-def test_warm_theme_is_preserved_not_repainted(client):
-    """The warm midcentury system is reused, not repainted: the espresso/
-    cream tokens carry the palette, no dark grounds in the default :root,
-    shadows are amber-tinted — never black."""
+def test_cool_slate_is_the_default_theme(client):
+    """The COOL PROFESSIONAL system: SLATE is the default light :root — a cool
+    slate ground, flat white panels, cool near-black ink. Structure is carried
+    by 1px hairlines; the default theme uses at most a 1px whisper shadow tinted
+    cool ink (rgba(20,22,26,…)), never warm-amber and never black. No dark
+    grounds leak into the default :root — graphite is the opt-in dark theme."""
     css = client.get("/static/style.css").text
     root = css.split("}", 1)[0]
-    assert "#ECE1CB" in root, "Canvas Oatmeal is the desktop ground"
-    assert "#FBF4E6" in root, "Card Cream is the resting surface"
-    assert "#2A1F14" in root, "Espresso Ink is the primary text — never #000"
-    # CHROMA DISCIPLINE: marigold + the wheel are MUTED into a 25-40% S band
-    # (the maturation pass). The warm cream/oatmeal/espresso grounds are
-    # unchanged; only the saturated accent hues were pulled down.
-    assert "#D09735" in root, "Marigold (muted) is the primary-action fill"
-    assert "#D8CDB8" in css, "Abstention-Taupe — the dignified 'no reading' ground"
-    for hue in ("#2C5956", "#945442", "#6C733A", "#375E72", "#713D68"):
-        assert hue in css, f"the muted atlas categorical hue {hue} is in the wheel"
+    assert "#F6F7F9" in root, "Slate canvas is the cool desktop ground"
+    assert "#FFFFFF" in root, "flat white is the resting panel surface"
+    assert "#14161A" in root, "cool near-black ink is the primary text — never #000"
+    # ONE accent: graphite-indigo (flat fill, never a gradient or warm marigold)
+    assert "#313ECF" in root, "graphite-indigo is the single Slate accent"
+    assert "#EEF0FB" in css or "rgba(49, 62, 207, 0.07)" in css, "the soft accent fill"
+    # status/positive teal + the cool desaturated categorical wheel
+    assert "#0E8C84" in root, "teal is status/positive (= confirmed)"
+    for hue in ("#5B6B86", "#7D5BA6", "#3E6FA3", "#4C5578", "#5E8C7A"):
+        assert hue in css, f"the cool categorical data hue {hue} is in the wheel"
+    # NO tan/cream/amber/orange anywhere — the warm palette is fully gone
+    for warm in ("#ECE1CB", "#FBF4E6", "#2A1F14", "#D09735", "#D8CDB8",
+                 "#2C5956", "#945442", "#6C733A", "#375E72", "#713D68"):
+        assert warm not in css, f"the warm token {warm} is gone from the cool system"
+    # the GRAPHITE dark ground is legitimate ONLY behind the dark data-theme
     default_block = css.split('html[data-theme="dark"]')[0]
-    for dead in ("#0b0d10", "#0e1116", "#11141a", "#161a22"):
-        assert dead not in default_block, f"the old dark ground {dead} is gone from the warm default"
-    assert "rgba(90, 55, 20" in default_block or "rgba(90,55,20" in default_block, \
-        "elevation shadows are warm-amber tinted"
+    for dark_ground in ("#0E1014", "#161A20", "#1C2128", "#12151A"):
+        assert dark_ground not in default_block, \
+            f"the graphite dark ground {dark_ground} must not leak into the Slate default :root"
+    # Slate elevation shadows are a cool-ink whisper, never warm-amber, never black
+    assert "rgba(20, 22, 26" in default_block or "rgba(20,22,26" in default_block, \
+        "Slate whisper shadows are cool-ink tinted (rgba(20,22,26,…))"
+    assert "rgba(90, 55, 20" not in default_block and "rgba(90,55,20" not in default_block, \
+        "no warm-amber shadows in the cool Slate default"
     assert "rgba(0, 0, 0" not in default_block and "rgba(0,0,0" not in default_block, \
-        "no black shadows in the warm default theme"
+        "black shadows are reserved for the Graphite dark theme — never in Slate"
 
 
 def test_attention_hierarchy_chrome_dim_tier_exists(client):
@@ -540,17 +552,22 @@ def test_palette_governance_is_documented_in_css(client):
     css = client.get("/static/style.css").text
     assert "PALETTE GOVERNANCE" in css, "the ink-ramp governance note is in style.css"
     assert "ATTENTION-HIERARCHY" in css, "the chrome-tier intent is documented inline"
-    # the recorded contrast ratios stay AA+ on cream
-    assert "14.7:1" in css and "6.0:1" in css, "the measured AA contrast figures are recorded"
+    # the recorded contrast ratios stay AA+ on the flat white panel
+    assert "16.8:1" in css and "5.6:1" in css, "the measured AA contrast figures are recorded"
 
 
-def test_marigold_is_fill_not_text_on_buttons():
+def test_primary_button_is_a_flat_accent_fill_no_gradient():
+    """COOL PROFESSIONAL hard rule: the primary action is a FLAT accent fill
+    (graphite-indigo), never a gradient. The accent carries the button as a
+    solid background; the label sits in white on the accent for AA contrast."""
     css = (STATIC_DIR / "style.css").read_text(encoding="utf-8")
     forge = re.search(r"\.btn-forge\s*\{([^}]*)\}", css)
-    assert forge, "the primary marigold button class exists"
+    assert forge, "the primary accent button class exists"
     body = forge.group(1)
-    assert "--marigold" in body or "#E0A126" in body, "the primary button is marigold-filled"
-    assert "--ink" in body, "its label is espresso ink, not white"
+    assert "background: var(--marigold)" in body or "#313ECF" in body, \
+        "the primary button is a flat accent fill (the --marigold token = graphite-indigo)"
+    assert "gradient" not in body, "NO gradient buttons — the fill is flat"
+    assert "#fff" in body or "var(--ink)" not in body, "its label reads on the accent fill"
 
 
 def test_confidence_gauge_is_an_arc_not_a_bar():
@@ -689,7 +706,11 @@ def test_silos_collect_in_a_dignified_archipelago():
     assert ".constellation .archipelago" in css
     arch_rules = "".join(m.group(0) for m in re.finditer(r"\.archipelago[^{]*\{[^}]*\}", css))
     assert "--verdict-red" not in arch_rules, "silos are quiet, never error-red"
-    assert "small-caps" in css
+    # COOL system: island labels are quiet tracked-uppercase (the warm small-caps
+    # ornament is gone — section labels are 10-11px tracked uppercase now)
+    island_label = re.search(r"\.island-label\s*\{([^}]*)\}", css)
+    assert island_label and "text-transform: uppercase" in island_label.group(1), \
+        "island labels are quiet tracked-uppercase, not the warm small-caps ornament"
 
 
 def test_atlas_scale_discipline_is_documented_and_held():
@@ -750,32 +771,35 @@ def _strip_css_comments(css):
     return re.sub(r"/\*.*?\*/", "", css, flags=re.S)
 
 
-def test_chroma_discipline_hues_are_muted(client):
-    """CHROMA DISCIPLINE: the 8-hue wheel + marigold are pulled out of the
-    ~50-70% crayon band into a muted 25-40% S band — desaturated, NOT grayed.
-    The old saturated literals are gone; the muted ones carry the wheel."""
+def test_chroma_discipline_hues_are_cool_desaturated(client):
+    """CHROMA DISCIPLINE (cool): the categorical DATA wheel is the cool,
+    low-saturation, information-only set — teal anchor + cool slate/plum/steel/
+    sage tones. The ONE accent is graphite-indigo (#313ECF), a flat fill. The
+    warm crayon/tan literals are gone everywhere."""
     css = client.get("/static/style.css").text
     root = _root(css)
-    # the muted wheel, in ATLAS_HUES order (mirrored in core.js)
-    muted = ("#2C5956", "#945442", "#6C733A", "#375E72", "#945942", "#713D68", "#86663C")
-    for hue in muted:
-        assert hue in root, f"the muted hue {hue} declares in :root"
-    # marigold is muted but stays a readable primary FILL (ink-on-marigold AA)
-    assert "#D09735" in root, "marigold muted from the crayon #E0A126"
-    # the old crayon literals must be gone from the warm default DECLARATIONS
+    # the cool desaturated wheel (the :root token values, mirroring ATLAS_HUES roles)
+    cool = ("#0E8C84", "#5B6B86", "#7D5BA6", "#3E6FA3", "#9A6B86", "#4C5578", "#5E8C7A")
+    for hue in cool:
+        assert hue in root, f"the cool data hue {hue} declares in :root"
+    # the one accent is graphite-indigo, a flat fill (never a warm marigold)
+    assert "#313ECF" in root, "graphite-indigo is the single accent"
+    # the old warm crayon/tan literals must be gone from the default DECLARATIONS
     # (comments may still name them when documenting the swap)
     default_block = _strip_css_comments(css.split('html[data-theme="dark"]')[0])
-    for crayon in ("#E0A126", "#1F6F6B", "#C75B39", "#B8532A", "#2D6E8E", "#6E4A63"):
-        assert crayon not in default_block, f"the saturated crayon {crayon} is gone"
-    # the JS categorical contract is muted in lockstep (core.js + constellation.js)
+    for crayon in ("#E0A126", "#1F6F6B", "#C75B39", "#B8532A", "#2D6E8E",
+                   "#6E4A63", "#D09735", "#2C5956", "#945442"):
+        assert crayon not in default_block, f"the warm crayon {crayon} is gone"
+    # the JS categorical contract is cool in lockstep (core.js + constellation.js):
+    # the ATLAS_HUES list keeps the same names/order/count, recolored cool.
     core_raw = (JS_DIR / "core.js").read_text(encoding="utf-8")
     engine = (JS_DIR / "constellation.js").read_text(encoding="utf-8")
-    for hue in ("#2C5956", "#D09735"):
-        assert hue in core_raw and hue in engine, f"{hue} is in the JS wheel contract"
+    for hue in ("#0E8C84", "#4A56C7"):
+        assert hue in core_raw and hue in engine, f"{hue} is in the JS cool wheel contract"
     # strip // line + /* */ block comments before checking old literals are gone
     core_code = re.sub(r"//[^\n]*", "", _strip_css_comments(core_raw))
-    assert "#E0A126" not in core_code and "#1F6F6B" not in core_code, \
-        "old crayon hues gone from the core.js wheel values"
+    assert "#D09735" not in core_code and "#2C5956" not in core_code, \
+        "warm hues gone from the core.js wheel values"
 
 
 def test_neutral_accent_ratio_titlebar_is_not_a_colored_bezel(client):
@@ -795,21 +819,28 @@ def test_neutral_accent_ratio_titlebar_is_not_a_colored_bezel(client):
     assert "border-left: 3px solid var(--ocean)" not in css, "console clarify edge neutralized"
 
 
-def test_type_maturity_serif_added_and_smallcaps_off_buttons(client):
-    """TYPE MATURITY: a system serif (no webfont, offline-safe) carries hero
-    headlines; the chrome sans is humanist (not Futura); small-caps is OFF the
-    buttons/dock/titles and reserved for tiny eyebrow kickers only."""
+def test_type_is_tight_system_sans_no_serif_hero_no_smallcaps(client):
+    """COOL TYPE TREATMENT: the hero/taglines are a tight system SANS (NO
+    decorative serif hero); section labels are quiet 10-11px tracked uppercase
+    (NO small-caps eyebrow ornament anywhere); mono carries every number/id.
+    The chrome sans is system, not Futura."""
     css = client.get("/static/style.css").text
     root = _root(css)
-    assert "--serif:" in root and "ui-serif" in root, "a system serif stack is declared"
+    # a system SANS stack is declared; the --serif token survives as a caller
+    # alias but resolves to a SANS stack (no ui-serif / serif webfont)
+    assert "--sans:" in root and "-apple-system" in root, "a system sans stack is declared"
+    assert "ui-serif" not in root, "NO decorative serif — the hero is tight system sans"
     assert "Futura" not in root, "the geometric Futura-first chrome is gone"
-    # buttons must NOT use small-caps anymore
+    # mono carries the numbers/ids
+    assert "--mono:" in root and "ui-monospace" in root, "mono for every number/id/metric"
+    # buttons must NOT use small-caps
     btn = re.search(r"\n\.btn\s*\{([^}]*)\}", css)
-    assert btn and "small-caps" not in btn.group(1), "the .btn label is no longer small-caps"
-    # the hero headlines wear the serif
-    assert "var(--serif)" in css, "the serif is actually applied to a hero headline"
-    # small-caps survives ONLY as the reserved tiny-kicker use (e.g. .badge)
-    assert "small-caps" in css, "small-caps is retained for tiny eyebrow kickers"
+    assert btn and "small-caps" not in btn.group(1), "the .btn label is not small-caps"
+    # the small-caps eyebrow ornament is removed ENTIRELY (cool hard rule);
+    # section labels are tracked uppercase instead
+    assert "small-caps" not in css, "NO small-caps ornament anywhere in the cool system"
+    assert "text-transform: uppercase" in css and "letter-spacing" in css, \
+        "section labels are quiet tracked-uppercase, not small-caps"
 
 
 def test_form_restraint_radii_reduced_and_toy_motifs_removed(client):
@@ -819,7 +850,8 @@ def test_form_restraint_radii_reduced_and_toy_motifs_removed(client):
     overshoot, the likely-breathe pulse, the 45° striped chart placeholder."""
     css = client.get("/static/style.css").text
     root = _root(css)
-    assert "--radius: 8px" in root and "--radius-win: 10px" in root, "radii are tighter"
+    # COOL system: small radii throughout (6-8px)
+    assert "--radius: 7px" in root and "--radius-win: 8px" in root, "radii are small (6-8px)"
     assert "--radius-pill:" in root, "a small rounded-rect pill token replaces 999px"
     # the deleted motif keyframes / gradients are gone
     for motif in ("@keyframes dot-pulse", "@keyframes switcher-halo",
@@ -835,11 +867,14 @@ def test_form_restraint_radii_reduced_and_toy_motifs_removed(client):
     assert "coach-lit" not in modes, "the switcher coach-halo hook is removed"
 
 
-def test_grain_is_quieter(client):
-    """The paper grain is calmer: lower frequency + lower opacity."""
+def test_ground_is_flat_no_paper_grain(client):
+    """COOL PROFESSIONAL: the ground is a flat cool surface — the warm paper
+    grain is OFF (the grain overlay sits at opacity 0), so structure comes from
+    hairlines and flat panels, not texture."""
     css = client.get("/static/style.css").text
-    assert "baseFrequency='0.65'" in css, "the grain frequency is lowered"
-    assert "opacity: 0.025" in css, "the grain opacity is lowered from 0.03"
+    grain = re.search(r"body::before\s*\{([^}]*)\}", css)
+    assert grain, "the body grain overlay rule exists"
+    assert "opacity: 0" in grain.group(1), "the paper grain is turned off (flat cool ground)"
 
 
 def test_datamap_has_a_canvas_render_path_with_svg_fallback():
@@ -862,21 +897,25 @@ def test_datamap_has_a_canvas_render_path_with_svg_fallback():
     css = (STATIC_DIR / "style.css").read_text(encoding="utf-8")
     cv = re.search(r"\.constellation-canvas\s*\{([^}]*)\}", css)
     assert cv and "pointer-events: none" in cv.group(1), "the canvas takes no pointer events"
-    # the canvas paints with literal warm tokens (no CSS var() in a 2d context),
-    # and they are the MUTED palette
-    assert "#2C5956" in engine and "#D09735" in engine, "the canvas paints the muted wheel"
+    # the canvas paints with literal tokens (no CSS var() in a 2d context),
+    # and they are the COOL desaturated wheel (teal anchor + indigo data hue)
+    assert "#0E8C84" in engine and "#4A56C7" in engine, "the canvas paints the cool wheel"
 
 
-def test_payload_dropped_and_under_budget():
-    """The maturation NET-shrinks the decorative bloat; even with the additive
-    canvas layer the whole non-vendor shell stays under the 290 KB budget."""
+def test_payload_under_budget_with_canvas_and_both_themes():
+    """The cool Slate/Graphite rewrite stays under the 340 KB non-vendor budget,
+    even carrying the additive canvas layer and BOTH themes (Slate :root +
+    Graphite data-theme) in one stylesheet."""
     total = sum(
         p.stat().st_size
         for p in STATIC_DIR.rglob("*")
         if p.is_file() and "vendor" not in p.parts
     )
     assert total < PAYLOAD_BUDGET, f"non-vendor payload is {total} bytes (budget {PAYLOAD_BUDGET})"
-    # the stylesheet itself shrank vs the pre-maturation ~79.5 KB (chroma swaps
-    # are value-neutral; the deleted keyframes/gradients + comment trim shrink it)
+    # the stylesheet carries both themes and stays well within the budget — the
+    # cool system is disciplined (flat panels, hairlines, one accent), so a
+    # single stylesheet holds Slate + Graphite without blowing the ceiling.
     css_bytes = (STATIC_DIR / "style.css").stat().st_size
-    assert css_bytes < 79480, f"style.css ({css_bytes}) is smaller than the pre-maturation 79480"
+    assert css_bytes < PAYLOAD_BUDGET, (
+        f"style.css ({css_bytes}) carries both cool themes within the budget"
+    )

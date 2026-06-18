@@ -229,10 +229,10 @@ const spotlight = createSpotlight({
 });
 $("#spotlight-hint").addEventListener("click", () => spotlight.toggle());
 
-/* ───────────────────────────────────────────────── theme (warm default) */
+/* ───────────────────────────────── theme (Slate light is the default) */
 const THEME_KEY = "ontoforge.theme";
-/* sun (shown in Observatory/dark → tap to go warm) vs crescent moon
-   (shown in Atelier/warm → tap to go dark), built XSS-safe via svgEl. */
+/* sun (shown in Graphite/dark → tap to go light) vs crescent moon
+   (shown in Slate/light → tap to go dark), built XSS-safe via svgEl. */
 function themeIcon(theme) {
   const ic = svgEl("svg", {
     viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",
@@ -253,9 +253,9 @@ function applyTheme(theme) {
   const t = $("#theme-toggle");
   if (t) clear(t).append(themeIcon(theme));
 }
-applyTheme(store.get(THEME_KEY, "warm"));
+applyTheme(store.get(THEME_KEY, "light"));   // Slate light is the default
 $("#theme-toggle").addEventListener("click", () => {
-  const next = document.documentElement.getAttribute("data-theme") === "dark" ? "warm" : "dark";
+  const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
   store.set(THEME_KEY, next);
   applyTheme(next);
 });

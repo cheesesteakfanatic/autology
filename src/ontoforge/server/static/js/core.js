@@ -72,18 +72,19 @@ export function errorNote(err) {
 }
 
 /* ─────────────────────────────────────────── the categorical atlas wheel
-   The locked atomic-age 8-hue family. Every island, tag, chart series and
-   cite-dot picks from here, deterministically, so a concept keeps its hue
-   across the whole OS. Index 0 (teal) doubles as 'confirmed'. */
+   The locked COOL 8-hue family — low saturation, INFORMATION ONLY. Every
+   island, tag, chart series and cite-dot picks from here, deterministically,
+   so a concept keeps its hue across the whole OS. Index 0 (teal) doubles as
+   'confirmed'/positive. Same names/order/count as the warm wheel it replaced. */
 export const ATLAS_HUES = [
-  "#2C5956", // teal      — anchor / confirmed   (muted from #1F6F6B)
-  "#D09735", // marigold                          (muted from #E0A126)
-  "#945442", // terracotta                        (muted from #C75B39)
-  "#6C733A", // avocado                           (muted from #7C8A3B)
-  "#375E72", // ocean                             (muted from #2D6E8E)
-  "#945942", // persimmon rust                    (muted from #B8532A)
-  "#713D68", // plum raisin                       (muted from #6E4A63)
-  "#86663C", // mustard brown                     (muted from #9A6B2F)
+  "#0E8C84", // teal      — anchor / confirmed / positive
+  "#4A56C7", // indigo    — (was marigold)
+  "#5B6B86", // slate     — (was terracotta)
+  "#7D5BA6", // plum      — (was avocado)
+  "#3E6FA3", // steel blue — (was ocean)
+  "#9A6B86", // dusty mauve — (was persimmon)
+  "#4C5578", // deep indigo-slate — (was plum)
+  "#5E8C7A", // sage teal — (was mustard)
 ];
 
 /** Stable hue for any string key (uri / id / name) — same key, same hue. */
@@ -97,16 +98,16 @@ export function hueFor(key) {
 /** Per-app accent (the title-strip / dock-tile hue) — the dock order is the
     wheel order, so the eight apps each own a distinct atlas hue. */
 export const APP_HUE = {
-  ask: "#D09735",          // marigold — the primary console
-  constellation: "#2C5956",// teal — the map
-  inspector: "#375E72",    // ocean
-  evidence: "#86663C",     // mustard brown — the index-card tray
-  review: "#713D68",       // plum raisin — adjudication
-  dashboards: "#6C733A",   // avocado
-  pulse: "#945442",        // terracotta — the instrument cluster
-  exporter: "#945942",     // persimmon rust
+  ask: "#313ECF",          // the one accent — the primary console
+  constellation: "#0E8C84",// teal — the map
+  inspector: "#3E6FA3",    // steel blue
+  evidence: "#5E8C7A",     // sage teal — the index-card tray
+  review: "#7D5BA6",       // plum — adjudication
+  dashboards: "#4C5578",   // deep indigo-slate
+  pulse: "#5B6B86",        // slate — the instrument cluster
+  exporter: "#9A6B86",     // dusty mauve
 };
-export function appHue(appId) { return APP_HUE[appId] || "#6B5A45"; }
+export function appHue(appId) { return APP_HUE[appId] || "#525866"; }
 
 /* ───────────────────────────────────────────── the confidence gauge
    A 270° open arc (the kidney/TV-screen curve). Track in sunken bisque;

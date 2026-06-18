@@ -12,31 +12,32 @@ import {
   el, clear, api, errorNote, fmt, toast, loadOntology, ontologyNow,
 } from "../core.js";
 
-/* the warm editorial chart theme — the MUTED atlas wheel (kept in sync with
-   core.js ATLAS_HUES); humanist sans chrome, mono labels */
-const ATLAS_RANGE = ["#2C5956", "#D09735", "#945442", "#6C733A", "#375E72", "#945942", "#713D68", "#86663C"];
-const INK = "#2A1F14", WALNUT = "#6B5A45";
-const CHART_SANS = "-apple-system, 'Inter', 'Segoe UI', system-ui, sans-serif";
+/* the COOL professional chart theme — the cool desaturated atlas wheel (kept
+   in sync with core.js ATLAS_HUES); tight system sans chrome, mono labels.
+   The primary single-series mark is the indigo data hue; teal = positive. */
+const ATLAS_RANGE = ["#0E8C84", "#4A56C7", "#5B6B86", "#7D5BA6", "#3E6FA3", "#9A6B86", "#4C5578", "#5E8C7A"];
+const INK = "#14161A", WALNUT = "#525866";
+const CHART_SANS = "-apple-system, 'SF Pro Text', 'Inter', system-ui, sans-serif";
 const VEGA_CONFIG = {
   background: "transparent",
   view: { stroke: "transparent" },
   font: CHART_SANS,
   axis: {
     labelColor: WALNUT, titleColor: WALNUT,
-    gridColor: "rgba(42,31,20,0.08)", domainColor: "rgba(42,31,20,0.26)",
-    tickColor: "rgba(42,31,20,0.26)",
+    gridColor: "#E4E7EC", domainColor: "#D0D5DD",
+    tickColor: "#D0D5DD",
     labelFont: "ui-monospace, Menlo, monospace", titleFont: CHART_SANS,
-    labelFontSize: 10, titleFontSize: 10, gridDash: [1, 3],
+    labelFontSize: 10, titleFontSize: 10, gridDash: [],
   },
   legend: { labelColor: WALNUT, titleColor: WALNUT },
   title: { color: INK, font: CHART_SANS, fontWeight: 600 },
   range: { category: ATLAS_RANGE },
-  mark: { color: "#D09735" },
-  bar: { fill: "#D09735" },
-  line: { stroke: "#2C5956", strokeWidth: 2 },
-  point: { fill: "#2C5956" },
-  area: { fill: "#D09735", fillOpacity: 0.65 },
-  arc: { fill: "#D09735" },
+  mark: { color: "#4A56C7" },
+  bar: { fill: "#4A56C7" },
+  line: { stroke: "#4A56C7", strokeWidth: 2 },
+  point: { fill: "#4A56C7" },
+  area: { fill: "#4A56C7", fillOpacity: 0.12 },
+  arc: { fill: "#4A56C7" },
   text: { fill: INK, font: "ui-monospace, Menlo, monospace" },
 };
 
