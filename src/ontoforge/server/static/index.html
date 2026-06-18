@@ -73,11 +73,18 @@
   <section id="pane-build" class="pane pane-build" data-mode="build" role="tabpanel"
            aria-label="Build — measure something, pull data out" hidden></section>
 
-  <!-- STUDIO — the data-engineering workspace; WM windows are born here -->
+  <!-- STUDIO — the coherent cockpit: a left rail selects the center stage;
+       a fixed Confirm queue rides the right; the plain-English Console is a
+       persistent bottom command bar. The named apps mount into fixed regions
+       (no floating windows). #desktop survives as the transient evidence
+       overlay layer; #dock survives (test-pinned, holds minimized evidence). -->
   <section id="pane-studio" class="pane pane-studio" data-mode="studio" role="tabpanel"
            aria-label="Studio — add and wire up data" hidden>
-    <div id="desktop" class="desktop" aria-label="studio workspace">
-      <!-- the studio rail + panels mount here; WM windows float over the canvas -->
+    <div id="cockpit" class="cockpit-grid" aria-label="studio cockpit">
+      <!-- the studio-rail + cockpit regions are built in app.js -->
+      <div id="desktop" class="desktop" aria-label="studio overlays" aria-hidden="true">
+        <!-- transient evidence overlays are born here, over the stage -->
+      </div>
     </div>
   </section>
 

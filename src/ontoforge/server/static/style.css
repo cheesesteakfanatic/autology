@@ -1156,7 +1156,10 @@ td.cited { position: relative; }
   min-height: 0;
   display: flex;
   flex-direction: column;
-  background: var(--canvas);   /* flat cool ground for the data map */
+  /* in the cockpit the Data Map sits in the flat-white .map-stage card, so the
+     wrap is transparent — nodes (white discs) gain the framed white stage and
+     read as the focal object. Standalone (no stage) it falls back to slate. */
+  background: transparent;
   overflow: hidden;
 }
 
@@ -1181,17 +1184,18 @@ td.cited { position: relative; }
 .constellation .node-core {
   fill: var(--cream);
   stroke: var(--teal);
-  stroke-width: 1.5;
+  stroke-width: 1.7;           /* CONTRAST LIFT: a touch heavier resting ring */
   cursor: pointer;
   transition: stroke-width var(--ease);
 }
-.constellation .node-core:hover { stroke-width: 2.5; }
-.constellation g.selected .node-core { stroke-width: 2.5; fill: var(--marigold-wash); stroke: var(--marigold); }
+.constellation .node-core:hover { stroke-width: 2.6; }
+.constellation g.selected .node-core { stroke-width: 2.6; fill: var(--marigold-wash); stroke: var(--marigold); }
 .constellation .node-event { stroke: var(--walnut); stroke-dasharray: 2 3; fill: none; pointer-events: none; }
 .constellation .node-label {
   font-family: var(--sans);
-  font-size: 11px;
-  fill: var(--walnut);
+  font-size: 11.5px;
+  font-weight: 500;
+  fill: var(--chrome-ink);     /* CONTRAST LIFT: 8.9:1 ink, up from dim walnut */
   pointer-events: none;
 }
 .constellation g.selected .node-label { fill: var(--ink); }
@@ -1236,9 +1240,8 @@ td.cited { position: relative; }
 
 .constellation .island-hull {
   fill: var(--teal);                /* default; the engine may tint per island */
-  fill-opacity: 0.10;
-  stroke: var(--hairline-strong);
-  stroke-dasharray: 1 3;            /* a faint mid-century contour line */
+  fill-opacity: 0.16;               /* CONTRAST LIFT: islands read as regions */
+  stroke: var(--hairline-strong);   /* solid faint contour (was dashed 1 3) */
   vector-effect: non-scaling-stroke;
 }
 .constellation .island-label {
@@ -1253,8 +1256,8 @@ td.cited { position: relative; }
 .constellation .island-label .il-count { fill: var(--walnut); font-variant: normal; font-size: 0.82em; }
 
 .constellation .atlas-edge { fill: none; stroke-width: 2; pointer-events: none; vector-effect: non-scaling-stroke; }
-.constellation .tier-confirmed { stroke: var(--teal); stroke-opacity: 0.7; }
-.constellation .tier-likely    { stroke: var(--marigold); stroke-dasharray: 5 6; }  /* opacity ∝ score, per arc */
+.constellation .tier-confirmed { stroke: var(--teal); stroke-opacity: 0.85; }  /* CONTRAST LIFT: confirmed joins read at a glance */
+.constellation .tier-likely    { stroke: var(--marigold); stroke-dasharray: 5 6; }  /* opacity ∝ score, per arc (floor lifted in engine) */
 .constellation .tier-hint      { stroke: var(--walnut); stroke-width: 1; stroke-dasharray: 1 5; stroke-opacity: 0.2; }
 
 /* invisible wide hit twins make hairline arcs honestly hoverable */
@@ -2474,31 +2477,120 @@ html[data-theme="dark"] .src-table { box-shadow: none; }
 .addpanel-ad { width: 30px; height: 30px; border: 1px solid var(--hairline); border-radius: var(--radius-pill); display: flex; align-items: center; justify-content: center; }
 
 /* ══════ STUDIO — the workspace + left rail */
-.pane-studio { display: flex; }
+/* ══════════════════════════════════════ STUDIO — the coherent COCKPIT.
+   A fixed grid, NOT a floating-window desktop: a left RAIL selects the CENTER
+   stage; the Confirm queue is a fixed right column; the plain-English Console
+   is a persistent bottom command bar. Flat white panels on the slate ground,
+   structure carried by hairlines, ONE indigo accent — the Slate language. */
+.pane-studio { display: block; }
+.cockpit-grid {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 182px minmax(0, 1fr) 340px;
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "rail center confirm"
+    "rail console confirm";
+  gap: 14px;
+  padding: 14px;
+  background: var(--canvas);
+}
+
 .studio-rail {
-  width: 178px; flex: 0 0 178px;
+  grid-area: rail;
   background: var(--bisque);
-  border-right: 1px solid var(--hairline);
-  padding: 0.75rem 0.5rem; display: flex; flex-direction: column; gap: 0.25rem;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  padding: 0.6rem 0.5rem; display: flex; flex-direction: column; gap: 0.2rem;
   overflow: auto;
 }
 .rail-item {
   position: relative; text-align: left;
-  padding: 0.5rem 0.7rem; border: none; border-radius: 8px;
-  background: none; color: var(--walnut); cursor: pointer;  
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.5rem 0.65rem; border: none; border-radius: var(--radius);
+  background: none; color: var(--chrome-dim); cursor: pointer;
   font-family: var(--sans); font-size: var(--fs-2); font-weight: 500;
   transition: background var(--ease), color var(--ease);
 }
+.rail-item .rail-ic { width: 18px; height: 18px; flex: none; color: var(--ink-faint); }
 .rail-item:hover { background: var(--warm-white); color: var(--ink); }
-
-.rail-item.active { background: var(--warm-white); color: var(--ink); box-shadow: 0 0 0 1px var(--marigold-line) inset; }
+.rail-item.active {
+  background: var(--warm-white); color: var(--ink);
+  box-shadow: 0 0 0 1px var(--marigold-line) inset;
+}
+.rail-item.active .rail-ic { color: var(--marigold); }
 .rail-badge {
   position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%);
   min-width: 16px; height: 16px; padding: 0 4px;
-  background: var(--marigold); color: var(--ink); border-radius: 8px;
-  font-size: 0.6rem; font-weight: 600; display: inline-flex; align-items: center; justify-content: center;
+  background: var(--marigold); color: #fff; border-radius: var(--radius-pill);
+  font-family: var(--mono); font-size: 0.6rem; font-weight: 600;
+  display: inline-flex; align-items: center; justify-content: center;
 }
-#desktop { position: relative; top: 0; flex: 1; z-index: 1; }
+
+/* ── the CENTER stage — the high-contrast Data Map centerpiece ── */
+.cockpit-center {
+  grid-area: center; position: relative; min-width: 0; min-height: 0;
+  display: flex; flex-direction: column;
+}
+.map-stage {
+  background: var(--cream);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+}
+.cockpit-center .stage-app { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.cockpit-center .stage-app[hidden] { display: none; }
+.cockpit-center .region-body { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+
+/* ── the right column — the Confirm queue (review app) ── */
+.cockpit-confirm {
+  grid-area: confirm; min-height: 0;
+  display: flex; flex-direction: column;
+  background: var(--cream);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+}
+.cockpit-confirm .region-body { flex: 1; min-height: 0; overflow: auto; padding: 0.5rem 0.6rem 0.7rem; }
+
+/* ── the bottom command bar — the plain-English Console ── */
+.cockpit-console {
+  grid-area: console; min-height: 0;
+  background: var(--cream);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-2);
+  overflow: hidden;
+}
+.cockpit-console .region-body { max-height: 38vh; overflow: auto; }
+
+/* a shared region kicker (Confirm queue header) — quiet tracked uppercase */
+.region-head {
+  flex: none; display: flex; align-items: baseline; gap: 0.6rem;
+  padding: 0.7rem 0.85rem 0.55rem; border-bottom: 1px solid var(--hairline);
+}
+.region-kicker {
+  font-size: var(--fs-0); letter-spacing: 0.14em; text-transform: uppercase;
+  font-weight: 600; color: var(--chrome-dim);
+}
+.region-hint { font-size: var(--fs-1); color: var(--ink-faint); margin-left: auto; }
+
+/* a focus flash when a rail item targets an always-present region */
+.region-flash { box-shadow: 0 0 0 2px var(--marigold-line); }
+.cockpit-console.region-flash, .cockpit-confirm.region-flash { transition: box-shadow var(--ease-std); }
+
+/* the dock + the evidence overlay layer live OVER the stage.
+   The rail subsumed the dock; #desktop is now just the transient overlay host. */
+#dock { display: none; }
+#desktop {
+  position: absolute; inset: 0; z-index: 40;
+  pointer-events: none;            /* only the overlay windows catch events */
+  background: transparent;         /* overlay host must NOT paint over the cockpit */
+}
+#desktop .window { pointer-events: auto; }
 
 /* ── Data Catalog ── */
 .app-catalog .catalog-bar { display: flex; gap: 0.5rem; margin-bottom: 0.6rem; }
@@ -2612,10 +2704,22 @@ html[data-theme="dark"] .src-table { box-shadow: none; }
 .coach-lines li { font-size: var(--fs-2); color: var(--walnut); }
 .coach-lines b { color: var(--ink); font-weight: 600; letter-spacing: 0.01em; }
 
+@media (max-width: 1080px) {
+  /* the cockpit folds: the rail narrows to icons, the Confirm column slims */
+  .cockpit-grid { grid-template-columns: 56px minmax(0, 1fr) 280px; }
+  .rail-item .rail-label { display: none; }
+  .rail-item { justify-content: center; padding: 0.5rem; }
+}
 @media (max-width: 720px) {
   .mode-seg .seg-sub { display: none; }
   .build-grid { grid-template-columns: 1fr; }
   .surface-ask.sources-open .ask-main { grid-template-columns: 1fr; }
-  .studio-rail { width: 56px; flex-basis: 56px; }
-  .rail-item { font-size: 0; padding: 0.5rem; }
+  /* the cockpit stacks vertically on narrow screens */
+  .cockpit-grid {
+    grid-template-columns: 56px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1.4fr) minmax(0, 1fr) auto;
+    grid-template-areas: "rail center" "rail confirm" "rail console";
+  }
+  .rail-item .rail-label { display: none; }
+  .rail-item { justify-content: center; padding: 0.5rem; }
 }

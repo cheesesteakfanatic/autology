@@ -6,7 +6,7 @@
    THREE MODES (one always-visible switcher): ASK the questioner, BUILD the
    dashboard/data builder, STUDIO the windowed data-engineering desktop. */
 
-import { $, api, fmt, loadOntology, store, workspaceState, svgEl, clear } from "./js/core.js";
+import { $, el, api, fmt, loadOntology, store, workspaceState, svgEl, clear, appHue } from "./js/core.js";
 import { createBus } from "./js/bus.js";
 import { createModeShell, MODES } from "./js/modes.js";
 import { createAskSurface } from "./js/surfaces/ask.js";
@@ -19,15 +19,22 @@ import { createRegistry } from "./js/apps/registry.js";
 const registry = createRegistry();
 const bus = createBus();
 
-/* ════════════════════════════ STUDIO — the windowed power-tool substrate.
-   The WM + dock are born inside the STUDIO pane only. ASK and BUILD never
-   spawn windows. */
+/* ════════════════════════════ STUDIO — the coherent COCKPIT.
+   No longer a floating-window desktop: a left RAIL selects the CENTER
+   STAGE; a fixed CONFIRM queue rides the right; the plain-English CONSOLE
+   is a persistent bottom command bar. Each named app mounts ONCE into a
+   fixed cockpit region through a tiny host that mimics the WM ctx; visibility
+   toggles preserve state (and the Data Map live-build poller). The WM lives
+   on ONLY for the transient Evidence overlay ("Where this came from"), which
+   is genuinely a detached child of its citing element. */
 
-const studioDesktop = $("#desktop");
+const studioDesktop = $("#desktop");   // now the transient evidence-overlay layer
 let dock = null;
 let studioMounted = false;
 let studioApi = null;
 
+/* The WM is retained for the Evidence drill alone (multi+transient child
+   overlays). dockTarget is a no-op since the dock no longer magnifies. */
 const wm = createWM({
   desktop: studioDesktop, bus, registry,
   dockTarget: (win) => (dock ? dock.targetFor(win) : null),
@@ -35,10 +42,44 @@ const wm = createWM({
 });
 dock = createDock({ root: $("#dock"), registry, wm });
 
+/* ─────────────────────────────── the cockpit region host.
+   Mounts an app spec into a fixed region (NOT a floating window) with a ctx
+   that mirrors the WM contract: root=region body, on/emit over the bus,
+   addDisposer/setTitle/close/focus/openNear. The app code is unchanged. */
+const regions = new Map();   // appId -> { el, body, api }
+
+function mountRegion(appId, regionEl, params = {}) {
+  if (regions.has(appId)) return regions.get(appId);
+  const spec = registry.get(appId);
+  if (!spec) return null;
+  regionEl.style.setProperty("--accent", appHue(spec.id));
+  const body = el("div", { class: "region-body" });
+  regionEl.append(body);
+  const disposers = [], subs = [];
+  const ctx = {
+    winId: `region-${appId}`,
+    root: body,
+    setTitle() { /* the cockpit names regions in chrome, not per-app */ },
+    on(event, fn) { const off = bus.on(event, fn); subs.push(off); return off; },
+    emit(event, payload = {}) { bus.emit(event, { sourceWinId: `region-${appId}`, ...payload }); },
+    addDisposer(fn) { disposers.push(fn); },
+    close() { /* fixed regions don't close */ },
+    focus() { focusRegion(appId); },
+    openNear(otherApp, otherParams, otherOpts = {}) {
+      // an app asking to open a neighbour (Evidence) → the transient overlay
+      return wm.open(otherApp, otherParams, otherOpts);
+    },
+  };
+  const appApi = spec.mount(ctx, params) || {};
+  const rec = { el: regionEl, body, api: appApi, subs, disposers };
+  regions.set(appId, rec);
+  return rec;
+}
+
 /* ─────────────────────────────────── intent routing policy (Studio).
-   Apps emit; the shell decides which window answers. Apps never import or
+   Apps emit; the shell decides which region answers. Apps never import or
    reference each other. Several intents must also surface STUDIO first so a
-   window has somewhere to live. */
+   region exists to receive them. */
 
 function ensureStudio() {
   if (modes && modes.current() !== "studio") modes.switchTo("studio");
@@ -48,36 +89,32 @@ bus.on("app:launch", ({ app }) => {
   const spec = registry.get(app);
   if (!spec) return;
   ensureStudio();
-  if (spec.multi === false) {
-    const existing = wm.find((w) => w.app.id === app);
-    if (existing) { wm.focus(existing); return; }
-  }
-  wm.open(app);
+  // center apps route to the stage; fixed-region apps just focus their region
+  if (app === "evidence") { wm.open(app); return; }
+  showPanel(app);
 });
 
-bus.on("entity:open", ({ uri, sourceWinId }) => {
+bus.on("entity:open", ({ uri }) => {
   if (!uri) return;
   ensureStudio();
-  const existing = wm.find((w) => w.app.id === "inspector" && w.appApi.uri && w.appApi.uri() === uri);
-  if (existing) { wm.focus(existing); return; }
-  const source = sourceWinId ? wm.get(sourceWinId) : null;
-  wm.open("inspector", { uri }, source ? { near: source } : {});
+  // the Record opens as a CENTER detail view, loading the requested entity
+  showCenter("inspector");
+  const rec = regions.get("inspector");
+  if (rec && rec.api.load) rec.api.load(uri);
 });
 
 bus.on("class:focus", ({ uri, prop }) => {
   ensureStudio();
-  const existing = wm.find((w) => w.app.id === "constellation");
-  if (existing) {
-    wm.focus(existing);
-    if (uri && existing.appApi.focusClass) existing.appApi.focusClass(uri, prop);
-  } else {
-    wm.open("constellation", uri ? { uri, prop } : {});
-  }
+  showCenter("constellation");
+  const rec = regions.get("constellation");
+  if (uri && rec && rec.api.focusClass) rec.api.focusClass(uri, prop);
 });
 
+/* Evidence stays a genuinely-floating transient overlay over the stage
+   (child of its citing element). It keeps using the WM. */
 function routeEvidence(params, sourceWinId) {
   ensureStudio();
-  const source = sourceWinId ? wm.get(sourceWinId) : null;
+  const source = sourceWinId && wm.get ? wm.get(sourceWinId) : null;
   if (source) {
     const child = wm.find((w) => w.app.id === "evidence" && w.parentId === source.id);
     if (child) { if (child.appApi.show) child.appApi.show(params); wm.focus(child); return; }
@@ -101,11 +138,10 @@ bus.on("review:count", ({ count }) => { if (modes) modes.setBadge(count); });
 bus.on("mode:goto", ({ mode, panel }) => { if (modes) modes.switchTo(mode, panel ? { panel } : {}); });
 bus.on("ask:suggest", () => { if (modes) modes.switchTo("ask", { suggest: true }); });
 
-/* ════════════════════════════ STUDIO layout — the labeled panels.
-   The signature pairing on entry: the Data Map canvas with the Console
-   docked along the bottom. A left rail names the sections; clicking one
-   focuses (or opens) the matching window. The dock still powers the
-   windows; the rail is the plain-language way in. */
+/* ════════════════════════════ STUDIO layout — the cockpit regions.
+   A left rail names the sections; clicking one selects the CENTER stage (or
+   focuses the always-present Confirm queue / Console bar). The Data Map is
+   the default high-contrast centerpiece. */
 
 const STUDIO_PANELS = [
   { id: "catalog", label: "Data Catalog" },
@@ -113,41 +149,76 @@ const STUDIO_PANELS = [
   { id: "console", label: "Console" },
   { id: "review", label: "Confirm suggestions" },
   { id: "pulse", label: "Activity" },
+  { id: "observatory", label: "Observatory" },
 ];
 
-function focusOrOpen(appId, params) {
-  const existing = wm.find((w) => w.app.id === appId);
-  if (existing) { wm.focus(existing); return existing; }
-  return wm.open(appId, params || {});
-}
+// which rail ids live in the CENTER stage (swapped) vs. fixed cockpit regions
+const CENTER_APPS = ["constellation", "catalog", "pulse", "observatory", "inspector"];
+const RAIL_GLYPHS = {
+  catalog: "M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z",
+  constellation: "M6 6m-2.5 0a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0 -5 0M18 9m-2.5 0a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0 -5 0M9 18m-2.5 0a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0 -5 0M8 7.5l8 .8M7.5 16l1.2-7M11 17l5.5-6",
+  console: "M3 4h18v16H3zM7 9l3 3-3 3M13 15h4",
+  review: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M8.5 12.5l2.3 2.3 4.7-5",
+  pulse: "M3 12h4l2.5 7 5-14 2.5 7h4",
+  observatory: "M11 5a6 6 0 1 0 0 12 6 6 0 0 0 0-12M15.5 15.5L21 21",
+};
+let centerHost = null;   // the stage region wrapper that holds the swapped apps
 
-async function mountStudio(firstVisit) {
+/* The cockpit shell: rail | center stage | confirm rail, console bar across
+   the bottom. Built ONCE; the apps mount lazily into their regions. */
+async function mountStudio() {
   if (studioMounted) return;
   studioMounted = true;
 
-  // a left rail of named sections (not a flat icon dock)
-  const rail = document.createElement("nav");
-  rail.className = "studio-rail";
-  rail.setAttribute("aria-label", "studio sections");
+  const cockpit = $("#cockpit");
+
+  // ── left rail of named sections ──
+  const rail = el("nav", { class: "studio-rail", "aria-label": "studio sections" });
   for (const p of STUDIO_PANELS) {
-    const btn = document.createElement("button");
-    btn.className = "rail-item";
-    btn.type = "button";
-    btn.dataset.panel = p.id;
-    btn.textContent = p.label;
+    const icon = svgEl("svg", {
+      class: "rail-ic", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",
+      "stroke-width": "1.6", "stroke-linecap": "round", "stroke-linejoin": "round",
+      "aria-hidden": "true",
+    }, svgEl("path", { d: RAIL_GLYPHS[p.id] || "" }));
+    const label = el("span", { class: "rail-label" }, p.label);
+    const btn = el("button", {
+      class: "rail-item", type: "button", dataset: { panel: p.id },
+      onclick: () => showPanel(p.id),
+    }, icon, label);
     if (p.id === "review") {
-      const b = document.createElement("span");
-      b.className = "rail-badge";
-      b.id = "rail-review-badge";
-      b.hidden = true;
-      btn.append(b);
+      btn.append(el("span", { class: "rail-badge", id: "rail-review-badge", hidden: "hidden" }));
     }
-    btn.addEventListener("click", () => showPanel(p.id));
     rail.append(btn);
   }
-  studioDesktop.parentElement.insertBefore(rail, studioDesktop);
 
-  // decide the entry panel from the data state
+  // ── center stage (the high-contrast centerpiece host) ──
+  centerHost = el("div", { class: "cockpit-center map-stage", id: "cockpit-center" });
+
+  // ── right rail: the Confirm queue (review app, always present) ──
+  const confirm = el("aside", { class: "cockpit-confirm", "aria-label": "Confirm suggestions" },
+    el("div", { class: "region-head" },
+      el("span", { class: "region-kicker" }, "Confirm queue"),
+      el("span", { class: "region-hint" }, "suggested joins & merges")));
+
+  // ── bottom: the plain-English Console command bar (console app) ──
+  const consoleBar = el("div", { class: "cockpit-console", "aria-label": "Console command bar" });
+
+  // insert the regions BEFORE #desktop (the evidence overlay layer stays last)
+  cockpit.insertBefore(rail, studioDesktop);
+  cockpit.insertBefore(centerHost, studioDesktop);
+  cockpit.insertBefore(confirm, studioDesktop);
+  cockpit.insertBefore(consoleBar, studioDesktop);
+
+  // mount the permanent regions: Confirm queue + Console + the live Data Map
+  mountRegion("review", confirm);
+  mountRegion("console", consoleBar);
+  // the Data Map mounts up front so studio:build-started always animates,
+  // even before the rail selects it
+  const stageMap = el("div", { class: "stage-app", dataset: { app: "constellation" } });
+  centerHost.append(stageMap);
+  mountRegion("constellation", stageMap);
+
+  // decide the entry view from the data state
   let ws = null;
   try { ws = await workspaceState(); } catch { ws = null; }
   let onto = null;
@@ -155,38 +226,53 @@ async function mountStudio(firstVisit) {
   const hasModel = !!(onto && onto.classes && onto.classes.length) || !!(ws && ws.built);
   const hasData = !!(ws && ws.datasets && ws.datasets.length);
 
-  if (!hasData && !hasModel) {
-    // empty project: Data Catalog front and center
-    showPanel("catalog");
-  } else {
-    // the signature moment: Data Map on top, Console docked along the bottom
-    focusOrOpen("constellation");
-    focusOrOpen("console");
-    tileStudioSignature();
-    showPanel("constellation");
-  }
+  // empty project → Data Catalog front and centre; else → the Data Map
+  showPanel(hasData || hasModel ? "constellation" : "catalog");
+  tileStudioSignature();
 
   studioApi = { showPanel };
 }
 
+/* The signature pairing is now structural (the cockpit grid puts the Data
+   Map centre-stage with the Console docked along the bottom) — no hand-tiling
+   of floating windows. Kept as a hook for entry + the test pin. */
 function tileStudioSignature() {
-  // Data Map fills the top; Console docked along the bottom.
-  const map = wm.find((w) => w.app.id === "constellation");
-  const con = wm.find((w) => w.app.id === "console");
-  const W = studioDesktop.clientWidth, H = studioDesktop.clientHeight;
-  if (W < 50 || H < 50) return;
-  const split = Math.round(H * 0.62);
-  if (map) { Object.assign(map, { x: 0, y: 0, w: W, h: split, snapped: null }); wm.applyRect(map); }
-  if (con) { Object.assign(con, { x: 0, y: split + 8, w: W, h: Math.max(180, H - split - 8), snapped: null }); wm.applyRect(con); }
+  if (centerHost) centerHost.classList.add("signature");
+}
+
+/* ensure a center app is mounted into the stage host, show it, hide siblings */
+function showCenter(appId) {
+  if (!centerHost) return null;
+  if (!CENTER_APPS.includes(appId)) return null;
+  let host = centerHost.querySelector(`.stage-app[data-app="${appId}"]`);
+  if (!host) {
+    host = el("div", { class: "stage-app", dataset: { app: appId } });
+    centerHost.append(host);
+    mountRegion(appId, host);
+  }
+  for (const node of centerHost.querySelectorAll(".stage-app")) {
+    node.hidden = node !== host;
+  }
+  return regions.get(appId);
+}
+
+/* a fixed-region rail item (Confirm / Console) just focuses its region */
+function focusRegion(appId) {
+  const rec = regions.get(appId);
+  if (!rec) return;
+  rec.el.classList.add("region-flash");
+  setTimeout(() => rec.el.classList.remove("region-flash"), 700);
+  const focusable = rec.body.querySelector("input, textarea, button, [tabindex]");
+  if (focusable) focusable.focus({ preventScroll: true });
 }
 
 function showPanel(panelId) {
-  const win = focusOrOpen(panelId);
-  // light the rail item
+  ensureStudio();
+  if (CENTER_APPS.includes(panelId)) showCenter(panelId);
+  else focusRegion(panelId);     // review / console are always-present regions
   for (const b of document.querySelectorAll(".rail-item")) {
     b.classList.toggle("active", b.dataset.panel === panelId);
   }
-  return win;
 }
 
 bus.on("studio:show-map", () => { ensureStudio(); showPanel("constellation"); });
@@ -296,6 +382,7 @@ document.addEventListener("keydown", (e) => {
 
   if (e.key === "Escape" && !typing) {
     if (modes.current() === "studio") {
+      // a transient evidence overlay closes first
       const top = wm.topWin();
       if (top && top.app.transient) wm.close(top);
     }
@@ -310,16 +397,33 @@ document.addEventListener("keydown", (e) => {
   if (modes.current() === "ask") {
     if (askSurface.onKey && askSurface.onKey(e)) return;
   }
-  // keys aimed inside a Studio window belong to that window's app
+  // STUDIO cockpit: keys aimed at a region route to that region's app.
+  // j/k/a/r belong to the Confirm queue (review); other regions get keys
+  // when the event originates inside them.
   if (modes.current() === "studio") {
+    // a transient evidence overlay (a real WM window) claims keys first
     const hitWin = e.target instanceof Element && e.target.closest(".window");
     if (hitWin) {
       const win = wm.get(hitWin.dataset.winId);
       if (win && win.appApi.onKey) win.appApi.onKey(e);
       return;
     }
-    const top = wm.topWin();
-    if (top && top.appApi.onKey) top.appApi.onKey(e);
+    // which fixed region does the event belong to?
+    const hitRegion = e.target instanceof Element
+      && e.target.closest(".cockpit-confirm, .cockpit-console, .cockpit-center");
+    if (hitRegion) {
+      for (const [id, rec] of regions) {
+        if (rec.el === hitRegion || rec.el.contains(hitRegion) || hitRegion.contains(rec.el)) {
+          if (rec.api.onKey) rec.api.onKey(e);
+          return;
+        }
+      }
+    }
+    // the Confirm queue owns the global j/k/a/r adjudication shortcuts
+    if (/^[jkar]$/i.test(e.key)) {
+      const rev = regions.get("review");
+      if (rev && rev.api.onKey) rev.api.onKey(e);
+    }
   }
 });
 

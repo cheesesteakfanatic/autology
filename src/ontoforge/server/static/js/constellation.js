@@ -208,7 +208,7 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
     const labelsHidden = svg.classList.contains("labels-hidden");
 
     for (const h of drawList.hulls) {
-      cctx.globalAlpha = 0.10;
+      cctx.globalAlpha = 0.16;   // CONTRAST LIFT: islands read as regions (matches CSS)
       cctx.fillStyle = h.hue;
       roundRect(cctx, X(h.x), Y(h.y), h.w * sx, h.h * sy, 18 * sx);
       cctx.fill();
@@ -241,9 +241,11 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
       cctx.beginPath(); cctx.arc(cx, cy, r, 0, 6.2832);
       cctx.fillStyle = n.silo ? BISQUE : CREAM;
       cctx.fill();
-      cctx.lineWidth = (n.uri === selectedUri ? 2.5 : 1.5) * dpr;
+      cctx.lineWidth = (n.uri === selectedUri ? 2.6 : 1.7) * dpr;
       cctx.strokeStyle = n.uri === selectedUri ? MARIGOLD : (n.hue || TEAL);
-      cctx.globalAlpha = Math.max(0.15, n.lum);
+      // CONTRAST LIFT: the resting ring alpha floors at 0.45 (was 0.15) to
+      // match the SVG path — legible white discs on the flat-white stage.
+      cctx.globalAlpha = n.lum > 0.02 ? Math.max(0.45, n.lum) : 0.45;
       cctx.stroke();
     }
     cctx.globalAlpha = 1;
@@ -463,7 +465,11 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
 
   function appendNode(layer, uri, x, y, c, { halo = true, hue = null } = {}) {
     const r = nodeRadius(c);
-    const lum = Math.max(0.15, c.confidence);
+    // CONTRAST LIFT: resting node ring opacity floors at 0.45 (was 0.15) so a
+    // white disc on the flat-white stage keeps a legible ring; the confidence
+    // halo stays a whisper (off the raw confidence, not the lifted floor).
+    const haloLum = Math.max(0.15, c.confidence);
+    const lum = Math.max(0.45, c.confidence);
     const g = svgEl("g", {
       class: uri === selectedUri ? "selected" : "",
       "data-uri": uri,
@@ -472,7 +478,7 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
       // luminance halo: marigold glow scaled by confidence — the star's heat
       g.append(svgEl("circle", {
         class: "node-halo", cx: x.toFixed(1), cy: y.toFixed(1),
-        r: (r * 2.1).toFixed(1), opacity: (0.12 * lum).toFixed(3),
+        r: (r * 2.1).toFixed(1), opacity: (0.12 * haloLum).toFixed(3),
       }));
     }
     g.append(svgEl("circle", {
@@ -760,10 +766,13 @@ export function createConstellation({ svg, wrap, card, evCard, svgEl, el, clear,
       // a likely hypothesis carries its weight: opacity ∝ score; it whispers
       // until lit; a cross-island bridge whispers quieter than a local guess
       const score = Math.max(0, Math.min(1, Number(l.score) || 0));
-      const likelyAlpha = (bridge ? 0.65 : 1) * (0.1 + 0.38 * score);
+      // CONTRAST LIFT: the likely-arc opacity floor rises 0.1 → 0.2 so a likely
+      // join is legible at rest; it still scales with score and dims for bridges.
+      const likelyAlpha = (bridge ? 0.7 : 1) * (0.2 + 0.36 * score);
       if (useCanvas) {
           const m = arcMid(a, b, 110);
-        const base = tier === "confirmed" ? 0.7 : tier === "likely" ? likelyAlpha : 0.2;
+        // confirmed joins paint solid teal at 0.85 (was 0.7) — read at a glance
+        const base = tier === "confirmed" ? 0.85 : tier === "likely" ? likelyAlpha : 0.2;
         drawList.arcs.push({
           li, tier, touchesSilo,
           ax: a.x, ay: a.y, bx: b.x, by: b.y, cx: m.cx, cy: m.cy,

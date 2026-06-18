@@ -21,9 +21,12 @@ ATLAS_FIXTURE = Path(__file__).parent / "fixtures" / "atlas_synthetic_250.json"
 
 #: the three modes
 MODES = ("ask", "build", "studio")
-#: STUDIO's windowed power-tool apps (internal ids kept; labels de-jargoned).
-#: ``observatory`` is the OBSERVABILITY surface (R0 P1): value-level lineage,
-#: the append-only audit log, run history, and the compute-at-cost ledger.
+#: STUDIO's power-tool apps (internal ids kept; labels de-jargoned). They are
+#: now mounted into the fixed COCKPIT regions (rail-selected center stage,
+#: Confirm queue, Console bar) rather than floating WM windows — but the app
+#: code and its endpoints are REUSED unchanged. ``observatory`` is the
+#: OBSERVABILITY surface (R0 P1): value-level lineage, the append-only audit
+#: log, run history, and the compute-at-cost ledger.
 STUDIO_APPS = (
     "catalog", "datamap", "console", "review", "pulse", "inspector", "evidence", "observatory",
 )
@@ -77,9 +80,13 @@ def test_root_serves_the_three_mode_shell(client):
     # spotlight is pre-mounted so open is instant
     assert 'id="spotlight"' in html and 'id="spotlight-input"' in html
     assert 'role="combobox"' in html and 'aria-controls="spotlight-results"' in html
-    # the studio dock is present but starts hidden (Studio-only chrome)
+    # STUDIO is now a coherent COCKPIT, not floating windows: the cockpit grid
+    # is the studio pane's frame (rail | center stage | confirm | console bar)
+    assert 'id="cockpit"' in html and "cockpit-grid" in html, "the studio cockpit grid frame"
+    # the dock survives (Studio-only chrome, starts hidden) — it now holds
+    # minimized transient Evidence overlays rather than every app
     assert 'id="dock"' in html
-    # the studio workspace canvas where WM windows are born
+    # #desktop survives as the transient evidence-overlay layer over the stage
     assert 'id="desktop"' in html
     # first-run orientation coach
     assert 'id="coach"' in html
@@ -111,7 +118,7 @@ def test_app_boots_into_ask_and_routes_modes():
     assert 'modes.boot("ask"' in app, "ASK is the default landing for every session"
     # ⌘1/⌘2/⌘3 jump straight to a mode — the shell claims these first
     assert "modeForDigit" in app
-    # the windowed apps live in STUDIO only; intents surface Studio first
+    # the cockpit apps live in STUDIO only; intents surface Studio first
     assert "ensureStudio" in app
 
 
@@ -352,17 +359,30 @@ def test_studio_engineering_console_previews_then_applies(client):
 
 
 def test_studio_left_rail_names_the_sections():
-    """STUDIO is organized into labeled, persistent sections (not a flat
-    icon dock): Data Catalog, Data Map, Console, Confirm suggestions,
-    Activity — a named left rail, the dock is the substrate underneath."""
+    """STUDIO is a coherent COCKPIT, not floating windows: a named left RAIL
+    selects the high-contrast CENTER stage; the Confirm queue rides a fixed
+    right region; the plain-English Console is a persistent bottom command bar.
+    The rail names labeled sections — Data Catalog, Data Map, Console, Confirm
+    suggestions, Activity, Observatory — and clicking one shows that section."""
     app = (STATIC_DIR / "app.js").read_text(encoding="utf-8")
     assert "STUDIO_PANELS" in app and "studio-rail" in app
-    for label in ("Data Catalog", "Data Map", "Console", "Confirm suggestions", "Activity"):
+    for label in ("Data Catalog", "Data Map", "Console", "Confirm suggestions",
+                  "Activity", "Observatory"):
         assert label in app, f"the rail names the '{label}' section"
-    # the signature pairing on entry: Data Map + Console docked
+    # the cockpit regions are fixed (not floating windows): a center stage host,
+    # a Confirm queue region, a Console command bar — the apps mount into them
+    assert "mountRegion" in app, "apps mount into fixed cockpit regions (reused, not rewritten)"
+    assert "cockpit-center" in app and "cockpit-confirm" in app and "cockpit-console" in app, \
+        "the center stage, the Confirm queue and the Console bar are fixed regions"
+    # the Data Map is the default centerpiece; the rail toggles the center stage
+    assert "showPanel" in app and "CENTER_APPS" in app
+    # the signature pairing is now structural (Data Map centre-stage, Console bar)
     assert "tileStudioSignature" in app
     css = (STATIC_DIR / "style.css").read_text(encoding="utf-8")
     assert ".studio-rail" in css and ".rail-item" in css
+    assert ".cockpit-grid" in css and ".cockpit-center" in css, "the cockpit grid is styled"
+    assert ".cockpit-confirm" in css and ".cockpit-console" in css, \
+        "the Confirm queue and Console bar regions are styled"
 
 
 # ════════════════════════════════════════════ first-run onboarding
