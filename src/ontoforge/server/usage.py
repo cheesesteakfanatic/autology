@@ -212,6 +212,39 @@ def record_usage(world: Any, element_uris: list[str], kind: str) -> None:
         return
 
 
+def scores_by_class(world: Any) -> dict[str, float]:
+    """Every class uri → its criticality score, with a STRUCTURAL fallback.
+
+    The lazy model only assigns a usage/recency-weighted score to uris that
+    actual usage has touched; a fresh / never-queried world therefore scores
+    every class 0. To rank FIELDS meaningfully before any usage accrues we fall
+    back to a normalized graph DEGREE (the same centrality signal the model
+    blends), so a highly-connected class still ranks above an isolated one.
+
+    Returns ``{}`` for an unbuilt world (no graph) or any failure — never raises.
+    The mapping is a pure function of the ontology/atlas + accrued usage, so it
+    is deterministic for a given world state.
+    """
+    try:
+        with _LOCK:
+            state = _active(world)
+            model = state.model
+            adjacency = state.adjacency
+            max_deg = max((len(n) for n in adjacency.values()), default=0)
+            live = model.scores  # treat as read-only
+            out: dict[str, float] = {}
+            for uri in model.nodes:
+                s = float(live.get(uri, 0.0))
+                if s <= 0.0 and max_deg > 0:
+                    # structural prior: normalized degree, discounted so any real
+                    # usage score always dominates a purely-structural one.
+                    s = 0.25 * (len(adjacency.get(uri, ())) / max_deg)
+                out[uri] = s
+            return out
+    except Exception:
+        return {}
+
+
 def top_criticality(world: Any, n: int = DEFAULT_TOP_N) -> list[dict[str, Any]]:
     """Top-``n`` critical elements as ``[{uri, label, score}]`` (score desc).
 

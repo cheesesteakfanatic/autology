@@ -763,3 +763,141 @@ class CriticalityOut(BaseModel):
 
     elements: list[CriticalityElement] = Field(default_factory=list)
     total: int = 0
+
+
+# ===================================================================== FIELDS
+# GET /api/fields — the faceted, criticality-RANKED field search that scales to
+# thousands of datasets. Every numeric/dimensioned property becomes a MEASURE
+# (with a default aggregate + unit), every other groupable property a DIMENSION.
+# Each field carries its OWNING class (the "dataset"/type) and that class's
+# criticality score, so the panel ranks the most important fields first instead
+# of dumping a flat list. ``q`` does a deterministic grounding-score search
+# (VISTA's lexicon); facets give COUNTS so the UI can offer filter pills.
+
+
+class FieldOut(BaseModel):
+    """One searchable analytic field of the active ontology.
+
+    ``key`` is a stable client id (``"measure:<class_uri>:<prop>:<agg>"`` or
+    ``"dim:<class_uri>:<prop>"``). ``kind`` is ``measure`` or ``dimension``.
+    ``on_class`` / ``dataset`` are the owning class uri / human name (the
+    "dataset"). For a measure: ``prop`` (the measure property), ``agg`` (default
+    aggregate), ``unit`` (canonical unit, if any). For a dimension: ``dim_kind``
+    (``temporal``|``categorical``|``link``) and ``link_target`` (range-class name
+    when it is a link). ``rows`` is the owning class's materialized extent size,
+    ``criticality`` its criticality score, ``score`` the search relevance
+    (grounding × criticality; equal to criticality when ``q`` is empty)."""
+
+    key: str
+    kind: Literal["measure", "dimension"]
+    label: str
+    prop: str
+    on_class: str
+    dataset: str
+    domain: str = ""
+    agg: Optional[str] = None
+    unit: Optional[str] = None
+    dim_kind: Optional[str] = None
+    link_target: Optional[str] = None
+    rows: int = 0
+    criticality: float = 0.0
+    score: float = 0.0
+
+
+class FacetCount(BaseModel):
+    """One facet value + how many fields match it (for the filter pills)."""
+
+    value: str
+    label: str = ""
+    count: int = 0
+
+
+class FieldFacets(BaseModel):
+    """Facet histograms over the WHOLE matched field set (not just the page) so
+    the panel's filter pills show real totals as it scales."""
+
+    kind: list[FacetCount] = Field(default_factory=list)        # measure/dimension
+    domain: list[FacetCount] = Field(default_factory=list)      # owning-class domain
+    dataset: list[FacetCount] = Field(default_factory=list)     # owning class
+    unit: list[FacetCount] = Field(default_factory=list)        # measure units
+    dim_kind: list[FacetCount] = Field(default_factory=list)    # temporal/categorical/link
+
+
+class FieldsOut(BaseModel):
+    """GET /api/fields — ranked top-N fields + facet counts. Never a flat dump:
+    ``fields`` is paginated (``limit``), ``total`` is the full match count, and
+    ``facets`` count across the entire match set. Empty everything on an unbuilt
+    world (never raises)."""
+
+    fields: list[FieldOut] = Field(default_factory=list)
+    facets: FieldFacets = Field(default_factory=FieldFacets)
+    total: int = 0
+    returned: int = 0
+
+
+# ====================================================================== VIEW
+# POST /api/view — parse a Tableau-shelf / natural-language view request into a
+# structured ViewSpec, EXECUTE it over the materialized world, and return the
+# rows + a ready-to-chart Vega-Lite spec + per-cell citations. If the text is
+# ambiguous it returns a clarification (one question + options) rather than
+# guessing — never a confidently-wrong view.
+
+
+class ViewMeasure(BaseModel):
+    prop: Optional[str] = None        # measure property name (None ⇒ COUNT of rows)
+    agg: str = "count"                # count|sum|avg|min|max
+    unit: Optional[str] = None
+
+
+class ViewBreakdown(BaseModel):
+    prop: str                         # group-by property name
+    kind: str = "categorical"         # temporal|categorical|link
+    grain: Optional[str] = None       # reserved (temporal grain); v0 leaves None
+
+
+class ViewFilter(BaseModel):
+    prop: str
+    op: Literal["==", "!=", "<", "<=", ">", ">=", "contains"] = "=="
+    value: Any = None
+
+
+class ViewSpec(BaseModel):
+    """The structured view request (shelves). ``class_uri`` is the dataset/type
+    the measure+breakdowns live on; ``viz`` is the resolved chart type."""
+
+    class_uri: str = ""
+    class_name: str = ""
+    measure: ViewMeasure = Field(default_factory=ViewMeasure)
+    breakdowns: list[ViewBreakdown] = Field(default_factory=list)
+    filters: list[ViewFilter] = Field(default_factory=list)
+    viz: Literal["kpi", "bar", "line"] = "kpi"
+
+
+class ViewIn(BaseModel):
+    """Either free ``text`` (natural language) OR a pre-built ``spec`` (the
+    shelves the UI assembled). When both are present ``spec`` wins; ``text``
+    then only supplies filters/agg the spec left unset."""
+
+    text: Optional[str] = None
+    spec: Optional[ViewSpec] = None
+    limit: int = 5000
+
+
+class ViewOut(BaseModel):
+    """POST /api/view result. On a confident parse: ``spec`` (the resolved
+    shelves), ``vega`` (the chart spec with data filled), ``columns``/``rows``
+    (the executed table), ``citations`` (per-cell atom evidence), and
+    ``plain_english`` (a human restatement). On ambiguity: ``clarification`` (the
+    ONE question) + ``options`` and an empty chart. On an unbuilt/empty world:
+    ``abstained`` with a reason."""
+
+    spec: Optional[ViewSpec] = None
+    vega: dict[str, Any] = Field(default_factory=dict)
+    columns: list[str] = Field(default_factory=list)
+    rows: list[list[Any]] = Field(default_factory=list)
+    citations: list[ExtractCitation] = Field(default_factory=list)
+    plain_english: str = ""
+    clarification: Optional[str] = None
+    options: list[str] = Field(default_factory=list)
+    abstained: bool = False
+    abstain_reason: str = ""

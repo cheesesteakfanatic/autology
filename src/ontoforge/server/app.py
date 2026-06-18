@@ -1265,6 +1265,45 @@ def create_app(project: Path | str) -> FastAPI:
             total=len(elements),
         )
 
+    # -------------------------------------------------------- fields / view
+    # The Build-mode analytic surface, server-side: a faceted criticality-ranked
+    # field search (replacing the old client regex chip list) + an NL/shelf view
+    # request that parses → executes → cites a single chart. Both keyless,
+    # offline, deterministic, and DEFENSIVE on an unbuilt world (never 500).
+
+    @app.get("/api/fields", response_model=S.FieldsOut)
+    async def api_fields(
+        q: str = "", type: str = "", domain: str = "", dataset: str = "", limit: int = 60
+    ) -> S.FieldsOut:
+        """Every analytic field of the active ontology — each numeric/dimensioned
+        property as a MEASURE (default agg + unit + owning class + extent size +
+        criticality), every other groupable property as a DIMENSION — RANKED by a
+        deterministic grounding-score search (``q``) blended with the owning
+        class's criticality, with facet COUNTS (kind / domain / dataset / unit /
+        dim_kind). Paginated top-N (``limit``), never a flat dump — the scale
+        story. ``type`` (measure|dimension), ``domain``, and ``dataset`` (owning
+        class name or uri) narrow the set. Empty on an unbuilt world."""
+        from . import fields as field_search
+
+        with world.lock:
+            return field_search.search_fields(
+                world, q=q, type_=type, domain=domain, dataset=dataset, limit=limit
+            )
+
+    @app.post("/api/view", response_model=S.ViewOut)
+    async def api_view(body: S.ViewIn) -> S.ViewOut:
+        """Parse a natural-language (or shelf-driven) view request — measure,
+        break down by, filter, chart type — into a structured ViewSpec, EXECUTE
+        it over the materialized world, and return the resolved spec, a
+        ready-to-render Vega-Lite chart with data, the table rows, per-cell SOURCE
+        citations, and a plain-English restatement. Ambiguous text returns a
+        clarification (one question + options), never a confident guess; an
+        unbuilt world abstains. Keyless / offline / deterministic."""
+        from . import views as view_engine
+
+        with world.lock:
+            return view_engine.run_view(world, body)
+
     # ----------------------------------------------------------- the SPA
 
     app.mount("/static", _NoCacheStatic(directory=STATIC_DIR), name="static")

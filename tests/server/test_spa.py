@@ -29,15 +29,17 @@ STUDIO_APPS = (
 )
 #: the de-jargoned single-surface modes
 SURFACES = ("ask", "build")
-#: Non-vendor payload budget. Held at 340 KB to seat the approved COOL
-#: PROFESSIONAL redesign — SLATE (cool light :root, the default) / GRAPHITE
-#: (cool dark data-theme). The cool system is disciplined (flat panels, 1px
-#: hairlines instead of pillowy shadows, ONE accent per view, mono for every
-#: number) so it is LIGHTER than the warm system it replaced, but the budget
-#: stays a hard ceiling: it holds the shell, the eight Studio apps, the canvas
-#: layer, and BOTH themes under the limit, so any future decorative bloat still
-#: trips it.
-PAYLOAD_BUDGET = 340 * 1024
+#: Non-vendor payload budget. Raised to 400 KB to seat the Tableau-grade BUILD
+#: rebuild — the NL view bar (POST /api/view), the editable Measure / Break down
+#: by / Filter / Chart type shelves, the faceted criticality-ranked field-search
+#: panel (GET /api/fields) that scales to thousands of datasets, and the real
+#: VENDORED-Vega charting all live in build.js. The user chose CAPABILITY over
+#: bytes here: that substantial builder pushes the non-vendor payload past the
+#: old 340 KB ceiling, so the budget rises to 400 KB. It still holds the shell,
+#: the eight Studio apps, the canvas layer, and BOTH cool themes (SLATE light
+#: :root + GRAPHITE dark data-theme) under one hard ceiling, so any future
+#: decorative bloat still trips it.
+PAYLOAD_BUDGET = 400 * 1024
 
 
 def all_js_files():
@@ -221,34 +223,50 @@ def test_ask_guides_to_studio_when_no_model(client):
 # ════════════════════════════════════════════ BUILD — measure & pull data
 
 
-def test_build_surface_is_the_two_pane_builder(client):
+def test_build_surface_is_the_tableau_grade_builder(client):
+    """BUILD is a Tableau-grade view builder: a natural-language VIEW BAR
+    (POST /api/view) that parses an utterance into a structured ViewSpec and a
+    plain-English confirmation, editable shelves (Measure / Break down by /
+    Filter / Chart type), and a faceted criticality-ranked field panel
+    (GET /api/fields) that scales to thousands — search + facets + ranking, never
+    a flat list."""
     build = (SURFACES_DIR / "build.js").read_text(encoding="utf-8")
     assert "createBuildSurface" in build
-    # the plain-language pickers
-    assert "Measure something" in build and "Break it down by" in build
-    # the free-text box feeds the same synthesis
-    assert "describe what you want to see" in build
-    assert "/api/dashboards" in build, "proposals come from VISTA synthesis"
+    # the NL view bar + the editable Tableau shelves
+    assert "/api/view" in build, "the view bar parses+executes a single view"
+    assert "Measure" in build and "Break down by" in build and "Chart type" in build
+    # the faceted, ranked field search that scales (not a flat chip list)
+    assert "/api/fields" in build, "the field panel is wired to the ranked search"
+    assert "renderFacets" in build and "fieldState" in build, "facet filters narrow the search"
+    assert "criticality" in build, "results are ranked by criticality"
+    # clarify-don't-guess: an ambiguous parse asks ONE question, never guesses
+    assert "clarification" in build and "renderClarification" in build
     # cool chart theme: the COOL desaturated atlas wheel — teal anchor + the
     # graphite-indigo data hue, never the warm marigold/tan palette
     assert "ATLAS_RANGE" in build and "#0E8C84" in build and "#4A56C7" in build
     assert "#D09735" not in build and "#9b978e" not in build, "the warm/old chart inks are gone"
     css = client.get("/static/style.css").text
-    assert ".build-layout" in css and ".build-left" in css and ".build-right" in css
+    assert ".build-grid" in css and ".viewbar" in css and ".shelves" in css
+    assert ".panel" in css and ".results" in css and ".ftag" in css, "the faceted field panel is styled"
 
 
-def test_build_separates_extract_from_export(client):
-    """Extract (a CSV slice) and Export (the whole portable dataset) must be
-    labeled and separated so a slice is never confused with the whole."""
+def test_build_chart_and_pinnable_dashboard(client):
+    """The chart renders with the VENDORED Vega from the executed view rows; the
+    view can be pinned into an arrangeable, nameable dashboard grid, and every
+    panel carries its plain-English definition, a provenance line, and an
+    Extract-CSV action (/api/extract)."""
     build = (SURFACES_DIR / "build.js").read_text(encoding="utf-8")
-    assert "/api/extract" in build, "Extract pulls a filtered slice"
-    assert "Download CSV" in build, "the slice downloads as CSV"
-    assert "/api/export" in build, "Export seals the whole portable bundle"
-    assert "Download the whole dataset" in build, "Export is labeled plainly as the whole"
-    # the two are visually distinct containers
-    assert "build-extract" in build and "build-export" in build
+    # the real chart uses the vendored vega-embed over the executed rows
+    assert "vegaEmbed" in build and "renderVega" in build
+    assert "view.vega" in build or "out.vega" in build, "the chart is built from the executed view"
+    # the dashboard grid: pin → an arrangeable, nameable, savable grid
+    assert "pinCurrent" in build and "Pin to dashboard" in build
+    assert "renderDashboard" in build and "dashname-input" in build, "the dashboard is nameable"
+    assert 'draggable: "true"' in build, "panels are arrangeable"
+    # Extract a CSV slice for the view + each panel (/api/extract)
+    assert "/api/extract" in build and "Extract CSV" in build
     css = client.get("/static/style.css").text
-    assert ".build-extract" in css and ".build-export" in css
+    assert ".chartcard" in css and ".dashgrid" in css and ".dpanel" in css
 
 
 # ════════════════════════════════════════════ STUDIO — the playground
@@ -466,7 +484,7 @@ def test_module_data_interpolation_is_text_node_safe(client):
 
 def test_total_non_vendor_payload_under_budget():
     """Performance is part of the contract: the whole shell (sans vendored
-    vega) ships under 290 KB."""
+    vega) ships under the 400 KB non-vendor budget."""
     total = sum(
         p.stat().st_size
         for p in STATIC_DIR.rglob("*")
@@ -903,9 +921,9 @@ def test_datamap_has_a_canvas_render_path_with_svg_fallback():
 
 
 def test_payload_under_budget_with_canvas_and_both_themes():
-    """The cool Slate/Graphite rewrite stays under the 340 KB non-vendor budget,
-    even carrying the additive canvas layer and BOTH themes (Slate :root +
-    Graphite data-theme) in one stylesheet."""
+    """The cool Slate/Graphite rewrite plus the Tableau-grade BUILD rebuild stay
+    under the 400 KB non-vendor budget, even carrying the additive canvas layer
+    and BOTH themes (Slate :root + Graphite data-theme) in one stylesheet."""
     total = sum(
         p.stat().st_size
         for p in STATIC_DIR.rglob("*")
