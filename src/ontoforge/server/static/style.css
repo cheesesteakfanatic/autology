@@ -460,6 +460,7 @@ html[data-theme="dark"] .dock { background: rgba(20, 15, 8, 0.7); }
   border: 1px solid transparent;
   border-radius: 12px;
   cursor: pointer;
+  transform-origin: bottom center; /* swell seats on the dock floor */
   transition: transform var(--ease), box-shadow var(--ease), color var(--ease), background var(--ease);
 }
 
@@ -469,6 +470,14 @@ html[data-theme="dark"] .dock { background: rgba(20, 15, 8, 0.7); }
   color: var(--chrome-dim);
 }
 .dock-icon:hover { transform: translateY(-5px); color: var(--ink); }
+/* when JS proximity-magnification owns the transform (rAF inline scale+lift),
+   suppress the CSS hover-lift so the two don't fight — the rAF loop does the
+   easing and the hover still reveals the label + brightens the ink. Reduced-
+   motion keeps the static CSS hover (the .dock-magnify class is never added). */
+.dock.dock-magnify .dock-icon, .dock.dock-magnify .dock-tile { will-change: transform; }
+.dock.dock-magnify .dock-icon:hover, .dock.dock-magnify .dock-tile:hover { transform: none; }
+/* the directly-hovered tile keeps its label clear of the magnified neighbours */
+.dock.dock-magnify .dock-icon:hover, .dock.dock-magnify .dock-tile:hover { z-index: 3; }
 
 .dock-icon.running {
   color: var(--burnt);

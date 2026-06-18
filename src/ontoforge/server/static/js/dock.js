@@ -39,6 +39,22 @@ function dockIcon(appId) {
   return svg;
 }
 
+/* fisheye magnification — nearest tile to the cursor swells to PEAK, neighbors
+   taper over FALLOFF px, far tiles rest at 1.0. The lift rides the swell so the
+   crowd parts upward like the macOS dock. A single rAF loop lerps each tile's
+   live scale toward its target with a spring-ish ease (no per-tile transition —
+   transforms are GPU-cheap, transform-origin bottom keeps tiles seated). */
+const PEAK = 1.6;      // nearest-icon scale
+const FALLOFF = 78;    // px over which the swell decays to rest
+const LIFT = 13;       // px translateY at full swell
+const EASE = 0.26;     // lerp factor per frame (≈ critically damped feel)
+const SETTLE = 0.0015; // |scale - target| below which a tile is "settled"
+
+function prefersReducedMotion() {
+  return typeof matchMedia === "function"
+    && matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 export function createDock({ root, registry, wm }) {
   const appsBox = el("div", { class: "dock-apps", role: "group", "aria-label": "applications" });
   const sep = el("span", { class: "dock-sep", hidden: "hidden", "aria-hidden": "true" });
@@ -94,12 +110,108 @@ export function createDock({ root, registry, wm }) {
       tileEls.set(w.id, tile);
       minBox.append(tile);
     }
+    invalidateMagnify(); // tile set changed → resting anchors moved
   }
 
   /** FLIP target: the window's minimized tile if present, else its app icon. */
   function targetFor(win) {
     const node = tileEls.get(win.id) || iconEls.get(win.app.id);
     return node ? node.getBoundingClientRect() : null;
+  }
+
+  /* ── proximity magnification ─────────────────────────────────────────────
+     Every live dock button (app icons + minimized tiles) is a magnifier cell.
+     `cursorX` is null when the pointer is away → all cells relax to rest. The
+     rAF loop runs only while something is still moving, then parks itself. */
+  const live = new Map(); // node -> { scale, target }
+  let cursorX = null;
+  let raf = 0;
+
+  function cells() {
+    return [...appsBox.children, ...minBox.children];
+  }
+
+  /** swell at a given distance (px) from the cursor — PEAK at 0, 1.0 past FALLOFF. */
+  function swellAt(dist) {
+    const d = Math.min(Math.abs(dist), FALLOFF);
+    // cosine shoulder: flat-topped near the cursor, smooth tail (fisheye, not a spike)
+    const k = 0.5 + 0.5 * Math.cos((d / FALLOFF) * Math.PI); // 1 → 0
+    return 1 + (PEAK - 1) * k;
+  }
+
+  /** Each cell's RESTING center-x in viewport coords. We measure off the
+      untransformed layout box (dock rect + offsetLeft/offsetWidth) so a swollen
+      tile never shifts its own anchor — otherwise the scale feeds back and the
+      dock jitters. Cached per gesture, rebuilt when the cell set changes. */
+  let restX = new Map(); // node -> center x
+  function invalidateMagnify() {
+    restX = new Map();
+    // forget per-node tween state for nodes that no longer exist
+    const present = new Set(cells());
+    for (const node of live.keys()) if (!present.has(node)) live.delete(node);
+    if (cursorX != null) kick(); // re-settle the surviving cells against new anchors
+  }
+  function measureRest() {
+    restX = new Map();
+    const dockLeft = root.getBoundingClientRect().left - root.scrollLeft;
+    for (const node of cells()) {
+      restX.set(node, dockLeft + node.offsetLeft + node.offsetWidth / 2);
+    }
+  }
+
+  function targetScale(node) {
+    if (cursorX == null) return 1;
+    const cx = restX.get(node);
+    return cx == null ? 1 : swellAt(cursorX - cx);
+  }
+
+  function frame() {
+    raf = 0;
+    let moving = false;
+    for (const node of cells()) {
+      let rec = live.get(node);
+      if (!rec) { rec = { scale: 1, target: 1 }; live.set(node, rec); }
+      rec.target = targetScale(node);
+      rec.scale += (rec.target - rec.scale) * EASE;
+      if (Math.abs(rec.target - rec.scale) < SETTLE) rec.scale = rec.target;
+      else moving = true;
+      applyCell(node, rec.scale);
+    }
+    if (moving) raf = requestAnimationFrame(frame);
+  }
+
+  function applyCell(node, scale) {
+    if (scale <= 1.0001) {
+      node.style.transform = "";
+      node.style.zIndex = "";
+      return;
+    }
+    const lift = LIFT * ((scale - 1) / (PEAK - 1)); // lift scales with the swell
+    node.style.transform = `translateY(${-lift.toFixed(2)}px) scale(${scale.toFixed(3)})`;
+    node.style.zIndex = "1"; // magnified tiles ride above the panel hairline
+  }
+
+  function kick() {
+    if (!raf) raf = requestAnimationFrame(frame);
+  }
+
+  function onMove(e) {
+    if (cursorX == null || !restX.size) measureRest(); // (re)anchor on gesture start
+    cursorX = e.clientX;
+    kick();
+  }
+  function onLeave() {
+    cursorX = null;
+    kick(); // let the loop ease everyone back to rest, then it parks itself
+  }
+
+  if (!prefersReducedMotion()) {
+    root.classList.add("dock-magnify"); // CSS suppresses its static hover-lift here
+    root.addEventListener("mousemove", onMove);
+    root.addEventListener("mouseleave", onLeave);
+    // the resting anchors move when the dock reflows (window resize / tiles
+    // appear or vanish) — drop the cache so the next frame re-measures.
+    addEventListener("resize", () => { restX = new Map(); });
   }
 
   return { update, targetFor, activate };
